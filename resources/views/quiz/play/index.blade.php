@@ -209,16 +209,17 @@
                             question_number: question_number,
                         },
                         success: function(data) {
-
                         },
                         error: function(xhr, error, message) {
                             if (xhr.status == 401) {
+                                swalError('Sesi Anda Telah Habis');
                                 window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz->id]) }}'
                             }
-                            console.log('====================================');
-                            console.log(xhr);
-                            console.log('====================================');
-                            // swalError(error);
+
+                            if (xhr.status == 500) {
+                                swalError('Terjadi Kesalahan Koneksi');
+                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz->id]) }}'
+                            }
                         }
                     });
                 }
