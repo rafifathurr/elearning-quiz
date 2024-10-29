@@ -457,9 +457,7 @@ class QuizController extends Controller
     {
         if (Session::has('quiz')) {
             $quiz = Session::get('quiz');
-            // $quiz_collection = $quiz->toArray();
 
-            // dd($quiz->quizQuestion->where('question_number', $request->question_number)->first()->quizAnswer->where('answer', $request->value)->first());
             $quiz_answer = $quiz->quizQuestion->where('question_number', $request->question_number)->first()->quizAnswer->where('answer', $request->value)->first()->toArray();
             $quiz_answer['answered'] = true;
 
@@ -476,6 +474,31 @@ class QuizController extends Controller
             return response()->json(['message' => 'Jawaban Berhasil Disimpan'],  200);
         } else {
             return response()->json(['message' => 'Session Telah Habis'], 401);
+        }
+    }
+
+    public function finish(Request $request, Quiz $quiz)
+    {
+        if (Session::has('quiz')) {
+            $quiz_session = Session::get('quiz');
+
+            $data['quiz'] = $quiz;
+            $data['right_answer'] = 0;
+            $data['wrong_answer'] = 0;
+            foreach ($quiz_session->quizQuestion as $question) {
+                foreach ($question->quizAnswer as $answer) {
+                    if ($answer['answered'] == true && $answer['is_answer'] == 1) {
+                        $data['right_answer'] += 1;
+                    } elseif ($answer['answered'] == true && $answer['is_answer'] == 0) {
+                        $data['wrong_answer'] += 1;
+                    }
+                }
+            }
+
+            Session::forget('quiz');
+            return view('quiz.result', $data);
+        } else {
+            return redirect()->route('admin.quiz.start', ['quiz' => $quiz->id])->with(['failed' => 'Sesi Anda Telah Habis']);
         }
     }
 

@@ -26,7 +26,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::get('start/{quiz}', 'start')->name('start');
         Route::get('play/{quiz}', 'play')->name('play');
         Route::post('answer', 'answer')->name('answer');
-        Route::post('finish', 'finish')->name('finish');
+        Route::match(['put', 'patch'], 'finish/{quiz}', 'finish')->name('finish');
     });
     Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
 });

@@ -127,8 +127,12 @@
                                             @endif
                                             @if ($quiz_question->question_number == $quiz->total_question)
                                                 <div class="mx-2">
-                                                    <a href="#" class="btn btn-success">Selesai<i
-                                                            class="fas fa-check ml-2"></i></a>
+                                                    <form action="{{ route('admin.quiz.finish', ['quiz' => $quiz->id]) }}" method="post">
+                                                        @csrf
+                                                        @method('patch')
+                                                        <button type="submit" class="btn btn-success">Selesai<i
+                                                                class="fas fa-check ml-2"></i></button>
+                                                    </form>
                                                 </div>
                                             @else
                                                 <div class="mx-2">
@@ -152,31 +156,43 @@
     </div>
     @push('javascript-bottom')
         <script>
-            // $(document).bind("contextmenu", function(e) {
-            //     e.preventDefault();
-            // });
-            // $(document).keydown(function(e) {
-            //     if (e.which === 123) {
-            //         return false;
-            //     }
-            // });
+            $("form").submit(function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Apakah Anda Yakin Submit Quiz?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-2 mb-3',
+                        cancelButton: 'btn btn-danger mb-3',
+                    },
+                    buttonsStyling: false,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Tidak'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalProcess();
+                        $('form').unbind('submit').submit();
+                    }
+                })
+            });
 
             function nextPage(evt) {
 
-                // let allowed = false;
-                // $('#answer_list').each(function() {
-                //     if ($(this).find('input[type="radio"]:checked').length > 0) {
-                //         allowed = true;
-                //     }
-                // });
+                let allowed = false;
+                $('#answer_list').each(function() {
+                    if ($(this).find('input[type="radio"]:checked').length > 0) {
+                        allowed = true;
+                    }
+                });
 
-                // if (!allowed) {
-                //     swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!')
-                //     return false;
-                // } else {
-                //     window.location.href = $('#url-next').val();
-                // }
-                window.location.href = $('#url-next').val();
+                if (!allowed) {
+                    swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!')
+                    return false;
+                } else {
+                    window.location.href = $('#url-next').val();
+                }
 
             }
 
