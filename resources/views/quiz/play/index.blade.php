@@ -80,7 +80,7 @@
                                                     $index_new = 0;
                                                 @endphp
                                                 @foreach ($quiz_question['quiz_answer'] as $quiz_answer)
-                                                    @if (!$quiz_answer['is_answer'])
+                                                    @if ($quiz_answer['is_answer'] == 0)
                                                         <div class="p-2 text-center">
                                                             <h3>
                                                                 {{ $quiz_answer['answer'] }}

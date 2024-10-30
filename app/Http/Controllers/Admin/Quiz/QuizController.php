@@ -388,6 +388,7 @@ class QuizController extends Controller
 
                         $quiz_answer_first = $quiz_answer;
                         $quiz_answer_first['answered'] = false;
+                        $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
                         array_push($quiz_answer_arr, collect($quiz_answer_first));
                         for ($random_index = 1; $random_index <= 4; $random_index++) {
                             array_push($quiz_answer_arr, collect([
@@ -406,6 +407,7 @@ class QuizController extends Controller
                 } else {
                     foreach ($quiz_answer_arr  as $index => $quiz_answer) {
                         $quiz_answer_arr[$index]['answered'] = false;
+                        $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
                         $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
                     }
                 }
@@ -490,20 +492,26 @@ class QuizController extends Controller
             $quiz_session = Session::get('quiz');
 
             $data['quiz'] = $quiz;
-            $data['right_answer'] = 0;
-            $data['wrong_answer'] = 0;
+            $right_answer = 0;
+            $wrong_answer = 0;
 
+            $arr_right_ques = [];
             foreach ($quiz_session['quiz_question'] as $question) {
                 foreach ($question['quiz_answer'] as $answer) {
                     if ($answer['answered'] == true) {
-                        if ($answer['is_answer'] == 1) {
-                            $data['right_answer'] += 1;
+                        if ($answer['is_answer'] == 0) {
+                            $wrong_answer += 1;
                         } else {
-                            $data['wrong_answer'] += 1;
+                            array_push($arr_right_ques, $question);
+                            $right_answer += 1;
                         }
                     }
                 }
             }
+
+
+            $data['right_answer'] = $right_answer;
+            $data['wrong_answer'] = $wrong_answer;
 
             Session::forget('quiz');
             return view('quiz.result', $data);
