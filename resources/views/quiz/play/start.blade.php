@@ -19,7 +19,7 @@
                                             {{ '100 Poin' }}</h5>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
-                                                <a href="{{ url()->previous() }}" class="btn btn-lg btn-danger"><i
+                                                <a href="{{route('admin.quiz.index') }}" class="btn btn-lg btn-danger"><i
                                                         class="fas fa-arrow-left mr-2"></i>Kembali</a>
                                             </div>
                                             <div class="mx-2">

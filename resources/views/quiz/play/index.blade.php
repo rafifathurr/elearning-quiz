@@ -14,14 +14,14 @@
                                 </h2>
                             </div>
                             <div class="card-body p-3">
-                                <div class="d-flex flex-wrap justify-content-between">
-                                    @foreach ($quiz->quizQuestion as $quiz_question_list)
+                                <div class="d-flex flex-wrap justify-content-between justify-content-sm-center">
+                                    @foreach ($quiz['quiz_question'] as $quiz_question_list)
                                         <div class="p-0">
                                             <div
-                                                class="card m-2 px-3 @if ($quiz_question_list->is_active) bg-primary text-white @endif">
+                                                class="card m-2 px-3 @if ($quiz_question_list['is_active'] == true) bg-primary text-white @elseif($quiz_question_list['answered'] == true) bg-gray text-white @endif ">
                                                 <div class="card-body">
                                                     <h5 class="font-weight-bold text-center my-auto">
-                                                        {{ $quiz_question_list->question_number }}
+                                                        {{ $quiz_question_list['question_number'] }}
                                                     </h5>
                                                 </div>
                                             </div>
@@ -35,7 +35,7 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
                                 <h2 class="card-title mb-0 font-weight-bold my-auto">
-                                    Soal {{ $quiz_question->question_number }}
+                                    Soal {{ $quiz_question['question_number'] }}
                                 </h2>
                                 <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
                                     -- : -- : --
@@ -45,19 +45,19 @@
                                 <div class="card">
                                     <div class="card-header bg-gray-light">
                                         <h2 class="card-title mb-0 font-weight-bold my-auto">
-                                            Petunjuk Soal : {{ $quiz_question->direction_question }}
+                                            Petunjuk Soal : {{ $quiz_question['direction_question'] }}
                                         </h2>
                                     </div>
                                     <div class="card-body">
                                         <p>
-                                            {{ $quiz_question->question ?? '' }}
+                                            {{ $quiz_question['question'] ?? '' }}
                                         </p>
-                                        @if ($quiz_question->is_generate_random_answer)
+                                        @if ($quiz_question['is_generate_random_answer'])
                                             <div class="d-flex flex-wrap justify-content-center">
                                                 @php
                                                     $index_new = 0;
                                                 @endphp
-                                                @foreach ($quiz_question->quizAnswer->toArray() as $quiz_answer)
+                                                @foreach ($quiz_question['quiz_answer'] as $quiz_answer)
                                                     <div class="p-2 text-center">
                                                         <h3>
                                                             {{ $quiz_answer['answer'] }}
@@ -79,7 +79,7 @@
                                                 @php
                                                     $index_new = 0;
                                                 @endphp
-                                                @foreach ($quiz_question->quizAnswer->toArray() as $quiz_answer)
+                                                @foreach ($quiz_question['quiz_answer'] as $quiz_answer)
                                                     @if (!$quiz_answer['is_answer'])
                                                         <div class="p-2 text-center">
                                                             <h3>
@@ -101,15 +101,15 @@
                                             </div>
                                         @endif
                                         <div class="mt-3">
-                                            {!! $quiz_question->description !!}
+                                            {!! $quiz_question['description'] !!}
                                         </div>
                                         <div class="border-top py-3 mt-4" id="answer_list">
-                                            @foreach ($quiz_question->quizAnswer as $quiz_answer)
+                                            @foreach ($quiz_question['quiz_answer'] as $quiz_answer)
                                                 <div class="form-check py-3">
                                                     <input class="form-check-input" type="radio" name="answer_list"
-                                                        onchange="answer(this, $(this).val(), {{ $quiz_question->question_number }})"
+                                                        onchange="answer(this, $(this).val(), {{ $quiz_question['question_number'] }})"
                                                         class="form-control" value="{{ $quiz_answer['answer'] }}"
-                                                        @if ($quiz_answer['answered']) checked @endif>
+                                                        @if ($quiz_answer['answered'] == true) checked @endif>
                                                     <label class="form-check-label">{{ $quiz_answer['answer'] }}</label>
                                                 </div>
                                             @endforeach
@@ -117,17 +117,19 @@
                                     </div>
                                     <div class="card-footer py-3">
                                         <div
-                                            class="d-flex  @if ($quiz_question->question_number != 1) justify-content-between @else justify-content-end @endif">
-                                            @if ($quiz_question->question_number != 1)
+                                            class="d-flex  @if ($quiz_question['question_number'] != 1) justify-content-between @else justify-content-end @endif">
+                                            @if ($quiz_question['question_number'] != 1)
                                                 <div class="mx-2">
-                                                    <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?q=' . $quiz_question->question_number - 1 }}"
+                                                    <a href="{{ route('admin.quiz.play', ['quiz' => $quiz['id']]) . '?q=' . $quiz_question['question_number'] - 1 }}"
                                                         class="btn btn-danger"><i
                                                             class="fas fa-arrow-left mr-2"></i>Kembali</a>
                                                 </div>
                                             @endif
-                                            @if ($quiz_question->question_number == $quiz->total_question)
+                                            @if ($quiz_question['question_number'] == $quiz['total_question'])
                                                 <div class="mx-2">
-                                                    <form action="{{ route('admin.quiz.finish', ['quiz' => $quiz->id]) }}" method="post">
+                                                    <form
+                                                        action="{{ route('admin.quiz.finish', ['quiz' => $quiz['id']]) }}"
+                                                        method="post">
                                                         @csrf
                                                         @method('patch')
                                                         <button type="submit" class="btn btn-success">Selesai<i
@@ -139,7 +141,7 @@
                                                     <a onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
                                                             class="fas fa-arrow-right ml-2"></i></a>
                                                     <input type="hidden" id="url-next"
-                                                        value="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?q=' . $quiz_question->question_number + 1 }}">
+                                                        value="{{ route('admin.quiz.play', ['quiz' => $quiz['id']]) . '?q=' . $quiz_question['question_number'] + 1 }}">
                                                 </div>
                                             @endif
                                         </div>
@@ -206,19 +208,17 @@
                         data: {
                             _token: token,
                             value: value,
-                            question_number: question_number,
+                            q: question_number,
                         },
-                        success: function(data) {
-                        },
+                        success: function(data) {},
                         error: function(xhr, error, message) {
                             if (xhr.status == 401) {
                                 swalError('Sesi Anda Telah Habis');
-                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz->id]) }}'
+                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
                             }
 
                             if (xhr.status == 500) {
                                 swalError('Terjadi Kesalahan Koneksi');
-                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz->id]) }}'
                             }
                         }
                     });
