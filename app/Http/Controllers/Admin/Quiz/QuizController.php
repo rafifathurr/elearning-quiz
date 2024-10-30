@@ -493,25 +493,20 @@ class QuizController extends Controller
 
             $data['quiz'] = $quiz;
             $right_answer = 0;
-            $wrong_answer = 0;
 
-            $arr_right_ques = [];
+            $total_question = count($quiz_session['quiz_question']);
             foreach ($quiz_session['quiz_question'] as $question) {
                 foreach ($question['quiz_answer'] as $answer) {
                     if ($answer['answered'] == true) {
-                        if ($answer['is_answer'] == 0) {
-                            $wrong_answer += 1;
-                        } else {
-                            array_push($arr_right_ques, $question);
+                        if ($answer['is_answer'] == 1) {
                             $right_answer += 1;
                         }
                     }
                 }
             }
 
-
             $data['right_answer'] = $right_answer;
-            $data['wrong_answer'] = $wrong_answer;
+            $data['wrong_answer'] = $total_question - $right_answer;
 
             Session::forget('quiz');
             return view('quiz.result', $data);
