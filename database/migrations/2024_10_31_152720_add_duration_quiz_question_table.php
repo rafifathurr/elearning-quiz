@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quiz_question', function (Blueprint $table) {
+        Schema::table('quiz_question', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->integer('time_duration')->nullable();
         });
