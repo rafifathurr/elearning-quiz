@@ -35,6 +35,30 @@
             </div>
         </div>
         <div class="form-group row">
+            <label for="quiz_question[{{ $parent }}][quiz_answer][{{ $increment }}][answer]"
+                class="col-md-4 control-label text-left">
+                Point
+                <span class="text-danger ml-1">*</span>
+            </label>
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input
+                            class="form-control @error('quiz_question[{{ $parent }}][quiz_answer][{{ $increment }}][point]') is-invalid @enderror"
+                            type="number"
+                            name="quiz_question[{{ $parent }}][quiz_answer][{{ $increment }}][point]"
+                            value="{{ old('quiz_question[' . $parent . '][quiz_answer][' . $increment . '][point]', $quiz_answer->point ?? '') }}"
+                            value="0" required {{ $disabled }}>
+                        @error('quiz_question[' . $parent . '][quiz_answer][' . $increment . '][point]')
+                            <div class="alert alert-danger mt-2">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
             <label for="" class="col-md-4 control-label text-left">&nbsp;
             </label>
             <div class="col-md-8 col-sm-12">

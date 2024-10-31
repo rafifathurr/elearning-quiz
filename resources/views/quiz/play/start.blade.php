@@ -15,8 +15,6 @@
                                         <h5 class="font-weight-medium">Durasi : {{ $quiz->time_duration . ' Detik' }}</h5>
                                         <h5 class="font-weight-medium">Total Pertanyaan :
                                             {{ count($quiz->quizQuestion) . ' Soal' }}</h5>
-                                        <h5 class="font-weight-medium">Total Pencapaian Poin :
-                                            {{ '100 Poin' }}</h5>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
                                                 <a href="{{route('admin.quiz.index') }}" class="btn btn-lg btn-danger"><i

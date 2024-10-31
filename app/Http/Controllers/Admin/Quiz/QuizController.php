@@ -103,9 +103,30 @@ class QuizController extends Controller
             }
 
             $quiz_type_user_access = QuizTypeUserAccess::insert($quiz_type_user_access_request);
+            $time_duration_quiz = intval($request->time_duration);
 
             if ($quiz && $quiz_type_user_access) {
                 foreach ($request->quiz_question as $index => $quiz_question_request) {
+
+                    $quiz_question_duration = null;
+
+                    if (!is_null($time_duration_quiz)) {
+                        if (!is_null($quiz_question_request['time_duration'])) {
+                            if ($time_duration_quiz - intval($quiz_question_request['time_duration']) >= 0) {
+                                $quiz_question_duration = $quiz_question_request['time_duration'];
+                                $time_duration_quiz -= intval($quiz_question_request['time_duration']);
+                            } else {
+                                DB::rollBack();
+                                return redirect()
+                                    ->back()
+                                    ->with(['failed' => 'Waktu Durasi Tidak Sesuai'])
+                                    ->withInput();
+                            }
+                        }
+                    } else {
+                        $quiz_question_duration = $quiz_question_request['time_duration'];
+                    }
+
                     $quiz_question = QuizQuestion::create([
                         'quiz_id' => $quiz->id,
                         'is_random_answer' => isset($quiz_question_request['is_random_answer']),
@@ -114,6 +135,7 @@ class QuizController extends Controller
                         'direction_question' => $quiz_question_request['direction_question'],
                         'question' => $quiz_question_request['question'],
                         'description' => $quiz_question_request['description'],
+                        'time_duration' => $quiz_question_duration,
                     ]);
 
                     if (!$quiz_question) {
@@ -128,6 +150,7 @@ class QuizController extends Controller
                         $quiz_answer = QuizAnswer::create([
                             'quiz_question_id' => $quiz_question->id,
                             'answer' => $quiz_answer_request['answer'],
+                            'point' => $quiz_answer_request['point'],
                             'is_answer' => isset($quiz_answer_request['is_answer']),
                         ]);
 
@@ -230,10 +253,31 @@ class QuizController extends Controller
                     ];
                 }
                 $quiz_type_user_access = QuizTypeUserAccess::insert($quiz_type_user_access_request);
+                $time_duration_quiz = intval($request->time_duration);
 
                 if ($quiz_type_user_access) {
 
                     foreach ($request->quiz_question as $index => $quiz_question_request) {
+
+                        $quiz_question_duration = null;
+
+                        if (!is_null($time_duration_quiz)) {
+                            if (!is_null($quiz_question_request['time_duration'])) {
+                                if ($time_duration_quiz - intval($quiz_question_request['time_duration']) >= 0) {
+                                    $quiz_question_duration = $quiz_question_request['time_duration'];
+                                    $time_duration_quiz -= intval($quiz_question_request['time_duration']);
+                                } else {
+                                    DB::rollBack();
+                                    return redirect()
+                                        ->back()
+                                        ->with(['failed' => 'Waktu Durasi Tidak Sesuai'])
+                                        ->withInput();
+                                }
+                            }
+                        } else {
+                            $quiz_question_duration = $quiz_question_request['time_duration'];
+                        }
+
                         $quiz_question = QuizQuestion::create([
                             'quiz_id' => $quiz->id,
                             'is_random_answer' => isset($quiz_question_request['is_random_answer']),
@@ -242,6 +286,7 @@ class QuizController extends Controller
                             'direction_question' => $quiz_question_request['direction_question'],
                             'question' => $quiz_question_request['question'],
                             'description' => $quiz_question_request['description'],
+                            'time_duration' => $quiz_question_duration,
                         ]);
 
                         if (!$quiz_question) {
@@ -256,6 +301,7 @@ class QuizController extends Controller
                             $quiz_answer = QuizAnswer::create([
                                 'quiz_question_id' => $quiz_question->id,
                                 'answer' => $quiz_answer_request['answer'],
+                                'point' => $quiz_answer_request['point'],
                                 'is_answer' => isset($quiz_answer_request['is_answer']),
                             ]);
 
@@ -532,21 +578,17 @@ class QuizController extends Controller
             $quiz_session = Session::get('quiz');
 
             $data['quiz'] = $quiz;
-            $right_answer = 0;
+            $total_point = 0;
 
-            $total_question = count($quiz_session['quiz_question']);
             foreach ($quiz_session['quiz_question'] as $question) {
                 foreach ($question['quiz_answer'] as $answer) {
-                    if ($answer['answered'] == true) {
-                        if ($answer['is_answer'] == 1) {
-                            $right_answer += 1;
-                        }
+                    if ($answer['answered']) {
+                        $total_point += $answer['point'];
                     }
                 }
             }
 
-            $data['right_answer'] = $right_answer;
-            $data['wrong_answer'] = $total_question - $right_answer;
+            $data['total_point'] = $total_point;
 
             Session::forget('quiz');
             return view('quiz.result', $data);

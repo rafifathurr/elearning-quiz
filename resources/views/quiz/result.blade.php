@@ -12,8 +12,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-md-6 text-center">
                                         <h3 class="font-weight-bold">{{ $quiz->name }}</h3>
-                                        <h5 class="font-weight-medium">Jawaban Benar : {{ $right_answer }} Soal </h5>
-                                        <h5 class="font-weight-medium">Jawaban Salah : {{ $wrong_answer }} Soal </h5>
+                                        <h5 class="font-weight-medium">Total Point : {{ $total_point }} Point </h5>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
                                                 <a href="{{ url('/') }}" class="btn btn-lg btn-danger"><i
