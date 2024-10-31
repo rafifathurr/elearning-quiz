@@ -30,6 +30,11 @@
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
                     Soal {{ $quiz_question['question_number'] }}
                 </h2>
+                {{-- <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
+                    <input type="hidden" value="{{ $quiz_question['time_duration'] }}" id="q_time">
+                    <span id="q_hour_time">--</span> : <span id="q_minute_time">--</span> : <span
+                        id="q_second_time">--</span>
+                </h2> --}}
             </div>
             <div class="card-body">
                 <div class="card">
@@ -146,3 +151,60 @@
         </div>
     </div>
 </div>
+{{-- @push('javascript-bottom')
+    <script>
+        let qTime = $('#q_time').val();
+
+        updateTimestampQuestion();
+        let questionInterval = setInterval(updateTimestampQuestion, 1000);
+
+        function updateTimestampQuestion() {
+
+            if (qTime % 60 > 9) {
+                $('#q_second_time').html(qTime % 60);
+            } else {
+                $('#q_second_time').html('0'.concat(qTime % 60));
+            }
+
+            if (qTime > 0) {
+                if (Math.floor(qTime / 3600) > 0) {
+                    $('#q_hour_time').html(Math.floor(qTime / 3600));
+                } else {
+                    $('#q_hour_time').html('00');
+                    if (Math.floor(qTime / 60) > 9) {
+                        $('#q_minute_time').html(Math.floor(qTime / 60));
+                    } else {
+                        $('#q_minute_time').html('0'.concat(Math.floor(qTime / 60)));
+                    }
+                }
+
+                qTime--;
+            } else {
+                clearInterval(questionInterval);
+                finishQuestion();
+            }
+        }
+
+        function finishQuestion() {
+            swalError('Waktu Soal Anda Telah Habis!');
+            $.ajax({
+                url: $('#url-next').val(),
+                type: 'GET',
+                cache: false,
+                success: function(data) {
+                    $('#question_box').html(data);
+                },
+                error: function(xhr, error, message) {
+                    if (xhr.status == 401) {
+                        swalError('Sesi Anda Telah Habis');
+                        window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
+                    }
+
+                    if (xhr.status == 500) {
+                        swalError('Terjadi Kesalahan Koneksi');
+                    }
+                }
+            });
+        }
+    </script>
+@endpush --}}

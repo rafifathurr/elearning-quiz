@@ -184,7 +184,7 @@
                                             </div>
                                             <div class="form-group row">
                                                 <label for="name" class="col-md-4 control-label text-left">Durasi
-                                                    Waktu (Menit)
+                                                    Waktu (Detik)
                                                     <span class="text-danger ml-1">*</span>
                                                 </label>
                                                 <div class="col-lg-3 col-md-4 col-sm-12">

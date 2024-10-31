@@ -51,6 +51,28 @@
             </div>
         </div>
         <div class="form-group row">
+            <label for="name" class="col-md-4 control-label text-left">Durasi
+                Waktu (Detik)
+                <span class="text-danger ml-1">*</span>
+            </label>
+            <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input
+                            class="form-control @error('quiz_question[{{ $increment }}][time_duration]') is-invalid @enderror"
+                            type="text" name="quiz_question[{{ $increment }}][time_duration]"
+                            value="{{ old('quiz_question[' . $increment . '][time_duration]', $quiz_question->time_duration ?? '') }}"
+                            {{ $disabled }}>
+                        @error('quiz_question[' . $increment . '][time_duration]')
+                            <div class="alert alert-danger mt-2">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
             <label for="quiz_question[{{ $increment }}][description]"
                 class="col-md-4 control-label text-left">Deskripsi
             </label>
