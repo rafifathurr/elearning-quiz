@@ -390,16 +390,23 @@ class QuizController extends Controller
                         $quiz_answer_first['answered'] = false;
                         $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
                         array_push($quiz_answer_arr, collect($quiz_answer_first));
+
+                        $answer_list = [intval($quiz_answer_first['answer'])];
                         for ($random_index = 1; $random_index <= 4; $random_index++) {
+
+                            $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
+
                             array_push($quiz_answer_arr, collect([
                                 'quiz_question_id' => $quiz_answer['quiz_question_id'],
-                                'answer' => rand(intval($range_num_min), intval($range_num_max)),
+                                'answer' => $answer,
                                 'attachment' => null,
                                 'is_answer' => 0,
                                 'answered' => false,
                                 'created_at' => $quiz_answer['created_at'],
                                 'updated_at' => $quiz_answer['updated_at'],
                             ]));
+
+                            array_push($answer_list, $answer);
                         }
 
                         shuffle($quiz_answer_arr);
@@ -468,12 +475,12 @@ class QuizController extends Controller
 
 
             foreach ($quiz['quiz_question'] as $index => $question) {
-                if ($question['question_number'] == $current_quiz['question_number']) {
+                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
                     $quiz['quiz_question'][$index] = $current_quiz;
-                }
-                foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
-                    if ($quiz_answer['answer'] == $answer['answer']) {
-                        $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($quiz_answer);
+                    foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
+                        if ($quiz_answer['answer'] == $answer['answer']) {
+                            $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($quiz_answer);
+                        }
                     }
                 }
             }
@@ -537,5 +544,14 @@ class QuizController extends Controller
         $data['increment'] = $increment;
         $data['parent'] = $parent;
         return view('quiz.form.answer', $data);
+    }
+
+    private function generateAnswerRandom(int $min, int $max, array $exception)
+    {
+        do {
+            $answer = rand($min, $max);
+        } while (in_array($answer, $exception));
+
+        return $answer;
     }
 }

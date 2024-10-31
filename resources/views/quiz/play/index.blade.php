@@ -18,7 +18,7 @@
                                     @foreach ($quiz['quiz_question'] as $quiz_question_list)
                                         <div class="p-0">
                                             <div
-                                                class="card m-2 px-3 @if ($quiz_question_list['is_active'] == true) bg-primary text-white @elseif($quiz_question_list['answered'] == true) bg-gray text-white @endif ">
+                                                class="card m-2 px-3 @if ($quiz_question_list['is_active']) bg-primary text-white @elseif($quiz_question_list['answered']) bg-gray text-white @endif ">
                                                 <div class="card-body">
                                                     <h5 class="font-weight-bold text-center my-auto">
                                                         {{ $quiz_question_list['question_number'] }}
@@ -109,7 +109,7 @@
                                                     <input class="form-check-input" type="radio" name="answer_list"
                                                         onchange="answer(this, $(this).val(), {{ $quiz_question['question_number'] }})"
                                                         class="form-control" value="{{ $quiz_answer['answer'] }}"
-                                                        @if ($quiz_answer['answered'] == true) checked @endif>
+                                                        @if ($quiz_answer['answered']) checked @endif>
                                                     <label class="form-check-label">{{ $quiz_answer['answer'] }}</label>
                                                 </div>
                                             @endforeach
