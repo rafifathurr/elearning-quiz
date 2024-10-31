@@ -20,7 +20,7 @@
                                                         class="fas fa-home mr-2"></i>Halaman Utama</a>
                                             </div>
                                             <div class="mx-2">
-                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?q=1' }}"
+                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
                                                     class="btn btn-lg btn-success"><i class="fas fa-play mr-2"></i>Mulai
                                                     Kembali</a>
                                             </div>

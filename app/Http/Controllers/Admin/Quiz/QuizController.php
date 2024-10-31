@@ -429,6 +429,39 @@ class QuizController extends Controller
             }
         }
 
+        $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
+        $current_quiz['is_active'] = true;
+
+        foreach ($quiz['quiz_question'] as $index => $question) {
+            if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+                $quiz['quiz_question'][$index] = $current_quiz;
+            }
+        }
+
+        Session::forget('quiz');
+        Session::put('quiz', $quiz);
+
+        $data['quiz'] = $quiz;
+        $data['quiz_question'] = $current_quiz;
+
+        if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+            return response()->json(['result' => $data], 200);
+        } else {
+            if (isset($request->q)) {
+                return view('quiz.play.question', $data);
+            }
+            return view('quiz.play.index', $data);
+        }
+    }
+
+    /**
+     * Preview quiz resource
+     */
+    public function preview(Quiz $quiz, Request $request)
+    {
+        $quiz = Session::get('quiz');
+        Session::forget('quiz');
+
         if (!isset($request->q) || is_null(collect($quiz['quiz_question'])->where('question_number', $request->q)->first())) {
             if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
                 return response()->json(['failed' => 'Permintaan Tidak Sesuai'], 404);
@@ -443,7 +476,7 @@ class QuizController extends Controller
             $current_quiz['is_active'] = true;
 
             foreach ($quiz['quiz_question'] as $index => $question) {
-                if ($question['question_number'] == $current_quiz['question_number']) {
+                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
                     $quiz['quiz_question'][$index] = $current_quiz;
                 }
             }

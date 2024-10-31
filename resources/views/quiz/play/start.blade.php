@@ -12,7 +12,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-md-6 text-center">
                                         <h3 class="font-weight-bold">{{ $quiz->name }}</h3>
-                                        <h5 class="font-weight-medium">Durasi : {{ $quiz->time_duration . ' Menit' }}</h5>
+                                        <h5 class="font-weight-medium">Durasi : {{ $quiz->time_duration . ' Detik' }}</h5>
                                         <h5 class="font-weight-medium">Total Pertanyaan :
                                             {{ count($quiz->quizQuestion) . ' Soal' }}</h5>
                                         <h5 class="font-weight-medium">Total Pencapaian Poin :
@@ -23,7 +23,7 @@
                                                         class="fas fa-arrow-left mr-2"></i>Kembali</a>
                                             </div>
                                             <div class="mx-2">
-                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]).'?q=1' }}"
+                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id])}}"
                                                     class="btn btn-lg btn-success"><i class="fas fa-play mr-2"></i>Mulai</a>
                                             </div>
                                         </div>

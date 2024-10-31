@@ -5,7 +5,7 @@
         <section class="content">
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
-                <div class="row">
+                {{-- <div class="row">
                     <div class="col-lg-3 col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -150,6 +150,27 @@
                             </div>
                         </div>
                     </div>
+                </div> --}}
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <div class="p-2">
+                                <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto px-3 py-2">
+                                    {{ $quiz['name'] }}
+                                </h2>
+                            </div>
+                            <div class="p-2">
+                                <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
+                                    <input type="hidden" value="{{ $quiz['time_duration'] }}" id="time">
+                                    <span id="hour_time">--</span> : <span id="minute_time">--</span> : <span
+                                        id="second_time">--</span>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="question_box">
+                    @include('quiz.play.question')
                 </div>
                 <!-- /.row (main row) -->
             </div><!-- /.container-fluid -->
@@ -158,6 +179,8 @@
     </div>
     @push('javascript-bottom')
         <script>
+            let time = $('#time').val();
+
             $("form").submit(function(e) {
                 e.preventDefault();
                 Swal.fire({
@@ -180,7 +203,30 @@
                 })
             });
 
-            function nextPage(evt) {
+            function backPage() {
+
+                $.ajax({
+                    url: $('#url-previous').val(),
+                    type: 'GET',
+                    cache: false,
+                    success: function(data) {
+                        $('#question_box').html(data);
+                    },
+                    error: function(xhr, error, message) {
+                        if (xhr.status == 401) {
+                            swalError('Sesi Anda Telah Habis');
+                            window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
+                        }
+
+                        if (xhr.status == 500) {
+                            swalError('Terjadi Kesalahan Koneksi');
+                        }
+                    }
+                });
+
+            }
+
+            function nextPage() {
 
                 let allowed = false;
                 $('#answer_list').each(function() {
@@ -193,7 +239,24 @@
                     swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!')
                     return false;
                 } else {
-                    window.location.href = $('#url-next').val();
+                    $.ajax({
+                        url: $('#url-next').val(),
+                        type: 'GET',
+                        cache: false,
+                        success: function(data) {
+                            $('#question_box').html(data);
+                        },
+                        error: function(xhr, error, message) {
+                            if (xhr.status == 401) {
+                                swalError('Sesi Anda Telah Habis');
+                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
+                            }
+
+                            if (xhr.status == 500) {
+                                swalError('Terjadi Kesalahan Koneksi');
+                            }
+                        }
+                    });
                 }
 
             }
@@ -223,6 +286,52 @@
                         }
                     });
                 }
+            }
+
+            updateTimestamp();
+            let interval = setInterval(updateTimestamp, 1000);
+
+            function updateTimestamp() {
+
+                if (time % 60 > 9) {
+                    $('#second_time').html(time % 60);
+                } else {
+                    $('#second_time').html('0'.concat(time % 60));
+                }
+
+                if (time > 0) {
+                    if (Math.floor(time / 3600) > 0) {
+                        $('#hour_time').html(Math.floor(time / 3600));
+                    } else {
+                        $('#hour_time').html('00');
+                        if (Math.floor(time / 60) > 9) {
+                            $('#minute_time').html(Math.floor(time / 60));
+                        } else {
+                            $('#minute_time').html('0'.concat(Math.floor(time / 60)));
+                        }
+                    }
+
+                    time--;
+                } else {
+                    clearInterval(interval);
+                    finishQuiz();
+                }
+            }
+
+            function finishQuiz() {
+                Swal.fire({
+                    title: 'Waktu Quiz Anda Telah Habis!',
+                    icon: 'warning',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary',
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#finish-form').unbind('submit').submit();
+                    }
+                })
             }
         </script>
     @endpush
