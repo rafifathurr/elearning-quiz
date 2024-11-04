@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.section')
 @section('content')
     <div class="px-3 py-1">
         <!-- Content Header (Page header) -->
