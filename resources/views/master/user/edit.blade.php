@@ -16,14 +16,16 @@
                     <div class="card ">
 
                         <!-- form start -->
-                        <form method="post" action="{{ route('master.user.store') }}">
+                        <form action="{{ route('master.user.update', ['id' => $user->id]) }}" method="post">
                             @csrf
+                            @method('patch')
                             <div class="card-body">
 
                                 <div class="form-group">
                                     <label for="username">Username <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('username') is-invalid @enderror"
-                                        id="username" name="username" placeholder="Username" value="{{ old('username') }}">
+                                        id="username" name="username" placeholder="Username"
+                                        value="{{ old('username', $user->username) }}">
 
                                     @error('username')
                                         <div class="alert alert-danger mt-2">
@@ -34,12 +36,14 @@
 
                                 <div class="form-group">
                                     <label for="type_of_user">Tipe User <span class="text-danger">*</span></label>
+                                    <input type="hidden" id="value_type_user"
+                                        value="{{ json_encode($user->userTypeAccess->pluck('type_user_id')->toArray()) }}">
                                     <select class="form-control @error('type_of_user[]') is-invalid @enderror"
                                         name="type_of_user[]" id="type_of_user" data-placeholder="Pilih Tipe User"
-                                        style="width: 100%;">
-                                        @foreach ($type_user as $type)
-                                            <option value="{{ $type->id }}">
-                                                {{ $type->name }}</option>
+                                        style="width: 100%;" required {{ $disabled }}>
+                                        @foreach ($type_user as $type_of_user)
+                                            <option value="{{ $type_of_user->id }}" selected>
+                                                {{ $type_of_user->name }}</option>
                                         @endforeach
                                     </select>
                                     @error('type_of_user[]')
@@ -52,7 +56,8 @@
                                 <div class="form-group">
                                     <label for="name">Nama <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        id="name" name="name" placeholder="Nama" value="{{ old('name') }}">
+                                        id="name" name="name" placeholder="Nama"
+                                        value="{{ old('name', $user->name) }}">
                                     @error('name')
                                         <div class="alert alert-danger mt-2">
                                             {{ $message }}
@@ -63,7 +68,8 @@
                                 <div class="form-group">
                                     <label for="email">Email <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('email') is-invalid @enderror"
-                                        id="email" name="email" placeholder="Email" value="{{ old('email') }}">
+                                        id="email" name="email" placeholder="Email"
+                                        value="{{ old('email', $user->email) }}">
                                     @error('email')
                                         <div class="alert alert-danger mt-2">
                                             {{ $message }}
@@ -77,7 +83,7 @@
                                         id="roles" name="roles" required>
                                         <option disabled hidden selected>Pilih Peran</option>
                                         @foreach ($roles as $role)
-                                            @if (!is_null(old('roles')) && old('roles') == $role->name)
+                                            @if (old('roles', $user->getRoleNames()[0]) == $role->name)
                                                 <option value="{{ $role->name }}" selected>{{ $role->name }}
                                                 </option>
                                             @else
@@ -95,7 +101,8 @@
                                 <div class="form-group">
                                     <label for="phone">Phone <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                                        id="phone" name="phone" placeholder="Phone" value="{{ old('phone') }}">
+                                        id="phone" name="phone" placeholder="Phone"
+                                        value="{{ old('phone', $user->phone) }}">
 
                                     @error('phone')
                                         <div class="alert alert-danger mt-2">
@@ -149,6 +156,7 @@
             });
 
             $('#type_of_user').val('').trigger('change');
+            $('#type_of_user').val(JSON.parse($('#value_type_user').val())).trigger('change');
         </script>
         @include('js.master.user.script')
     @endpush

@@ -12,9 +12,28 @@ class TypeQuizSeeder extends Seeder
      */
     public function run(): void
     {
-        TypeQuiz::create([
-            'name' => 'Matematika & Logika',
-            'description' => 'Matematika & Logika',
-        ]);
+
+        // TypeQuiz::create([
+        //     'name' => 'Matematika & Logika',
+        //     'description' => 'Matematika & Logika',
+        // ]);
+
+        $typeQuiz = [
+            [
+                'name' => 'Tes Kepribadian',
+                'description' => 'Tes Kepribadian',
+            ],
+            [
+                'name' => 'Tes Wawasan Kebangsaan',
+                'description' => 'Tes Wawasan Kebangsaan',
+            ],
+        ];
+
+        foreach ($typeQuiz as $quiz) {
+            TypeQuiz::create([
+                'name' => $quiz['name'],
+                'description' => $quiz['description'],
+            ]);
+        }
     }
 }

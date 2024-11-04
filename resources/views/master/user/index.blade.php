@@ -34,6 +34,7 @@
                                                 <th>Username</th>
                                                 <th>Email</th>
                                                 <th>Role</th>
+                                                <th>Tipe</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
