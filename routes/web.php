@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Quiz\QuizController;
+use App\Http\Controllers\Admin\Quiz\QuizController;
+use App\Http\Controllers\UserController;
 use App\Models\Quiz\Quiz;
 use Illuminate\Support\Facades\Route;
 
@@ -16,17 +18,45 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view(view: 'home');
-})->name('home');
 
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
-    Route::group(['controller' => \App\Http\Controllers\Admin\Quiz\QuizController::class, 'prefix' => 'quiz', 'as' => 'quiz.'], function () {
-        Route::get('append', 'append')->name('append');
-        Route::get('start/{quiz}', 'start')->name('start');
-        Route::get('play/{quiz}', 'play')->name('play');
-        Route::post('answer', 'answer')->name('answer');
-        Route::match(['put', 'patch'], 'finish/{quiz}', 'finish')->name('finish');
+
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/', function () {
+        return view(view: 'home');
+    })->name('home');
+});
+
+Route::group(['middleware' => ['role:user']], function () {
+    Route::group(['prefix' => 'quiz', 'as' => 'quiz.'], function () {
+        Route::get('listQuiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
     });
-    Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
+});
+
+Route::group(['middleware' => ['role:admin|user']], function () {
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::group(['controller' => \App\Http\Controllers\Admin\Quiz\QuizController::class, 'prefix' => 'quiz', 'as' => 'quiz.'], function () {
+            Route::get('append', 'append')->name('append');
+            Route::get('start/{quiz}', 'start')->name('start');
+            Route::get('play/{quiz}', 'play')->name('play');
+            Route::post('answer', 'answer')->name('answer');
+            Route::match(['put', 'patch'], 'finish/{quiz}', 'finish')->name('finish');
+        });
+    });
+});
+Route::group(['middleware' => ['role:admin']], function () {
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
+    });
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        Route::group(['controller' => UserController::class, 'prefix' => 'user', 'as' => 'user.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('user', UserController::class)->parameters(['user' => 'id']);
+    });
 });

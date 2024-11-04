@@ -14,13 +14,22 @@ class UserSeeder extends Seeder
     {
 
         $admin_account = User::create([
-            'name' => 'Super Admin',
-            'username' => 'super_admin',
+            'name' => 'Admin',
+            'username' => 'admin',
             'phone' => '081122334455',
-            'email' => 'super-admin@sisfosigasi.com',
-            'password'=> bcrypt('superadmin')
+            'email' => 'admin@gmail.com',
+            'password' => bcrypt('admin')
         ]);
 
-        $admin_account->assignRole('super-admin');
+        $admin_account->assignRole('admin');
+
+        $ASN_account = User::create([
+            'name' => 'User ASN',
+            'username' => 'user_ASN',
+            'phone' => '081122334455',
+            'email' => 'user_ASN@gmail.com',
+            'password' => bcrypt('password123')
+        ]);
+        $ASN_account->assignRole('user');
     }
 }

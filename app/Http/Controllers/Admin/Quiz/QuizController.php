@@ -19,6 +19,11 @@ class QuizController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function listQuiz()
+    {
+        $quizes = Quiz::all();
+        return view('quiz.list.index', compact('quizes'));
+    }
     public function index(Request $request)
     {
         if ($request->ajax()) {
