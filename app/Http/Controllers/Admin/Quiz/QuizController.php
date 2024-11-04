@@ -448,6 +448,7 @@ class QuizController extends Controller
                                 'attachment' => null,
                                 'is_answer' => 0,
                                 'answered' => false,
+                                'point' => 0,
                                 'created_at' => $quiz_answer['created_at'],
                                 'updated_at' => $quiz_answer['updated_at'],
                             ]));
