@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\Quiz\QuizController;
+use App\Http\Controllers\TypeQuizController;
 use App\Http\Controllers\UserController;
 use App\Models\Quiz\Quiz;
 use Illuminate\Support\Facades\Route;
@@ -58,5 +59,10 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('user', UserController::class)->parameters(['user' => 'id']);
+
+        Route::group(['controller' => TypeQuizController::class, 'prefix' => 'category', 'as' => 'category.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('category', TypeQuizController::class)->parameters(['category' => 'id']);
     });
 });

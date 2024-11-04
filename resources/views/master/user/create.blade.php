@@ -73,8 +73,8 @@
 
                                 <div class="form-group">
                                     <label for="roles">Role <span class="text-danger">*</span></label>
-                                    <select class="form-control select2bs4 @error('roles') is-invalid @enderror"
-                                        id="roles" name="roles" required>
+                                    <select class="form-control @error('roles') is-invalid @enderror" id="roles"
+                                        name="roles" required>
                                         <option disabled hidden selected>Pilih Peran</option>
                                         @foreach ($roles as $role)
                                             @if (!is_null(old('roles')) && old('roles') == $role->name)
@@ -147,6 +147,7 @@
             $('#type_of_user').select2({
                 multiple: true,
             });
+            $('#roles').select2();
 
             $('#type_of_user').val('').trigger('change');
         </script>

@@ -16,16 +16,16 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 swalProcess();
-                $('form').unbind('submit').submit();
+                $('form').unbind('submit').submit()
             }
-        })
+        });
     });
 
     function dataTable() {
         const url = $('#url_dt').val();
-        $('#dt-user').DataTable({
-            autoWidth: false,
+        $('#dt-category').DataTable({
             responsive: true,
+            autoWidth: false,
             processing: true,
             serverSide: true,
             ajax: {
@@ -39,26 +39,13 @@
                     width: '5%',
                     searchable: false
                 },
-
                 {
                     data: 'name',
-                    defaultContent: '-',
+                    defaultContent: '-'
                 },
                 {
-                    data: 'username',
-                    defaultContent: '-',
-                },
-                {
-                    data: 'email',
-                    defaultContent: '-',
-                },
-                {
-                    data: 'role',
-                    defaultContent: '-',
-                },
-                {
-                    data: 'tipe',
-                    defaultContent: '-',
+                    data: 'description',
+                    defaultContent: '-'
                 },
                 {
                     data: 'action',
@@ -68,7 +55,9 @@
                     searchable: false
                 },
             ]
+
         });
+
     }
 
     function destroyRecord(id) {
@@ -86,11 +75,11 @@
             buttonsStyling: false,
             confirmButtonText: 'Yes',
             cancelButtonText: 'Cancel'
-        }).then((result) => {
+        }).then(result => {
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: '{{ url('master/user') }}/' + id,
+                    url: '{{ url('master/category') }}/' + id,
                     type: 'DELETE',
                     cache: false,
                     data: {
@@ -104,6 +93,6 @@
                     }
                 });
             }
-        })
+        });
     }
 </script>

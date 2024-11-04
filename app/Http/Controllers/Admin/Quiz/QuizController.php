@@ -21,9 +21,16 @@ class QuizController extends Controller
      */
     public function listQuiz()
     {
-        $quizes = Quiz::all();
+        $userTypeIds = auth()->user()->userTypeAccess->pluck('type_user_id');
+
+
+        $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
+            $query->whereIn('type_user_id', $userTypeIds);
+        })->get();
+
         return view('quiz.list.index', compact('quizes'));
     }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
