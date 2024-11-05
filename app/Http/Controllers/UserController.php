@@ -135,7 +135,7 @@ class UserController extends Controller
             } else {
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Username dan Password Sudah Tersedia '])
+                    ->with(['failed' => 'Username dan Email Sudah Tersedia '])
                     ->withInput();
             }
         } catch (Exception $e) {

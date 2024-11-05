@@ -27,6 +27,10 @@ class TypeQuizSeeder extends Seeder
                 'name' => 'Tes Wawasan Kebangsaan',
                 'description' => 'Tes Wawasan Kebangsaan',
             ],
+            [
+                'name' => 'Matematika & Logika',
+                'description' => 'Matematika & Logika',
+            ]
         ];
 
         foreach ($typeQuiz as $quiz) {

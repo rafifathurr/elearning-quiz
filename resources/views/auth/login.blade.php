@@ -1,5 +1,19 @@
 @extends('layouts.main')
 @section('section')
+    <style>
+        .login-box {
+            position: fixed;
+            /* Atur posisi menjadi fixed */
+            top: 50%;
+            /* Posisi vertikal di tengah */
+            left: 50%;
+            /* Posisi horizontal di tengah */
+            transform: translate(-50%, -50%);
+            /* Menggeser form agar tepat di tengah */
+            z-index: 1000;
+            /* Pastikan di atas elemen lain */
+        }
+    </style>
 
     <body class="hold-transition login-page">
         <div class="login-box">

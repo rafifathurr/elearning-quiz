@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('quiz_answer', function (Blueprint $table) {
             $table->engine = 'InnoDB';
+            $table->integer('id')->autoIncrement();
             $table->integer('quiz_question_id');
             $table->string('answer')->nullable();
             $table->text('attachment')->nullable();

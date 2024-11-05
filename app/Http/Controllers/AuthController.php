@@ -33,9 +33,9 @@ class AuthController extends Controller
             if ($credentials && Auth::attempt([$fields => $email_or_username, 'password' => $request->password])) {
                 // Redirect berdasarkan peran pengguna
                 if (User::find(auth()->user()->id)->hasRole('admin')) {
-                    return redirect()->route('admin.quiz.index');
+                    return redirect()->route('admin.quiz.index')->with(['success' => 'Login Berhasil']);
                 } else {
-                    return view('home');
+                    return redirect()->route('home')->with(['success' => 'Login Berhasil']);
                 }
             } else {
                 return redirect()
@@ -52,6 +52,6 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('login');
+        return redirect()->route('login')->with(['success' => 'Logout Berhasil']);
     }
 }

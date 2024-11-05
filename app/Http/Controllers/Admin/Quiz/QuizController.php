@@ -9,6 +9,7 @@ use App\Models\Quiz\QuizQuestion;
 use App\Models\Quiz\QuizTypeUserAccess;
 use App\Models\Quiz\TypeQuiz;
 use App\Models\TypeUser;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -399,117 +400,125 @@ class QuizController extends Controller
      */
     public function play(Quiz $quiz, Request $request)
     {
-        if (Session::has('quiz')) {
-            $quiz = Session::get('quiz');
+        try {
 
-            foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
-                $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+
+            if (Session::has('quiz')) {
+                $quiz = Session::get('quiz');
+
+                foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+                    $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+                }
+
+                Session::forget('quiz');
+            } else {
+                $quiz = $quiz->with(['quizTypeUserAccess.typeUser', 'quizQuestion.quizAnswer'])->find($quiz->id)->toArray();
+                $quiz['total_question'] = count($quiz['quiz_question']);
+
+                // Generate It Has Random Question
+                if ($quiz['is_random_question']) {
+                    shuffle($quiz['quiz_question']);
+                }
+
+                // Quiz Question
+                $question_number = 1;
+                foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+                    // Adding Question Numbering
+                    $quiz['quiz_question'][$index_quiz_question]['question_number'] = $question_number;
+                    $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+                    $quiz['quiz_question'][$index_quiz_question]['answered'] = false;
+                    $question_number++;
+
+                    // Array of Answer
+                    $quiz_answer_arr = $quiz_question['quiz_answer'];
+
+                    // Generate It Has Random Another Correct Answer
+                    if ($quiz_question['is_generate_random_answer']) {
+                        $quiz_answer_arr = [];
+                        $quiz_answer = collect($quiz_question['quiz_answer'])->where('is_answer', 1)->first();
+
+                        if (!is_null($quiz_answer['attachment'])) {
+                        } else {
+                            // Generate Random Another Correct Answer Number Method
+                            $range_num_min = '1';
+                            $range_num_max = '9';
+
+                            for ($index = 1; $index < strlen($quiz_answer['answer']); $index++) {
+                                $range_num_min .= '0';
+                                $range_num_max .= '9';
+                            }
+
+                            $quiz_answer_first = $quiz_answer;
+                            $quiz_answer_first['answered'] = false;
+                            $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
+                            array_push($quiz_answer_arr, collect($quiz_answer_first));
+
+                            $answer_list = [intval($quiz_answer_first['answer'])];
+                            for ($random_index = 1; $random_index <= 4; $random_index++) {
+
+                                $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
+
+                                array_push($quiz_answer_arr, collect([
+                                    'quiz_question_id' => $quiz_answer['quiz_question_id'],
+                                    'answer' => $answer,
+                                    'attachment' => null,
+                                    'is_answer' => 0,
+                                    'answered' => false,
+                                    'point' => 0,
+                                    'created_at' => $quiz_answer['created_at'],
+                                    'updated_at' => $quiz_answer['updated_at'],
+                                ]));
+
+                                array_push($answer_list, $answer);
+                            }
+
+                            shuffle($quiz_answer_arr);
+                        }
+                    } else {
+                        foreach ($quiz_answer_arr  as $index => $quiz_answer) {
+                            $quiz_answer_arr[$index]['answered'] = false;
+                            $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
+                            $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
+                        }
+                    }
+
+                    // Generate It Has Random Answer
+                    if ($quiz_question['is_random_answer']) {
+                        shuffle($quiz_answer_arr);
+                    }
+
+                    // Picking New List Answer
+                    $quiz['quiz_question'][$index_quiz_question]['quiz_answer'] = collect($quiz_answer_arr);
+                }
+            }
+
+            $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
+            $current_quiz['is_active'] = true;
+
+            foreach ($quiz['quiz_question'] as $index => $question) {
+                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+                    $quiz['quiz_question'][$index] = $current_quiz;
+                }
             }
 
             Session::forget('quiz');
-        } else {
-            $quiz = $quiz->with(['quizTypeUserAccess.typeUser', 'quizQuestion.quizAnswer'])->find($quiz->id)->toArray();
-            $quiz['total_question'] = count($quiz['quiz_question']);
+            Session::put('quiz', $quiz);
 
-            // Generate It Has Random Question
-            if ($quiz['is_random_question']) {
-                shuffle($quiz['quiz_question']);
-            }
+            $data['quiz'] = $quiz;
+            $data['quiz_question'] = $current_quiz;
 
-            // Quiz Question
-            $question_number = 1;
-            foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
-                // Adding Question Numbering
-                $quiz['quiz_question'][$index_quiz_question]['question_number'] = $question_number;
-                $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
-                $quiz['quiz_question'][$index_quiz_question]['answered'] = false;
-                $question_number++;
-
-                // Array of Answer
-                $quiz_answer_arr = $quiz_question['quiz_answer'];
-
-                // Generate It Has Random Another Correct Answer
-                if ($quiz_question['is_generate_random_answer']) {
-                    $quiz_answer_arr = [];
-                    $quiz_answer = collect($quiz_question['quiz_answer'])->where('is_answer', 1)->first();
-
-                    if (!is_null($quiz_answer['attachment'])) {
-                    } else {
-                        // Generate Random Another Correct Answer Number Method
-                        $range_num_min = '1';
-                        $range_num_max = '9';
-
-                        for ($index = 1; $index < strlen($quiz_answer['answer']); $index++) {
-                            $range_num_min .= '0';
-                            $range_num_max .= '9';
-                        }
-
-                        $quiz_answer_first = $quiz_answer;
-                        $quiz_answer_first['answered'] = false;
-                        $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
-                        array_push($quiz_answer_arr, collect($quiz_answer_first));
-
-                        $answer_list = [intval($quiz_answer_first['answer'])];
-                        for ($random_index = 1; $random_index <= 4; $random_index++) {
-
-                            $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
-
-                            array_push($quiz_answer_arr, collect([
-                                'quiz_question_id' => $quiz_answer['quiz_question_id'],
-                                'answer' => $answer,
-                                'attachment' => null,
-                                'is_answer' => 0,
-                                'answered' => false,
-                                'point' => 0,
-                                'created_at' => $quiz_answer['created_at'],
-                                'updated_at' => $quiz_answer['updated_at'],
-                            ]));
-
-                            array_push($answer_list, $answer);
-                        }
-
-                        shuffle($quiz_answer_arr);
-                    }
-                } else {
-                    foreach ($quiz_answer_arr  as $index => $quiz_answer) {
-                        $quiz_answer_arr[$index]['answered'] = false;
-                        $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
-                        $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
-                    }
+            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+                return response()->json(['result' => $data], 200);
+            } else {
+                if (isset($request->q)) {
+                    return view('quiz.play.question', $data);
                 }
-
-                // Generate It Has Random Answer
-                if ($quiz_question['is_random_answer']) {
-                    shuffle($quiz_answer_arr);
-                }
-
-                // Picking New List Answer
-                $quiz['quiz_question'][$index_quiz_question]['quiz_answer'] = collect($quiz_answer_arr);
+                return view('quiz.play.index', $data);
             }
-        }
-
-        $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
-        $current_quiz['is_active'] = true;
-
-        foreach ($quiz['quiz_question'] as $index => $question) {
-            if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
-                $quiz['quiz_question'][$index] = $current_quiz;
-            }
-        }
-
-        Session::forget('quiz');
-        Session::put('quiz', $quiz);
-
-        $data['quiz'] = $quiz;
-        $data['quiz_question'] = $current_quiz;
-
-        if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-            return response()->json(['result' => $data], 200);
-        } else {
-            if (isset($request->q)) {
-                return view('quiz.play.question', $data);
-            }
-            return view('quiz.play.index', $data);
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed', $e->getMessage()]);
         }
     }
 
