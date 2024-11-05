@@ -57,7 +57,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('master.category.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-file"></i>
+                        <i class="nav-icon fas fa-cubes"></i>
                         <p>
                             Kategori Quiz
                         </p>
@@ -66,7 +66,7 @@
 
                 <li class="nav-item">
                     <a href="{{ route('master.user.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-file"></i>
+                        <i class="nav-icon fas fa-user-cog"></i>
                         <p>
                             Daftar Pengguna
                         </p>
