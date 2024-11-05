@@ -337,6 +337,23 @@ class UserController extends Controller
         }
     }
 
+    public function show(string $id)
+    {
+        try {
+
+            $user = User::find($id);
+            if (!is_null($user)) {
+
+                $type_user = TypeUser::whereNull('deleted_at')->get();
+                return view('master.user.detail', compact('user', 'type_user'));
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()]);
+        }
+    }
+
     public function destroy(string $id)
     {
         try {

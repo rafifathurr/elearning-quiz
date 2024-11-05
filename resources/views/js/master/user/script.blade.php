@@ -2,7 +2,7 @@
     $('form').submit(function(e) {
         e.preventDefault();
         Swal.fire({
-            title: 'Are You Sure Want To Save Record?',
+            title: 'Apakah Anda Ingin Menyimpan Data Ini?',
             icon: 'question',
             showCancelButton: true,
             allowOutsideClick: false,
