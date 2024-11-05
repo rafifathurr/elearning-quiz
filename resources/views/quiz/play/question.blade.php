@@ -151,6 +151,29 @@
         </div>
     </div>
 </div>
+<script>
+    $("form").submit(function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Apakah Anda Yakin Submit Quiz?',
+            icon: 'question',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn btn-primary mr-2 mb-3',
+                cancelButton: 'btn btn-danger mb-3',
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Tidak'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalProcess();
+                $('form').unbind('submit').submit();
+            }
+        })
+    });
+</script>
 {{-- @push('javascript-bottom')
     <script>
         let qTime = $('#q_time').val();
