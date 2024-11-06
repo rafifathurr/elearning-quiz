@@ -20,7 +20,8 @@
                                             </div>
                                             <div class="mx-2">
                                                 <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
-                                                    class="btn btn-lg btn-success"><i class="fas fa-play mr-2"></i>Mulai
+                                                    class="btn btn-lg btn-success" id="mulaiKembali"><i
+                                                        class="fas fa-play mr-2"></i>Mulai
                                                     Kembali</a>
                                             </div>
                                         </div>
@@ -36,5 +37,16 @@
         <!-- /.content -->
     </div>
     @push('javascript-bottom')
+        <script>
+            document.getElementById('mulaiKembali').addEventListener('click', function(e) {
+                e.preventDefault(); // Mencegah pengalihan default
+
+                // Hapus waktu dari localStorage ketika tombol "Mulai" diklik
+                localStorage.removeItem('remainingTime');
+
+                // Setelah menghapus, pindahkan halaman secara manual
+                window.location.href = this.href;
+            });
+        </script>
     @endpush
 @endsection
