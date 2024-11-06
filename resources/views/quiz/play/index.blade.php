@@ -179,7 +179,8 @@
     </div>
     @push('javascript-bottom')
         <script>
-            let time = $('#time').val();
+            let time = localStorage.getItem('quiz_time') || $('#time').val(); // Mengambil waktu dari localStorage jika ada
+
 
             $("form").submit(function(e) {
                 e.preventDefault();
@@ -198,6 +199,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         swalProcess();
+                        localStorage.removeItem('quiz_time');
                         $('form').unbind('submit').submit();
                     }
                 })
@@ -292,7 +294,6 @@
             let interval = setInterval(updateTimestamp, 1000);
 
             function updateTimestamp() {
-
                 if (time % 60 > 9) {
                     $('#second_time').html(time % 60);
                 } else {
@@ -312,6 +313,7 @@
                     }
 
                     time--;
+                    localStorage.setItem('quiz_time', time); // Simpan waktu yang tersisa
                 } else {
                     clearInterval(interval);
                     finishQuiz();
@@ -329,6 +331,7 @@
                     },
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        localStorage.removeItem('quiz_time');
                         $('#finish-form').unbind('submit').submit();
                     }
                 })
