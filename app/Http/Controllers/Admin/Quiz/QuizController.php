@@ -8,9 +8,12 @@ use App\Models\Quiz\QuizAnswer;
 use App\Models\Quiz\QuizQuestion;
 use App\Models\Quiz\QuizTypeUserAccess;
 use App\Models\Quiz\TypeQuiz;
+use App\Models\QuizUserAnswer;
+use App\Models\QuizUserResult;
 use App\Models\TypeUser;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
@@ -22,7 +25,7 @@ class QuizController extends Controller
      */
     public function listQuiz()
     {
-        $userTypeIds = auth()->user()->userTypeAccess->pluck('type_user_id');
+        $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
 
 
         $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
@@ -31,6 +34,29 @@ class QuizController extends Controller
 
         return view('quiz.list.index', compact('quizes'));
     }
+
+    public function historyQuiz()
+    {
+        $user_id = Auth::user()->id;
+        // Ambil semua attempt untuk user ini
+        $histories = QuizUserResult::where('user_id', $user_id)
+            ->orderBy('quiz_id')
+            ->orderBy('id')
+            ->get();
+
+        // Menambahkan nomor attempt secara manual per quiz_id
+        $grouped_histories = [];
+        foreach ($histories->groupBy('quiz_id') as $quiz_id => $attempts) {
+            foreach ($attempts as $index => $history) {
+                $history->attempt_number = $index + 1; // Menambahkan nomor attempt ke-berapa
+                $grouped_histories[] = $history;
+            }
+        }
+
+        return view('quiz.list.history', ['histories' => $grouped_histories]);
+    }
+
+
 
     public function index(Request $request)
     {
@@ -390,6 +416,12 @@ class QuizController extends Controller
                 return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
             }
 
+            // Tentukan percakapan pertama
+            $attempt_number = 1;
+
+            // Simpan percakapan pertama pada session
+            session(['quiz_attempt' => $attempt_number]);
+
             $data['quiz'] = $quiz;
             return view('quiz.play.start', $data);
         }
@@ -574,6 +606,21 @@ class QuizController extends Controller
             $quiz_answer = collect(collect($quiz['quiz_question'])->where('question_number', $request->q)->first()['quiz_answer'])->where('answer', $request->value)->first();
             $quiz_answer['answered'] = true;
 
+            // Insert ke DB
+            $is_correct = $quiz_answer['is_answer'];
+            $point =  $quiz_answer['point'];
+            $attempt_number = session('quiz_attempt', 1);
+
+            QuizUserAnswer::create([
+                'quiz_id' => $quiz['id'],
+                'user_id' => Auth::user()->id,
+                'quiz_question_id' => $current_quiz['id'],
+                'quiz_answer_id' => $quiz_answer['id'],
+                'is_correct' => $is_correct,
+                'point' => $point,
+                'attempt_number' => $attempt_number,
+            ]);
+
 
             foreach ($quiz['quiz_question'] as $index => $question) {
                 if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
@@ -599,6 +646,25 @@ class QuizController extends Controller
         if (Session::has('quiz')) {
             $quiz_session = Session::get('quiz');
 
+
+            // Insert ke DB
+            $user_id = Auth::user()->id;
+            $attempt_number = session('quiz_attempt', 1);
+            $total_score = QuizUserAnswer::where('quiz_id', $quiz->id)
+                ->where('user_id', $user_id)
+                ->where('attempt_number', $attempt_number)
+                ->sum('point');
+
+            QuizUserResult::insert([
+                'quiz_id' => $quiz->id,
+                'user_id' => $user_id,
+                'total_score' => $total_score
+            ]);
+
+            // Menambahkan 1 pada attempt_number untuk percakapan berikutnya
+            session(['quiz_attempt' => $attempt_number + 1]);
+
+
             $data['quiz'] = $quiz;
             $total_point = 0;
 
@@ -609,6 +675,7 @@ class QuizController extends Controller
                     }
                 }
             }
+
 
             $data['total_point'] = $total_point;
 

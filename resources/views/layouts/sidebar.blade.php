@@ -30,15 +30,24 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
-                        <i class="nav-icon fas fa-book"></i>
-                        <p>
-                            Daftar Quiz
-                        </p>
-                    </a>
-                </li>
-
+                @hasrole('user')
+                    <li class="nav-item">
+                        <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>
+                                Daftar Quiz
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('quiz.historyQuiz') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>
+                                Riwayat Quiz
+                            </p>
+                        </a>
+                    </li>
+                @endhasrole
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-file"></i>
@@ -47,31 +56,33 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.quiz.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-file"></i>
-                        <p>
-                            Bank Soal
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('master.category.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-cubes"></i>
-                        <p>
-                            Kategori Quiz
-                        </p>
-                    </a>
-                </li>
+                @hasrole('admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.quiz.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file"></i>
+                            <p>
+                                Bank Soal
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('master.category.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cubes"></i>
+                            <p>
+                                Kategori Quiz
+                            </p>
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('master.user.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-user-cog"></i>
-                        <p>
-                            Daftar Pengguna
-                        </p>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="{{ route('master.user.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-user-cog"></i>
+                            <p>
+                                Daftar Pengguna
+                            </p>
+                        </a>
+                    </li>
+                @endhasrole
                 <li class="nav-item">
                     <a href="{{ route('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-power-off"></i>

@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth'], function () {
 Route::group(['middleware' => ['role:user']], function () {
     Route::group(['prefix' => 'quiz', 'as' => 'quiz.'], function () {
         Route::get('listQuiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
+        Route::get('historyQuiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
     });
 });
 

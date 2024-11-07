@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('quiz_answer_id')->nullable();
             $table->boolean('is_correct')->default(false);
             $table->integer('point')->default(0);
+            $table->integer('attempt_number')->default(1);
             $table->timestamps();
 
             $table->foreign('quiz_id')->references('id')->on('quiz');

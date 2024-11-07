@@ -41,4 +41,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(TypeUserAccess::class, 'user_id', 'id');
     }
+    public function quizResult()
+    {
+        return $this->hasMany(QuizUserResult::class, 'user_id');
+    }
 }

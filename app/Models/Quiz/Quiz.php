@@ -2,6 +2,7 @@
 
 namespace App\Models\Quiz;
 
+use App\Models\QuizUserResult;
 use App\Models\TypeUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,5 +24,10 @@ class Quiz extends Model
     public function quizQuestion()
     {
         return $this->hasMany(QuizQuestion::class, 'quiz_id', 'id');
+    }
+
+    public function quizResult()
+    {
+        return $this->hasMany(QuizUserResult::class, 'quiz_id');
     }
 }
