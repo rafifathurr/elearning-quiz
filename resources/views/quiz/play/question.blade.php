@@ -7,11 +7,11 @@
                 </h2>
             </div>
             <div class="card-body p-3">
-                <div class="d-flex flex-wrap justify-content-xl-between justify-content-md-center">
+                <div class="d-flex flex-wrap justify-content-xl-center justify-content-md-center">
                     @foreach ($quiz['quiz_question'] as $quiz_question_list)
                         <div class="p-0">
                             <div
-                                class="card m-2 px-3 @if ($quiz_question_list['is_active']) bg-primary text-white @elseif($quiz_question_list['answered']) bg-gray text-white @endif ">
+                                class="card m-2 px-2 @if ($quiz_question_list['is_active']) bg-primary text-white @elseif($quiz_question_list['answered']) bg-gray text-white @endif ">
                                 <div class="card-body">
                                     <h5 class="font-weight-bold text-center my-auto">
                                         {{ $quiz_question_list['question_number'] }}

@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             TypeUserSeeder::class,
-            TypeQuizSeeder::class
+            TypeQuizSeeder::class,
+            QuizSeeder::class
         ]);
     }
 }
