@@ -49,7 +49,7 @@
                                     <p>{!! $quiz->description !!}</p>
 
                                 </div>
-                                <div class="card-footer">
+                                <div class="card-footer bg-white my-3">
                                     @if (
                                         (is_null($openQuizDateTime) && (is_null($closeQuizDateTime) || $currentDateTime->lte($closeQuizDateTime))) ||
                                             (!is_null($openQuizDateTime) &&
@@ -57,9 +57,9 @@
                                                 $currentDateTime->between($openQuizDateTime, $closeQuizDateTime)) ||
                                             (!is_null($openQuizDateTime) && is_null($closeQuizDateTime) && $currentDateTime->gte($openQuizDateTime)))
                                         <div class="d-flex justify-content-end">
-                                            <a href="{{ route('admin.quiz.start', ['quiz' => $quiz->id]) }}"
+                                            <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
                                                 class="btn btn-sm btn-success">
-                                                <i class="fas fa-play"></i>
+                                                <i class="fas fa-play mr-2"></i>Mulai
                                             </a>
                                         </div>
                                     @endif
