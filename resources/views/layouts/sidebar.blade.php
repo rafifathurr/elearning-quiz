@@ -48,14 +48,6 @@
                         </a>
                     </li>
                 @endhasrole
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-file"></i>
-                        <p>
-                            Materi Pembelajaran
-                        </p>
-                    </a>
-                </li>
                 @hasrole('admin')
                     <li class="nav-item">
                         <a href="{{ route('admin.quiz.index') }}" class="nav-link">

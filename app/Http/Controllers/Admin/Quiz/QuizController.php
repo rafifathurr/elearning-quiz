@@ -233,7 +233,9 @@ class QuizController extends Controller
 
         $data['quiz_question'] = '';
         foreach ($quiz->quizQuestion as $index => $question) {
-            $data['quiz_question'] .= $this->appendQuestion($question, $index + 1, 'disabled');
+            if (is_null($question->deleted_at)) {
+                $data['quiz_question'] .= $this->appendQuestion($question, $index + 1, 'disabled');
+            }
         }
 
         return view('quiz.edit', $data);
@@ -251,7 +253,9 @@ class QuizController extends Controller
 
         $data['quiz_question'] = '';
         foreach ($quiz->quizQuestion as $index => $question) {
-            $data['quiz_question'] .= $this->appendQuestion($question, $index + 1);
+            if (is_null($question->deleted_at)) {
+                $data['quiz_question'] .= $this->appendQuestion($question, $index + 1);
+            }
         }
 
         return view('quiz.edit', $data);
@@ -279,10 +283,11 @@ class QuizController extends Controller
              * Clear Last Record
              */
             $deleted_quiz_type_user_access = QuizTypeUserAccess::where('quiz_id', $quiz->id)->delete();
-            $deleted_quiz_answer = QuizAnswer::whereIn('quiz_question_id', QuizQuestion::where('quiz_id', $quiz->id)->pluck('id')->toArray())->delete();
-            $deleted_quiz_question = QuizQuestion::where('quiz_id',  $quiz->id)->delete();
+            $last_quiz_question = $quiz->quizQuestion->pluck('id')->toArray();
+            // $deleted_quiz_answer = QuizAnswer::whereIn('quiz_question_id', QuizQuestion::where('quiz_id', $quiz->id)->pluck('id')->toArray())->delete();
+            // $deleted_quiz_question = QuizQuestion::where('quiz_id',  $quiz->id)->delete();
 
-            if ($quiz_update && $deleted_quiz_type_user_access && $deleted_quiz_answer && $deleted_quiz_question) {
+            if ($quiz_update && $deleted_quiz_type_user_access) {
 
                 $quiz_type_user_access_request = [];
                 foreach ($request->quiz_type_user as $type_user_id) {
@@ -298,13 +303,11 @@ class QuizController extends Controller
 
                     foreach ($request->quiz_question as $index => $quiz_question_request) {
 
-                        $quiz_question_duration = null;
-
                         if (!is_null($time_duration_quiz)) {
                             if (!is_null($quiz_question_request['time_duration'])) {
                                 if ($time_duration_quiz - intval($quiz_question_request['time_duration']) >= 0) {
                                     $quiz_question_duration = $quiz_question_request['time_duration'];
-                                    $time_duration_quiz -= intval($quiz_question_request['time_duration']);
+                                    $time_duration_quiz -= $quiz_question_duration;
                                 } else {
                                     DB::rollBack();
                                     return redirect()
@@ -312,45 +315,135 @@ class QuizController extends Controller
                                         ->with(['failed' => 'Waktu Durasi Tidak Sesuai'])
                                         ->withInput();
                                 }
+                            } else {
+                                $quiz_question_duration = 0;
+                                $time_duration_quiz -= $quiz_question_duration;
                             }
                         } else {
                             $quiz_question_duration = $quiz_question_request['time_duration'];
                         }
 
-                        $quiz_question = QuizQuestion::create([
-                            'quiz_id' => $quiz->id,
-                            'is_random_answer' => isset($quiz_question_request['is_random_answer']),
-                            'is_generate_random_answer' => isset($quiz_question_request['is_generate_random_answer']),
-                            'order' => $index,
-                            'direction_question' => $quiz_question_request['direction_question'],
-                            'question' => $quiz_question_request['question'],
-                            'description' => $quiz_question_request['description'],
-                            'time_duration' => $quiz_question_duration,
-                        ]);
+                        if (isset($quiz_question_request['id'])) {
 
-                        if (!$quiz_question) {
-                            DB::rollBack();
-                            return redirect()
-                                ->back()
-                                ->with(['failed' => 'Gagal Simpan Pertanyaan'])
-                                ->withInput();
-                        }
+                            $last_quiz_answer = $quiz->quizQuestion->where('id', $quiz_question_request['id'])->first()->quizAnswer->pluck('id')->toArray();
 
-                        foreach ($quiz_question_request['quiz_answer'] as $quiz_answer_request) {
-                            $quiz_answer = QuizAnswer::create([
-                                'quiz_question_id' => $quiz_question->id,
-                                'answer' => $quiz_answer_request['answer'],
-                                'point' => $quiz_answer_request['point'],
-                                'is_answer' => isset($quiz_answer_request['is_answer']),
+                            $quiz_question = QuizQuestion::where('id', $quiz_question_request['id'])->update([
+                                'quiz_id' => $quiz->id,
+                                'is_random_answer' => isset($quiz_question_request['is_random_answer']),
+                                'is_generate_random_answer' => isset($quiz_question_request['is_generate_random_answer']),
+                                'order' => $index,
+                                'direction_question' => $quiz_question_request['direction_question'],
+                                'question' => $quiz_question_request['question'],
+                                'description' => $quiz_question_request['description'],
+                                'time_duration' => $quiz_question_duration,
                             ]);
 
-                            if (!$quiz_answer) {
+                            if (!$quiz_question) {
                                 DB::rollBack();
                                 return redirect()
                                     ->back()
                                     ->with(['failed' => 'Gagal Simpan Pertanyaan'])
                                     ->withInput();
                             }
+
+                            foreach ($quiz_question_request['quiz_answer'] as $quiz_answer_request) {
+
+                                if (isset($quiz_answer_request['id'])) {
+                                    $quiz_answer = QuizAnswer::where('id', $quiz_answer_request['id'])->update([
+                                        'quiz_question_id' => $quiz_question_request['id'],
+                                        'answer' => $quiz_answer_request['answer'],
+                                        'point' => $quiz_answer_request['point'],
+                                        'is_answer' => isset($quiz_answer_request['is_answer']),
+                                    ]);
+
+                                    if (($key_answer_array = array_search($quiz_answer_request['id'], $last_quiz_answer)) !== false) {
+                                        unset($last_quiz_answer[$key_answer_array]);
+                                    }
+                                } else {
+                                    $quiz_answer = QuizAnswer::create([
+                                        'quiz_question_id' => $quiz_question_request['id'],
+                                        'answer' => $quiz_answer_request['answer'],
+                                        'point' => $quiz_answer_request['point'],
+                                        'is_answer' => isset($quiz_answer_request['is_answer']),
+                                    ]);
+                                }
+
+                                if (!$quiz_answer) {
+                                    DB::rollBack();
+                                    return redirect()
+                                        ->back()
+                                        ->with(['failed' => 'Gagal Simpan Pertanyaan'])
+                                        ->withInput();
+                                }
+                            }
+
+                            if (!empty($last_quiz_answer)) {
+                                $quiz_answer_destroy = QuizAnswer::whereIn('id', $last_quiz_answer)
+                                    ->update(['deleted_at' => date('Y-m-d H:i:s')]);
+
+                                if (!$quiz_answer_destroy) {
+                                    DB::rollBack();
+                                    return redirect()
+                                        ->back()
+                                        ->with(['failed' => 'Gagal Hapus Jawaban'])
+                                        ->withInput();
+                                }
+                            }
+
+                            if (($key_question_array = array_search($quiz_question_request['id'], $last_quiz_question)) !== false) {
+                                unset($last_quiz_question[$key_question_array]);
+                            }
+                        } else {
+
+                            $quiz_question = QuizQuestion::create([
+                                'quiz_id' => $quiz->id,
+                                'is_random_answer' => isset($quiz_question_request['is_random_answer']),
+                                'is_generate_random_answer' => isset($quiz_question_request['is_generate_random_answer']),
+                                'order' => $index,
+                                'direction_question' => $quiz_question_request['direction_question'],
+                                'question' => $quiz_question_request['question'],
+                                'description' => $quiz_question_request['description'],
+                                'time_duration' => $quiz_question_duration,
+                            ]);
+
+                            if (!$quiz_question) {
+                                DB::rollBack();
+                                return redirect()
+                                    ->back()
+                                    ->with(['failed' => 'Gagal Simpan Pertanyaan'])
+                                    ->withInput();
+                            }
+
+                            foreach ($quiz_question_request['quiz_answer'] as $quiz_answer_request) {
+                                $quiz_answer = QuizAnswer::create([
+                                    'quiz_question_id' => $quiz_question->id,
+                                    'answer' => $quiz_answer_request['answer'],
+                                    'point' => $quiz_answer_request['point'],
+                                    'is_answer' => isset($quiz_answer_request['is_answer']),
+                                ]);
+
+                                if (!$quiz_answer) {
+                                    DB::rollBack();
+                                    return redirect()
+                                        ->back()
+                                        ->with(['failed' => 'Gagal Simpan Pertanyaan'])
+                                        ->withInput();
+                                }
+                            }
+                        }
+                        $quiz_question_duration = null;
+                    }
+
+                    if (!empty($last_quiz_question)) {
+                        $quiz_question_destroy = QuizQuestion::whereIn('id', $last_quiz_question)
+                            ->update(['deleted_at' => date('Y-m-d H:i:s')]);
+
+                        if (!$quiz_question_destroy) {
+                            DB::rollBack();
+                            return redirect()
+                                ->back()
+                                ->with(['failed' => 'Gagal Hapus Pertanyaan'])
+                                ->withInput();
                         }
                     }
 
@@ -694,7 +787,9 @@ class QuizController extends Controller
 
         if (!is_null($quiz_question)) {
             foreach ($quiz_question->quizAnswer as $index => $quiz_answer) {
-                $data['quiz_answer'][$index + 1] = $this->appendAnswer($quiz_answer, $index + 1, $increment, $disabled);
+                if (is_null($quiz_answer->deleted_at)) {
+                    $data['quiz_answer'][$index + 1] = $this->appendAnswer($quiz_answer, $index + 1, $increment, $disabled);
+                }
             }
         }
 

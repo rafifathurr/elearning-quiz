@@ -3,6 +3,9 @@
         <h2 class="card-title mb-0 font-weight-bold my-auto">
             Pertanyaan {{ $increment }}
         </h2>
+        @isset($quiz_question->id)
+            <input type="hidden" name="quiz_question[{{ $increment }}][id]" value="{{ $quiz_question->id }}">
+        @endisset
         @if ($disabled == '')
             <div class="dropdown text-black">
                 <button class="btn btn-link text-black-50" id="dropdownMenuButtonQuestion" data-toggle="dropdown"><i
@@ -53,7 +56,6 @@
         <div class="form-group row">
             <label for="name" class="col-md-4 control-label text-left">Durasi
                 Waktu (Detik)
-                <span class="text-danger ml-1">*</span>
             </label>
             <div class="col-lg-3 col-md-4 col-sm-12">
                 <div class="row">
