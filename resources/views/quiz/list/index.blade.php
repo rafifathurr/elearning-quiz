@@ -74,5 +74,8 @@
         <!-- /.content -->
     </div>
     @push('javascript-bottom')
+        <script>
+            localStorage.removeItem('remainingTime');
+        </script>
     @endpush
 @endsection
