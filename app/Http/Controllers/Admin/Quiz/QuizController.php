@@ -25,8 +25,9 @@ class QuizController extends Controller
      */
     public function listQuiz()
     {
-        $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
+        Session::forget('quiz');
 
+        $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
 
         $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
             $query->whereIn('type_user_id', $userTypeIds);
