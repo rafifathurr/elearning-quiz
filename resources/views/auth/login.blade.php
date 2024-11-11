@@ -59,12 +59,7 @@
 
                         <div class="row pt-3">
                             <div class="col-8">
-                                <div class="icheck-primary">
-                                    <input type="checkbox" id="remember" name="remember">
-                                    <label for="remember" class="font-weight-normal">
-                                        Remember Me
-                                    </label>
-                                </div>
+                                <a href="{{ route('account.create') }}" class="">Register Akun</a>
                             </div>
                             <div class="col-4">
                                 <button type="submit" class="btn btn-primary btn-block font-weight-bold">Log In</button>
@@ -77,4 +72,5 @@
             <!-- /.card -->
         </div>
         <!-- /.login-box -->
-    @endsection
+    </body>
+@endsection

@@ -30,29 +30,41 @@ class Handler extends ExceptionHandler
         });
     }
 
-    function render($request, Throwable $exception)
+    /**
+     * Custom render method to handle different HTTP exception statuses.
+     */
+    public function render($request, Throwable $exception)
     {
+        // Handle HTTP Exceptions
         if ($exception instanceof HttpExceptionInterface) {
+
+            // Handle 403 Forbidden error (no access)
             if ($exception->getStatusCode() == 403) {
                 if (Auth::check()) {
+                    // If the user is authenticated but doesn't have access
                     return redirect()
                         ->back()
                         ->with(['failed' => 'Anda Tidak Memiliki Akses']);
                 } else {
-                    return redirect()->route('logout');
+                    // If the user is not authenticated, redirect to login page
+                    return redirect()->route('login')->with(['error' => 'Silakan login terlebih dahulu']);
                 }
             }
 
+            // Handle 404 Not Found error (URL not found)
             if ($exception->getStatusCode() == 404) {
                 return redirect()
                     ->back()
                     ->with(['failed' => 'URL Tidak Ditemukan']);
             }
 
+            // Handle 419 Page Expired error (session expired)
             if ($exception->getStatusCode() == 419) {
-                return redirect()->route('logout');
+                return redirect()->route('login')->with(['error' => 'Session Anda telah kedaluwarsa, silakan login kembali']);
             }
         }
+
+        // Default rendering of the exception if it's not handled explicitly
         return parent::render($request, $exception);
     }
 }

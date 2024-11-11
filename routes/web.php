@@ -26,6 +26,11 @@ Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
+    Route::get('create', [UserController::class, 'create'])->name('create');
+    Route::post('store', [UserController::class, 'store'])->name('store');
+});
+
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', function () {

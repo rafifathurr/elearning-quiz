@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HistoryPayment;
+use App\Models\PaymentPackage;
 use App\Models\TypeUser;
 use App\Models\TypeUserAccess;
 use App\Models\User;
@@ -73,19 +75,27 @@ class UserController extends Controller
     {
         $type_user = TypeUser::whereNull('deleted_at')->get();
         $roles = Role::all();
-        return view('master.user.create', compact('type_user', 'roles'));
+        $payment_packages = PaymentPackage::all();
+
+        if (Auth::check()) {
+            return view('master.user.create', compact('type_user', 'roles'));
+        } else {
+            return view('auth.register', compact('type_user', 'roles', 'payment_packages'));
+        }
     }
 
     public function store(Request $request)
     {
 
         try {
+
             $request->validate([
                 'username' => 'required',
                 'name' => 'required|string',
                 'email' => 'required|email',
                 'roles' => 'required',
                 'phone' => 'required',
+                'id_payment_package' => 'required',
                 'password' => 'required',
                 're_password' => 'required|same:password',
             ]);
@@ -119,12 +129,36 @@ class UserController extends Controller
 
                 $user_type_access = TypeUserAccess::insert($type_user_access_request);
 
+
+
+
                 if ($add_user && $user_role && $user_type_access) {
 
-                    DB::commit();
-                    return redirect()
-                        ->route('master.user.index')
-                        ->with(['success' => 'Berhasilkan Menambahkan User']);
+                    $payment_package = PaymentPackage::where('id', $request->id_payment_package)->first();
+                    $history_payment_request[] = [
+                        'user_id' => $add_user->id,
+                        'payment_package_id' => $request->id_payment_package,
+                        'price' => $payment_package->price,
+                    ];
+                    $history_payment_add = HistoryPayment::insert($history_payment_request);
+                    if ($history_payment_add) {
+                        DB::commit();
+                        if (Auth::check()) {
+                            return redirect()
+                                ->route('master.user.index')
+                                ->with(['success' => 'Berhasilkan Menambahkan User']);
+                        } else {
+                            return redirect()
+                                ->route('login')
+                                ->with(['success' => 'Berhasilkan Register Akun']);
+                        }
+                    } else {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Menambahkan user'])
+                            ->withInput();
+                    }
                 } else {
                     DB::rollBack();
                     return redirect()
