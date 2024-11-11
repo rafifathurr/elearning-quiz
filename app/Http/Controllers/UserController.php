@@ -78,7 +78,7 @@ class UserController extends Controller
         $payment_packages = PaymentPackage::all();
 
         if (Auth::check()) {
-            return view('master.user.create', compact('type_user', 'roles'));
+            return view('master.user.create', compact('type_user', 'roles', 'payment_packages'));
         } else {
             return view('auth.register', compact('type_user', 'roles', 'payment_packages'));
         }

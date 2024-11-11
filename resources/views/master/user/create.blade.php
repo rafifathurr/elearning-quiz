@@ -25,7 +25,8 @@
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('username') is-invalid @enderror" type="text"
-                                            name="username" id="username" value="{{ old('username') }}" required>
+                                            name="username" id="username" value="{{ old('username') }}"
+                                            placeholder="Username" required>
                                         @error('username')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
@@ -124,12 +125,41 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-md-4 control-label text-left" for="id_payment_package">Paket
+                                        Pembayaran
+                                        <span class="text-danger">*</span></label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select name="id_payment_package" id="id_payment_package"
+                                            class="form-control @error('id_payment_package')
+                                            is-invalid
+                                        @enderror">
+                                            <option disabled hidden selected>Pilih Paket Pembayaran</option>
+                                            @foreach ($payment_packages as $payment)
+                                                @if (!is_null(old('id_payment_package')) && old('id_payment_package') == $payment->id)
+                                                    <option value="{{ $payment->id }}" selected>
+                                                        {{ $payment->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $payment->id }}">{{ $payment->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+
+                                        @error('id_payment_package')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-md-4 control-label text-left" for="password">Password
                                         <span class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
-                                        <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                            id="password" name="password" placeholder="Password"
-                                            value="{{ old('password') }}">
+                                        <input type="password"
+                                            class="form-control @error('password') is-invalid @enderror" id="password"
+                                            name="password" placeholder="Password" value="{{ old('password') }}">
 
                                         @error('password')
                                             <div class="alert alert-danger mt-2">
@@ -175,6 +205,7 @@
                 multiple: true,
             });
             $('#roles').select2();
+            $('#id_payment_package').select2();
 
             $('#type_of_user').val('').trigger('change');
         </script>

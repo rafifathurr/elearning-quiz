@@ -33,7 +33,7 @@
                                     <div class="input-group">
                                         <input type="text" name="name"
                                             class="form-control @error('name') is-invalid @enderror"
-                                            placeholder="Nama Lengkap">
+                                            placeholder="Nama Lengkap" value="{{ old('name') }}">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <span class="fas fa-user"></span>
@@ -53,7 +53,7 @@
                                     <div class="input-group">
                                         <input type="text" name="username"
                                             class="form-control @error('username') is-invalid @enderror"
-                                            placeholder="Username">
+                                            placeholder="Username" value="{{ old('username') }}">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <span class="fas fa-user"></span>
@@ -74,7 +74,8 @@
                                 <div class="form-group">
                                     <div class="input-group">
                                         <input type="text" name="email"
-                                            class="form-control @error('email') is-invalid @enderror" placeholder="Email">
+                                            class="form-control @error('email') is-invalid @enderror" placeholder="Email"
+                                            value="{{ old('email') }}">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <span class="fas fa-envelope"></span>
@@ -94,7 +95,7 @@
                                     <div class="input-group">
                                         <input type="text" name="phone"
                                             class="form-control @error('phone') is-invalid @enderror"
-                                            placeholder="Nomor Handphone">
+                                            placeholder="Nomor Handphone" value="{{ old('phone') }}">
                                         <div class="input-group-append">
                                             <div class="input-group-text">
                                                 <span class="fas fa-phone"></span>
@@ -211,7 +212,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <select class="form-control @error('id_payment_package') is-invalid @enderror"s
+                                        <select class="form-control @error('id_payment_package') is-invalid @enderror"
                                             id="id_payment_package" name="id_payment_package" required>
                                             <option disabled hidden selected>Paket Pembayaran</option>
                                             @foreach ($payment_packages as $payment)
