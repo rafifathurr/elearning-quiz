@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\Quiz\QuizController;
+use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\TypeQuizController;
 use App\Http\Controllers\UserController;
 use App\Models\Quiz\Quiz;
@@ -65,5 +66,10 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('category', TypeQuizController::class)->parameters(['category' => 'id']);
+
+        Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
     });
 });

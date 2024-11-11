@@ -146,11 +146,10 @@ class TypeQuizController extends Controller
                 }
             }
         } catch (Exception $e) {
-            dd($e->getMessage());
-            // return redirect()
-            //     ->back()
-            //     ->with(['failed', $e->getMessage()])
-            //     ->withInput();
+            return redirect()
+                ->back()
+                ->with(['failed', $e->getMessage()])
+                ->withInput();
         }
     }
 }

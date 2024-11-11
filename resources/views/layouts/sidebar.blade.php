@@ -67,6 +67,16 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="{{ route('master.payment.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-credit-card"></i>
+                            <p>
+                                Payment Package
+                            </p>
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item">
                         <a href="{{ route('master.user.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-user-cog"></i>
                             <p>
