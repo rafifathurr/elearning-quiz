@@ -6,7 +6,8 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
-                    @foreach ($histories as $history)
+
+                    @forelse ($histories as $history)
                         <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header">
@@ -22,7 +23,13 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col text-center ">
+                            <div class="card  py-4">
+                                <h3>Belum Ada Riwayat Quiz</h3>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
 
 

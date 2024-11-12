@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
-                    @foreach ($quizes as $quiz)
+                    @forelse ($quizes as $quiz)
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="card-header">
@@ -66,7 +66,13 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col text-center ">
+                            <div class="card  py-4">
+                                <h3>Belum Ada Daftar Quiz</h3>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
                 <!-- /.row (main row) -->
             </div><!-- /.container-fluid -->
