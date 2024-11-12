@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TypeUserSeeder::class,
             TypeQuizSeeder::class,
-            QuizSeeder::class
+            QuizSeeder::class,
+            Quiz2Seeder::class
         ]);
     }
 }
