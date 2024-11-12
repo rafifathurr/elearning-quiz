@@ -6,7 +6,6 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
-
                     @forelse ($histories as $history)
                         <div class="col-md-4">
                             <div class="card">
@@ -24,15 +23,16 @@
                             </div>
                         </div>
                     @empty
-                        <div class="col text-center ">
-                            <div class="card  py-4">
+                        <div class="col text-center">
+                            <div class="card py-4">
                                 <h3>Belum Ada Riwayat Quiz</h3>
                             </div>
                         </div>
                     @endforelse
                 </div>
-
-
+                <div class="d-flex justify-content-center">
+                    {{ $histories->links() }}
+                </div>
                 <!-- /.row (main row) -->
             </div><!-- /.container-fluid -->
         </section>

@@ -52,7 +52,7 @@
                                                 </label>
                                                 <div class="col-md-8 col-sm-12">
                                                     <select class="form-control @error('type_quiz') is-invalid @enderror"
-                                                        name="type_quiz" id="type_quiz">
+                                                        name="type_quiz" id="type_quiz" required>
                                                         <option value="">Pilih Kategori Quiz</option>
                                                         @foreach ($type_quiz as $type_of_quiz)
                                                             <option value="{{ $type_of_quiz->id }}">
@@ -75,7 +75,7 @@
                                                     <select
                                                         class="form-control @error('quiz_type_user[]') is-invalid @enderror"
                                                         name="quiz_type_user[]" id="quiz_type_user"
-                                                        data-placeholder="Pilih Tipe User" style="width: 100%;">
+                                                        data-placeholder="Pilih Tipe User" style="width: 100%;" required>
                                                         @foreach ($type_user as $type_of_user)
                                                             <option value="{{ $type_of_user->id }}">
                                                                 {{ $type_of_user->name }}</option>

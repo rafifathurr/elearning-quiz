@@ -31,7 +31,7 @@ class QuizController extends Controller
 
         $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
             $query->whereIn('type_user_id', $userTypeIds);
-        })->get();
+        })->paginate(6);
 
         return view('quiz.list.index', compact('quizes'));
     }
@@ -39,23 +39,29 @@ class QuizController extends Controller
     public function historyQuiz()
     {
         $user_id = Auth::user()->id;
-        // Ambil semua attempt untuk user ini
+
+        // Ambil semua attempt untuk user ini, paginate 3 data per halaman
         $histories = QuizUserResult::where('user_id', $user_id)
             ->orderBy('quiz_id')
             ->orderBy('id')
-            ->get();
+            ->paginate(6);
 
-        // Menambahkan nomor attempt secara manual per quiz_id
-        $grouped_histories = [];
-        foreach ($histories->groupBy('quiz_id') as $quiz_id => $attempts) {
-            foreach ($attempts as $index => $history) {
-                $history->attempt_number = $index + 1; // Menambahkan nomor attempt ke-berapa
-                $grouped_histories[] = $history;
-            }
-        }
+        // Menambahkan nomor attempt per quiz_id
+        $histories->getCollection()->transform(function ($history) {
+            $quiz_id = $history->quiz_id;
+            // Hitung nomor attempt untuk quiz_id yang sama
+            $attempt_number = QuizUserResult::where('user_id', $history->user_id)
+                ->where('quiz_id', $quiz_id)
+                ->where('id', '<=', $history->id)
+                ->count();
 
-        return view('quiz.list.history', ['histories' => $grouped_histories]);
+            $history->attempt_number = $attempt_number; // Menambahkan nomor attempt
+            return $history;
+        });
+
+        return view('quiz.list.history', ['histories' => $histories]);
     }
+
 
 
 

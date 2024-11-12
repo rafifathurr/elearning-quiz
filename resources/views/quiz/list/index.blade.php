@@ -74,6 +74,9 @@
                         </div>
                     @endforelse
                 </div>
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $quizes->links() }}
+                </div>
                 <!-- /.row (main row) -->
             </div><!-- /.container-fluid -->
         </section>
