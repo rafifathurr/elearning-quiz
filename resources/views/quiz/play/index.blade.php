@@ -306,10 +306,10 @@
                 if (time > 0) {
 
                     if (Math.floor(time / 60) > 0) {
-                        if ((Math.floor(time / 60) - 60) % 60 == 0) {
-                            $('#minute_time').html('00');
+                        if (Math.floor(time / 60) > 9) {
+                            $('#minute_time').html(Math.floor(time / 60));
                         } else {
-                            $('#minute_time').html(Math.floor(time / 60) - 60);
+                            $('#minute_time').html('0'.concat(Math.floor(time / 60)))
                         }
                     } else {
                         $('#minute_time').html('00');
