@@ -694,42 +694,36 @@ class QuizController extends Controller
         if (Session::has('quiz')) {
             $quiz = Session::get('quiz');
 
+            // Ambil soal dan jawaban saat ini berdasarkan nomor soal
             $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
-            $current_quiz['answered'] = true;
 
-            $quiz_answer = collect(collect($quiz['quiz_question'])->where('question_number', $request->q)->first()['quiz_answer'])->where('answer', $request->value)->first();
-            $quiz_answer['answered'] = true;
+            // Tandai jawaban sebelumnya sebagai tidak dijawab
+            foreach ($current_quiz['quiz_answer'] as $index => $answer) {
+                $current_quiz['quiz_answer'][$index]['answered'] = false;
+            }
 
-            // Insert ke DB
-            $is_correct = $quiz_answer['is_answer'];
-            $point =  $quiz_answer['point'];
-            $attempt_number = session('quiz_attempt', 1);
+            // Update jawaban yang dipilih pengguna
+            $selected_answer = collect($current_quiz['quiz_answer'])->where('answer', $request->value)->first();
+            $selected_answer['answered'] = true;
 
-            QuizUserAnswer::create([
-                'quiz_id' => $quiz['id'],
-                'user_id' => Auth::user()->id,
-                'quiz_question_id' => $current_quiz['id'],
-                'quiz_answer_id' => $quiz_answer['id'],
-                'is_correct' => $is_correct,
-                'point' => $point,
-                'attempt_number' => $attempt_number,
-            ]);
-
-
+            // Simpan kembali jawaban ke dalam sesi
             foreach ($quiz['quiz_question'] as $index => $question) {
                 if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
                     $quiz['quiz_question'][$index] = $current_quiz;
+
                     foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
-                        if ($quiz_answer['answer'] == $answer['answer']) {
-                            $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($quiz_answer);
+                        if ($selected_answer['answer'] == $answer['answer']) {
+                            $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($selected_answer);
                         }
                     }
                 }
             }
 
+            // Simpan kembali seluruh sesi quiz yang telah diperbarui
             Session::forget('quiz');
             Session::put('quiz', $quiz);
-            return response()->json(['message' => 'Jawaban Berhasil Disimpan'],  200);
+
+            return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
         } else {
             return response()->json(['message' => 'Session Telah Habis'], 401);
         }
@@ -740,38 +734,48 @@ class QuizController extends Controller
         if (Session::has('quiz')) {
             $quiz_session = Session::get('quiz');
 
-
-            // Insert ke DB
-            $user_id = Auth::user()->id;
-            $attempt_number = session('quiz_attempt', 1);
-            $total_score = QuizUserAnswer::where('quiz_id', $quiz->id)
-                ->where('user_id', $user_id)
-                ->where('attempt_number', $attempt_number)
-                ->sum('point');
-
-            QuizUserResult::insert([
-                'quiz_id' => $quiz->id,
-                'user_id' => $user_id,
-                'total_score' => $total_score
-            ]);
-
-            // Menambahkan 1 pada attempt_number untuk percakapan berikutnya
-            session(['quiz_attempt' => $attempt_number + 1]);
-
-
             $data['quiz'] = $quiz;
             $total_point = 0;
 
+            // Hitung total poin hanya dari jawaban terakhir yang dipilih
             foreach ($quiz_session['quiz_question'] as $question) {
-                foreach ($question['quiz_answer'] as $answer) {
-                    if ($answer['answered']) {
-                        $total_point += $answer['point'];
-                    }
+                $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
+                if ($selected_answer) {
+                    $total_point += $selected_answer['point'];
                 }
             }
 
-
             $data['total_point'] = $total_point;
+
+            // Insert hasil ke database (misalnya pada QuizUserAnswer dan QuizUserResult)
+            $user_id = Auth::user()->id;
+            $attempt_number = session('quiz_attempt', 1);
+
+            // Simpan data jawaban pengguna
+            foreach ($quiz_session['quiz_question'] as $question) {
+                $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
+                if ($selected_answer) {
+                    QuizUserAnswer::create([
+                        'quiz_id' => $quiz->id,
+                        'user_id' => $user_id,
+                        'quiz_question_id' => $question['id'],
+                        'quiz_answer_id' => $selected_answer['id'],
+                        'is_correct' => $selected_answer['is_answer'],
+                        'point' => $selected_answer['point'],
+                        'attempt_number' => $attempt_number,
+                    ]);
+                }
+            }
+
+            // Simpan hasil kuis
+            QuizUserResult::create([
+                'quiz_id' => $quiz->id,
+                'user_id' => $user_id,
+                'total_score' => $total_point
+            ]);
+
+            // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
+            session(['quiz_attempt' => $attempt_number + 1]);
 
             Session::forget('quiz');
             return view('quiz.result', $data);
@@ -779,6 +783,8 @@ class QuizController extends Controller
             return redirect()->route('admin.quiz.start', ['quiz' => $quiz->id])->with(['failed' => 'Sesi Anda Telah Habis']);
         }
     }
+
+
 
     private function appendQuestion(QuizQuestion $quiz_question = null, $increment, $disabled = '')
     {
