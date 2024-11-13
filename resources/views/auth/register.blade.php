@@ -18,6 +18,7 @@
             }
         }
     </style>
+
     <body class="hold-transition register-page">
         <div class="register-box">
             <div class="card card-outline card-primary">
@@ -208,10 +209,12 @@
         <script>
             $('#type_of_user').select2({
                 multiple: true,
-                placeholder: 'Pilih Jenis Akun'
+                placeholder: 'Pilih Jenis Akun',
+                dropdownParent: $('.register-box')
             });
             $('#id_payment_package').select2({
-                placeholder: 'Pilih Paket'
+                placeholder: 'Pilih Paket',
+                dropdownParent: $('.register-box')
             });
             $('#type_of_user').val('').trigger('change');
             $('#id_payment_package').val('').trigger('change');
