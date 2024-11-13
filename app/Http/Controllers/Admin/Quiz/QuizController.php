@@ -28,6 +28,11 @@ class QuizController extends Controller
      */
     public function listQuiz()
     {
+
+        QuizAuthenticationAccess::where('key', Session::get('key'))->update([
+            'deleted_at' => date('Y-m-d H:i:s')
+        ]);
+
         Session::forget('key');
         Session::forget('quiz');
 
@@ -555,6 +560,11 @@ class QuizController extends Controller
 
             if (User::find(auth()->user()->id)->hasRole('user')) {
                 if (Session::has('key')) {
+                    $check = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $quiz->id)->where('key', Session::get('key'))->first();
+
+                    if (is_null($check)) {
+                        return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
+                    }
                 } else {
                     return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
                 }
@@ -808,6 +818,9 @@ class QuizController extends Controller
             // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
             session(['quiz_attempt' => $attempt_number + 1]);
 
+            QuizAuthenticationAccess::where('key', Session::get('key'))->update([
+                'deleted_at' => date('Y-m-d H:i:s')
+            ]);
             Session::forget('key');
             Session::forget('quiz');
             return view('quiz.result', $data);
