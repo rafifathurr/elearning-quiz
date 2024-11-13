@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Home</h1>
+                        {{-- <h1 class="m-0">Home</h1> --}}
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -15,8 +15,19 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <!-- Small boxes (Stat box) -->
                 <div class="row">
+                    <div class="col-md-12">
+                        <h3>Selamat Datang, <b>{{ auth()->user()->name }}</b> !</h3>
+                    </div>
+                    @hasrole('user')
+                        <div class="col-md-12 mt-3">
+                            <h5 class="my-auto">Jika Ingin Melanjutkan Ke Halaman Quiz<a
+                                    href="{{ route('quiz.listQuiz') }}" class="btn btn-primary ml-3 font-weight-bold">Klik Disini</a></h5>
+                        </div>
+                    @endhasrole
+                </div>
+                <!-- Small boxes (Stat box) -->
+                {{-- <div class="row">
                     <div class="col-lg-3 col-6">
                         <!-- small box -->
                         <div class="small-box bg-info">
@@ -81,7 +92,7 @@
                         </div>
                     </div>
                     <!-- ./col -->
-                </div>
+                </div> --}}
                 <!-- /.row -->
                 <!-- Main row -->
                 {{-- <div class="row">

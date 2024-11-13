@@ -40,8 +40,9 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::group(['middleware' => ['role:user']], function () {
     Route::group(['prefix' => 'quiz', 'as' => 'quiz.'], function () {
-        Route::get('listQuiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
-        Route::get('historyQuiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
+        Route::post('auth', [QuizController::class, 'auth'])->name('auth');
+        Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
+        Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
     });
 });
 
@@ -56,6 +57,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         });
     });
 });
+
 Route::group(['middleware' => ['role:admin']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);

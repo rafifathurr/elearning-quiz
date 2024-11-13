@@ -3,15 +3,10 @@
     <style>
         .login-box {
             position: fixed;
-            /* Atur posisi menjadi fixed */
             top: 50%;
-            /* Posisi vertikal di tengah */
             left: 50%;
-            /* Posisi horizontal di tengah */
             transform: translate(-50%, -50%);
-            /* Menggeser form agar tepat di tengah */
             z-index: 1000;
-            /* Pastikan di atas elemen lain */
         }
     </style>
 
@@ -56,13 +51,22 @@
                                 @enderror
                             </div>
                         </div>
-
                         <div class="row pt-3">
                             <div class="col-8">
-                                <a href="{{ route('account.create') }}" class="">Register Akun</a>
+                                <div class="icheck-primary">
+                                    <input type="checkbox" id="remember" name="remember">
+                                    <label for="remember" class="font-weight-normal">
+                                        Remember Me
+                                    </label>
+                                </div>
                             </div>
                             <div class="col-4">
                                 <button type="submit" class="btn btn-primary btn-block font-weight-bold">Log In</button>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center mt-4">
+                            <div class="col-12 text-center">
+                                Tidak Punya Akun ? <a href="{{ route('account.create') }}" class="">Daftar Akun</a>
                             </div>
                         </div>
                     </form>

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Register\SendMail;
 use App\Models\HistoryPayment;
 use App\Models\PaymentPackage;
+use App\Models\Quiz\Quiz;
+use App\Models\Quiz\QuizAuthenticationAccess;
+use App\Models\Quiz\QuizTypeUserAccess;
 use App\Models\TypeUser;
 use App\Models\TypeUserAccess;
 use App\Models\User;
@@ -11,8 +15,10 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -86,25 +92,35 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-
         try {
-
-            $request->validate([
-                'username' => 'required',
-                'name' => 'required|string',
-                'email' => 'required|email',
-                'roles' => 'required',
-                'phone' => 'required',
-                'id_payment_package' => 'required',
-                'password' => 'required',
-                're_password' => 'required|same:password',
-            ]);
+            if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                $request->validate([
+                    'username' => 'required',
+                    'name' => 'required|string',
+                    'email' => 'required|email',
+                    'roles' => 'required',
+                    'phone' => 'required',
+                    'id_payment_package' => 'required',
+                    'password' => 'required',
+                    're_password' => 'required|same:password',
+                ]);
+            } else {
+                $request->validate([
+                    'username' => 'required',
+                    'name' => 'required|string',
+                    'email' => 'required|email',
+                    'phone' => 'required',
+                    'id_payment_package' => 'required',
+                    'password' => 'required',
+                    're_password' => 'required|same:password',
+                ]);
+            }
 
             $username_check = User::whereNull('deleted_at')
                 ->where('username', $request->username)
                 ->first();
-            $email_check = User::whereNull('deleted_at')
-                ->where('email', $request->email)
+
+            $email_check = User::where('email', $request->email)
                 ->first();
 
             if (is_null($username_check) && is_null($email_check)) {
@@ -117,7 +133,11 @@ class UserController extends Controller
                     'password' => bcrypt($request->password)
                 ]);
 
-                $user_role = $add_user->assignRole($request->roles);
+                if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                    $user_role = $add_user->assignRole($request->roles);
+                } else {
+                    $user_role = $add_user->assignRole('user');
+                }
 
                 $type_user_access_request = [];
                 foreach ($request->type_of_user as $type_user_id) {
@@ -129,47 +149,90 @@ class UserController extends Controller
 
                 $user_type_access = TypeUserAccess::insert($type_user_access_request);
 
-
-
-
                 if ($add_user && $user_role && $user_type_access) {
-
                     $payment_package = PaymentPackage::where('id', $request->id_payment_package)->first();
+
                     $history_payment_request[] = [
                         'user_id' => $add_user->id,
                         'payment_package_id' => $request->id_payment_package,
                         'price' => $payment_package->price,
                     ];
+
                     $history_payment_add = HistoryPayment::insert($history_payment_request);
+
                     if ($history_payment_add) {
-                        DB::commit();
-                        if (Auth::check()) {
-                            return redirect()
-                                ->route('master.user.index')
-                                ->with(['success' => 'Berhasilkan Menambahkan User']);
+
+                        $list_of_quiz = QuizTypeUserAccess::whereIn('type_user_id', $request->type_of_user)->groupBy('quiz_id')->pluck('quiz_id');
+
+                        foreach ($list_of_quiz->toArray() as $quiz_id) {
+                            for ($num = 1; $num <= intval($payment_package->quota_access); $num++) {
+                                $code_access = Str::random(8);
+                                $password = Str::random(20);
+                                $key = Str::random(25);
+
+                                $quiz_name = Quiz::find($quiz_id)->name;
+
+                                $quiz_authentication_access[] = [
+                                    'user_id' => $add_user->id,
+                                    'quiz_id' => $quiz_id,
+                                    'code_access' => $code_access,
+                                    'password' => $password,
+                                    'key' => $key,
+                                ];
+
+                                $quiz_data[] = [
+                                    'quiz' => $quiz_name,
+                                    'code_access' => $code_access,
+                                    'password' => $password,
+                                ];
+                            }
+                        }
+
+                        $quiz_authentication_access_add = QuizAuthenticationAccess::insert($quiz_authentication_access);
+
+                        if ($quiz_authentication_access_add) {
+
+                            $data['to'] = $add_user->email;
+                            $data['name'] = $add_user->name;
+                            $data['quiz'] = $quiz_data;
+
+                            Mail::queue(new SendMail($data));
+
+                            DB::commit();
+                            if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                                return redirect()
+                                    ->route('master.user.index')
+                                    ->with(['success' => 'Berhasilkan Menambahkan User']);
+                            } else {
+                                return redirect()
+                                    ->route('login')
+                                    ->with(['success' => 'Berhasilkan Register Akun']);
+                            }
                         } else {
+                            DB::rollBack();
                             return redirect()
-                                ->route('login')
-                                ->with(['success' => 'Berhasilkan Register Akun']);
+                                ->back()
+                                ->with(['failed' => 'Gagal Menambahkan User'])
+                                ->withInput();
                         }
                     } else {
                         DB::rollBack();
                         return redirect()
                             ->back()
-                            ->with(['failed' => 'Gagal Menambahkan user'])
+                            ->with(['failed' => 'Gagal Menambahkan User'])
                             ->withInput();
                     }
                 } else {
                     DB::rollBack();
                     return redirect()
                         ->back()
-                        ->with(['failed' => 'Gagal Menambahkan user'])
+                        ->with(['failed' => 'Gagal Menambahkan User'])
                         ->withInput();
                 }
             } else {
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Username dan Email Sudah Tersedia '])
+                    ->with(['failed' => 'Email atau Username Sudah Tersedia'])
                     ->withInput();
             }
         } catch (Exception $e) {

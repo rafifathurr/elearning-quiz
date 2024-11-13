@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin\Quiz;
 use App\Http\Controllers\Controller;
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizAnswer;
+use App\Models\Quiz\QuizAuthenticationAccess;
 use App\Models\Quiz\QuizQuestion;
 use App\Models\Quiz\QuizTypeUserAccess;
 use App\Models\Quiz\TypeQuiz;
 use App\Models\QuizUserAnswer;
 use App\Models\QuizUserResult;
 use App\Models\TypeUser;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,11 +22,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class QuizController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
     public function listQuiz()
     {
+        Session::forget('key');
         Session::forget('quiz');
 
         $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
@@ -61,9 +65,6 @@ class QuizController extends Controller
 
         return view('quiz.list.history', ['histories' => $histories]);
     }
-
-
-
 
     public function index(Request $request)
     {
@@ -527,6 +528,24 @@ class QuizController extends Controller
         }
     }
 
+    public function auth(Request $request)
+    {
+        $request->validate([
+            'quiz_id' => 'required',
+            'code_access' => 'required',
+            'password' => 'required',
+        ]);
+
+        $checking = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $request->quiz_id)->where('code_access', $request->code_access)->where('password', $request->password)->first();
+
+        if (!is_null($checking)) {
+            Session::put('key', $checking->key);
+            return redirect()->route('admin.quiz.play', ['quiz' => $checking->quiz_id]);
+        } else {
+            return redirect()->back()->with(['failed' => 'Kode Akses atau Password Tidak Sesuai!']);
+        }
+    }
+
     /**
      * Play quiz resource
      */
@@ -534,6 +553,12 @@ class QuizController extends Controller
     {
         try {
 
+            if (User::find(auth()->user()->id)->hasRole('user')) {
+                if (Session::has('key')) {
+                } else {
+                    return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
+                }
+            }
 
             if (Session::has('quiz')) {
                 $quiz = Session::get('quiz');
@@ -783,6 +808,7 @@ class QuizController extends Controller
             // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
             session(['quiz_attempt' => $attempt_number + 1]);
 
+            Session::forget('key');
             Session::forget('quiz');
             return view('quiz.result', $data);
         } else {
