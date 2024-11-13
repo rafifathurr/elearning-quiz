@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -12,6 +13,8 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+
+
 
     public function authenticate(Request $request)
     {
@@ -26,13 +29,18 @@ class AuthController extends Controller
                 $fields => 'required',
             ]);
 
-            // Mencari user berdasarkan email atau username
-            $credentials = User::where($fields, $email_or_username)->first();
+            // Mencari user berdasarkan email atau username, dengan kondisi deleted_at null
+            $user = User::where($fields, $email_or_username)
+                ->whereNull('deleted_at') // Pastikan pengguna belum dihapus
+                ->first();
 
-            // Memeriksa apakah kredensial valid
-            if ($credentials && Auth::attempt([$fields => $email_or_username, 'password' => $request->password])) {
+            // Verifikasi password secara manual
+            if ($user && Hash::check($request->password, $user->password)) {
+                // Login pengguna secara manual
+                Auth::login($user);
+
                 // Redirect berdasarkan peran pengguna
-                if (User::find(auth()->user()->id)->hasRole('admin')) {
+                if ($user->hasRole('admin')) {
                     return redirect()->route('admin.quiz.index')->with(['success' => 'Login Berhasil']);
                 } else {
                     return redirect()->route('home')->with(['success' => 'Login Berhasil']);
@@ -48,6 +56,7 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again later.'])->withInput();
         }
     }
+
 
     public function logout()
     {
