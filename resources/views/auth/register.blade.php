@@ -256,9 +256,14 @@
         <script>
             $('#type_of_user').select2({
                 multiple: true,
+                dropdownParent: $('.register-box')
             });
-            $('#roles').select2();
-            $('#id_payment_package').select2();
+            $('#roles').select2({
+                dropdownParent: $('.register-box')
+            });
+            $('#id_payment_package').select2({
+                dropdownParent: $('.register-box')
+            });
 
             $('#type_of_user').val('').trigger('change');
         </script>
