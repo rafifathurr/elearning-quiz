@@ -116,35 +116,6 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <select class="form-control @error('roles') is-invalid @enderror" id="roles"
-                                            name="roles" required>
-                                            <option disabled hidden selected>Pilih Peran</option>
-                                            @foreach ($roles as $role)
-                                                @if (!is_null(old('roles')) && old('roles') == $role->name)
-                                                    <option value="{{ $role->name }}" selected>
-                                                        {{ $role->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $role->name }}">{{ $role->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <div class="input-group-text">
-                                            <span class="fas fa-cogs"></span>
-                                        </div>
-                                        @error('role')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="input-group">
                                         <select class="form-control @error('type_of_user[]') is-invalid @enderror"
                                             name="type_of_user[]" id="type_of_user" data-placeholder="Pilih Tipe User"
                                             style="width: 100%;">
@@ -158,6 +129,35 @@
                                         </div>
                                         @error('type_of_user[]')
                                             <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <select class="form-control @error('id_payment_package') is-invalid @enderror"
+                                            id="id_payment_package" name="id_payment_package" required>
+                                            <option disabled hidden selected>Paket Pembayaran</option>
+                                            @foreach ($payment_packages as $payment)
+                                                @if (!is_null(old('id_payment_package')) && old('id_payment_package') == $payment->id)
+                                                    <option value="{{ $payment->id }}" selected>
+                                                        {{ $payment->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $payment->id }}">{{ $payment->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <div class="input-group-text">
+                                            <span class="fas fa-wallet"></span>
+                                        </div>
+                                        @error('id_payment_package')
+                                            <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
@@ -207,39 +207,7 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <select class="form-control @error('id_payment_package') is-invalid @enderror"
-                                            id="id_payment_package" name="id_payment_package" required>
-                                            <option disabled hidden selected>Paket Pembayaran</option>
-                                            @foreach ($payment_packages as $payment)
-                                                @if (!is_null(old('id_payment_package')) && old('id_payment_package') == $payment->id)
-                                                    <option value="{{ $payment->id }}" selected>
-                                                        {{ $payment->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $payment->id }}">{{ $payment->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <div class="input-group-text">
-                                            <span class="fas fa-wallet"></span>
-                                        </div>
-                                        @error('role')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
+                        <input type="hidden" name="roles" value="user">
 
                         <div class="row pt-3">
                             <div class="col-12">
