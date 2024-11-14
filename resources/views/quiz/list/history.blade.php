@@ -26,7 +26,8 @@
                                 <div class="card-footer bg-white ">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <p>Attempt ke-{{ $history->attempt_number }}</p>
-                                        <a href="" class="btn btn-sm btn-success">Review</a>
+                                        <a href="{{ route('quiz.reviewQuiz', ['id' => $history->id]) }}"
+                                            class="btn btn-sm btn-success">Review</a>
                                     </div>
                                 </div>
                             </div>

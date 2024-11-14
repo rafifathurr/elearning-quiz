@@ -43,6 +43,7 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::post('auth', [QuizController::class, 'auth'])->name('auth');
         Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
         Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
+        Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
     });
 });
 

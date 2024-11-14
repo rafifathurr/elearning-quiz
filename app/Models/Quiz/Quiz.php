@@ -30,4 +30,9 @@ class Quiz extends Model
     {
         return $this->hasMany(QuizUserResult::class, 'quiz_id');
     }
+
+    public function quizAuthenticationAccess()
+    {
+        return $this->hasMany(QuizAuthenticationAccess::class, 'quiz_id', 'id');
+    }
 }

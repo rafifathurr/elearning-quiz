@@ -10,6 +10,7 @@ use App\Models\Quiz\QuizQuestion;
 use App\Models\Quiz\QuizTypeUserAccess;
 use App\Models\Quiz\TypeQuiz;
 use App\Models\QuizUserAnswer;
+use App\Models\QuizUserAnswerResult;
 use App\Models\QuizUserResult;
 use App\Models\TypeUser;
 use App\Models\User;
@@ -42,6 +43,7 @@ class QuizController extends Controller
             $query->whereIn('type_user_id', $userTypeIds);
         })->paginate(6);
 
+
         return view('quiz.list.index', compact('quizes'));
     }
 
@@ -69,6 +71,20 @@ class QuizController extends Controller
         });
 
         return view('quiz.list.history', ['histories' => $histories]);
+    }
+
+    public function reviewQuiz(string $id)
+    {
+        try {
+            $review = QuizUserResult::find($id);
+            if (!is_null($review)) {
+                return view('quiz.list.review', compact('review'));
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()]);
+        }
     }
 
     public function index(Request $request)
@@ -792,11 +808,18 @@ class QuizController extends Controller
             $user_id = Auth::user()->id;
             $attempt_number = session('quiz_attempt', 1);
 
+            // Simpan hasil kuis
+            $quizUserResult =  QuizUserResult::create([
+                'quiz_id' => $quiz->id,
+                'user_id' => $user_id,
+                'total_score' => $total_point
+            ]);
+
             // Simpan data jawaban pengguna
             foreach ($quiz_session['quiz_question'] as $question) {
                 $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
                 if ($selected_answer) {
-                    QuizUserAnswer::create([
+                    $quizUserAnswer = QuizUserAnswer::create([
                         'quiz_id' => $quiz->id,
                         'user_id' => $user_id,
                         'quiz_question_id' => $question['id'],
@@ -805,15 +828,15 @@ class QuizController extends Controller
                         'point' => $selected_answer['point'],
                         'attempt_number' => $attempt_number,
                     ]);
+
+                    QuizUserAnswerResult::create([
+                        'quiz_user_answer_id' => $quizUserAnswer->id,
+                        'quiz_user_result_id' => $quizUserResult->id,
+                    ]);
                 }
             }
 
-            // Simpan hasil kuis
-            QuizUserResult::create([
-                'quiz_id' => $quiz->id,
-                'user_id' => $user_id,
-                'total_score' => $total_point
-            ]);
+
 
             // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
             session(['quiz_attempt' => $attempt_number + 1]);
