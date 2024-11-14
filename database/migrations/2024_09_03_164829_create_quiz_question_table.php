@@ -18,6 +18,7 @@ return new class extends Migration
             $table->tinyInteger('is_random_answer')->default(0);
             $table->tinyInteger('is_generate_random_answer')->default(0);
             $table->integer('order')->nullable();
+            $table->integer('level')->nullable();
             $table->string('direction_question');
             $table->string('question')->nullable();
             $table->longText('description')->nullable();

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             TypeUserSeeder::class,
             TypeQuizSeeder::class,
             PaymentPackageSeeder::class,
-            AllDataQuizSeeder::class
+            //AllDataQuizSeeder::class
             // QuizSeeder::class,
             // Quiz2Seeder::class
         ]);
