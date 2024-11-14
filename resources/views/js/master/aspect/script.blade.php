@@ -23,7 +23,7 @@
 
     function dataTable() {
         const url = $('#url_dt').val();
-        $('#dt-category').DataTable({
+        $('#dt-aspect').DataTable({
             responsive: true,
             autoWidth: false,
             processing: true,
@@ -45,6 +45,10 @@
                 },
                 {
                     data: 'description',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'question',
                     defaultContent: '-'
                 },
                 {
@@ -79,7 +83,7 @@
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: '{{ url('master/category') }}/' + id,
+                    url: '{{ url('master/aspect') }}/' + id,
                     type: 'DELETE',
                     cache: false,
                     data: {

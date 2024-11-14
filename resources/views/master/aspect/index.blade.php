@@ -20,18 +20,19 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <a href="{{ route('master.category.create') }}" class="btn btn-primary btn-sm">
+                                <a href="{{ route('master.aspect.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus mr-1"></i>
                                     Tambah Category Quiz
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-category">
+                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-aspect">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama</th>
                                                 <th>Deskripsi</th>
+                                                <th>Pertanyaan</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -48,7 +49,7 @@
 
     </div>
     @push('javascript-bottom')
-        @include('js.master.category.script')
+        @include('js.master.aspect.script')
         <script>
             dataTable();
         </script>

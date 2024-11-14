@@ -16,7 +16,7 @@
                     <div class="card ">
 
                         <!-- form start -->
-                        <form method="post" action="{{ route('master.category.update', [($id = $category->id)]) }}">
+                        <form method="post" action="{{ route('master.aspect.update', [($id = $aspect->id)]) }}">
                             @csrf
                             @method('PATCH')
                             <div class="card-body">
@@ -27,8 +27,7 @@
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('name') is-invalid @enderror" type="text"
-                                            name="name" id="name" value="{{ old('name', $category->name) }}"
-                                            required>
+                                            name="name" id="name" value="{{ old('name', $aspect->name) }}" required>
                                         @error('name')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
@@ -41,7 +40,7 @@
                                     <label for="description" class="col-md-4 control-label text-left">Deskripsi
                                         <span class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
-                                        <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote">{{ old('description', $category->description) }}</textarea>
+                                        <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote">{{ old('description', $aspect->description) }}</textarea>
                                         @error('description')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
@@ -52,7 +51,7 @@
 
 
                                 <div class="pt-3 d-flex">
-                                    <a href="{{ route('master.category.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                    <a href="{{ route('master.aspect.index') }}" class="btn btn-danger mr-2"> Back</a>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </div>
@@ -64,6 +63,6 @@
         </div>
     </div>
     @push('javascript-bottom')
-        @include('js.master.category.script')
+        @include('js.master.aspect.script')
     @endpush
 @endsection

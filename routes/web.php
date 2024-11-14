@@ -72,10 +72,10 @@ Route::group(['middleware' => ['role:admin']], function () {
         });
         Route::resource('user', UserController::class)->parameters(['user' => 'id']);
 
-        Route::group(['controller' => TypeQuizController::class, 'prefix' => 'category', 'as' => 'category.'], function () {
+        Route::group(['controller' => TypeQuizController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
-        Route::resource('category', TypeQuizController::class)->parameters(['category' => 'id']);
+        Route::resource('aspect', TypeQuizController::class)->parameters(['aspect' => 'id']);
 
         Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');

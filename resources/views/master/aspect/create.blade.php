@@ -16,7 +16,7 @@
                     <div class="card ">
 
                         <!-- form start -->
-                        <form method="post" action="{{ route('master.category.store') }}">
+                        <form method="post" action="{{ route('master.aspect.store') }}">
                             @csrf
                             <div class="card-body">
 
@@ -50,7 +50,7 @@
 
 
                                 <div class="pt-3 d-flex">
-                                    <a href="{{ route('master.category.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                    <a href="{{ route('master.aspect.index') }}" class="btn btn-danger mr-2"> Back</a>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </div>
@@ -62,6 +62,6 @@
         </div>
     </div>
     @push('javascript-bottom')
-        @include('js.master.category.script')
+        @include('js.master.aspect.script')
     @endpush
 @endsection

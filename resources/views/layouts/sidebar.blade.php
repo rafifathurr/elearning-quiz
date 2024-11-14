@@ -58,7 +58,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('master.category.index') }}" class="nav-link">
+                        <a href="{{ route('master.aspect.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cubes"></i>
                             <p>
                                 Aspek Pertanyaan

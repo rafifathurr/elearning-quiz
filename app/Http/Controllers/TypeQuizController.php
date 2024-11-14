@@ -12,8 +12,8 @@ class TypeQuizController extends Controller
 {
     public function index()
     {
-        $datatable_route = route('master.category.dataTable');
-        return view('master.category.index', compact('datatable_route'));
+        $datatable_route = route('master.aspect.dataTable');
+        return view('master.aspect.index', compact('datatable_route'));
     }
 
     public function dataTable()
@@ -24,15 +24,23 @@ class TypeQuizController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-                // $btn_action .= '<a href="' . route('master.category.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
-                $btn_action .= '<a href="' . route('master.category.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit">Edit</a>';
+                // $btn_action .= '<a href="' . route('master.aspect.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
+                $btn_action .= '<a href="' . route('master.aspect.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit">Edit</a>';
                 $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete">Delete</button>';
 
                 $btn_action .= '<div>';
                 return $btn_action;
             })
-            ->only(['name', 'description', 'action'])
-            ->rawColumns(['action', 'description'])
+            ->addColumn('question', function ($data) {
+                $list_view = '<ul>';
+                foreach ($data->questionTypeQuiz as $question_type) {
+                    $list_view .= '<li>' . $question_type->questionList->question . '</li>';
+                }
+                $list_view .= '</ul>';
+                return $list_view;
+            })
+            ->only(['name', 'description', 'action', 'question'])
+            ->rawColumns(['action', 'description', 'question'])
             ->make(true);
 
         return $dataTable;
@@ -40,7 +48,7 @@ class TypeQuizController extends Controller
 
     public function create()
     {
-        return view('master.category.create');
+        return view('master.aspect.create');
     }
 
     public function store(Request $request)
@@ -52,13 +60,13 @@ class TypeQuizController extends Controller
                 'description' => 'required'
             ]);
 
-            $add_category = TypeQuiz::lockForUpdate()->create([
+            $add_aspect = TypeQuiz::lockForUpdate()->create([
                 'name' => $request->name,
                 'description' => $request->description
             ]);
-            if ($add_category) {
+            if ($add_aspect) {
                 DB::commit();
-                return redirect()->route('master.category.index')->with(['success' => 'Berhasil Menambahkan Kategori Quiz']);
+                return redirect()->route('master.aspect.index')->with(['success' => 'Berhasil Menambahkan Kategori Quiz']);
             } else {
                 DB::rollBack();
                 return redirect()
@@ -77,8 +85,8 @@ class TypeQuizController extends Controller
     public function edit(string $id)
     {
         try {
-            $category = TypeQuiz::find($id);
-            return view('master.category.edit', compact('category'));
+            $aspect = TypeQuiz::find($id);
+            return view('master.aspect.edit', compact('aspect'));
         } catch (Exception $e) {
             return redirect()
                 ->back()
@@ -91,8 +99,8 @@ class TypeQuizController extends Controller
     {
         try {
 
-            $category = TypeQuiz::find($id);
-            if (!is_null($category)) {
+            $aspect = TypeQuiz::find($id);
+            if (!is_null($aspect)) {
 
                 $request->validate([
                     'name' => 'required',
@@ -100,15 +108,15 @@ class TypeQuizController extends Controller
                 ]);
                 DB::beginTransaction();
 
-                $category_update = TypeQuiz::where('id', $id)
+                $aspect_update = TypeQuiz::where('id', $id)
                     ->update([
                         'name' => $request->name,
                         'description' => $request->description
                     ]);
-                if ($category_update) {
+                if ($aspect_update) {
                     DB::commit();
                     return redirect()
-                        ->route('master.category.index')
+                        ->route('master.aspect.index')
                         ->with(['success' => 'Berhasil Mengubah Data']);
                 } else {
                     DB::rollBack();
@@ -130,14 +138,14 @@ class TypeQuizController extends Controller
     {
         try {
             DB::beginTransaction();
-            $category = TypeQuiz::find($id);
+            $aspect = TypeQuiz::find($id);
 
-            if (!is_null($category)) {
-                $category_deleted = TypeQuiz::where('id', $id)->update([
+            if (!is_null($aspect)) {
+                $aspect_deleted = TypeQuiz::where('id', $id)->update([
                     'deleted_at' => date('Y-m-d H:i:s')
                 ]);
 
-                if ($category_deleted) {
+                if ($aspect_deleted) {
                     DB::commit();
                     session()->flash('success', 'Berhasil Menghapus Data Kategori Quiz');
                 } else {
