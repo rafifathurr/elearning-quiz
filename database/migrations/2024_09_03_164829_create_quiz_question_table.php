@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('quiz_question', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->integer('id')->autoIncrement();
-            $table->integer('quiz_id');
             $table->tinyInteger('is_random_answer')->default(0);
             $table->tinyInteger('is_generate_random_answer')->default(0);
             $table->integer('order')->nullable();
@@ -24,9 +23,6 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
-            // Foreign Key
-            $table->foreign('quiz_id')->references('id')->on('quiz');
         });
     }
 

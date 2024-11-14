@@ -79,5 +79,11 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
+
+        //question
+        Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'question', 'as' => 'question.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('question', PaymentPackageController::class)->parameters(['question' => 'id']);
     });
 });

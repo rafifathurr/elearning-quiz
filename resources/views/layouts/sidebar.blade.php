@@ -53,7 +53,7 @@
                         <a href="{{ route('admin.quiz.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-file"></i>
                             <p>
-                                Bank Soal
+                                Menu Quiz
                             </p>
                         </a>
                     </li>
@@ -61,7 +61,16 @@
                         <a href="{{ route('master.category.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cubes"></i>
                             <p>
-                                Kategori Quiz
+                                Aspek Pertanyaan
+                            </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.category.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-cubes"></i>
+                            <p>
+                                Daftar Pertanyaan
                             </p>
                         </a>
                     </li>
