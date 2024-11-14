@@ -16,6 +16,6 @@ class QuestionTypeQuiz extends Model
 
     public function aspect()
     {
-        return $this->hasOne(TypeQuiz::class, 'id', 'type_user_id');
+        return $this->hasOne(TypeQuiz::class, 'id', 'type_quiz_id');
     }
 }

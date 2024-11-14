@@ -67,7 +67,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.category.index') }}" class="nav-link">
+                        <a href="{{ route('master.question.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cubes"></i>
                             <p>
                                 Daftar Pertanyaan
