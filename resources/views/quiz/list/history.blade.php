@@ -15,9 +15,18 @@
                                 <div class="card-body">
                                     <h5 class="card-title font-weight-bold mb-2">{{ $history->quiz->name }}</h5>
                                     <div class="card-text">
-                                        <h5>Total skor: <span>{{ $history->total_score }}</span></h5>
+                                        <p>Dikerjakan Pada:
+                                            {{ \Carbon\Carbon::parse($history->created_at)->translatedFormat('d F Y') }}
+                                        </p>
+
+                                        <h4 class="my-3">Total skor: <span>{{ $history->total_score }}</span></h4>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer bg-white ">
+                                    <div class="d-flex justify-content-between align-items-center">
                                         <p>Attempt ke-{{ $history->attempt_number }}</p>
-                                        <a href="" class="btn btn-primary">Lihat</a>
+                                        <a href="" class="btn btn-sm btn-success">Review</a>
                                     </div>
                                 </div>
                             </div>

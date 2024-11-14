@@ -50,19 +50,22 @@
 
                                 </div>
                                 <div class="card-footer bg-white my-3">
-                                    @if (
-                                        (is_null($openQuizDateTime) && (is_null($closeQuizDateTime) || $currentDateTime->lte($closeQuizDateTime))) ||
-                                            (!is_null($openQuizDateTime) &&
-                                                !is_null($closeQuizDateTime) &&
-                                                $currentDateTime->between($openQuizDateTime, $closeQuizDateTime)) ||
-                                            (!is_null($openQuizDateTime) && is_null($closeQuizDateTime) && $currentDateTime->gte($openQuizDateTime)))
-                                        <div class="d-flex justify-content-end">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="font-weight-bold">Sisa Akses:
+                                            {{ count($quiz->quizAuthenticationAccess->whereNull('deleted_at')) }}</span>
+                                        @if (
+                                            (is_null($openQuizDateTime) && (is_null($closeQuizDateTime) || $currentDateTime->lte($closeQuizDateTime))) ||
+                                                (!is_null($openQuizDateTime) &&
+                                                    !is_null($closeQuizDateTime) &&
+                                                    $currentDateTime->between($openQuizDateTime, $closeQuizDateTime)) ||
+                                                (!is_null($openQuizDateTime) && is_null($closeQuizDateTime) && $currentDateTime->gte($openQuizDateTime)))
                                             <button data-toggle="modal" data-target="#modal-{{ $quiz->id }}"
-                                                class="btn btn-sm btn-success">
+                                                class="btn btn-sm btn-success"
+                                                @if (count($quiz->quizAuthenticationAccess->whereNull('deleted_at')) < 1) disabled @endif>
                                                 <i class="fas fa-play mr-2"></i>Mulai
                                             </button>
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
