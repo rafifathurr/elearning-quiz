@@ -1,6 +1,13 @@
 <div class="card" id="answer_form_{{ $increment }}">
     <div class="card-header">
-        <h2 class="card-title">Jawaban {{ $increment }}</h2>
+        <h2 class="card-title">Jawaban </h2>
+        <div class="dropdown text-black">
+            <button class="btn btn-link text-black-50" id="dropdownMenuButtonAnswer" data-toggle="dropdown"><i
+                    class="fas fa-cog"></i></button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLinkAnswer">
+                <a class="dropdown-item" onclick="remove('answer_form_{{ $increment }}')" href="#">Hapus</a>
+            </div>
+        </div>
     </div>
     <div class="card-body">
         <!-- Answer Field -->
