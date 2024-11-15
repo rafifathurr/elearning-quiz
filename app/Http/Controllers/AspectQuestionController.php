@@ -50,7 +50,7 @@ class AspectQuestionController extends Controller
             DB::beginTransaction();
             $request->validate([
                 'name' => 'required',
-                'description' => 'required'
+                'description' => 'nullable'
             ]);
 
             $add_aspect = AspectQuestion::lockForUpdate()->create([
@@ -71,7 +71,7 @@ class AspectQuestionController extends Controller
             return redirect()
                 ->back()
                 ->with(['failed', $e->getMessage()])
-                ->withInput();;
+                ->withInput();
         }
     }
 
