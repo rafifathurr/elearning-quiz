@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Tipe Quiz</h1>
+                    <h1 class="m-0">Edit Aspek Pertanyaan #{{ $aspect->id }}</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -22,7 +22,7 @@
                             <div class="card-body">
 
                                 <div class="form-group row">
-                                    <label for="name" class="col-md-4 control-label text-left">Tipe Quiz
+                                    <label for="name" class="col-md-4 control-label text-left">Aspek Pertanyaan
                                         <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
