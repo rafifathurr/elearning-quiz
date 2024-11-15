@@ -6,6 +6,7 @@ use App\Models\QuestionTypeQuiz;
 use App\Models\Quiz\QuizAnswer;
 use App\Models\Quiz\QuizQuestion;
 use App\Models\Quiz\TypeQuiz;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -108,7 +109,6 @@ class QuestionController extends Controller
             $quiz_question = QuizQuestion::create([
                 'is_random_answer' => isset($request->is_random_answer),
                 'is_generate_random_answer' => isset($request->is_generate_random_answer),
-                'order' => 1,
                 'direction_question' => $request->direction_question,
                 'question' => $request->question,
                 'description' => $request->description,
@@ -140,7 +140,7 @@ class QuestionController extends Controller
             return redirect()
                 ->route('master.question.index')
                 ->with(['success' => 'Berhasil Simpan Jawaban']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return redirect()
                 ->back()
@@ -172,7 +172,94 @@ class QuestionController extends Controller
         return view('master.question.edit', $data);
     }
 
-    public function update(){
-        
+    public function update(Request $request, string $id)
+    {
+        try {
+            DB::beginTransaction();
+            $question = QuizQuestion::find($id);
+            $question_update = QuizQuestion::where('id', $id)->update([
+                'is_random_answer' => isset($request->is_random_answer),
+                'is_generate_random_answer' => isset($request->is_generate_random_answer),
+                'direction_question' => $request->direction_question,
+                'question' => $request->question,
+                'description' => $request->description,
+                'time_duration' => $request->time_duration,
+                'level' => $request->level,
+            ]);
+
+            $deleted_type_question = QuestionTypeQuiz::where('question_id', $question->id)->delete();
+
+            if ($question_update && $deleted_type_question) {
+                $question_type_quiz_data = [];
+                foreach ($request->type_quiz as $type_quiz_id) {
+                    $question_type_quiz_data[] = [
+                        'question_id' => $question->id,
+                        'type_quiz_id' => $type_quiz_id,
+                    ];
+                }
+                QuestionTypeQuiz::insert($question_type_quiz_data);
+
+                $last_quiz_answer = QuizQuestion::where('id', $question->id)->first()->quizAnswer->pluck('id')->toArray();
+
+                foreach ($request->quiz_answer as $quiz_answer_request) {
+                    if (isset($quiz_answer_request['id'])) {
+                        $quiz_answer = QuizAnswer::where('id', $quiz_answer_request['id'])->update([
+                            'quiz_question_id' => $question->id,
+                            'answer' => $quiz_answer_request['answer'],
+                            'point' => $quiz_answer_request['point'],
+                            'is_answer' => isset($quiz_answer_request['is_answer']),
+                        ]);
+
+                        if (($key_answer_array = array_search($quiz_answer_request['id'], $last_quiz_answer)) !== false) {
+                            unset($last_quiz_answer[$key_answer_array]);
+                        }
+                    } else {
+                        $quiz_answer = QuizAnswer::create([
+                            'quiz_question_id' => $question->id,
+                            'answer' => $quiz_answer_request['answer'],
+                            'point' => $quiz_answer_request['point'],
+                            'is_answer' => isset($quiz_answer_request['is_answer']),
+                        ]);
+                    }
+                    if (!$quiz_answer) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Update Data Pertanyaan'])
+                            ->withInput();
+                    }
+                }
+
+                if (!empty($last_quiz_answer)) {
+                    $quiz_answer_destroy = QuizAnswer::whereIn('id', $last_quiz_answer)
+                        ->update(['deleted_at' => date('Y-m-d H:i:s')]);
+
+                    if (!$quiz_answer_destroy) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Hapus Jawaban'])
+                            ->withInput();
+                    }
+                }
+
+                DB::commit();
+                return redirect()
+                    ->route('master.question.index')
+                    ->with(['success' => 'Berhasil Update Data Pertanyaan']);
+            } else {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->with(['failed' => 'Gagal Update Data Pertanyaan'])
+                    ->withInput();
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()])
+                ->withInput();
+        }
     }
 }

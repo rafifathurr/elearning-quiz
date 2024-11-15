@@ -179,28 +179,24 @@
                                             <input type="hidden" id="question_answer" value="{{ count($quiz_answer) }}">
                                         @endisset
                                     </div>
-                                    @if ($disabled == '')
-                                        <div class="form-group border rounded p-3">
-                                            <div class="text-center" id="add_answer"
-                                                onclick="appendForm(false, [true, 'answer_list'])">
-                                                <h5 class="my-auto">
-                                                    <i class="fas fa-plus mr-2"></i>
-                                                    Tambah Jawaban
-                                                </h5>
-                                            </div>
+                                    <div class="form-group border rounded p-3">
+                                        <div class="text-center" id="add_answer"
+                                            onclick="appendForm(false, [true, 'answer_list'])">
+                                            <h5 class="my-auto">
+                                                <i class="fas fa-plus mr-2"></i>
+                                                Tambah Jawaban
+                                            </h5>
                                         </div>
-                                    @endif
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Kembali</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            Simpan
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
-                            <div class="card-footer d-flex justify-content-end">
-                                <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Kembali</a>
-                                @if ($disabled == '')
-                                    <button type="submit" class="btn btn-primary">
-                                        Simpan
-                                    </button>
-                                @endif
-                            </div>
-                            </form>
+
                         </div>
                     </div>
                 </div>
