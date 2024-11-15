@@ -37,7 +37,8 @@
             columns: [{
                     data: 'DT_RowIndex',
                     width: '5%',
-                    searchable: false
+                    searchable: false,
+                    orderable: false
                 },
                 {
                     data: 'question',

@@ -87,17 +87,17 @@
                                         </div>
                                         <div class="form-group ml-4">
                                             <div class="form-check">
-                                                <input class="form-check-input" name="level" id="level1" value="1"
+                                                <input class="form-check-input" name="level[]" id="level1" value="1"
                                                     type="checkbox">
                                                 <label class="form-check-label">Level 1</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" name="level" id="level2" value="2"
+                                                <input class="form-check-input" name="level[]" id="level2" value="2"
                                                     type="checkbox">
                                                 <label class="form-check-label">Level 2</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" name="level" id="level3" value="3"
+                                                <input class="form-check-input" name="level[]" id="level3" value="3"
                                                     type="checkbox">
                                                 <label class="form-check-label">Level 3</label>
                                             </div>
@@ -111,8 +111,7 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="type_quiz" class="col-md-4 control-label text-left">Aspek
-                                        Pertanyaan
+                                    <label for="aspect" class="col-md-4 control-label text-left">Aspek Pertanyaan
                                         <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
@@ -122,17 +121,16 @@
                                             <label class="form-check-label">Pilih Semua Aspek</label>
                                         </div>
                                         <div class="form-group ml-4">
-                                            @foreach ($type_quiz as $type_of_quiz)
+                                            @foreach ($aspects as $aspect)
                                                 <div class="form-check">
-                                                    <input class="form-check-input" name="type_quiz[]"
-                                                        id="aspect{{ $type_of_quiz->id }}" value="{{ $type_of_quiz->id }}"
+                                                    <input class="form-check-input" name="aspect[]"
+                                                        id="aspect{{ $aspect->id }}" value="{{ $aspect->id }}"
                                                         type="checkbox">
-                                                    <label class="form-check-label">{{ $type_of_quiz->name }}</label>
+                                                    <label class="form-check-label">{{ $aspect->name }}</label>
                                                 </div>
                                             @endforeach
                                         </div>
-
-                                        @error('type_quiz')
+                                        @error('aspect')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
@@ -257,10 +255,9 @@
             }
 
             const allLevelCheckbox = document.getElementById('all_level');
-            const levelCheckboxes = document.querySelectorAll('[id^="level"]')
+            const levelCheckboxes = document.querySelectorAll('[id^="level"]');
 
             allLevelCheckbox.addEventListener('change', function() {
-
                 if (this.checked) {
                     levelCheckboxes.forEach(checkbox => {
                         checkbox.disabled = true;
@@ -273,10 +270,8 @@
                 }
             });
 
-
             const allAspectCheckbox = document.getElementById('all_aspect');
             const aspectCheckboxes = document.querySelectorAll('[id^="aspect"]');
-
 
             allAspectCheckbox.addEventListener('change', function() {
                 if (this.checked) {

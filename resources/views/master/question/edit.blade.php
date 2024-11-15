@@ -67,7 +67,8 @@
                                     <div class="form-group row">
                                         <label for="attachment" class="col-md-4 control-label text-left">Gambar</label>
                                         <div class="col-md-8 col-sm-12">
-                                            <input type="file" class="form-control" name="attachment" id="documentInput">
+                                            <input type="file" class="form-control" name="attachment" id="documentInput"
+                                                accept="image/jpeg,image/jpg,image/png">
                                             @if (!is_null($quiz_question->attachment))
                                                 <label class="m-2">
                                                     <a href="{{ asset($quiz_question->attachment) }}" target="_blank">
@@ -105,20 +106,67 @@
                                             Level
                                             <span class="text-danger ml-1">*</span>
                                         </label>
-                                        <div class="col-lg-3 col-md-4 col-sm-12">
-                                            <div class="row">
-                                                <div class="col-md-10">
-                                                    <input class="form-control @error('level') is-invalid @enderror"
-                                                        type="text" name="level"
-                                                        value="{{ old('level', $quiz_question->level ?? '') }}"
-                                                        {{ $disabled }} required>
-                                                    @error('level')
-                                                        <div class="alert alert-danger mt-2">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
+                                        <div class="col-md-8 col-sm-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="all_level" id="all_level"
+                                                    type="checkbox" {{ $quiz_question->level == 0 ? 'checked' : '' }}>
+                                                <label class="form-check-label">Pilih Semua Level</label>
+                                            </div>
+                                            <div class="form-group ml-4">
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="level[]" id="level1"
+                                                        value="1" type="checkbox"
+                                                        @if (in_array(1, explode('|', $quiz_question->level))) checked @endif>
+                                                    <label class="form-check-label">Level 1</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="level[]" id="level2"
+                                                        value="2" type="checkbox"
+                                                        @if (in_array(2, explode('|', $quiz_question->level))) checked @endif>
+                                                    <label class="form-check-label">Level 2</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="level[]" id="level3"
+                                                        value="3" type="checkbox"
+                                                        @if (in_array(3, explode('|', $quiz_question->level))) checked @endif>
+                                                    <label class="form-check-label">Level 3</label>
                                                 </div>
                                             </div>
+                                            @error('level')
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="aspect" class="col-md-4 control-label text-left">Aspek Pertanyaan
+                                            <span class="text-danger ml-1">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="all_aspect" id="all_aspect"
+                                                    type="checkbox" {{ $quiz_question->aspect == 0 ? 'checked' : '' }}>
+                                                <label class="form-check-label">Pilih Semua Aspek</label>
+                                            </div>
+                                            <div class="form-group ml-4">
+                                                @foreach ($aspects as $aspect)
+                                                    <div class="form-check">
+                                                        <?php $isChecked = in_array($aspect->id, explode('|', $quiz_question->aspect)); ?>
+                                                        <input class="form-check-input" name="aspect[]"
+                                                            id="aspect{{ $aspect->id }}" value="{{ $aspect->id }}"
+                                                            type="checkbox" {{ $isChecked ? 'checked' : '' }}>
+                                                        <label class="form-check-label">{{ $aspect->name }}</label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            @error('aspect')
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
                                         </div>
                                     </div>
 
@@ -155,9 +203,9 @@
                                         </label>
                                         <div class="col-md-8 col-sm-12">
                                             <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input" name="is_random_answer"
-                                                    id="is_random_answer" @if (old('is_random_answer', $quiz_question->is_random_answer ?? '')) checked @endif
-                                                    {{ $disabled }}>
+                                                <input type="checkbox" class="custom-control-input"
+                                                    name="is_random_answer" id="is_random_answer"
+                                                    @if (old('is_random_answer', $quiz_question->is_random_answer ?? '')) checked @endif {{ $disabled }}>
                                                 <label class="custom-control-label" for="is_random_answer">Acak
                                                     Semua Jawaban</label>
                                             </div>
@@ -199,14 +247,57 @@
     </div>
     @push('javascript-bottom')
         <script>
-            let answer_increment = 0;
+            document.addEventListener('DOMContentLoaded', function() {
+                // Untuk Level
+                const allLevelCheckbox = document.getElementById('all_level');
+                const levelCheckboxes = document.querySelectorAll('[id^="level"]');
 
-            $('#type_quiz').select2({
-                multiple: true,
+                // Fungsi untuk handle checked dan disabled state saat halaman dimuat
+                function updateLevelCheckboxes() {
+                    if (allLevelCheckbox.checked) {
+                        levelCheckboxes.forEach(checkbox => {
+                            checkbox.disabled = true;
+                            checkbox.checked = false;
+                        });
+                    } else {
+                        levelCheckboxes.forEach(checkbox => {
+                            checkbox.disabled = false;
+                        });
+                    }
+                }
+
+                // Jalankan fungsi saat halaman pertama kali dimuat
+                updateLevelCheckboxes();
+
+                // Event listener untuk perubahan pada checkbox "Pilih Semua Level"
+                allLevelCheckbox.addEventListener('change', updateLevelCheckboxes);
+
+                // Untuk Aspect
+                const allAspectCheckbox = document.getElementById('all_aspect');
+                const aspectCheckboxes = document.querySelectorAll('[id^="aspect"]');
+
+                // Fungsi untuk handle checked dan disabled state saat halaman dimuat
+                function updateAspectCheckboxes() {
+                    if (allAspectCheckbox.checked) {
+                        aspectCheckboxes.forEach(checkbox => {
+                            checkbox.disabled = true;
+                            checkbox.checked = false;
+                        });
+                    } else {
+                        aspectCheckboxes.forEach(checkbox => {
+                            checkbox.disabled = false;
+                        });
+                    }
+                }
+
+                // Jalankan fungsi saat halaman pertama kali dimuat
+                updateAspectCheckboxes();
+
+                // Event listener untuk perubahan pada checkbox "Pilih Semua Aspek"
+                allAspectCheckbox.addEventListener('change', updateAspectCheckboxes);
             });
 
-            $('#type_quiz').val('').trigger('change');
-            $('#type_quiz').val(JSON.parse($('#value_type_quiz').val())).trigger('change');
+            let answer_increment = 0;
 
             function enabledEvent(element, target) {
                 if (element.checked) {

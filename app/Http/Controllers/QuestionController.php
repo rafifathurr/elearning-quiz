@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AspectQuestion;
-use App\Models\QuestionTypeQuiz;
 use App\Models\Quiz\QuizAnswer;
 use App\Models\Quiz\QuizQuestion;
 
@@ -24,16 +23,47 @@ class QuestionController extends Controller
 
     public function dataTable()
     {
-        $question = QuizQuestion::whereNull('deleted_at')->get();
+        $question = QuizQuestion::query()->whereNull('deleted_at');
 
         $dataTable = DataTables::of($question)
             ->addIndexColumn()
 
+            ->addColumn('level', function ($data) {
+                $list_view = '<ul>';
+                if ($data->level == 0) {
+                    $list_view .= '<li>' . 'Level 1' . '</li>';
+                    $list_view .= '<li>' . 'Level 2' . '</li>';
+                    $list_view .= '<li>' . 'Level 3' . '</li>';
+                } else {
+                    $levels = explode('|', $data->level);
+                    foreach ($levels as $level) {
+                        $list_view .= '<li>' . 'Level ' . $level . '</li>';
+                    }
+                }
+
+                $list_view .= '</ul>';
+                return $list_view;
+            })
             ->addColumn('aspect', function ($data) {
                 $list_view = '<ul>';
-                foreach ($data->questionTypeQuiz as $question_type) {
-                    $list_view .= '<li>' . $question_type->aspect->name . '</li>';
+                $aspects = explode('|', $data->aspect);
+                $found = false;
+
+                foreach ($aspects as $aspect) {
+                    $aspectQuestion = AspectQuestion::where('id', $aspect)->first();
+                    if ($aspectQuestion) {
+                        $list_view .= '<li>' . $aspectQuestion->name . '</li>';
+                        $found = true;
+                    }
                 }
+
+                if (!$found) {
+                    $allAspects = AspectQuestion::all();
+                    foreach ($allAspects as $aspect) {
+                        $list_view .= '<li>' . $aspect->name . '</li>';
+                    }
+                }
+
                 $list_view .= '</ul>';
                 return $list_view;
             })
@@ -50,7 +80,8 @@ class QuestionController extends Controller
                 return $time_duration;
             })
             ->only(['question', 'aspect', 'description', 'level', 'time_duration', 'action'])
-            ->rawColumns(['action', 'description', 'aspect', 'time_duration'])
+            ->rawColumns(['action', 'description', 'level', 'aspect', 'time_duration'])
+            ->with('draw', request('draw'))
             ->make(true);
 
         return $dataTable;
@@ -58,7 +89,7 @@ class QuestionController extends Controller
 
     public function create()
     {
-        $data['type_quiz'] = AspectQuestion::whereNull('deleted_at')->get();
+        $data['aspects'] = AspectQuestion::whereNull('deleted_at')->get();
         return view('master.question.create', $data);
     }
 
@@ -107,7 +138,20 @@ class QuestionController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create the question
+
+            if (isset($request->all_level) && $request->all_level == 'on') {
+                $level = '0';
+            } else {
+                $level = isset($request->level) ? implode('|', $request->level) : '';
+            }
+
+
+            if (isset($request->all_aspect) && $request->all_aspect == 'on') {
+                $aspect = '0';
+            } else {
+                $aspect = isset($request->aspect) ? implode('|', $request->aspect) : '';
+            }
+
             $quiz_question = QuizQuestion::create([
                 'is_random_answer' => isset($request->is_random_answer),
                 'is_generate_random_answer' => isset($request->is_generate_random_answer),
@@ -115,7 +159,8 @@ class QuestionController extends Controller
                 'question' => $request->question,
                 'description' => $request->description,
                 'time_duration' => $request->time_duration,
-                'level' => 1,
+                'level' => $level,
+                'aspect' => $aspect
             ]);
 
             if ($quiz_question) {
@@ -158,18 +203,6 @@ class QuestionController extends Controller
                     ->with(['failed' => 'Gagal Menambahkan Pertanyaan'])
                     ->withInput();
             }
-            // Insert the question type
-            // $question_type_quiz_data = [];
-            // foreach ($request->type_quiz as $type_quiz_id) {
-            //     $question_type_quiz_data[] = [
-            //         'question_id' => $quiz_question->id,
-            //         'type_quiz_id' => $type_quiz_id,
-            //     ];
-            // }
-            // QuestionTypeQuiz::insert($question_type_quiz_data);
-
-            // Insert answers related to the question
-
         } catch (Exception $e) {
             DB::rollBack();
             return redirect()
@@ -183,7 +216,7 @@ class QuestionController extends Controller
 
     public function edit(string $id)
     {
-        $data['type_quiz'] = AspectQuestion::whereNull('deleted_at')->get();
+        $data['aspects'] = AspectQuestion::whereNull('deleted_at')->get();
         $data['disabled'] = '';
         $data['quiz_question'] = QuizQuestion::find($id);
 
@@ -207,6 +240,18 @@ class QuestionController extends Controller
         try {
             DB::beginTransaction();
             $question = QuizQuestion::find($id);
+
+            if (isset($request->all_level) && $request->all_level == 'on') {
+                $level = '0';
+            } else {
+                $level = isset($request->level) ? implode('|', $request->level) : '';
+            }
+
+            if (isset($request->all_aspect) && $request->all_aspect == 'on') {
+                $aspect = '0';
+            } else {
+                $aspect = isset($request->aspect) ? implode('|', $request->aspect) : '';
+            }
             $question_update = QuizQuestion::where('id', $id)->update([
                 'is_random_answer' => isset($request->is_random_answer),
                 'is_generate_random_answer' => isset($request->is_generate_random_answer),
@@ -214,7 +259,8 @@ class QuestionController extends Controller
                 'question' => $request->question,
                 'description' => $request->description,
                 'time_duration' => $request->time_duration,
-                'level' => $request->level,
+                'level' => $level,
+                'aspect' => $aspect,
             ]);
 
 
@@ -305,6 +351,33 @@ class QuestionController extends Controller
                 ->back()
                 ->with(['failed' => $e->getMessage()])
                 ->withInput();
+        }
+    }
+
+    public function destroy(string $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $question = QuizQuestion::find($id);
+
+            if (!is_null($question)) {
+
+                $question_deleted = QuizQuestion::where('id', $id)->update([
+                    'deleted_at' => date('Y-m-d H:i:s')
+                ]);
+                if ($question_deleted) {
+                    DB::commit();
+                    session()->flash('success', 'Berhasil Hapus Data Question');
+                } else {
+                    DB::rollBack();
+                    session()->flash('failed', 'Gagal Hapus Data Question');
+                }
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()]);
         }
     }
 }
