@@ -97,7 +97,7 @@ class AspectQuestionController extends Controller
 
                 $request->validate([
                     'name' => 'required',
-                    'description' => 'required'
+                    'description' => 'nullable'
                 ]);
                 DB::beginTransaction();
 
