@@ -59,12 +59,12 @@ class AspectQuestionController extends Controller
             ]);
             if ($add_aspect) {
                 DB::commit();
-                return redirect()->route('master.aspect.index')->with(['success' => 'Berhasil Menambahkan Kategori Quiz']);
+                return redirect()->route('master.aspect.index')->with(['success' => 'Berhasil Menambahkan Aspek Pertanyaan']);
             } else {
                 DB::rollBack();
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Gagal Menambahkan Kategori Quiz'])
+                    ->with(['failed' => 'Gagal Menambahkan Aspek Pertanyaan'])
                     ->withInput();
             }
         } catch (Exception $e) {
@@ -110,12 +110,12 @@ class AspectQuestionController extends Controller
                     DB::commit();
                     return redirect()
                         ->route('master.aspect.index')
-                        ->with(['success' => 'Berhasil Mengubah Data']);
+                        ->with(['success' => 'Berhasil Mengubah Data Aspek Pertanyaan']);
                 } else {
                     DB::rollBack();
                     return redirect()
                         ->back()
-                        ->with(['failed' => 'Gagal Mengubah Data'])
+                        ->with(['failed' => 'Gagal Mengubah Data Aspek Pertanyaan'])
                         ->withInput();
                 }
             }
@@ -140,10 +140,10 @@ class AspectQuestionController extends Controller
 
                 if ($aspect_deleted) {
                     DB::commit();
-                    session()->flash('success', 'Berhasil Menghapus Data Kategori Quiz');
+                    session()->flash('success', 'Berhasil Menghapus Data Aspek Pertanyaan');
                 } else {
                     DB::rollBack();
-                    session()->flash('failed', 'Gagal Menghapus Data Kategori Quiz');
+                    session()->flash('failed', 'Gagal Menghapus Data Aspek Pertanyaan');
                 }
             }
         } catch (Exception $e) {
