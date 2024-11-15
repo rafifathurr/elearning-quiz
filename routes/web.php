@@ -88,5 +88,6 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('append', 'append')->name('append');
         });
         Route::resource('question', QuestionController::class)->parameters(['question' => 'id']);
+        // Route::get('question/edit/{id}/{increment}', [QuestionController::class, 'edit'])->name('question.edit.increment');
     });
 });

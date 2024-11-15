@@ -104,51 +104,37 @@ class QuestionController extends Controller
         try {
             DB::beginTransaction();
 
-            $question_type_quiz_data = []; // Array untuk menyimpan data dari setiap pertanyaan
+            // Create the question
+            $quiz_question = QuizQuestion::create([
+                'is_random_answer' => isset($request->is_random_answer),
+                'is_generate_random_answer' => isset($request->is_generate_random_answer),
+                'order' => 1,
+                'direction_question' => $request->direction_question,
+                'question' => $request->question,
+                'description' => $request->description,
+                'time_duration' => $request->time_duration,
+                'level' => $request->level,
+            ]);
 
-            foreach ($request->quiz_question as $index => $quiz_question_request) {
-
-                // Simpan data pertanyaan
-                $quiz_question = QuizQuestion::create([
-                    'is_random_answer' => isset($quiz_question_request['is_random_answer']),
-                    'is_generate_random_answer' => isset($quiz_question_request['is_generate_random_answer']),
-                    'order' => $index,
-                    'direction_question' => $quiz_question_request['direction_question'],
-                    'question' => $quiz_question_request['question'],
-                    'description' => $quiz_question_request['description'],
-                    'time_duration' => $quiz_question_request['time_duration'],
-                    'level' => $quiz_question_request['level'],
-                ]);
-
-                // Simpan data type_quiz terkait pertanyaan
-                foreach ($quiz_question_request['type_quiz'] as $type_quiz_id) {
-                    $question_type_quiz_data[] = [
-                        'question_id' => $quiz_question->id,
-                        'type_quiz_id' => $type_quiz_id,
-                    ];
-                }
-
-                // Simpan data jawaban terkait pertanyaan
-                foreach ($quiz_question_request['quiz_answer'] as $quiz_answer_request) {
-                    $quiz_answer = QuizAnswer::create([
-                        'quiz_question_id' => $quiz_question->id,
-                        'answer' => $quiz_answer_request['answer'],
-                        'point' => $quiz_answer_request['point'],
-                        'is_answer' => isset($quiz_answer_request['is_answer']),
-                    ]);
-
-                    if (!$quiz_answer) {
-                        DB::rollBack();
-                        return redirect()
-                            ->back()
-                            ->with(['failed' => 'Gagal Simpan Jawaban'])
-                            ->withInput();
-                    }
-                }
+            // Insert the question type
+            $question_type_quiz_data = [];
+            foreach ($request->type_quiz as $type_quiz_id) {
+                $question_type_quiz_data[] = [
+                    'question_id' => $quiz_question->id,
+                    'type_quiz_id' => $type_quiz_id,
+                ];
             }
-
-            // Insert all question_type_quiz data at once
             QuestionTypeQuiz::insert($question_type_quiz_data);
+
+            // Insert answers related to the question
+            foreach ($request->quiz_answer as $quiz_answer_request) {
+                QuizAnswer::create([
+                    'quiz_question_id' => $quiz_question->id,
+                    'answer' => $quiz_answer_request['answer'],
+                    'point' => $quiz_answer_request['point'],
+                    'is_answer' => isset($quiz_answer_request['is_answer']),
+                ]);
+            }
 
             DB::commit();
             return redirect()
@@ -161,5 +147,32 @@ class QuestionController extends Controller
                 ->with(['failed' => $e->getMessage()])
                 ->withInput();
         }
+    }
+
+
+
+    public function edit(string $id)
+    {
+        $data['type_quiz'] = TypeQuiz::whereNull('deleted_at')->get();
+        $data['disabled'] = '';
+        $data['quiz_question'] = QuizQuestion::find($id);
+
+        // Inisialisasi array untuk menyimpan jawaban kuis
+        $data['quiz_answer'] = [];
+
+        if (!is_null($data['quiz_question'])) {
+            foreach ($data['quiz_question']->quizAnswer as $index => $quiz_answer) {
+                if (is_null($quiz_answer->deleted_at)) {
+                    // Menambahkan jawaban ke dalam array quiz_answer
+                    $data['quiz_answer'][] = $this->appendAnswer($quiz_answer, $index + 1, $id);
+                }
+            }
+        }
+
+        return view('master.question.edit', $data);
+    }
+
+    public function update(){
+        
     }
 }
