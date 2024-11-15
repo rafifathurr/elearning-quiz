@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+
 use Database\Seeders\Roles\RoleSeeder;
 use Illuminate\Database\Seeder;
 
@@ -19,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TypeUserSeeder::class,
             TypeQuizSeeder::class,
+            AspectQuestionSeeder::class,
             PaymentPackageSeeder::class,
             //AllDataQuizSeeder::class
             // QuizSeeder::class,

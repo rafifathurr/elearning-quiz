@@ -22,7 +22,7 @@
                             <div class="card-body">
                                 <a href="{{ route('master.aspect.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus mr-1"></i>
-                                    Tambah Category Quiz
+                                    Tambah Aspek Pertanyaan
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
@@ -32,7 +32,6 @@
                                                 <th>No</th>
                                                 <th>Nama</th>
                                                 <th>Deskripsi</th>
-                                                <th>Pertanyaan</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

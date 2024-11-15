@@ -5,8 +5,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\Quiz\QuizController;
 use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\TypeQuizController;
+use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\UserController;
+
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizQuestion;
 use Illuminate\Support\Facades\Route;
@@ -72,10 +73,10 @@ Route::group(['middleware' => ['role:admin']], function () {
         });
         Route::resource('user', UserController::class)->parameters(['user' => 'id']);
 
-        Route::group(['controller' => TypeQuizController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
+        Route::group(['controller' => AspectQuestionController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
-        Route::resource('aspect', TypeQuizController::class)->parameters(['aspect' => 'id']);
+        Route::resource('aspect', AspectQuestionController::class)->parameters(['aspect' => 'id']);
 
         Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');

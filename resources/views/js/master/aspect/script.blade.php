@@ -48,10 +48,6 @@
                     defaultContent: '-'
                 },
                 {
-                    data: 'question',
-                    defaultContent: '-'
-                },
-                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',
