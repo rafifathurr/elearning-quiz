@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <form action="{{ route('master.question.store') }}" method="post">
+                        <form action="{{ route('master.question.store') }}" enctype="multipart/form-data" method="post">
                             @csrf
                             <div class="card-body">
                                 <div class="form-group row">
@@ -48,6 +48,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
+                                    <label for="attachment" class="col-md-4 control-label text-left">Gambar </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <input type="file" class="form-control" name="attachment" id="documentInput"
+                                            accept="image/jpeg,image/jpg,image/png">
+                                        <p class="text-danger py-1">* .jpg .jpeg .png</p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label for="name" class="col-md-4 control-label text-left">Durasi
                                         Waktu (Detik)
                                     </label>
@@ -71,18 +80,33 @@
                                         Level
                                         <span class="text-danger ml-1">*</span>
                                     </label>
-                                    <div class="col-lg-3 col-md-4 col-sm-12">
-                                        <div class="row">
-                                            <div class="col-md-10">
-                                                <input class="form-control @error('level') is-invalid @enderror"
-                                                    type="text" name="level" value="{{ old('level') }}" required>
-                                                @error('level')
-                                                    <div class="alert alert-danger mt-2">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
+                                    <div class="col-md-8 col-sm-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" name="all_level" id="all_level" type="checkbox">
+                                            <label class="form-check-label">Pilih Semua Level</label>
+                                        </div>
+                                        <div class="form-group ml-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="level" id="level1" value="1"
+                                                    type="checkbox">
+                                                <label class="form-check-label">Level 1</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="level" id="level2" value="2"
+                                                    type="checkbox">
+                                                <label class="form-check-label">Level 2</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="level" id="level3" value="3"
+                                                    type="checkbox">
+                                                <label class="form-check-label">Level 3</label>
                                             </div>
                                         </div>
+                                        @error('level')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -92,15 +116,23 @@
                                         <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('type_quiz[]') is-invalid @enderror"
-                                            name="type_quiz[]" id="type_quiz" required>
+                                        <div class="form-check">
+                                            <input class="form-check-input" name="all_aspect" id="all_aspect"
+                                                type="checkbox">
+                                            <label class="form-check-label">Pilih Semua Aspek</label>
+                                        </div>
+                                        <div class="form-group ml-4">
                                             @foreach ($type_quiz as $type_of_quiz)
-                                                <option value="{{ $type_of_quiz->id }}">
-                                                    {{ $type_of_quiz->name }}
-                                                </option>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="type_quiz[]"
+                                                        id="aspect{{ $type_of_quiz->id }}" value="{{ $type_of_quiz->id }}"
+                                                        type="checkbox">
+                                                    <label class="form-check-label">{{ $type_of_quiz->name }}</label>
+                                                </div>
                                             @endforeach
-                                        </select>
-                                        @error('type_quiz[]')
+                                        </div>
+
+                                        @error('type_quiz')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
@@ -187,12 +219,6 @@
 
     @push('javascript-bottom')
         <script>
-            $('#type_quiz').select2({
-                multiple: true,
-            });
-
-            $('#type_quiz').val('').trigger('change');
-
             function enabledEvent(element, target) {
                 if (element.checked) {
                     $('#'.concat(target)).attr('disabled', false);
@@ -230,11 +256,40 @@
                 $('#'.concat(target)).remove();
             }
 
+            const allLevelCheckbox = document.getElementById('all_level');
+            const levelCheckboxes = document.querySelectorAll('[id^="level"]')
+
+            allLevelCheckbox.addEventListener('change', function() {
+
+                if (this.checked) {
+                    levelCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                    });
+                } else {
+                    levelCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = false;
+                    });
+                }
+            });
 
 
-            function remove(target) {
-                $('#'.concat(target)).remove();
-            }
+            const allAspectCheckbox = document.getElementById('all_aspect');
+            const aspectCheckboxes = document.querySelectorAll('[id^="aspect"]');
+
+
+            allAspectCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    aspectCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                    });
+                } else {
+                    aspectCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = false;
+                    });
+                }
+            });
         </script>
     @endpush
 @endsection

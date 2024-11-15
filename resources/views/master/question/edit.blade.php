@@ -27,7 +27,7 @@
 
                             <div class="card-body">
                                 <form action="{{ route('master.question.update', ['id' => $quiz_question->id]) }}"
-                                    method="post">
+                                    method="post" enctype="multipart/form-data">
                                     @csrf
                                     @method('patch')
                                     <div class="form-group row">
@@ -63,6 +63,22 @@
                                             @enderror
                                         </div>
                                     </div>
+
+                                    <div class="form-group row">
+                                        <label for="attachment" class="col-md-4 control-label text-left">Gambar</label>
+                                        <div class="col-md-8 col-sm-12">
+                                            <input type="file" class="form-control" name="attachment" id="documentInput">
+                                            @if (!is_null($quiz_question->attachment))
+                                                <label class="m-2">
+                                                    <a href="{{ asset($quiz_question->attachment) }}" target="_blank">
+                                                        <i class="fas fa-download mr-1"></i>
+                                                        Gambar Terlampir
+                                                    </a>
+                                                </label>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                     <div class="form-group row">
                                         <label for="name" class="col-md-4 control-label text-left">Durasi
                                             Waktu (Detik)
@@ -118,30 +134,6 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <label for="type_quiz" class="col-md-4 control-label text-left">Aspek
-                                            Pertanyaan
-                                            <span class="text-danger ml-1">*</span>
-                                        </label>
-                                        <div class="col-md-8 col-sm-12">
-                                            <input type="hidden" id="value_type_quiz"
-                                                value="{{ json_encode($quiz_question->questionTypeQuiz->pluck('type_quiz_id')->toArray()) }}">
-                                            <select class="form-control @error('type_quiz[]') is-invalid @enderror"
-                                                name="type_quiz[]" id="type_quiz" data-placeholder="Pilih Tipe User"
-                                                style="width: 100%;" required {{ $disabled }}>
-                                                @foreach ($type_quiz as $type_of_quiz)
-                                                    <option value="{{ $type_of_quiz->id }}" selected>
-                                                        {{ $type_of_quiz->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('type_quiz[]')
-                                                <div class="alert alert-danger mt-2">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
 
                                     <div class="form-group row">
                                         <label for="" class="col-md-4 control-label text-left">&nbsp;

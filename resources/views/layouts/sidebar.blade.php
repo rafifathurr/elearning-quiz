@@ -68,9 +68,9 @@
 
                     <li class="nav-item">
                         <a href="{{ route('master.question.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cubes"></i>
+                            <i class="nav-icon fas fa-clipboard-list"></i>
                             <p>
-                                Daftar Pertanyaan
+                                Bank Soal
                             </p>
                         </a>
                     </li>

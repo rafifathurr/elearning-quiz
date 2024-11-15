@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AspectQuestion;
 use App\Models\QuestionTypeQuiz;
 use App\Models\Quiz\QuizAnswer;
 use App\Models\Quiz\QuizQuestion;
-use App\Models\Quiz\TypeQuiz;
+
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class QuestionController extends Controller
@@ -56,7 +58,7 @@ class QuestionController extends Controller
 
     public function create()
     {
-        $data['type_quiz'] = TypeQuiz::whereNull('deleted_at')->get();
+        $data['type_quiz'] = AspectQuestion::whereNull('deleted_at')->get();
         return view('master.question.create', $data);
     }
 
@@ -78,7 +80,7 @@ class QuestionController extends Controller
         $data['disabled'] = $disabled;
         $data['quiz_question'] = $quiz_question;
         $data['increment'] = $increment;
-        $data['type_quiz'] = TypeQuiz::whereNull('deleted_at')->get();
+        $data['type_quiz'] = AspectQuestion::whereNull('deleted_at')->get();
 
         if (!is_null($quiz_question)) {
             foreach ($quiz_question->quizAnswer as $index => $quiz_answer) {
@@ -113,33 +115,61 @@ class QuestionController extends Controller
                 'question' => $request->question,
                 'description' => $request->description,
                 'time_duration' => $request->time_duration,
-                'level' => $request->level,
+                'level' => 1,
             ]);
 
-            // Insert the question type
-            $question_type_quiz_data = [];
-            foreach ($request->type_quiz as $type_quiz_id) {
-                $question_type_quiz_data[] = [
-                    'question_id' => $quiz_question->id,
-                    'type_quiz_id' => $type_quiz_id,
-                ];
+            if ($quiz_question) {
+
+                if ($request->hasFile('attachment')) {
+
+                    $path = 'public/question/images' .  $quiz_question->id;
+                    $path_store = 'storage/question/images' .  $quiz_question->id;
+
+                    if (!Storage::exists($path)) {
+                        Storage::makeDirectory($path);
+                    }
+
+                    $file_name = $quiz_question->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('attachment')->getClientOriginalExtension();
+                    $request->file('attachment')->storePubliclyAs($path, $file_name);
+                    $attachment = $path_store . '/' . $file_name;
+
+                    $quiz_question->update([
+                        'attachment' => $attachment,
+                    ]);
+                }
+
+                foreach ($request->quiz_answer as $quiz_answer_request) {
+                    QuizAnswer::create([
+                        'quiz_question_id' => $quiz_question->id,
+                        'answer' => $quiz_answer_request['answer'],
+                        'point' => $quiz_answer_request['point'],
+                        'is_answer' => isset($quiz_answer_request['is_answer']),
+                    ]);
+                }
+
+                DB::commit();
+                return redirect()
+                    ->route('master.question.index')
+                    ->with(['success' => 'Berhasil Simpan Jawaban']);
+            } else {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->with(['failed' => 'Gagal Menambahkan Pertanyaan'])
+                    ->withInput();
             }
-            QuestionTypeQuiz::insert($question_type_quiz_data);
+            // Insert the question type
+            // $question_type_quiz_data = [];
+            // foreach ($request->type_quiz as $type_quiz_id) {
+            //     $question_type_quiz_data[] = [
+            //         'question_id' => $quiz_question->id,
+            //         'type_quiz_id' => $type_quiz_id,
+            //     ];
+            // }
+            // QuestionTypeQuiz::insert($question_type_quiz_data);
 
             // Insert answers related to the question
-            foreach ($request->quiz_answer as $quiz_answer_request) {
-                QuizAnswer::create([
-                    'quiz_question_id' => $quiz_question->id,
-                    'answer' => $quiz_answer_request['answer'],
-                    'point' => $quiz_answer_request['point'],
-                    'is_answer' => isset($quiz_answer_request['is_answer']),
-                ]);
-            }
 
-            DB::commit();
-            return redirect()
-                ->route('master.question.index')
-                ->with(['success' => 'Berhasil Simpan Jawaban']);
         } catch (Exception $e) {
             DB::rollBack();
             return redirect()
@@ -153,7 +183,7 @@ class QuestionController extends Controller
 
     public function edit(string $id)
     {
-        $data['type_quiz'] = TypeQuiz::whereNull('deleted_at')->get();
+        $data['type_quiz'] = AspectQuestion::whereNull('deleted_at')->get();
         $data['disabled'] = '';
         $data['quiz_question'] = QuizQuestion::find($id);
 
@@ -187,17 +217,32 @@ class QuestionController extends Controller
                 'level' => $request->level,
             ]);
 
-            $deleted_type_question = QuestionTypeQuiz::where('question_id', $question->id)->delete();
 
-            if ($question_update && $deleted_type_question) {
-                $question_type_quiz_data = [];
-                foreach ($request->type_quiz as $type_quiz_id) {
-                    $question_type_quiz_data[] = [
-                        'question_id' => $question->id,
-                        'type_quiz_id' => $type_quiz_id,
-                    ];
+            if ($question_update) {
+                if ($request->hasFile('attachment')) {
+                    $path = 'public/question/images' .  $question->id;
+                    $path_store = 'storage/question/images' .  $question->id;
+
+                    if (!Storage::exists($path)) {
+                        Storage::makeDirectory($path);
+                    }
+
+                    $file_name = $question->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('attachment')->getClientOriginalExtension();
+
+                    // Hapus file yang sudah ada jika ada
+                    if (Storage::exists($path . '/' . $file_name)) {
+                        Storage::delete($path . '/' . $file_name);
+                    }
+
+                    // Simpan file yang diunggah
+                    $request->file('attachment')->storePubliclyAs($path, $file_name);
+                    $attachment = $path_store . '/' . $file_name;
+
+                    // Update lampiran
+                    $question->update([
+                        'attachment' => $attachment,
+                    ]);
                 }
-                QuestionTypeQuiz::insert($question_type_quiz_data);
 
                 $last_quiz_answer = QuizQuestion::where('id', $question->id)->first()->quizAnswer->pluck('id')->toArray();
 
