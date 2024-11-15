@@ -68,8 +68,8 @@ class QuestionController extends Controller
                 return $list_view;
             })
             ->addColumn('action', function ($data) {
-                $btn_action = '<a href="' . route('master.question.show', ['id' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
-                $btn_action .= '<a href="' . route('master.question.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
+                // $btn_action = '<a href="' . route('master.question.show', ['id' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
+                $btn_action = '<a href="' . route('master.question.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
                 $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                 return $btn_action;
             })
@@ -352,6 +352,27 @@ class QuestionController extends Controller
                 ->with(['failed' => $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    public function show(string $id)
+    {
+        $data['aspects'] = AspectQuestion::whereNull('deleted_at')->get();
+        $data['disabled'] = 'disabled';
+        $data['quiz_question'] = QuizQuestion::find($id);
+
+        // Inisialisasi array untuk menyimpan jawaban kuis
+        $data['quiz_answer'] = [];
+
+        if (!is_null($data['quiz_question'])) {
+            foreach ($data['quiz_question']->quizAnswer as $index => $quiz_answer) {
+                if (is_null($quiz_answer->deleted_at)) {
+                    // Menambahkan jawaban ke dalam array quiz_answer
+                    $data['quiz_answer'][] = $this->appendAnswer($quiz_answer, $index + 1, 'disabled');
+                }
+            }
+        }
+
+        return view('master.question.edit', $data);
     }
 
     public function destroy(string $id)

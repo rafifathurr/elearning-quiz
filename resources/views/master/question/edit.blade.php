@@ -68,7 +68,7 @@
                                         <label for="attachment" class="col-md-4 control-label text-left">Gambar</label>
                                         <div class="col-md-8 col-sm-12">
                                             <input type="file" class="form-control" name="attachment" id="documentInput"
-                                                accept="image/jpeg,image/jpg,image/png">
+                                                accept="image/jpeg,image/jpg,image/png" {{ $disabled }}>
                                             @if (!is_null($quiz_question->attachment))
                                                 <label class="m-2">
                                                     <a href="{{ asset($quiz_question->attachment) }}" target="_blank">
@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row ">
                                         <label for="level" class="col-md-4 control-label text-left">
                                             Level
                                             <span class="text-danger ml-1">*</span>
@@ -117,19 +117,19 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" name="level[]" id="level1"
                                                         value="1" type="checkbox"
-                                                        @if (in_array(1, explode('|', $quiz_question->level))) checked @endif>
+                                                        {{ in_array(1, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
                                                     <label class="form-check-label">Level 1</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" name="level[]" id="level2"
                                                         value="2" type="checkbox"
-                                                        @if (in_array(2, explode('|', $quiz_question->level))) checked @endif>
+                                                        {{ in_array(2, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
                                                     <label class="form-check-label">Level 2</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" name="level[]" id="level3"
                                                         value="3" type="checkbox"
-                                                        @if (in_array(3, explode('|', $quiz_question->level))) checked @endif>
+                                                        {{ in_array(3, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
                                                     <label class="form-check-label">Level 3</label>
                                                 </div>
                                             </div>
