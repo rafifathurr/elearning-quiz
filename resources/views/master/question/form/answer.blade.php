@@ -1,11 +1,10 @@
 <div class="card" id="answer_form_{{ $increment }}">
 
-    @if ($disabled == 'disabled')
-        <h2>Jawa</h2>
-    @else
-        <div class="card-header">
-            <h2 class="card-title">Jawaban </h2>
 
+    <div class="card-header">
+        <h2 class="card-title mt-2">Jawaban </h2>
+
+        @if ($disabled == '')
             <div class="dropdown text-black">
                 <button class="btn btn-link text-black-50" id="dropdownMenuButtonAnswer" data-toggle="dropdown"><i
                         class="fas fa-cog"></i></button>
@@ -14,13 +13,13 @@
                         href="#">Hapus</a>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
+    </div>
+
     <div class="card-body">
         <!-- Answer Field -->
         <div class="form-group row">
-            <label class="col-md-4 control-label text-left">Jawaban {{ $disabled }}<span
-                    class="text-danger ml-1">*</span></label>
+            <label class="col-md-4 control-label text-left">Jawaban <span class="text-danger ml-1">*</span></label>
             <div class="col-md-8 col-sm-12">
                 <input type="text" name="quiz_answer[{{ $increment }}][answer]"
                     class="form-control @error('quiz_answer.{{ $increment }}.answer') is-invalid @enderror"

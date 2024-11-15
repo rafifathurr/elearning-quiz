@@ -66,18 +66,25 @@
 
                                     <div class="form-group row">
                                         <label for="attachment" class="col-md-4 control-label text-left">Gambar</label>
-                                        <div class="col-md-8 col-sm-12">
-                                            <input type="file" class="form-control" name="attachment" id="documentInput"
-                                                accept="image/jpeg,image/jpg,image/png" {{ $disabled }}>
-                                            @if (!is_null($quiz_question->attachment))
-                                                <label class="m-2">
-                                                    <a href="{{ asset($quiz_question->attachment) }}" target="_blank">
-                                                        <i class="fas fa-download mr-1"></i>
-                                                        Gambar Terlampir
-                                                    </a>
-                                                </label>
-                                            @endif
-                                        </div>
+
+                                        @if ($disabled == '')
+                                            <div class="col-md-8 col-sm-12">
+                                                <input type="file" class="form-control" name="attachment"
+                                                    id="documentInput" accept="image/jpeg,image/jpg,image/png">
+                                                @if (!is_null($quiz_question->attachment))
+                                                    <label class="m-2">
+                                                        <a href="{{ asset($quiz_question->attachment) }}" target="_blank">
+                                                            <i class="fas fa-download mr-1"></i>
+                                                            Gambar Terlampir
+                                                        </a>
+                                                    </label>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <img src="{{ asset($quiz_question->attachment) }}" class="img-fluid"
+                                                style="max-height: 18rem;">
+                                        @endif
+
                                     </div>
 
                                     <div class="form-group row">
@@ -107,38 +114,65 @@
                                             <span class="text-danger ml-1">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" name="all_level" id="all_level"
-                                                    type="checkbox" {{ $quiz_question->level == 0 ? 'checked' : '' }}>
-                                                <label class="form-check-label">Pilih Semua Level</label>
-                                            </div>
-                                            <div class="form-group ml-4">
+                                            @if ($disabled == '')
+                                                <!-- Checkbox untuk memilih semua level -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="all_level" id="all_level"
+                                                        type="checkbox" {{ $quiz_question->level == 0 ? 'checked' : '' }}>
+                                                    <label class="form-check-label">Pilih Semua Level</label>
+                                                </div>
+                                                <div class="form-group ml-4">
+                                                    <!-- Level 1 Checkbox -->
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" name="level[]" id="level1"
+                                                            value="1" type="checkbox"
+                                                            {{ in_array(1, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
+                                                        <label class="form-check-label">Level 1</label>
+                                                    </div>
+                                                    <!-- Level 2 Checkbox -->
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" name="level[]" id="level2"
+                                                            value="2" type="checkbox"
+                                                            {{ in_array(2, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
+                                                        <label class="form-check-label">Level 2</label>
+                                                    </div>
+                                                    <!-- Level 3 Checkbox -->
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" name="level[]" id="level3"
+                                                            value="3" type="checkbox"
+                                                            {{ in_array(3, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
+                                                        <label class="form-check-label">Level 3</label>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="form-group">
+                                                    <ul>
+                                                        @php
+                                                            $selectedLevels = explode('|', $quiz_question->level);
+                                                        @endphp
+                                                        <!-- Level 1 -->
+                                                        @if (in_array(1, $selectedLevels))
+                                                            <li>Level 1</li>
+                                                        @endif
+                                                        <!-- Level 2 -->
+                                                        @if (in_array(2, $selectedLevels))
+                                                            <li>Level 2</li>
+                                                        @endif
+                                                        <!-- Level 3 -->
+                                                        @if (in_array(3, $selectedLevels))
+                                                            <li>Level 3</li>
+                                                        @endif
+                                                    </ul>
+                                                </div>
+                                            @endif
 
-                                                <div class="form-check">
-                                                    <input class="form-check-input" name="level[]" id="level1"
-                                                        value="1" type="checkbox"
-                                                        {{ in_array(1, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Level 1</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" name="level[]" id="level2"
-                                                        value="2" type="checkbox"
-                                                        {{ in_array(2, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Level 2</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" name="level[]" id="level3"
-                                                        value="3" type="checkbox"
-                                                        {{ in_array(3, explode('|', $quiz_question->level)) ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Level 3</label>
-                                                </div>
-                                            </div>
                                             @error('level')
                                                 <div class="alert alert-danger mt-2">
                                                     {{ $message }}
                                                 </div>
                                             @enderror
                                         </div>
+
                                     </div>
 
                                     <div class="form-group row">
@@ -146,28 +180,47 @@
                                             <span class="text-danger ml-1">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" name="all_aspect" id="all_aspect"
-                                                    type="checkbox" {{ $quiz_question->aspect == 0 ? 'checked' : '' }}>
-                                                <label class="form-check-label">Pilih Semua Aspek</label>
-                                            </div>
-                                            <div class="form-group ml-4">
-                                                @foreach ($aspects as $aspect)
-                                                    <div class="form-check">
+                                            @if ($disabled == '')
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="all_aspect" id="all_aspect"
+                                                        type="checkbox"
+                                                        {{ $quiz_question->aspect == 0 ? 'checked' : '' }}>
+                                                    <label class="form-check-label">Pilih Semua Aspek</label>
+                                                </div>
+                                                <div class="form-group ml-4">
+                                                    @foreach ($aspects as $aspect)
                                                         <?php $isChecked = in_array($aspect->id, explode('|', $quiz_question->aspect)); ?>
-                                                        <input class="form-check-input" name="aspect[]"
-                                                            id="aspect{{ $aspect->id }}" value="{{ $aspect->id }}"
-                                                            type="checkbox" {{ $isChecked ? 'checked' : '' }}>
-                                                        <label class="form-check-label">{{ $aspect->name }}</label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" name="aspect[]"
+                                                                id="aspect{{ $aspect->id }}"
+                                                                value="{{ $aspect->id }}" type="checkbox"
+                                                                {{ $isChecked ? 'checked' : '' }}>
+                                                            <label class="form-check-label">{{ $aspect->name }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="form-group">
+                                                    <ul>
+                                                        @php
+                                                            $selectedAspects = explode('|', $quiz_question->aspect);
+                                                        @endphp
+                                                        @foreach ($aspects as $aspect)
+                                                            @if (in_array($aspect->id, $selectedAspects))
+                                                                <li>{{ $aspect->name }}</li>
+                                                            @endif
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
+
                                             @error('aspect')
                                                 <div class="alert alert-danger mt-2">
                                                     {{ $message }}
                                                 </div>
                                             @enderror
                                         </div>
+
                                     </div>
 
                                     <div class="form-group row">
@@ -219,18 +272,21 @@
                                             <input type="hidden" id="question_answer" value="{{ count($quiz_answer) }}">
                                         @endisset
                                     </div>
-                                    <div class="form-group border rounded p-3">
-                                        <div class="text-center" id="add_answer"
-                                            onclick="appendForm(false, [true, 'answer_list'])">
-                                            <h5 class="my-auto">
-                                                <i class="fas fa-plus mr-2"></i>
-                                                Tambah Jawaban
-                                            </h5>
+                                    @if ($disabled == '')
+                                        <div class="form-group border rounded p-3">
+                                            <div class="text-center" id="add_answer"
+                                                onclick="appendForm(false, [true, 'answer_list'])">
+                                                <h5 class="my-auto">
+                                                    <i class="fas fa-plus mr-2"></i>
+                                                    Tambah Jawaban
+                                                </h5>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
+
                                     <div class="d-flex justify-content-end">
                                         <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Kembali</a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" {{ $disabled }}>
                                             Simpan
                                         </button>
                                     </div>
