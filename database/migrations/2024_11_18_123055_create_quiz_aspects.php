@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('quiz_aspects', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->integer('id')->autoIncrement();
-            $table->integer('id_quiz');
-            $table->integer('id_aspect');
+            $table->integer('quiz_id');
+            $table->integer('aspect_id');
             $table->integer('level');
             $table->integer('total_question');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('deleted_at')->nullable();
 
             // Foreign Key
-            $table->foreign('id_quiz')->references('id')->on('quiz');
-            $table->foreign('id_aspect')->references('id')->on('aspect_questions');
+            $table->foreign('quiz_id')->references('id')->on('quiz');
+            $table->foreign('aspect_id')->references('id')->on('aspect_questions');
         });
     }
 

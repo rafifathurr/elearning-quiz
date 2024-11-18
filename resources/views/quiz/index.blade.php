@@ -31,7 +31,6 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Quiz</th>
-                                                <th>Tipe Quiz</th>
                                                 <th>Akses</th>
                                                 <th>Action</th>
                                             </tr>
@@ -62,9 +61,6 @@
                     },
                     {
                         data: 'name',
-                    },
-                    {
-                        data: 'type_quiz',
                     },
                     {
                         data: 'access',

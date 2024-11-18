@@ -2,6 +2,7 @@
 
 namespace App\Models\Quiz;
 
+use App\Models\QuizAspect;
 use App\Models\QuizUserResult;
 use App\Models\TypeUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,12 @@ class Quiz extends Model
     use HasFactory;
     protected $table = 'quiz';
     protected $guarded = [];
+
+
+    public function quizAspect()
+    {
+        return $this->hasMany(QuizAspect::class, 'quiz_id', 'id');
+    }
 
     public function typeQuiz()
     {

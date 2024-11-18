@@ -45,27 +45,7 @@
                                                     @enderror
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="type_quiz" class="col-md-4 control-label text-left">Kategori
-                                                    Quiz
-                                                    <span class="text-danger ml-1">*</span>
-                                                </label>
-                                                <div class="col-md-8 col-sm-12">
-                                                    <select class="form-control @error('type_quiz') is-invalid @enderror"
-                                                        name="type_quiz" id="type_quiz" required>
-                                                        <option value="">Pilih Kategori Quiz</option>
-                                                        @foreach ($type_quiz as $type_of_quiz)
-                                                            <option value="{{ $type_of_quiz->id }}">
-                                                                {{ $type_of_quiz->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('type_quiz')
-                                                        <div class="alert alert-danger mt-2">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="quiz_type_user" class="col-md-4 control-label text-left">Hak
                                                     Akses
@@ -100,18 +80,7 @@
                                                     @enderror
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-md-4 control-label text-left">&nbsp;
-                                                </label>
-                                                <div class="col-md-8 col-sm-12">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input"
-                                                            name="is_random_question" id="is_random_question">
-                                                        <label class="custom-control-label" for="is_random_question">Acak
-                                                            Pertanyaan</label>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </div>
                                     <div class="card">
@@ -209,17 +178,17 @@
                                     <div class="card">
                                         <div class="card-header bg-gray-light" id="headingTwo">
                                             <h2 class="card-title mb-0 font-weight-bold">
-                                                Daftar Pertanyaan
+                                                Daftar Aspek
                                             </h2>
                                         </div>
                                         <div class="card-body">
-                                            <div id="question_list"></div>
+                                            <div id="aspect_list"></div>
                                             <div class="form-group border rounded p-5">
                                                 <div class="text-center p-2" id="add_question"
                                                     onclick="appendForm(true, false)">
                                                     <h4 class="my-auto">
                                                         <i class="fas fa-plus mr-2"></i>
-                                                        Tambah Pertanyaan
+                                                        Tambah Aspek
                                                     </h4>
                                                 </div>
                                             </div>
@@ -243,8 +212,7 @@
     </div>
     @push('javascript-bottom')
         <script>
-            let question_increment = 0;
-            let answer_increment = 0;
+            let aspect_increment = 0;
 
             $('#quiz_type_user').select2({
                 multiple: true,
@@ -262,45 +230,24 @@
                 }
             }
 
-            function appendForm(question, arr_of_answer) {
-                if (question) {
-                    question_increment++;
-                    $.ajax({
-                        url: "{{ route('admin.quiz.append') }}",
-                        type: "GET",
-                        data: {
-                            question: question,
-                            answer: 0,
-                            increment: question_increment,
-                        },
-                        success: function(data) {
-                            $('#question_list').append(data);
-                        },
-                        error: function(xhr, status, error) {
-                            swalError(error);
-                        }
-                    });
-                } else {
-                    if (arr_of_answer[0]) {
-                        answer_increment++;
-                        $.ajax({
-                            url: "{{ route('admin.quiz.append') }}",
-                            type: "GET",
-                            data: {
-                                question: 0,
-                                answer: arr_of_answer[0],
-                                parent: arr_of_answer[2],
-                                increment: answer_increment,
-                            },
-                            success: function(data) {
-                                $('#'.concat(arr_of_answer[1])).append(data);
-                            },
-                            error: function(xhr, status, error) {
-                                swalError(error);
-                            }
-                        });
+            function appendForm(aspect_quiz) {
+
+                aspect_increment++;
+                $.ajax({
+                    url: "{{ route('admin.quiz.append') }}",
+                    type: "GET",
+                    data: {
+                        aspect_quiz: aspect_quiz,
+                        increment: aspect_increment,
+                    },
+                    success: function(data) {
+                        $('#aspect_list').append(data);
+                    },
+                    error: function(xhr, status, error) {
+                        swalError(error);
                     }
-                }
+                });
+
             }
 
             function remove(target) {
