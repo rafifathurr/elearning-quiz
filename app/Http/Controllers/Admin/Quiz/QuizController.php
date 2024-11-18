@@ -88,13 +88,6 @@ class QuizController extends Controller
         return view('quiz.form.aspect', $data);
     }
 
-    /**
-     * Append form resource
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
@@ -155,20 +148,17 @@ class QuizController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Quiz $quiz)
     {
         $data['disabled'] = 'disabled';
+
         $data['quiz'] = $quiz;
-        $data['type_quiz'] = TypeQuiz::whereNull('deleted_at')->get();
         $data['type_user'] = TypeUser::whereNull('deleted_at')->get();
 
-        $data['quiz_question'] = '';
-        foreach ($quiz->quizQuestion as $index => $question) {
-            if (is_null($question->deleted_at)) {
-                $data['quiz_question'] .= $this->appendQuestion($question, $index + 1, 'disabled');
+        $data['quiz_aspect'] = '';
+        foreach ($quiz->quizAspect as $index => $aspect) {
+            if (is_null($aspect->deleted_at)) {
+                $data['quiz_aspect'] .= $this->appendAspect($aspect, $index + 1, 'disabled');
             }
         }
 

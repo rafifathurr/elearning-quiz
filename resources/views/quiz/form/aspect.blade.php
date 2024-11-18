@@ -25,7 +25,7 @@
             </label>
             <div class="col-md-8 col-sm-12">
                 <select name="quiz_aspect[{{ $increment }}][aspect_id]"
-                    id="quiz_aspect[{{ $increment }}][aspect_id]" class="form-control" required>
+                    id="quiz_aspect[{{ $increment }}][aspect_id]" class="form-control" required {{ $disabled }}>
                     <option value="">Pilih Aspek Pertanyaan</option>
                     @foreach ($aspect_question as $aspect)
                         <option value="{{ $aspect->id }}"
@@ -50,7 +50,7 @@
             </label>
             <div class="col-md-8 col-sm-12">
                 <select name="quiz_aspect[{{ $increment }}][level]" id="quiz_aspect[{{ $increment }}][level]"
-                    class="form-control" required>
+                    class="form-control" required {{ $disabled }}>
                     <option value="">Pilih Level Pertanyaan</option>
                     <option value="1"
                         {{ old('quiz_aspect.' . $increment . '.level', $quiz_aspect->level ?? '') == 1 ? 'selected' : '' }}>
