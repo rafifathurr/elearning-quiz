@@ -330,8 +330,14 @@ class QuizController extends Controller
     {
         $questions = [];
         foreach ($quiz->quizAspect as $aspect) {
-            $questions[] = QuizQuestion::where('level', 'like', '%' . $aspect->level . '%')
-                ->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
+            $questions[] = QuizQuestion::where(function ($query) use ($aspect) {
+                $query->where('level', 'like', '%' . $aspect->level . '%')
+                    ->orWhere('level', 0);
+            })
+                ->where(function ($query) use ($aspect) {
+                    $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
+                        ->orWhere('aspect', 0);
+                })
                 ->limit($aspect->total_question)
                 ->get();
         }
