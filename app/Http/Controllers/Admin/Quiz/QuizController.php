@@ -47,7 +47,8 @@ class QuizController extends Controller
                 ->addColumn('action', function ($data) {
                     $btn_action = '<a href="' . route('admin.quiz.show', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
                     $btn_action .= '<a href="' . route('admin.quiz.edit', ['quiz' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
-                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
+                    $btn_action .= '<a href="' . route('admin.quiz.showQuestion', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-search"></i></a>';
+                    // $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
                     $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                     return $btn_action;
                 })
@@ -323,6 +324,21 @@ class QuizController extends Controller
         } catch (\Exception $e) {
             session()->flash('failed', $e->getMessage());
         }
+    }
+
+    public function showQuestion(Quiz $quiz)
+    {
+        $question = [];
+        foreach ($quiz->quizAspect as $aspect) {
+
+            $questions[] = QuizQuestion::where('level', $aspect->level)
+                ->where('aspect', $aspect->aspect_id)
+                ->inRandomOrder()
+                ->limit($aspect->total_question)
+                ->get();
+        }
+
+        return view('quiz.preview', compact('questions'));
     }
 
 

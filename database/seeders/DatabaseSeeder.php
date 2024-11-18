@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             TypeQuizSeeder::class,
             AspectQuestionSeeder::class,
             PaymentPackageSeeder::class,
+            QuestionSeeder::class,
+            Question2Seeder::class,
             //AllDataQuizSeeder::class
             // QuizSeeder::class,
             // Quiz2Seeder::class
