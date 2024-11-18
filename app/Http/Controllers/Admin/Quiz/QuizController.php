@@ -99,7 +99,7 @@ class QuizController extends Controller
     {
         try {
             DB::beginTransaction();
-            dd($request->quiz_aspect);
+
             $quiz = Quiz::create([
                 'name' => $request->name,
                 'description' => $request->description,
