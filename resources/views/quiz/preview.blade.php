@@ -45,4 +45,18 @@
         </section>
         <!-- /.content -->
     </div>
+    {{-- <script>
+        // Mencegah refresh dengan menekan F5 atau tombol CTRL + R
+        window.addEventListener('keydown', function(e) {
+            if ((e.key === 'F5') || (e.ctrlKey && e.key === 'r')) {
+                e.preventDefault(); // Mencegah aksi default refresh
+                alert("Halaman tidak dapat di-refresh");
+            }
+        });
+
+        // Mencegah refresh dengan menekan tombol reload pada browser
+        window.onbeforeunload = function() {
+            return "Apakah Anda yakin ingin meninggalkan halaman ini?";
+        };
+    </script> --}}
 @endsection
