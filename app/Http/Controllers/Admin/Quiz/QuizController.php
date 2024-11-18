@@ -328,14 +328,19 @@ class QuizController extends Controller
 
     public function showQuestion(Quiz $quiz)
     {
-        $question = [];
+        $questions = [];
         foreach ($quiz->quizAspect as $aspect) {
-
-            $questions[] = QuizQuestion::where('level', $aspect->level)
-                ->where('aspect', $aspect->aspect_id)
-                ->inRandomOrder()
+            $questions[] = QuizQuestion::where('level', 'like', '%' . $aspect->level . '%')
+                ->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
                 ->limit($aspect->total_question)
                 ->get();
+        }
+
+
+        foreach ($questions as $key => $questionSet) {
+            foreach ($questionSet as $question) {
+                $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
+            }
         }
 
         return view('quiz.preview', compact('questions'));

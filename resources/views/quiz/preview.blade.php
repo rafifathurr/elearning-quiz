@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Tambah Quiz</h1>
+                        <h1 class="m-0">Preview Quiz</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -21,17 +21,18 @@
                         <div class="card">
                             <div class="card-body">
                                 <ul>
-                                    <?php $no = 0; ?>
+                                    @php $no = 0; @endphp
                                     @foreach ($questions as $questionSet)
                                         @foreach ($questionSet as $question)
-                                            <?php
-                                            $no++; ?>
-                                            <p>{{ $no }}. {{ $question->question }}</p>
-                                            <ul>
-                                                @foreach ($question->quizAnswer as $answer)
-                                                    <li>{{ $answer->answer }}</li>
-                                                @endforeach
-                                            </ul>
+                                            @php $no++; @endphp
+                                            <li class="list-unstyled">
+                                                {{ $no }}. {{ $question->question }}
+                                                <ol style="list-style-type: lower-alpha;">
+                                                    @foreach ($question->quizAnswer as $answer)
+                                                        <li>{{ $answer->answer }}</li>
+                                                    @endforeach
+                                                </ol>
+                                            </li>
                                         @endforeach
                                     @endforeach
                                 </ul>
