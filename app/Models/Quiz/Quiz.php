@@ -17,7 +17,7 @@ class Quiz extends Model
 
     public function quizAspect()
     {
-        return $this->hasMany(QuizAspect::class, 'quiz_id', 'id');
+        return $this->hasMany(QuizAspect::class, 'quiz_id', 'id')->whereNull('deleted_at');
     }
 
     public function typeQuiz()
