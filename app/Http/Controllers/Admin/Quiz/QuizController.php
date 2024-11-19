@@ -45,10 +45,10 @@ class QuizController extends Controller
                     return $list_view;
                 })
                 ->addColumn('action', function ($data) {
-                    $btn_action = '<a href="' . route('admin.quiz.show', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
-                    $btn_action .= '<a href="' . route('admin.quiz.edit', ['quiz' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
-                    $btn_action .= '<a href="' . route('admin.quiz.showQuestion', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-search"></i></a>';
-                    // $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
+                    // $btn_action = '<a href="' . route('admin.quiz.show', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
+                    $btn_action = '<a href="' . route('admin.quiz.edit', ['quiz' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
+                    $btn_action .= '<a href="' . route('admin.quiz.showQuestion', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1 ml-1"><i class="fas fa-search"></i></a>';
+                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
                     $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                     return $btn_action;
                 })
@@ -349,9 +349,336 @@ class QuizController extends Controller
             }
         }
 
-        return view('quiz.preview', compact('questions'));
+        $totalQuestions = collect($questions)->sum(function ($questionSet) {
+            return $questionSet->count();
+        });
+
+        return view('quiz.preview', compact('questions', 'totalQuestions'));
     }
 
+    public function start(Quiz $quiz, Request $request)
+    {
+        // Bersihkan sesi sebelumnya
+        Session::forget('quiz');
+
+        $questions = [];
+        foreach ($quiz->quizAspect as $aspect) {
+            $questions[] = QuizQuestion::where(function ($query) use ($aspect) {
+                $query->where('level', 'like', '%' . $aspect->level . '%')
+                    ->orWhere('level', 0);
+            })
+                ->where(function ($query) use ($aspect) {
+                    $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
+                        ->orWhere('aspect', 0);
+                })
+                ->limit($aspect->total_question)
+                ->get();
+        }
+
+        $totalQuestions = collect($questions)->sum(function ($questionSet) {
+            return $questionSet->count();
+        });
+
+        // Jika permintaan berbasis API (JSON)
+        if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+            return response()->json([
+                'result' => $quiz,
+                'total_questions' => $totalQuestions,
+            ], 200);
+        } else {
+            // Jika permintaan berbasis browser
+            if (!empty($request->all())) {
+                return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
+            }
+
+            // Tentukan percobaan pertama
+            $attempt_number = 1;
+
+            // Simpan percobaan pertama ke dalam sesi
+            session(['quiz_attempt' => $attempt_number]);
+
+            // Kirim data ke tampilan
+            $data['quiz'] = $quiz;
+            $data['totalQuestions'] = $totalQuestions;
+
+            return view('quiz.play.start', $data);
+        }
+    }
+
+
+    public function play(Quiz $quiz, Request $request)
+    {
+        try {
+            // Ambil pertanyaan berdasarkan aspek kuis
+            $questions = [];
+            $questionIndex = 1;
+
+            foreach ($quiz->quizAspect as $aspect) {
+                $fetchedQuestions = QuizQuestion::where(function ($query) use ($aspect) {
+                    $query->where('level', 'like', '%' . $aspect->level . '%')
+                        ->orWhere('level', 0);
+                })
+                    ->where(function ($query) use ($aspect) {
+                        $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
+                            ->orWhere('aspect', 0);
+                    })
+                    ->limit($aspect->total_question)
+                    ->get();
+
+                foreach ($fetchedQuestions as $question) {
+                    $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
+                    $question->question_number = $questionIndex++;
+                    $question->is_active = false;
+                    $question->answered = false;
+                    $questions[] = $question;
+                }
+            }
+
+            // Total pertanyaan
+            $totalQuestions = count($questions);
+
+            // Tentukan pertanyaan aktif berdasarkan parameter `q`
+            $questionNumber = $request->q ?? 1; // Default ke nomor 1 jika `q` tidak disediakan
+            $currentQuestion = collect($questions)->firstWhere('question_number', $questionNumber);
+
+            if (!$currentQuestion) {
+                return redirect()->back()->withErrors(['error' => 'Pertanyaan tidak ditemukan.']);
+            }
+
+            // Tandai pertanyaan aktif
+            $currentQuestion->quiz_answer = $currentQuestion->quizAnswer->map(function ($answer) {
+                $answer->answered = false; // Pastikan ada di data yang dikirim ke view
+                return $answer;
+            })->toArray();
+
+            $currentQuestion->is_active = true;
+
+            // Struktur data yang dikirimkan ke view
+            $data = [
+                'quiz' => [
+                    'id' => $quiz->id,
+                    'name' => $quiz->name,
+                    'time_duration' => $quiz->time_duration,
+                    'total_question' => $totalQuestions,
+                    'quiz_question' => $questions,
+                ],
+                'quiz_question' => $currentQuestion,
+            ];
+
+            // Simpan data kuis ke dalam sesi
+            Session::put('quiz', [
+                'id' => $quiz->id,
+                'name' => $quiz->name,
+                'time_duration' => $quiz->time_duration,
+                'total_question' => $totalQuestions,
+                'quiz_question' => $questions,
+            ]);
+
+            // Respon berbasis API atau View
+            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+                return response()->json(['result' => $data], 200);
+            } else {
+                return view('quiz.play.index', $data);
+            }
+        } catch (Exception $e) {
+            // Tangani error
+            return redirect()->back()->with(['failed' => $e->getMessage()]);
+        }
+    }
+
+
+    public function answer(Request $request)
+    {
+        try {
+            // Ambil data kuis dari sesi
+            if (!Session::has('quiz')) {
+                return response()->json(['message' => 'Session Telah Habis'], 401);
+            }
+
+            $quiz = Session::get('quiz');
+            $questions = collect($quiz['quiz_question']);
+
+            // Cari pertanyaan saat ini berdasarkan nomor soal
+            $currentQuestion = $questions->firstWhere('question_number', $request->q);
+
+            if (!$currentQuestion) {
+                return response()->json(['message' => 'Pertanyaan tidak ditemukan'], 404);
+            }
+
+            // Tandai semua jawaban sebagai tidak dijawab
+            foreach ($currentQuestion['quiz_answer'] as &$answer) {
+                $answer['answered'] = false;
+            }
+
+            // Tandai jawaban yang dipilih pengguna
+            $selectedAnswer = collect($currentQuestion['quiz_answer'])->firstWhere('answer', $request->value);
+
+            if ($selectedAnswer) {
+                $selectedAnswer['answered'] = true;
+
+                // Simpan kembali jawaban ke dalam pertanyaan
+                foreach ($currentQuestion['quiz_answer'] as &$answer) {
+                    if ($answer['answer'] == $selectedAnswer['answer']) {
+                        $answer = $selectedAnswer;
+                    }
+                }
+
+                // Perbarui pertanyaan dalam daftar soal
+                foreach ($questions as &$question) {
+                    if ($question['question_number'] == $currentQuestion['question_number']) {
+                        $question = $currentQuestion;
+                        break;
+                    }
+                }
+
+                Session::forget('quiz');
+                // Simpan kembali data kuis ke sesi
+                $quiz['quiz_question'] = $questions->toArray();
+                Session::put('quiz', $quiz);
+
+                return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
+            } else {
+                return response()->json(['message' => 'Jawaban Tidak Ditemukan'], 400);
+            }
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // public function play(Quiz $quiz, Request $request)
+    // {
+    //     try {
+    //         if (Session::has('quiz')) {
+    //             $quiz = Session::get('quiz');
+
+    //             foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+    //                 $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+    //             }
+
+    //             Session::forget('quiz');
+    //         } else {
+    //             $quiz = $quiz->with(['quizTypeUserAccess.typeUser', 'quizQuestion.quizAnswer'])->find($quiz->id)->toArray();
+    //             $quiz['total_question'] = count($quiz['quiz_question']);
+
+    //             // Generate It Has Random Question
+    //             if ($quiz['is_random_question']) {
+    //                 shuffle($quiz['quiz_question']);
+    //             }
+
+    //             // Quiz Question
+    //             $question_number = 1;
+    //             foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+    //                 // Adding Question Numbering
+    //                 $quiz['quiz_question'][$index_quiz_question]['question_number'] = $question_number;
+    //                 $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+    //                 $quiz['quiz_question'][$index_quiz_question]['answered'] = false;
+    //                 $question_number++;
+
+    //                 // Array of Answer
+    //                 $quiz_answer_arr = $quiz_question['quiz_answer'];
+
+    //                 // Generate It Has Random Another Correct Answer
+    //                 if ($quiz_question['is_generate_random_answer']) {
+    //                     $quiz_answer_arr = [];
+    //                     $quiz_answer = collect($quiz_question['quiz_answer'])->where('is_answer', 1)->first();
+
+    //                     if (!is_null($quiz_answer['attachment'])) {
+    //                     } else {
+    //                         // Generate Random Another Correct Answer Number Method
+    //                         $range_num_min = '1';
+    //                         $range_num_max = '9';
+
+    //                         for ($index = 1; $index < strlen($quiz_answer['answer']); $index++) {
+    //                             $range_num_min .= '0';
+    //                             $range_num_max .= '9';
+    //                         }
+
+    //                         $quiz_answer_first = $quiz_answer;
+    //                         $quiz_answer_first['answered'] = false;
+    //                         $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
+    //                         array_push($quiz_answer_arr, collect($quiz_answer_first));
+
+    //                         $answer_list = [intval($quiz_answer_first['answer'])];
+    //                         for ($random_index = 1; $random_index <= 4; $random_index++) {
+
+    //                             $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
+
+    //                             array_push($quiz_answer_arr, collect([
+    //                                 'quiz_question_id' => $quiz_answer['quiz_question_id'],
+    //                                 'answer' => $answer,
+    //                                 'attachment' => null,
+    //                                 'is_answer' => 0,
+    //                                 'answered' => false,
+    //                                 'point' => 0,
+    //                                 'created_at' => $quiz_answer['created_at'],
+    //                                 'updated_at' => $quiz_answer['updated_at'],
+    //                             ]));
+
+    //                             array_push($answer_list, $answer);
+    //                         }
+
+    //                         shuffle($quiz_answer_arr);
+    //                     }
+    //                 } else {
+    //                     foreach ($quiz_answer_arr  as $index => $quiz_answer) {
+    //                         $quiz_answer_arr[$index]['answered'] = false;
+    //                         $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
+    //                         $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
+    //                     }
+    //                 }
+
+    //                 // Generate It Has Random Answer
+    //                 if ($quiz_question['is_random_answer']) {
+    //                     shuffle($quiz_answer_arr);
+    //                 }
+
+    //                 // Picking New List Answer
+    //                 $quiz['quiz_question'][$index_quiz_question]['quiz_answer'] = collect($quiz_answer_arr);
+    //             }
+    //         }
+
+    //         $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
+    //         $current_quiz['is_active'] = true;
+
+    //         foreach ($quiz['quiz_question'] as $index => $question) {
+    //             if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+    //                 $quiz['quiz_question'][$index] = $current_quiz;
+    //             }
+    //         }
+
+    //         Session::forget('quiz');
+    //         Session::put('quiz', $quiz);
+
+    //         $data['quiz'] = $quiz;
+    //         $data['quiz_question'] = $current_quiz;
+
+    //         if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+    //             return response()->json(['result' => $data], 200);
+    //         } else {
+    //             if (isset($request->q)) {
+    //                 return view('quiz.play.question', $data);
+    //             }
+    //             return view('quiz.play.index', $data);
+    //         }
+    //     } catch (Exception $e) {
+    //         dd($e->getMessage());
+    //         // return redirect()
+    //         //     ->back()
+    //         //     ->with(['failed', $e->getMessage()]);
+    //     }
+    // }
 
 
 
@@ -418,183 +745,183 @@ class QuizController extends Controller
     /**
      * Start quiz resource
      */
-    public function start(Quiz $quiz, Request $request)
-    {
-        Session::forget('quiz');
-        if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-            return response()->json(['result' => $quiz], 200);
-        } else {
-            if (!empty($request->all())) {
-                return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
-            }
+    // public function start(Quiz $quiz, Request $request)
+    // {
+    //     Session::forget('quiz');
+    //     if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+    //         return response()->json(['result' => $quiz], 200);
+    //     } else {
+    //         if (!empty($request->all())) {
+    //             return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
+    //         }
 
-            // Tentukan percakapan pertama
-            $attempt_number = 1;
+    //         // Tentukan percakapan pertama
+    //         $attempt_number = 1;
 
-            // Simpan percakapan pertama pada session
-            session(['quiz_attempt' => $attempt_number]);
+    //         // Simpan percakapan pertama pada session
+    //         session(['quiz_attempt' => $attempt_number]);
 
-            $data['quiz'] = $quiz;
-            return view('quiz.play.start', $data);
-        }
-    }
+    //         $data['quiz'] = $quiz;
+    //         return view('quiz.play.start', $data);
+    //     }
+    // }
 
 
-    public function auth(Request $request)
-    {
-        $request->validate([
-            'quiz_id' => 'required',
-            'code_access' => 'required',
-            'password' => 'required',
-        ]);
+    // public function auth(Request $request)
+    // {
+    //     $request->validate([
+    //         'quiz_id' => 'required',
+    //         'code_access' => 'required',
+    //         'password' => 'required',
+    //     ]);
 
-        $checking = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $request->quiz_id)->where('code_access', $request->code_access)->where('password', $request->password)->first();
+    //     $checking = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $request->quiz_id)->where('code_access', $request->code_access)->where('password', $request->password)->first();
 
-        if (!is_null($checking)) {
-            Session::put('key', $checking->key);
-            return redirect()->route('admin.quiz.play', ['quiz' => $checking->quiz_id]);
-        } else {
-            return redirect()->back()->with(['failed' => 'Kode Akses atau Password Tidak Sesuai!']);
-        }
-    }
+    //     if (!is_null($checking)) {
+    //         Session::put('key', $checking->key);
+    //         return redirect()->route('admin.quiz.play', ['quiz' => $checking->quiz_id]);
+    //     } else {
+    //         return redirect()->back()->with(['failed' => 'Kode Akses atau Password Tidak Sesuai!']);
+    //     }
+    // }
 
     /**
      * Play quiz resource
      */
-    public function play(Quiz $quiz, Request $request)
-    {
-        try {
+    // public function play(Quiz $quiz, Request $request)
+    // {
+    //     try {
 
-            if (User::find(auth()->user()->id)->hasRole('user')) {
-                if (Session::has('key')) {
-                    $check = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $quiz->id)->where('key', Session::get('key'))->first();
+    //         if (User::find(auth()->user()->id)->hasRole('user')) {
+    //             if (Session::has('key')) {
+    //                 $check = QuizAuthenticationAccess::whereNull('deleted_at')->where('quiz_id', $quiz->id)->where('key', Session::get('key'))->first();
 
-                    if (is_null($check)) {
-                        return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
-                    }
-                } else {
-                    return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
-                }
-            }
+    //                 if (is_null($check)) {
+    //                     return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
+    //                 }
+    //             } else {
+    //                 return redirect()->route('quiz.listQuiz')->with(['failed' => 'Anda Tidak Memiliki Akses']);
+    //             }
+    //         }
 
-            if (Session::has('quiz')) {
-                $quiz = Session::get('quiz');
+    //         if (Session::has('quiz')) {
+    //             $quiz = Session::get('quiz');
 
-                foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
-                    $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
-                }
+    //             foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+    //                 $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+    //             }
 
-                Session::forget('quiz');
-            } else {
-                $quiz = $quiz->with(['quizTypeUserAccess.typeUser', 'quizQuestion.quizAnswer'])->find($quiz->id)->toArray();
-                $quiz['total_question'] = count($quiz['quiz_question']);
+    //             Session::forget('quiz');
+    //         } else {
+    //             $quiz = $quiz->with(['quizTypeUserAccess.typeUser', 'quizQuestion.quizAnswer'])->find($quiz->id)->toArray();
+    //             $quiz['total_question'] = count($quiz['quiz_question']);
 
-                // Generate It Has Random Question
-                if ($quiz['is_random_question']) {
-                    shuffle($quiz['quiz_question']);
-                }
+    //             // Generate It Has Random Question
+    //             if ($quiz['is_random_question']) {
+    //                 shuffle($quiz['quiz_question']);
+    //             }
 
-                // Quiz Question
-                $question_number = 1;
-                foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
-                    // Adding Question Numbering
-                    $quiz['quiz_question'][$index_quiz_question]['question_number'] = $question_number;
-                    $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
-                    $quiz['quiz_question'][$index_quiz_question]['answered'] = false;
-                    $question_number++;
+    //             // Quiz Question
+    //             $question_number = 1;
+    //             foreach ($quiz['quiz_question'] as $index_quiz_question => $quiz_question) {
+    //                 // Adding Question Numbering
+    //                 $quiz['quiz_question'][$index_quiz_question]['question_number'] = $question_number;
+    //                 $quiz['quiz_question'][$index_quiz_question]['is_active'] = false;
+    //                 $quiz['quiz_question'][$index_quiz_question]['answered'] = false;
+    //                 $question_number++;
 
-                    // Array of Answer
-                    $quiz_answer_arr = $quiz_question['quiz_answer'];
+    //                 // Array of Answer
+    //                 $quiz_answer_arr = $quiz_question['quiz_answer'];
 
-                    // Generate It Has Random Another Correct Answer
-                    if ($quiz_question['is_generate_random_answer']) {
-                        $quiz_answer_arr = [];
-                        $quiz_answer = collect($quiz_question['quiz_answer'])->where('is_answer', 1)->first();
+    //                 // Generate It Has Random Another Correct Answer
+    //                 if ($quiz_question['is_generate_random_answer']) {
+    //                     $quiz_answer_arr = [];
+    //                     $quiz_answer = collect($quiz_question['quiz_answer'])->where('is_answer', 1)->first();
 
-                        if (!is_null($quiz_answer['attachment'])) {
-                        } else {
-                            // Generate Random Another Correct Answer Number Method
-                            $range_num_min = '1';
-                            $range_num_max = '9';
+    //                     if (!is_null($quiz_answer['attachment'])) {
+    //                     } else {
+    //                         // Generate Random Another Correct Answer Number Method
+    //                         $range_num_min = '1';
+    //                         $range_num_max = '9';
 
-                            for ($index = 1; $index < strlen($quiz_answer['answer']); $index++) {
-                                $range_num_min .= '0';
-                                $range_num_max .= '9';
-                            }
+    //                         for ($index = 1; $index < strlen($quiz_answer['answer']); $index++) {
+    //                             $range_num_min .= '0';
+    //                             $range_num_max .= '9';
+    //                         }
 
-                            $quiz_answer_first = $quiz_answer;
-                            $quiz_answer_first['answered'] = false;
-                            $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
-                            array_push($quiz_answer_arr, collect($quiz_answer_first));
+    //                         $quiz_answer_first = $quiz_answer;
+    //                         $quiz_answer_first['answered'] = false;
+    //                         $quiz_answer_first['is_answer'] = intval($quiz_answer_first['is_answer']);
+    //                         array_push($quiz_answer_arr, collect($quiz_answer_first));
 
-                            $answer_list = [intval($quiz_answer_first['answer'])];
-                            for ($random_index = 1; $random_index <= 4; $random_index++) {
+    //                         $answer_list = [intval($quiz_answer_first['answer'])];
+    //                         for ($random_index = 1; $random_index <= 4; $random_index++) {
 
-                                $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
+    //                             $answer =  $this->generateAnswerRandom(intval($range_num_min), intval($range_num_max), $answer_list);
 
-                                array_push($quiz_answer_arr, collect([
-                                    'quiz_question_id' => $quiz_answer['quiz_question_id'],
-                                    'answer' => $answer,
-                                    'attachment' => null,
-                                    'is_answer' => 0,
-                                    'answered' => false,
-                                    'point' => 0,
-                                    'created_at' => $quiz_answer['created_at'],
-                                    'updated_at' => $quiz_answer['updated_at'],
-                                ]));
+    //                             array_push($quiz_answer_arr, collect([
+    //                                 'quiz_question_id' => $quiz_answer['quiz_question_id'],
+    //                                 'answer' => $answer,
+    //                                 'attachment' => null,
+    //                                 'is_answer' => 0,
+    //                                 'answered' => false,
+    //                                 'point' => 0,
+    //                                 'created_at' => $quiz_answer['created_at'],
+    //                                 'updated_at' => $quiz_answer['updated_at'],
+    //                             ]));
 
-                                array_push($answer_list, $answer);
-                            }
+    //                             array_push($answer_list, $answer);
+    //                         }
 
-                            shuffle($quiz_answer_arr);
-                        }
-                    } else {
-                        foreach ($quiz_answer_arr  as $index => $quiz_answer) {
-                            $quiz_answer_arr[$index]['answered'] = false;
-                            $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
-                            $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
-                        }
-                    }
+    //                         shuffle($quiz_answer_arr);
+    //                     }
+    //                 } else {
+    //                     foreach ($quiz_answer_arr  as $index => $quiz_answer) {
+    //                         $quiz_answer_arr[$index]['answered'] = false;
+    //                         $quiz_answer_arr[$index]['is_answer'] = intval($quiz_answer['is_answer']);
+    //                         $quiz_answer_arr[$index] = collect($quiz_answer_arr[$index]);
+    //                     }
+    //                 }
 
-                    // Generate It Has Random Answer
-                    if ($quiz_question['is_random_answer']) {
-                        shuffle($quiz_answer_arr);
-                    }
+    //                 // Generate It Has Random Answer
+    //                 if ($quiz_question['is_random_answer']) {
+    //                     shuffle($quiz_answer_arr);
+    //                 }
 
-                    // Picking New List Answer
-                    $quiz['quiz_question'][$index_quiz_question]['quiz_answer'] = collect($quiz_answer_arr);
-                }
-            }
+    //                 // Picking New List Answer
+    //                 $quiz['quiz_question'][$index_quiz_question]['quiz_answer'] = collect($quiz_answer_arr);
+    //             }
+    //         }
 
-            $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
-            $current_quiz['is_active'] = true;
+    //         $current_quiz = collect($quiz['quiz_question'])->where('question_number', isset($request->q) ? $request->q : 1)->first();
+    //         $current_quiz['is_active'] = true;
 
-            foreach ($quiz['quiz_question'] as $index => $question) {
-                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
-                    $quiz['quiz_question'][$index] = $current_quiz;
-                }
-            }
+    //         foreach ($quiz['quiz_question'] as $index => $question) {
+    //             if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+    //                 $quiz['quiz_question'][$index] = $current_quiz;
+    //             }
+    //         }
 
-            Session::forget('quiz');
-            Session::put('quiz', $quiz);
+    //         Session::forget('quiz');
+    //         Session::put('quiz', $quiz);
 
-            $data['quiz'] = $quiz;
-            $data['quiz_question'] = $current_quiz;
+    //         $data['quiz'] = $quiz;
+    //         $data['quiz_question'] = $current_quiz;
 
-            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-                return response()->json(['result' => $data], 200);
-            } else {
-                if (isset($request->q)) {
-                    return view('quiz.play.question', $data);
-                }
-                return view('quiz.play.index', $data);
-            }
-        } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with(['failed', $e->getMessage()]);
-        }
-    }
+    //         if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+    //             return response()->json(['result' => $data], 200);
+    //         } else {
+    //             if (isset($request->q)) {
+    //                 return view('quiz.play.question', $data);
+    //             }
+    //             return view('quiz.play.index', $data);
+    //         }
+    //     } catch (Exception $e) {
+    //         return redirect()
+    //             ->back()
+    //             ->with(['failed', $e->getMessage()]);
+    //     }
+    // }
 
     /**
      * Preview quiz resource
@@ -637,45 +964,45 @@ class QuizController extends Controller
         }
     }
 
-    public function answer(Request $request)
-    {
-        if (Session::has('quiz')) {
-            $quiz = Session::get('quiz');
+    // public function answer(Request $request)
+    // {
+    //     if (Session::has('quiz')) {
+    //         $quiz = Session::get('quiz');
 
-            // Ambil soal dan jawaban saat ini berdasarkan nomor soal
-            $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
+    //         // Ambil soal dan jawaban saat ini berdasarkan nomor soal
+    //         $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
 
-            // Tandai jawaban sebelumnya sebagai tidak dijawab
-            foreach ($current_quiz['quiz_answer'] as $index => $answer) {
-                $current_quiz['quiz_answer'][$index]['answered'] = false;
-            }
+    //         // Tandai jawaban sebelumnya sebagai tidak dijawab
+    //         foreach ($current_quiz['quiz_answer'] as $index => $answer) {
+    //             $current_quiz['quiz_answer'][$index]['answered'] = false;
+    //         }
 
-            // Update jawaban yang dipilih pengguna
-            $selected_answer = collect($current_quiz['quiz_answer'])->where('answer', $request->value)->first();
-            $selected_answer['answered'] = true;
+    //         // Update jawaban yang dipilih pengguna
+    //         $selected_answer = collect($current_quiz['quiz_answer'])->where('answer', $request->value)->first();
+    //         $selected_answer['answered'] = true;
 
-            // Simpan kembali jawaban ke dalam sesi
-            foreach ($quiz['quiz_question'] as $index => $question) {
-                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
-                    $quiz['quiz_question'][$index] = $current_quiz;
+    //         // Simpan kembali jawaban ke dalam sesi
+    //         foreach ($quiz['quiz_question'] as $index => $question) {
+    //             if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+    //                 $quiz['quiz_question'][$index] = $current_quiz;
 
-                    foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
-                        if ($selected_answer['answer'] == $answer['answer']) {
-                            $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($selected_answer);
-                        }
-                    }
-                }
-            }
+    //                 foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
+    //                     if ($selected_answer['answer'] == $answer['answer']) {
+    //                         $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($selected_answer);
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            // Simpan kembali seluruh sesi quiz yang telah diperbarui
-            Session::forget('quiz');
-            Session::put('quiz', $quiz);
+    //         // Simpan kembali seluruh sesi quiz yang telah diperbarui
+    //         Session::forget('quiz');
+    //         Session::put('quiz', $quiz);
 
-            return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
-        } else {
-            return response()->json(['message' => 'Session Telah Habis'], 401);
-        }
-    }
+    //         return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
+    //     } else {
+    //         return response()->json(['message' => 'Session Telah Habis'], 401);
+    //     }
+    // }
 
     public function finish(Request $request, Quiz $quiz)
     {

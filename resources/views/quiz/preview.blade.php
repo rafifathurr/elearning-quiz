@@ -20,6 +20,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
+                                <h3>Total Pertanyaan {{ $totalQuestions }}</h3>
                                 <ul>
                                     @php $no = 0; @endphp
                                     @foreach ($questions as $questionSet)
