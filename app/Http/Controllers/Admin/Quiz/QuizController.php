@@ -20,6 +20,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -448,37 +449,46 @@ class QuizController extends Controller
             // Tandai pertanyaan aktif
             $currentQuestion->quiz_answer = $currentQuestion->quizAnswer->map(function ($answer) {
                 $answer->answered = false; // Pastikan ada di data yang dikirim ke view
+                $answer->is_answer = (int) $answer->is_answer; // Samakan tipe dengan versi lama
                 return $answer;
             })->toArray();
 
             $currentQuestion->is_active = true;
 
+            // Update daftar pertanyaan untuk menyertakan informasi "is_active" pada pertanyaan aktif
+            foreach ($questions as $index => $question) {
+                $questions[$index]->is_active = $question->question_number === $currentQuestion->question_number;
+                $questions[$index]->answered = false;
+            }
+
             // Struktur data yang dikirimkan ke view
+            $quizData = [
+                'id' => $quiz->id,
+                'name' => $quiz->name,
+                'time_duration' => $quiz->time_duration,
+                'total_question' => $totalQuestions,
+                'quiz_question' => $questions,
+            ];
+
             $data = [
-                'quiz' => [
-                    'id' => $quiz->id,
-                    'name' => $quiz->name,
-                    'time_duration' => $quiz->time_duration,
-                    'total_question' => $totalQuestions,
-                    'quiz_question' => $questions,
-                ],
+                'quiz' => $quizData,
                 'quiz_question' => $currentQuestion,
             ];
 
             // Simpan data kuis ke dalam sesi
             Session::put('quiz', [
                 'id' => $quiz->id,
-                'name' => $quiz->name,
-                'time_duration' => $quiz->time_duration,
-                'total_question' => $totalQuestions,
-                'quiz_question' => $questions,
+                'active_question' => $currentQuestion->question_number,
             ]);
 
             // Respon berbasis API atau View
             if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
                 return response()->json(['result' => $data], 200);
             } else {
-                return view('quiz.play.index', $data);
+                if (isset($request->q)) {
+                    return view('quiz.play.question', $data); // View detail pertanyaan
+                }
+                return view('quiz.play.index', $data); // View utama kuis
             }
         } catch (Exception $e) {
             // Tangani error
@@ -487,9 +497,13 @@ class QuizController extends Controller
     }
 
 
+
     public function answer(Request $request)
     {
         try {
+            // Log data yang diterima dari request
+            Log::info('Request received:', $request->all());
+
             // Ambil data kuis dari sesi
             if (!Session::has('quiz')) {
                 return response()->json(['message' => 'Session Telah Habis'], 401);
@@ -499,16 +513,23 @@ class QuizController extends Controller
             $questions = collect($quiz['quiz_question']);
 
             // Cari pertanyaan saat ini berdasarkan nomor soal
-            $currentQuestion = $questions->firstWhere('question_number', $request->q);
+            $currentQuestionIndex = $questions->search(function ($question) use ($request) {
+                return $question['question_number'] == $request->q;
+            });
 
-            if (!$currentQuestion) {
+            // Jika pertanyaan tidak ditemukan
+            if ($currentQuestionIndex === false) {
                 return response()->json(['message' => 'Pertanyaan tidak ditemukan'], 404);
             }
 
+            // Ambil pertanyaan yang ditemukan
+            $currentQuestion = $questions[$currentQuestionIndex];
+
             // Tandai semua jawaban sebagai tidak dijawab
-            foreach ($currentQuestion['quiz_answer'] as &$answer) {
+            $currentQuestion['quiz_answer'] = array_map(function ($answer) {
                 $answer['answered'] = false;
-            }
+                return $answer;
+            }, $currentQuestion['quiz_answer']);
 
             // Tandai jawaban yang dipilih pengguna
             $selectedAnswer = collect($currentQuestion['quiz_answer'])->firstWhere('answer', $request->value);
@@ -516,22 +537,17 @@ class QuizController extends Controller
             if ($selectedAnswer) {
                 $selectedAnswer['answered'] = true;
 
-                // Simpan kembali jawaban ke dalam pertanyaan
-                foreach ($currentQuestion['quiz_answer'] as &$answer) {
+                // Perbarui jawaban yang dipilih
+                $currentQuestion['quiz_answer'] = array_map(function ($answer) use ($selectedAnswer) {
                     if ($answer['answer'] == $selectedAnswer['answer']) {
-                        $answer = $selectedAnswer;
+                        return $selectedAnswer;
                     }
-                }
+                    return $answer;
+                }, $currentQuestion['quiz_answer']);
 
-                // Perbarui pertanyaan dalam daftar soal
-                foreach ($questions as &$question) {
-                    if ($question['question_number'] == $currentQuestion['question_number']) {
-                        $question = $currentQuestion;
-                        break;
-                    }
-                }
+                // Perbarui pertanyaan dalam koleksi
+                $questions[$currentQuestionIndex] = $currentQuestion;
 
-                Session::forget('quiz');
                 // Simpan kembali data kuis ke sesi
                 $quiz['quiz_question'] = $questions->toArray();
                 Session::put('quiz', $quiz);
@@ -541,9 +557,17 @@ class QuizController extends Controller
                 return response()->json(['message' => 'Jawaban Tidak Ditemukan'], 400);
             }
         } catch (Exception $e) {
+            // Log error untuk pemecahan masalah
+            Log::error('Error occurred: ' . $e->getMessage());
             return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
+
+
+
+
+
 
 
 
@@ -681,6 +705,45 @@ class QuizController extends Controller
     // }
 
 
+    // public function answer(Request $request)
+    // {
+    //     if (Session::has('quiz')) {
+    //         $quiz = Session::get('quiz');
+
+    //         // Ambil soal dan jawaban saat ini berdasarkan nomor soal
+    //         $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
+
+    //         // Tandai jawaban sebelumnya sebagai tidak dijawab
+    //         foreach ($current_quiz['quiz_answer'] as $index => $answer) {
+    //             $current_quiz['quiz_answer'][$index]['answered'] = false;
+    //         }
+
+    //         // Update jawaban yang dipilih pengguna
+    //         $selected_answer = collect($current_quiz['quiz_answer'])->where('answer', $request->value)->first();
+    //         $selected_answer['answered'] = true;
+
+    //         // Simpan kembali jawaban ke dalam sesi
+    //         foreach ($quiz['quiz_question'] as $index => $question) {
+    //             if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+    //                 $quiz['quiz_question'][$index] = $current_quiz;
+
+    //                 foreach ($quiz['quiz_question'][$index]['quiz_answer'] as $num => $answer) {
+    //                     if ($selected_answer['answer'] == $answer['answer']) {
+    //                         $quiz['quiz_question'][$index]['quiz_answer'][$num] = collect($selected_answer);
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Simpan kembali seluruh sesi quiz yang telah diperbarui
+    //         Session::forget('quiz');
+    //         Session::put('quiz', $quiz);
+
+    //         return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
+    //     } else {
+    //         return response()->json(['message' => 'Session Telah Habis'], 401);
+    //     }
+    // }
 
     public function listQuiz()
     {

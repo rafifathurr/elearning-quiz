@@ -133,6 +133,7 @@
                         },
                         success: function(data) {},
                         error: function(xhr, error, message) {
+                            console.log(xhr, error, message);
                             if (xhr.status == 401) {
                                 swalError('Sesi Anda Telah Habis');
                                 window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
