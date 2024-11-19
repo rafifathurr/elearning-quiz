@@ -116,8 +116,8 @@ class Question2Seeder extends Seeder
                     'is_random_answer' => 0,
                     'is_generate_random_answer' => 0,
                     'order' => $index + 1, // Penomoran urutan pertanyaan
-                    'level' => '2|3',
-                    'aspect' => '1|2',
+                    'level' => '|2|3|',
+                    'aspect' => '|3|',
                     'direction_question' => 'Pilih jawaban yang benar untuk soal berikut',
                     'question' => $item['question'],
                     'description' => null,

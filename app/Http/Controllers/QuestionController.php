@@ -27,23 +27,29 @@ class QuestionController extends Controller
 
         $dataTable = DataTables::of($question)
             ->addIndexColumn()
-
             ->addColumn('level', function ($data) {
                 $list_view = '<ul>';
+
+                // Jika level 0, tampilkan semua level (Level 1, Level 2, Level 3)
                 if ($data->level == 0) {
                     $list_view .= '<li>' . 'Level 1' . '</li>';
                     $list_view .= '<li>' . 'Level 2' . '</li>';
                     $list_view .= '<li>' . 'Level 3' . '</li>';
                 } else {
+                    // Jika level bukan 0, tampilkan level yang sesuai dari data yang ada
                     $levels = explode('|', $data->level);
                     foreach ($levels as $level) {
-                        $list_view .= '<li>' . 'Level ' . $level . '</li>';
+                        // Pastikan level hanya menampilkan data yang valid
+                        if (in_array($level, [1, 2, 3])) {
+                            $list_view .= '<li>' . 'Level ' . $level . '</li>';
+                        }
                     }
                 }
 
                 $list_view .= '</ul>';
                 return $list_view;
             })
+
             ->addColumn('aspect', function ($data) {
                 $list_view = '<ul>';
                 $aspects = explode('|', $data->aspect);
@@ -142,15 +148,15 @@ class QuestionController extends Controller
             if (isset($request->all_level) && $request->all_level == 'on') {
                 $level = '0';
             } else {
-                $level = isset($request->level) ? implode('|', $request->level) : '';
+                $level = isset($request->level) ? '|' . implode('|', $request->level) . '|' : '';
             }
-
 
             if (isset($request->all_aspect) && $request->all_aspect == 'on') {
                 $aspect = '0';
             } else {
-                $aspect = isset($request->aspect) ? implode('|', $request->aspect) : '';
+                $aspect = isset($request->aspect) ? '|' . implode('|', $request->aspect) . '|' : '';
             }
+
 
             $quiz_question = QuizQuestion::create([
                 'is_random_answer' => isset($request->is_random_answer),
@@ -273,13 +279,13 @@ class QuestionController extends Controller
             if (isset($request->all_level) && $request->all_level == 'on') {
                 $level = '0';
             } else {
-                $level = isset($request->level) ? implode('|', $request->level) : '';
+                $level = isset($request->level) ? '|' . implode('|', $request->level) . '|' : '';
             }
 
             if (isset($request->all_aspect) && $request->all_aspect == 'on') {
                 $aspect = '0';
             } else {
-                $aspect = isset($request->aspect) ? implode('|', $request->aspect) : '';
+                $aspect = isset($request->aspect) ? '|' . implode('|', $request->aspect) . '|' : '';
             }
             $question_update = QuizQuestion::where('id', $id)->update([
                 'is_random_answer' => isset($request->is_random_answer),

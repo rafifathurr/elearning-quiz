@@ -331,14 +331,16 @@ class QuizController extends Controller
     {
         $questions = [];
         foreach ($quiz->quizAspect as $aspect) {
+
             $questions[] = QuizQuestion::where(function ($query) use ($aspect) {
-                $query->where('level', 'like', '%' . $aspect->level . '%')
-                    ->orWhere('level', 0);
+                $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
+                    ->orWhere('level', '0');
             })
                 ->where(function ($query) use ($aspect) {
-                    $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
-                        ->orWhere('aspect', 0);
+                    $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
+                        ->orWhere('aspect', '0');
                 })
+                ->inRandomOrder()
                 ->limit($aspect->total_question)
                 ->get();
         }
@@ -430,7 +432,7 @@ class QuizController extends Controller
                     $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
                     $question->question_number = $questionIndex++;
                     $question->is_active = false;
-                    $question->answered = false;
+                    $question->answered = false; // Awalnya dianggap belum dijawab
                     $questions[] = $question;
                 }
             }
@@ -444,6 +446,20 @@ class QuizController extends Controller
 
             if (!$currentQuestion) {
                 return redirect()->back()->withErrors(['error' => 'Pertanyaan tidak ditemukan.']);
+            }
+
+            // Tandai jawaban yang sudah disimpan di sesi
+            if (Session::has('quiz')) {
+                $quizSession = Session::get('quiz');
+                $savedAnswer = $quizSession['quiz_question'][$currentQuestion->question_number - 1]['selected_answer'] ?? null;
+                if ($savedAnswer) {
+                    // Tandai jawaban yang sudah dipilih sebagai answered
+                    $currentQuestion->quizAnswer->each(function ($answer) use ($savedAnswer) {
+                        if ($answer->answer === $savedAnswer) {
+                            $answer->answered = true;
+                        }
+                    });
+                }
             }
 
             // Tandai pertanyaan aktif
@@ -498,12 +514,14 @@ class QuizController extends Controller
 
 
 
+
     public function answer(Request $request)
     {
+        // Mengecek apakah sesi 'quiz' ada
         if (Session::has('quiz')) {
             $quizSession = Session::get('quiz');
 
-            // Ambil kuis dari database
+            // Ambil kuis dari database berdasarkan ID sesi
             $quiz = Quiz::find($quizSession['id']);
 
             if (!$quiz) {
@@ -511,10 +529,11 @@ class QuizController extends Controller
                 return response()->json(['message' => 'Kuis tidak ditemukan'], 404);
             }
 
-            // Ambil pertanyaan berdasarkan aspek kuis
+            // Menyiapkan array pertanyaan
             $questions = [];
             $questionIndex = 1;
 
+            // Mengambil pertanyaan berdasarkan aspek kuis
             foreach ($quiz->quizAspect as $aspect) {
                 $fetchedQuestions = QuizQuestion::where(function ($query) use ($aspect) {
                     $query->where('level', 'like', '%' . $aspect->level . '%')
@@ -534,7 +553,7 @@ class QuizController extends Controller
                 }
             }
 
-            // Cari pertanyaan saat ini berdasarkan nomor soal
+            // Menemukan pertanyaan berdasarkan nomor soal yang dikirimkan
             $currentQuestion = collect($questions)->firstWhere('question_number', $request->q);
 
             if (!$currentQuestion) {
@@ -542,41 +561,23 @@ class QuizController extends Controller
                 return response()->json(['message' => 'Pertanyaan tidak ditemukan'], 404);
             }
 
-            // Tandai semua jawaban sebagai tidak dijawab
-            foreach ($currentQuestion->quizAnswer as $answer) {
-                $answer->answered = false;
-            }
-
-            // Update jawaban yang dipilih
-            $selectedAnswer = $currentQuestion->quizAnswer->firstWhere('answer', $request->value);
-            if ($selectedAnswer) {
-                $selectedAnswer->answered = true;
-                Log::info('Jawaban berhasil disimpan', [
-                    'quiz_id' => $quiz->id,
-                    'question_number' => $currentQuestion->question_number,
-                    'selected_answer' => $selectedAnswer->toArray(),
-                ]);
-            } else {
-                Log::error('Jawaban tidak valid', [
-                    'quiz_id' => $quiz->id,
-                    'question_number' => $currentQuestion->question_number,
-                    'submitted_answer' => $request->value,
-                ]);
-                return response()->json(['message' => 'Jawaban tidak valid'], 400);
-            }
-
-            // Simpan kembali sesi dengan jawaban yang diperbarui
-            $quizSession['quiz_question'][$currentQuestion->question_number - 1] = $currentQuestion;
+            // Simpan jawaban yang dipilih dalam sesi
+            $selectedAnswer = $request->input('answer');
+            $quizSession['quiz_question'][$currentQuestion->question_number - 1]['selected_answer'] = $selectedAnswer;
             Session::put('quiz', $quizSession);
 
-            Log::info('Sesi kuis diperbarui', ['session_data' => $quizSession]);
-
-            return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
-        } else {
-            Log::error('Sesi kuis telah habis.');
-            return response()->json(['message' => 'Sesi kuis telah habis'], 401);
+            // Kembalikan respons sukses
+            return response()->json(['message' => 'Jawaban disimpan'], 200);
         }
+
+        // Jika sesi tidak ditemukan
+        return response()->json(['message' => 'Sesi tidak ditemukan'], 404);
     }
+
+
+
+
+
 
 
 
