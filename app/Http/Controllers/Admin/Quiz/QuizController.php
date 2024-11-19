@@ -500,68 +500,85 @@ class QuizController extends Controller
 
     public function answer(Request $request)
     {
-        try {
-            // Log data yang diterima dari request
-            Log::info('Request received:', $request->all());
+        if (Session::has('quiz')) {
+            $quizSession = Session::get('quiz');
 
-            // Ambil data kuis dari sesi
-            if (!Session::has('quiz')) {
-                return response()->json(['message' => 'Session Telah Habis'], 401);
+            // Ambil kuis dari database
+            $quiz = Quiz::find($quizSession['id']);
+
+            if (!$quiz) {
+                Log::warning('Kuis tidak ditemukan untuk ID sesi: ' . $quizSession['id']);
+                return response()->json(['message' => 'Kuis tidak ditemukan'], 404);
             }
 
-            $quiz = Session::get('quiz');
-            $questions = collect($quiz['quiz_question']);
+            // Ambil pertanyaan berdasarkan aspek kuis
+            $questions = [];
+            $questionIndex = 1;
+
+            foreach ($quiz->quizAspect as $aspect) {
+                $fetchedQuestions = QuizQuestion::where(function ($query) use ($aspect) {
+                    $query->where('level', 'like', '%' . $aspect->level . '%')
+                        ->orWhere('level', 0);
+                })
+                    ->where(function ($query) use ($aspect) {
+                        $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
+                            ->orWhere('aspect', 0);
+                    })
+                    ->limit($aspect->total_question)
+                    ->get();
+
+                foreach ($fetchedQuestions as $question) {
+                    $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
+                    $question->question_number = $questionIndex++;
+                    $questions[] = $question;
+                }
+            }
 
             // Cari pertanyaan saat ini berdasarkan nomor soal
-            $currentQuestionIndex = $questions->search(function ($question) use ($request) {
-                return $question['question_number'] == $request->q;
-            });
+            $currentQuestion = collect($questions)->firstWhere('question_number', $request->q);
 
-            // Jika pertanyaan tidak ditemukan
-            if ($currentQuestionIndex === false) {
+            if (!$currentQuestion) {
+                Log::warning('Pertanyaan tidak ditemukan untuk nomor soal: ' . $request->q);
                 return response()->json(['message' => 'Pertanyaan tidak ditemukan'], 404);
             }
 
-            // Ambil pertanyaan yang ditemukan
-            $currentQuestion = $questions[$currentQuestionIndex];
-
             // Tandai semua jawaban sebagai tidak dijawab
-            $currentQuestion['quiz_answer'] = array_map(function ($answer) {
-                $answer['answered'] = false;
-                return $answer;
-            }, $currentQuestion['quiz_answer']);
-
-            // Tandai jawaban yang dipilih pengguna
-            $selectedAnswer = collect($currentQuestion['quiz_answer'])->firstWhere('answer', $request->value);
-
-            if ($selectedAnswer) {
-                $selectedAnswer['answered'] = true;
-
-                // Perbarui jawaban yang dipilih
-                $currentQuestion['quiz_answer'] = array_map(function ($answer) use ($selectedAnswer) {
-                    if ($answer['answer'] == $selectedAnswer['answer']) {
-                        return $selectedAnswer;
-                    }
-                    return $answer;
-                }, $currentQuestion['quiz_answer']);
-
-                // Perbarui pertanyaan dalam koleksi
-                $questions[$currentQuestionIndex] = $currentQuestion;
-
-                // Simpan kembali data kuis ke sesi
-                $quiz['quiz_question'] = $questions->toArray();
-                Session::put('quiz', $quiz);
-
-                return response()->json(['message' => 'Jawaban Berhasil Disimpan'], 200);
-            } else {
-                return response()->json(['message' => 'Jawaban Tidak Ditemukan'], 400);
+            foreach ($currentQuestion->quizAnswer as $answer) {
+                $answer->answered = false;
             }
-        } catch (Exception $e) {
-            // Log error untuk pemecahan masalah
-            Log::error('Error occurred: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+
+            // Update jawaban yang dipilih
+            $selectedAnswer = $currentQuestion->quizAnswer->firstWhere('answer', $request->value);
+            if ($selectedAnswer) {
+                $selectedAnswer->answered = true;
+                Log::info('Jawaban berhasil disimpan', [
+                    'quiz_id' => $quiz->id,
+                    'question_number' => $currentQuestion->question_number,
+                    'selected_answer' => $selectedAnswer->toArray(),
+                ]);
+            } else {
+                Log::error('Jawaban tidak valid', [
+                    'quiz_id' => $quiz->id,
+                    'question_number' => $currentQuestion->question_number,
+                    'submitted_answer' => $request->value,
+                ]);
+                return response()->json(['message' => 'Jawaban tidak valid'], 400);
+            }
+
+            // Simpan kembali sesi dengan jawaban yang diperbarui
+            $quizSession['quiz_question'][$currentQuestion->question_number - 1] = $currentQuestion;
+            Session::put('quiz', $quizSession);
+
+            Log::info('Sesi kuis diperbarui', ['session_data' => $quizSession]);
+
+            return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
+        } else {
+            Log::error('Sesi kuis telah habis.');
+            return response()->json(['message' => 'Sesi kuis telah habis'], 401);
         }
     }
+
+
 
 
 
