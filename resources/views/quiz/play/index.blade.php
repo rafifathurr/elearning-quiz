@@ -85,8 +85,9 @@
             }
 
             function nextPage() {
-
                 let allowed = false;
+
+                // Pastikan pengguna memilih salah satu jawaban
                 $('#answer_list').each(function() {
                     if ($(this).find('input[type="radio"]:checked').length > 0) {
                         allowed = true;
@@ -94,58 +95,75 @@
                 });
 
                 if (!allowed) {
-                    swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!')
+                    swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!');
                     return false;
-                } else {
-                    $.ajax({
-                        url: $('#url-next').val(),
-                        type: 'GET',
-                        cache: false,
-                        success: function(data) {
-                            $('#question_box').html(data);
-                        },
-                        error: function(xhr, error, message) {
-                            if (xhr.status == 401) {
-                                swalError('Sesi Anda Telah Habis');
-                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
-                            }
-
-                            if (xhr.status == 500) {
-                                swalError('Terjadi Kesalahan Koneksi');
-                            }
-                        }
-                    });
                 }
 
+                Swal.fire({
+                    title: 'Apakah Anda Yakin Mengisi Jawaban Ini?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-2 mb-3',
+                        cancelButton: 'btn btn-danger mb-3',
+                    },
+                    buttonsStyling: false,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Tidak',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika user yakin, ambil data jawaban yang dipilih
+                        let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+                        let questionNumber = $('#active_question').data('question-number');
+                        let token = $('meta[name="csrf-token"]').attr('content');
+
+                        // Kirim data jawaban ke server menggunakan AJAX
+                        $.ajax({
+                            url: '{{ url('admin/quiz/answer') }}',
+                            type: 'POST',
+                            cache: false,
+                            data: {
+                                _token: token,
+                                value: selectedAnswer,
+                                q: questionNumber,
+                            },
+                            success: function(data) {
+                                console.log("Jawaban berhasil disimpan:",
+                                    data); // Menampilkan data respons dari server
+                                // Muat pertanyaan berikutnya
+                                $.ajax({
+                                    url: $('#url-next').val(),
+                                    type: 'GET',
+                                    cache: false,
+                                    success: function(data) {
+                                        console.log(data);
+                                        $('#question_box').html(data);
+                                    },
+                                    error: function(xhr) {
+                                        console.log(
+                                            xhr); // Melihat informasi error jika terjadi
+                                        if (xhr.status == 401) {
+                                            swalError('Sesi Anda Telah Habis');
+                                            window.location.href =
+                                                '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
+                                        } else if (xhr.status == 500) {
+                                            swalError('Terjadi Kesalahan Koneksi');
+                                        }
+                                    },
+                                });
+                            },
+                            error: function(xhr) {
+                                console.log("Error AJAX:", xhr); // Melihat error dari server
+                                swalError('Gagal mengirim jawaban, silakan coba lagi.');
+                            },
+                        });
+
+                    }
+                });
             }
 
-            function answer(element, value, question_number) {
-                if (element.checked) {
-                    let token = $('meta[name="csrf-token"]').attr('content');
-                    $.ajax({
-                        url: '{{ url('admin/quiz/answer') }}',
-                        type: 'POST',
-                        cache: false,
-                        data: {
-                            _token: token,
-                            value: value,
-                            q: question_number,
-                        },
-                        success: function(data) {},
-                        error: function(xhr, error, message) {
-                            console.log(xhr, error, message);
-                            if (xhr.status == 401) {
-                                swalError('Sesi Anda Telah Habis');
-                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
-                            }
 
-                            if (xhr.status == 500) {
-                                swalError('Terjadi Kesalahan Koneksi');
-                            }
-                        }
-                    });
-                }
-            }
 
             updateTimestamp();
             let interval = setInterval(updateTimestamp, 1000);

@@ -56,6 +56,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
             Route::get('append', 'append')->name('append');
             Route::get('start/{quiz}', 'start')->name('start');
             Route::get('play/{quiz}', 'play')->name('play');
+            Route::get('getQuestion/{quiz}', 'getQuestion')->name('getQuestion');
             Route::get('showQuestion/{quiz}', 'showQuestion')->name('showQuestion');
             Route::post('answer', 'answer')->name('answer');
             Route::match(['put', 'patch'], 'finish/{quiz}', 'finish')->name('finish');

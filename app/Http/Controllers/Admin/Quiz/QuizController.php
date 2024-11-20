@@ -405,8 +405,6 @@ class QuizController extends Controller
     }
 
 
-
-
     public function play(Quiz $quiz, Request $request)
     {
         try {
@@ -418,8 +416,9 @@ class QuizController extends Controller
                 'time_duration' => $quiz->time_duration,
             ]);
 
-            $order = 0;
+            $order = 0; // Pertanyaan pertama dimulai dari order 0
 
+            // Simpan data soal berdasarkan level dan aspek
             foreach ($quiz->quizAspect as $aspect) {
                 // Ambil pertanyaan berdasarkan level dan aspect
                 $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
@@ -443,6 +442,7 @@ class QuizController extends Controller
                         'question_detail' => json_encode([
                             'direction_question' => $question->direction_question,
                             'description' => $question->description,
+                            'question' => $question->question,
                             'attachment' => $question->attachment,
                             'is_random_answer' => $question->is_random_answer,
                             'is_generate_random_answer' => $question->is_generate_random_answer,
@@ -454,21 +454,142 @@ class QuizController extends Controller
                 }
             }
 
-            return view('quiz.play.index');
+            // Jika permintaan adalah JSON (API)
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Quiz has started successfully',
+                    'quiz_id' => $quiz->id,
+                    'result_id' => $result->id,
+                ], 200);
+            }
+
+            // Mengarahkan ke halaman soal pertama
+            return redirect()->route('admin.quiz.getQuestion', ['quiz' => $quiz->id]);
         } catch (Exception $e) {
-            dd($e->getMessage());
-            // Log::error('Error in play(): ' . $e->getMessage());
-            // return redirect()->back()->with(['failed' => $e->getMessage()]);
+            // Tangani error
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
 
+    public function getQuestion(Quiz $quiz, Request $request)
+    {
+        try {
+            // Ambil Result berdasarkan quiz dan user yang sedang login
+            $result = Result::where('quiz_id', $quiz->id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+
+            // Ambil seluruh ResultDetail terkait quiz dan user
+            $resultDetails = $result->details()->get();
+
+            if ($resultDetails->isEmpty()) {
+                return response()->json(['message' => 'Tidak ada pertanyaan untuk kuis ini'], 404);
+            }
+
+            // Persiapkan data untuk setiap soal
+            $questions = $resultDetails->map(function ($resultDetail) {
+                // Ambil data soal dari ResultDetail
+                $question = QuizQuestion::find($resultDetail->question_id);
+
+                // Ambil jawaban soal yang terkait melalui relasi
+                $quizAnswerArr = $question->quizAnswer->map(function ($quiz_answer) {
+                    return [
+                        'id' => $quiz_answer->id,
+                        'answer' => $quiz_answer->answer,
+                        'is_answer' => intval($quiz_answer->is_answer),
+                        'answered' => false,
+                    ];
+                })->toArray();
+
+                // Proses jawaban soal
+                $questionDetail = json_decode($resultDetail->question_detail, true);
+                $questionData = [
+                    'id' => $resultDetail->question_id,
+                    'question_number' => $resultDetail->order, // Menambahkan order sebagai question_number
+                    'direction_question' => $questionDetail['direction_question'],
+                    'question' => $questionDetail['question'],
+                    'description' => $questionDetail['description'],
+                    'attachment' => $questionDetail['attachment'],
+                    'is_random_answer' => $questionDetail['is_random_answer'],
+                    'is_generate_random_answer' => $questionDetail['is_generate_random_answer'],
+                    'aspect_id' => $resultDetail->aspect_id,
+                    'level' => $resultDetail->level,
+                    'order' => $resultDetail->order,
+                    'quiz_answer' => $quizAnswerArr,
+                    'is_active' => false,
+                    'answered' => false,
+                ];
+
+                return $questionData;
+            });
+
+            // Update soal aktif
+            if ($questions->isNotEmpty()) {
+                $questions = $questions->transform(function ($item, $index) {
+                    if ($index === 0) {
+                        $item['is_active'] = true; // Tandai soal pertama sebagai aktif
+                    } else {
+                        $item['is_active'] = false;
+                    }
+                    return $item;
+                });
+            }
+
+            $activeQuestion = $questions->firstWhere('is_active', true);
+
+            // Persiapkan data untuk API
+            $data = [
+                'quiz' => $quiz->toArray(),
+                'result' => $result,
+                'questions' => $questions,
+                'active_question' => $activeQuestion,
+                'total_question' => $questions->count(),
+            ];
+
+            // Jika permintaan adalah JSON (API)
+            if ($request->wantsJson()) {
+                return response()->json(['result' => $data], 200);
+            } else {
+                // Jika permintaan adalah tampilan (web)
+                return view('quiz.play.index', $data);
+            }
+        } catch (Exception $e) {
+            // Tangani error
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 
 
+    public function answer(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'value' => 'required',
+                'q' => 'required|integer',
+            ]);
 
+            // Simpan jawaban pengguna
+            $resultDetail = ResultDetail::where('question_id', $request->q)
+                ->whereHas('result', function ($query) {
+                    $query->where('user_id', Auth::id());
+                })
+                ->first(); // Gunakan first() bukan get(), karena update hanya bisa dilakukan pada satu data
 
+            if (!$resultDetail) {
+                throw new Exception("Data result detail tidak ditemukan");
+            }
 
+            $resultDetail->update([
+                'answer' => $validated['value'],
+            ]);
 
+            return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
+        } catch (Exception $e) {
+            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 
 
 

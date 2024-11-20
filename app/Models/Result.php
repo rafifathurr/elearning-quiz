@@ -9,4 +9,8 @@ class Result extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    public function details()
+    {
+        return $this->hasMany(ResultDetail::class, 'result_id');
+    }
 }
