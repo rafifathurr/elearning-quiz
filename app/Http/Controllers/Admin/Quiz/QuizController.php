@@ -528,18 +528,15 @@ class QuizController extends Controller
             });
 
             // Update soal aktif
-            if ($questions->isNotEmpty()) {
-                $questions = $questions->transform(function ($item, $index) {
-                    if ($index === 0) {
-                        $item['is_active'] = true; // Tandai soal pertama sebagai aktif
-                    } else {
-                        $item['is_active'] = false;
-                    }
-                    return $item;
-                });
-            }
+            $activeQuestionNumber = max(1, min($questions->count(), (int) $request->input('q', 1)));
+
+            $questions = $questions->transform(function ($item) use ($activeQuestionNumber) {
+                $item['is_active'] = $item['question_number'] == $activeQuestionNumber;
+                return $item;
+            });
 
             $activeQuestion = $questions->firstWhere('is_active', true);
+
 
             // Persiapkan data untuk API
 
