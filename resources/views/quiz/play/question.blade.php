@@ -138,7 +138,7 @@
                                         <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
                                                 class="fas fa-arrow-right ml-2"></i></button>
                                         <input type="hidden" id="url-next"
-                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . ($active_question['question_number'] + 1) }}">
+                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] + 1 }}">
 
                                     </div>
                                 @endif

@@ -125,6 +125,12 @@
                             url: '{{ url('admin/quiz/answer') }}',
                             type: 'POST',
                             cache: false,
+                            headers: {
+                                'Accept': 'application/json', // Pastikan header ini ada
+                                'X-Requested-With': 'XMLHttpRequest', // Menambahkan header ini untuk memastikan permintaan AJAX
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                    'content'), // Pastikan token CSRF ada
+                            },
                             data: {
                                 _token: token,
                                 value: selectedAnswer,
@@ -134,17 +140,26 @@
                             },
                             success: function(data) {
                                 console.log("Jawaban berhasil disimpan:",
-                                    data); // Menampilkan data respons dari server
-                                // Muat pertanyaan berikutnya
+                                    data);
+
                                 $.ajax({
                                     url: $('#url-next').val(),
                                     type: 'GET',
                                     cache: false,
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                            'content'),
+                                    },
                                     success: function(data) {
                                         console.log(
-                                            data); // Periksa seluruh data respons dari server
-                                        $('#question_box').html(data);
-
+                                            data);
+                                        if (data) {
+                                            $('#question_box').html(data);
+                                        } else {
+                                            console.log('Tidak ada data pertanyaan baru');
+                                        }
                                     },
                                     error: function(xhr) {
                                         console.log(
@@ -168,6 +183,7 @@
                     }
                 });
             }
+
 
 
 

@@ -476,6 +476,10 @@ class QuizController extends Controller
     public function getQuestion(Result $result, Request $request)
     {
         try {
+            // Log data permintaan untuk debugging
+            Log::info('Request Headers:', $request->headers->all()); // Melihat semua headers permintaan
+            Log::info('Request Data:', $request->all()); // Melihat data yang dikirimkan (POST data, query params, dll)
+            Log::info('Request Accepts JSON: ' . ($request->wantsJson() ? 'Yes' : 'No'));
 
             Log::info('Result ID from route: ' . $result->id);
 
@@ -548,20 +552,22 @@ class QuizController extends Controller
                 'total_question' => $questions->count(),
             ];
 
-
-
             // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
+                Log::info('Sending JSON Response');
                 return response()->json(['result' => $data], 200);
             } else {
+                Log::info('Rendering HTML View');
                 // Jika permintaan adalah tampilan (web)
                 return view('quiz.play.index', $data);
             }
         } catch (Exception $e) {
             // Tangani error
+            Log::error('Error: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
 
 
     public function answer(Request $request)
