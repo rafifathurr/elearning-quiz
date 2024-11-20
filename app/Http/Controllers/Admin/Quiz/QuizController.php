@@ -607,6 +607,7 @@ class QuizController extends Controller
             $resultDetail->update([
                 'answer' => $validated['value'],
                 'score' => $score,
+                'display_time' => now(),
             ]);
 
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
