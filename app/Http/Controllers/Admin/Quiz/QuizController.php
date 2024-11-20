@@ -415,10 +415,10 @@ class QuizController extends Controller
                 'quiz_id' => $quiz->id,
                 'user_id' => Auth::user()->id,
                 'start_time' => now(),
+                'time_duration' => $quiz->time_duration,
             ]);
 
-            $order = 0; // Urutan pertanyaan
-            $questions = []; // Inisialisasi array untuk pertanyaan
+            $order = 0;
 
             foreach ($quiz->quizAspect as $aspect) {
                 // Ambil pertanyaan berdasarkan level dan aspect
@@ -452,9 +452,6 @@ class QuizController extends Controller
                         'order' => $order,
                     ]);
                 }
-
-                // Tambahkan pertanyaan ke array (jika diperlukan untuk return ke view)
-                $questions[] = $questionSet;
             }
 
             return view('quiz.play.index');

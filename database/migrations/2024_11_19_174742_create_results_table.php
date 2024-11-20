@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('time_duration')->nullable();
             $table->timestamp('start_time')->useCurrent()->nullable();
-            $table->timestamp('finish_time')->useCurrent()->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
 
             // Foreign Key
