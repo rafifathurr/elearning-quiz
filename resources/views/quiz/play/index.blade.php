@@ -125,12 +125,6 @@
                             url: '{{ url('admin/quiz/answer') }}',
                             type: 'POST',
                             cache: false,
-                            headers: {
-                                'Accept': 'application/json', // Pastikan header ini ada
-                                'X-Requested-With': 'XMLHttpRequest', // Menambahkan header ini untuk memastikan permintaan AJAX
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
-                                    'content'), // Pastikan token CSRF ada
-                            },
                             data: {
                                 _token: token,
                                 value: selectedAnswer,
@@ -146,16 +140,11 @@
                                     url: $('#url-next').val(),
                                     type: 'GET',
                                     cache: false,
-                                    headers: {
-                                        'Accept': 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest',
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
-                                            'content'),
-                                    },
                                     success: function(data) {
                                         console.log(
                                             data);
                                         if (data) {
+                                            console.log('Pertanyaan');
                                             $('#question_box').html(data);
                                         } else {
                                             console.log('Tidak ada data pertanyaan baru');

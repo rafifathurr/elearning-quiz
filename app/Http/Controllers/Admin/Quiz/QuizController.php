@@ -552,13 +552,16 @@ class QuizController extends Controller
                 'total_question' => $questions->count(),
             ];
 
-            // Jika permintaan adalah JSON (API)
-            if ($request->wantsJson()) {
+
+            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
                 Log::info('Sending JSON Response');
                 return response()->json(['result' => $data], 200);
             } else {
+                if (isset($request->q)) {
+                    Log::info('Render Question');
+                    return view('quiz.play.question', $data);
+                }
                 Log::info('Rendering HTML View');
-                // Jika permintaan adalah tampilan (web)
                 return view('quiz.play.index', $data);
             }
         } catch (Exception $e) {
