@@ -115,12 +115,12 @@
                                         <button onclick="backPage()" class="btn btn-danger"><i
                                                 class="fas fa-arrow-left mr-2"></i>Kembali</button>
                                         <input type="hidden" id="url-previous"
-                                            value="{{ route('admin.quiz.getQuestion', ['quiz' => $quiz['id']]) . '?q=' . $active_question['question_number'] - 1 }}">
+                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] - 1 }}">
                                     </div>
                                 @endif
                                 @if ($active_question['question_number'] == $total_question)
                                     <div class="mx-2">
-                                        <form action="{{ route('admin.quiz.finish', ['quiz' => $quiz['id']]) }}"
+                                        <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
                                             id="finish-form" method="post">
                                             @csrf
                                             @method('patch')
@@ -129,7 +129,7 @@
                                         </form>
                                     </div>
                                 @else
-                                    <form action="{{ route('admin.quiz.finish', ['quiz' => $quiz['id']]) }}"
+                                    <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
                                         id="finish-form" method="post">
                                         @csrf
                                         @method('patch')
@@ -138,7 +138,7 @@
                                         <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
                                                 class="fas fa-arrow-right ml-2"></i></button>
                                         <input type="hidden" id="url-next"
-                                            value="{{ route('admin.quiz.getQuestion', ['quiz' => $quiz['id']]) . '?q=' . ($active_question['question_number'] + 1) }}">
+                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . ($active_question['question_number'] + 1) }}">
 
                                     </div>
                                 @endif

@@ -415,6 +415,8 @@ class QuizController extends Controller
                 'time_duration' => $quiz->time_duration,
             ]);
 
+            Log::info('New result created with ID: ' . $result->id);
+
             $order = 0; // Pertanyaan pertama dimulai dari order 0
 
             // Simpan data soal berdasarkan level dan aspek
@@ -463,7 +465,7 @@ class QuizController extends Controller
             }
 
             // Mengarahkan ke halaman soal pertama
-            return redirect()->route('admin.quiz.getQuestion', ['quiz' => $quiz->id]);
+            return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id]);
         } catch (Exception $e) {
             // Tangani error
             return response()->json(['message' => $e->getMessage()], 500);
@@ -471,13 +473,11 @@ class QuizController extends Controller
     }
 
 
-    public function getQuestion(Quiz $quiz, Request $request)
+    public function getQuestion(Result $result, Request $request)
     {
         try {
-            // Ambil Result berdasarkan quiz dan user yang sedang login
-            $result = Result::where('quiz_id', $quiz->id)
-                ->where('user_id', Auth::id())
-                ->firstOrFail();
+
+            Log::info('Result ID from route: ' . $result->id);
 
             // Ambil seluruh ResultDetail terkait quiz dan user
             $resultDetails = $result->details()->get();
@@ -538,8 +538,10 @@ class QuizController extends Controller
             $activeQuestion = $questions->firstWhere('is_active', true);
 
             // Persiapkan data untuk API
+
+            $quizData = Quiz::find($result->quiz_id)->toArray();
             $data = [
-                'quiz' => $quiz->toArray(),
+                'quiz' => $quizData,
                 'result' => $result,
                 'questions' => $questions,
                 'active_question' => $activeQuestion,

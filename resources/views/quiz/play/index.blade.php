@@ -143,12 +143,8 @@
                                     success: function(data) {
                                         console.log(
                                             data); // Periksa seluruh data respons dari server
-                                        if (data.result && data.result.active_question) {
-                                            $('#question_box').html(data.result
-                                                .active_question);
-                                        } else {
-                                            console.log("Active question tidak ditemukan.");
-                                        }
+                                        $('#question_box').html(data);
+
                                     },
                                     error: function(xhr) {
                                         console.log(
