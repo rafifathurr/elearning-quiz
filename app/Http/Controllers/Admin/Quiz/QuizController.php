@@ -14,6 +14,8 @@ use App\Models\QuizAspect;
 use App\Models\QuizUserAnswer;
 use App\Models\QuizUserAnswerResult;
 use App\Models\QuizUserResult;
+use App\Models\Result;
+use App\Models\ResultDetail;
 use App\Models\TypeUser;
 use App\Models\User;
 use Exception;
@@ -394,12 +396,6 @@ class QuizController extends Controller
                 return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
             }
 
-            // Tentukan percobaan pertama
-            $attempt_number = 1;
-
-            // Simpan percobaan pertama ke dalam sesi
-            session(['quiz_attempt' => $attempt_number]);
-
             // Kirim data ke tampilan
             $data['quiz'] = $quiz;
             $data['totalQuestions'] = $totalQuestions;
@@ -409,170 +405,70 @@ class QuizController extends Controller
     }
 
 
+
+
     public function play(Quiz $quiz, Request $request)
     {
         try {
-            // Ambil pertanyaan berdasarkan aspek kuis
-            $questions = [];
-            $questionIndex = 1;
-
-            foreach ($quiz->quizAspect as $aspect) {
-                $fetchedQuestions = QuizQuestion::where(function ($query) use ($aspect) {
-                    $query->where('level', 'like', '%' . $aspect->level . '%')
-                        ->orWhere('level', 0);
-                })
-                    ->where(function ($query) use ($aspect) {
-                        $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
-                            ->orWhere('aspect', 0);
-                    })
-                    ->limit($aspect->total_question)
-                    ->get();
-
-                foreach ($fetchedQuestions as $question) {
-                    $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
-                    $question->question_number = $questionIndex++;
-                    $question->is_active = false;
-                    $question->answered = false; // Awalnya dianggap belum dijawab
-                    $questions[] = $question;
-                }
-            }
-
-            // Total pertanyaan
-            $totalQuestions = count($questions);
-
-            // Tentukan pertanyaan aktif berdasarkan parameter `q`
-            $questionNumber = $request->q ?? 1; // Default ke nomor 1 jika `q` tidak disediakan
-            $currentQuestion = collect($questions)->firstWhere('question_number', $questionNumber);
-
-            if (!$currentQuestion) {
-                return redirect()->back()->withErrors(['error' => 'Pertanyaan tidak ditemukan.']);
-            }
-
-            // Tandai jawaban yang sudah disimpan di sesi
-            if (Session::has('quiz')) {
-                $quizSession = Session::get('quiz');
-                $savedAnswer = $quizSession['quiz_question'][$currentQuestion->question_number - 1]['selected_answer'] ?? null;
-                if ($savedAnswer) {
-                    // Tandai jawaban yang sudah dipilih sebagai answered
-                    $currentQuestion->quizAnswer->each(function ($answer) use ($savedAnswer) {
-                        if ($answer->answer === $savedAnswer) {
-                            $answer->answered = true;
-                        }
-                    });
-                }
-            }
-
-            // Tandai pertanyaan aktif
-            $currentQuestion->quiz_answer = $currentQuestion->quizAnswer->map(function ($answer) {
-                $answer->answered = false; // Pastikan ada di data yang dikirim ke view
-                $answer->is_answer = (int) $answer->is_answer; // Samakan tipe dengan versi lama
-                return $answer;
-            })->toArray();
-
-            $currentQuestion->is_active = true;
-
-            // Update daftar pertanyaan untuk menyertakan informasi "is_active" pada pertanyaan aktif
-            foreach ($questions as $index => $question) {
-                $questions[$index]->is_active = $question->question_number === $currentQuestion->question_number;
-                $questions[$index]->answered = false;
-            }
-
-            // Struktur data yang dikirimkan ke view
-            $quizData = [
-                'id' => $quiz->id,
-                'name' => $quiz->name,
-                'time_duration' => $quiz->time_duration,
-                'total_question' => $totalQuestions,
-                'quiz_question' => $questions,
-            ];
-
-            $data = [
-                'quiz' => $quizData,
-                'quiz_question' => $currentQuestion,
-            ];
-
-            // Simpan data kuis ke dalam sesi
-            Session::put('quiz', [
-                'id' => $quiz->id,
-                'active_question' => $currentQuestion->question_number,
+            // Buat entri Result baru
+            $result = Result::create([
+                'quiz_id' => $quiz->id,
+                'user_id' => Auth::user()->id,
+                'start_time' => now(),
             ]);
 
-            // Respon berbasis API atau View
-            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-                return response()->json(['result' => $data], 200);
-            } else {
-                if (isset($request->q)) {
-                    return view('quiz.play.question', $data); // View detail pertanyaan
-                }
-                return view('quiz.play.index', $data); // View utama kuis
-            }
-        } catch (Exception $e) {
-            // Tangani error
-            return redirect()->back()->with(['failed' => $e->getMessage()]);
-        }
-    }
+            $order = 0; // Urutan pertanyaan
+            $questions = []; // Inisialisasi array untuk pertanyaan
 
-
-
-
-    public function answer(Request $request)
-    {
-        // Mengecek apakah sesi 'quiz' ada
-        if (Session::has('quiz')) {
-            $quizSession = Session::get('quiz');
-
-            // Ambil kuis dari database berdasarkan ID sesi
-            $quiz = Quiz::find($quizSession['id']);
-
-            if (!$quiz) {
-                Log::warning('Kuis tidak ditemukan untuk ID sesi: ' . $quizSession['id']);
-                return response()->json(['message' => 'Kuis tidak ditemukan'], 404);
-            }
-
-            // Menyiapkan array pertanyaan
-            $questions = [];
-            $questionIndex = 1;
-
-            // Mengambil pertanyaan berdasarkan aspek kuis
             foreach ($quiz->quizAspect as $aspect) {
-                $fetchedQuestions = QuizQuestion::where(function ($query) use ($aspect) {
-                    $query->where('level', 'like', '%' . $aspect->level . '%')
-                        ->orWhere('level', 0);
+                // Ambil pertanyaan berdasarkan level dan aspect
+                $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
+                    $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
+                        ->orWhere('level', '0');
                 })
                     ->where(function ($query) use ($aspect) {
-                        $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
-                            ->orWhere('aspect', 0);
+                        $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
+                            ->orWhere('aspect', '0');
                     })
+                    ->inRandomOrder()
                     ->limit($aspect->total_question)
                     ->get();
 
-                foreach ($fetchedQuestions as $question) {
-                    $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
-                    $question->question_number = $questionIndex++;
-                    $questions[] = $question;
+                // Simpan hasil pertanyaan ke ResultDetail
+                foreach ($questionSet as $question) {
+                    $order++;
+                    ResultDetail::create([
+                        'result_id' => $result->id,
+                        'question_id' => $question->id,
+                        'question_detail' => json_encode([
+                            'direction_question' => $question->direction_question,
+                            'description' => $question->description,
+                            'attachment' => $question->attachment,
+                            'is_random_answer' => $question->is_random_answer,
+                            'is_generate_random_answer' => $question->is_generate_random_answer,
+                        ]),
+                        'aspect_id' => $aspect->aspect_id,
+                        'level' => $aspect->level,
+                        'order' => $order,
+                    ]);
                 }
+
+                // Tambahkan pertanyaan ke array (jika diperlukan untuk return ke view)
+                $questions[] = $questionSet;
             }
 
-            // Menemukan pertanyaan berdasarkan nomor soal yang dikirimkan
-            $currentQuestion = collect($questions)->firstWhere('question_number', $request->q);
-
-            if (!$currentQuestion) {
-                Log::warning('Pertanyaan tidak ditemukan untuk nomor soal: ' . $request->q);
-                return response()->json(['message' => 'Pertanyaan tidak ditemukan'], 404);
-            }
-
-            // Simpan jawaban yang dipilih dalam sesi
-            $selectedAnswer = $request->input('answer');
-            $quizSession['quiz_question'][$currentQuestion->question_number - 1]['selected_answer'] = $selectedAnswer;
-            Session::put('quiz', $quizSession);
-
-            // Kembalikan respons sukses
-            return response()->json(['message' => 'Jawaban disimpan'], 200);
+            return view('quiz.play.index');
+        } catch (Exception $e) {
+            dd($e->getMessage());
+            // Log::error('Error in play(): ' . $e->getMessage());
+            // return redirect()->back()->with(['failed' => $e->getMessage()]);
         }
-
-        // Jika sesi tidak ditemukan
-        return response()->json(['message' => 'Sesi tidak ditemukan'], 404);
     }
+
+
+
+
+
 
 
 
