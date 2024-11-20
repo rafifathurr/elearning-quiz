@@ -15,6 +15,7 @@ class ResultDetail extends Model
     {
         return $this->belongsTo(Result::class, 'result_id');
     }
+
     public function resultQuestion()
     {
         return $this->belongsTo(QuizQuestion::class, 'question_id');

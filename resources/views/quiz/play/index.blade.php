@@ -115,6 +115,8 @@
                     if (result.isConfirmed) {
                         // Jika user yakin, ambil data jawaban yang dipilih
                         let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+                        let resultId = $('#result_id').val();
+                        let questionId = $('#question_id').val();
                         let questionNumber = $('#active_question').data('question-number');
                         let token = $('meta[name="csrf-token"]').attr('content');
 
@@ -126,6 +128,8 @@
                             data: {
                                 _token: token,
                                 value: selectedAnswer,
+                                resultId: resultId,
+                                questionId: questionId,
                                 q: questionNumber,
                             },
                             success: function(data) {
@@ -137,8 +141,14 @@
                                     type: 'GET',
                                     cache: false,
                                     success: function(data) {
-                                        console.log(data);
-                                        $('#question_box').html(data);
+                                        console.log(
+                                            data); // Periksa seluruh data respons dari server
+                                        if (data.result && data.result.active_question) {
+                                            $('#question_box').html(data.result
+                                                .active_question);
+                                        } else {
+                                            console.log("Active question tidak ditemukan.");
+                                        }
                                     },
                                     error: function(xhr) {
                                         console.log(

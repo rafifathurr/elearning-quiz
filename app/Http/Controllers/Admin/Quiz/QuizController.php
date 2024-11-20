@@ -363,8 +363,7 @@ class QuizController extends Controller
 
     public function start(Quiz $quiz, Request $request)
     {
-        // Bersihkan sesi sebelumnya
-        Session::forget('quiz');
+
 
         $questions = [];
         foreach ($quiz->quizAspect as $aspect) {
@@ -547,6 +546,8 @@ class QuizController extends Controller
                 'total_question' => $questions->count(),
             ];
 
+
+
             // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
                 return response()->json(['result' => $data], 200);
@@ -567,21 +568,37 @@ class QuizController extends Controller
             $validated = $request->validate([
                 'value' => 'required',
                 'q' => 'required|integer',
+                'resultId' => 'required|integer',
+                'questionId' => 'required|integer',
             ]);
 
+
+            Log::info('Question ID: ' . $request->questionId);
+            Log::info('Result ID: ' . $request->resultId);
+
             // Simpan jawaban pengguna
-            $resultDetail = ResultDetail::where('question_id', $request->q)
+            $resultDetail = ResultDetail::where('question_id', $request->questionId)->where('result_id', $request->resultId)
                 ->whereHas('result', function ($query) {
-                    $query->where('user_id', Auth::id());
+                    $query->where('user_id', Auth::user()->id);
                 })
-                ->first(); // Gunakan first() bukan get(), karena update hanya bisa dilakukan pada satu data
+                ->firstOrFail();
+
 
             if (!$resultDetail) {
                 throw new Exception("Data result detail tidak ditemukan");
             }
+            $question = QuizQuestion::find($request->questionId);
+
+            $score = 0;
+            foreach ($question->quizAnswer as $answer) {
+                if ($request->value == $answer->answer && $answer->is_answer == 1) {
+                    $score = 1;
+                }
+            };
 
             $resultDetail->update([
                 'answer' => $validated['value'],
+                'score' => $score,
             ]);
 
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);

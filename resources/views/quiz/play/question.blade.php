@@ -32,6 +32,8 @@
                 </h2>
             </div>
             <div id="active_question" data-question-number="{{ $active_question['question_number'] }}">
+                <input type="hidden" name="result_id" id="result_id" value="{{ $result->id }}">
+                <input type="hidden" name="question_id" id="question_id" value="{{ $active_question['id'] }}">
                 <div class="card-body">
                     <div class="card">
                         <div class="card-header bg-gray-light">
@@ -136,7 +138,8 @@
                                         <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
                                                 class="fas fa-arrow-right ml-2"></i></button>
                                         <input type="hidden" id="url-next"
-                                            value="{{ route('admin.quiz.getQuestion', ['quiz' => $quiz['id']]) . '?q=' . $active_question['question_number'] + 1 }}">
+                                            value="{{ route('admin.quiz.getQuestion', ['quiz' => $quiz['id']]) . '?q=' . ($active_question['question_number'] + 1) }}">
+
                                     </div>
                                 @endif
                             </div>
