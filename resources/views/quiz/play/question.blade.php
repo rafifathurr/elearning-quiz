@@ -21,7 +21,11 @@
                             <p>
                                 {{ $active_question['question'] ?? '' }}
                             </p>
-                            @if ($active_question['is_generate_random_answer'])
+                            @if (!is_null($active_question['attachment']))
+                                <img src="{{ asset($active_question['attachment']) }}" class="img-fluid"
+                                    style="max-height: 18rem;">
+                            @endif
+                            {{-- @if ($active_question['is_generate_random_answer'])
                                 <div class="d-flex flex-wrap justify-content-center">
                                     @php
                                         $index_new = 0;
@@ -68,7 +72,7 @@
                                         @endif
                                     @endforeach
                                 </div>
-                            @endif
+                            @endif --}}
                             <div class="mt-3">
                                 {!! $active_question['description'] !!}
                             </div>
@@ -84,16 +88,8 @@
                             </div>
                         </div>
                         <div class="card-footer py-3">
-                            <div
-                                class="d-flex  @if ($active_question['question_number'] != 1) justify-content-between @else justify-content-end @endif">
-                                @if ($active_question['question_number'] != 1)
-                                    <div class="mx-2">
-                                        <button onclick="backPage()" class="btn btn-danger"><i
-                                                class="fas fa-arrow-left mr-2"></i>Kembali</button>
-                                        <input type="hidden" id="url-previous"
-                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] - 1 }}">
-                                    </div>
-                                @endif
+                            <div class="d-flex   justify-content-end ">
+
                                 <div class="d-flex">
                                     <p class="mt-2">{{ $active_question['question_number'] }} /
                                         {{ $total_question }}</p>
@@ -123,26 +119,3 @@
         </div>
     </div>
 </div>
-<script>
-    $("form").submit(function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Apakah Anda Yakin Submit Quiz?',
-            icon: 'question',
-            showCancelButton: true,
-            allowOutsideClick: false,
-            customClass: {
-                confirmButton: 'btn btn-primary mr-2 mb-3',
-                cancelButton: 'btn btn-danger mb-3',
-            },
-            buttonsStyling: false,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Tidak'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                swalProcess();
-                $('form').unbind('submit').submit();
-            }
-        })
-    })
-</script>

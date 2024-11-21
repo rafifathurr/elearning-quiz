@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                {{-- <div class="form-group row">
                                     <label for="" class="col-md-4 control-label text-left">&nbsp;
                                     </label>
                                     <div class="col-md-8 col-sm-12">
@@ -166,7 +166,7 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="form-group row">
                                     <label for="" class="col-md-4 control-label text-left">&nbsp;
                                     </label>
