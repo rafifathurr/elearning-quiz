@@ -37,52 +37,7 @@
             let time = localStorage.getItem('remainingTime') ? parseInt(localStorage.getItem('remainingTime')) : parseInt($(
                 '#time').val());
 
-            $("form").submit(function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Apakah Anda Yakin Submit Quiz?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    customClass: {
-                        confirmButton: 'btn btn-primary mr-2 mb-3',
-                        cancelButton: 'btn btn-danger mb-3',
-                    },
-                    buttonsStyling: false,
-                    confirmButtonText: 'Ya',
-                    cancelButtonText: 'Tidak'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        swalProcess();
-                        // Hapus waktu dari localStorage saat quiz selesai
-                        localStorage.removeItem('remainingTime');
-                        $('form').unbind('submit').submit();
-                    }
-                })
-            });
 
-            function backPage() {
-
-                $.ajax({
-                    url: $('#url-previous').val(),
-                    type: 'GET',
-                    cache: false,
-                    success: function(data) {
-                        $('#question_box').html(data);
-                    },
-                    error: function(xhr, error, message) {
-                        if (xhr.status == 401) {
-                            swalError('Sesi Anda Telah Habis');
-                            window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}'
-                        }
-
-                        if (xhr.status == 500) {
-                            swalError('Terjadi Kesalahan Koneksi');
-                        }
-                    }
-                });
-
-            }
 
             function nextPage() {
                 let allowed = false;
@@ -173,6 +128,49 @@
                 });
             }
 
+            function timeExpired() {
+                Swal.fire({
+                    title: 'Waktu Quiz Anda Telah Habis!',
+                    icon: 'warning',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary',
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let token = $('meta[name="csrf-token"]').attr('content');
+                        let resultId = $('#result_id').val();
+                        let questionId = $('#question_id').val();
+                        let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+
+                        // Kirim data terakhir ke server
+                        $.ajax({
+                            url: '{{ url('admin/quiz/finish') }}',
+                            type: 'POST',
+                            cache: false,
+                            data: {
+                                _token: token,
+                                value: selectedAnswer,
+                                resultId: resultId,
+                                questionId: questionId,
+                                q: $('#active_question').data('question-number'),
+                            },
+                            success: function() {
+                                const resultUrl =
+                                    `{{ route('admin.quiz.result', ['resultId' => '__RESULT_ID__']) }}`
+                                    .replace('__RESULT_ID__', resultId);
+                                window.location.href = resultUrl;
+                            },
+
+                            error: function(xhr) {
+                                console.error("Error AJAX:", xhr);
+                                swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
+                            },
+                        });
+                    }
+                });
+            }
 
 
 
@@ -210,26 +208,56 @@
                     time--;
                 } else {
                     clearInterval(interval);
-                    finishQuiz();
+                    timeExpired();
                 }
             }
 
             function finishQuiz() {
                 Swal.fire({
-                    title: 'Waktu Quiz Anda Telah Habis!',
-                    icon: 'warning',
+                    title: 'Apakah Anda yakin ingin menyelesaikan quiz ini?',
+                    icon: 'question',
+                    showCancelButton: true,
                     allowOutsideClick: false,
-                    allowEscapeKey: false,
                     customClass: {
-                        confirmButton: 'btn btn-primary',
+                        confirmButton: 'btn btn-primary mr-2 mb-3',
+                        cancelButton: 'btn btn-danger mb-3',
                     },
+                    buttonsStyling: false,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Tidak',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Hapus waktu dari localStorage saat quiz selesai
-                        localStorage.removeItem('remainingTime');
-                        $('#finish-form').unbind('submit').submit();
+                        let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+                        let resultId = $('#result_id').val();
+                        let questionId = $('#question_id').val();
+                        let token = $('meta[name="csrf-token"]').attr('content');
+
+                        // Kirim data terakhir ke server
+                        $.ajax({
+                            url: '{{ url('admin/quiz/finish') }}',
+                            type: 'POST',
+                            cache: false,
+                            data: {
+                                _token: token,
+                                value: selectedAnswer,
+                                resultId: resultId,
+                                questionId: questionId,
+                                q: $('#active_question').data('question-number'),
+                            },
+                            success: function() {
+                                const resultUrl =
+                                    `{{ route('admin.quiz.result', ['resultId' => '__RESULT_ID__']) }}`
+                                    .replace('__RESULT_ID__', resultId);
+                                window.location.href = resultUrl;
+                            },
+
+                            error: function(xhr) {
+                                console.error("Error AJAX:", xhr);
+                                swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
+                            },
+                        });
                     }
-                })
+                });
             }
         </script>
     @endpush

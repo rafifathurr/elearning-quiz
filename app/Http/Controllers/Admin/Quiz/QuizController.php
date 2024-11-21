@@ -620,17 +620,82 @@ class QuizController extends Controller
         }
     }
 
-    public function finish(Result $result, Request $request)
+    public function finish(Request $request)
     {
-        $totalScore = ResultDetail::where('result_id', $result->id)->sum('score');
+        try {
 
-        $result->update([
-            'total_score' => $totalScore,
-            'finish_time' => now(),
-        ]);
 
-        return view('quiz.result', compact('result'));
+            $validated = $request->validate([
+                'value' => 'required',
+                'q' => 'required|integer',
+                'resultId' => 'required|integer',
+                'questionId' => 'required|integer',
+            ]);
+
+
+            Log::info('Question ID: ' . $request->questionId);
+            Log::info('Result ID: ' . $request->resultId);
+
+            // Simpan jawaban pengguna
+            $resultDetail = ResultDetail::where('question_id', $request->questionId)->where('result_id', $request->resultId)
+                ->whereHas('result', function ($query) {
+                    $query->where('user_id', Auth::user()->id);
+                })
+                ->firstOrFail();
+
+
+            if (!$resultDetail) {
+                throw new Exception("Data result detail tidak ditemukan");
+            }
+            $question = QuizQuestion::find($request->questionId);
+
+            $score = 0;
+            foreach ($question->quizAnswer as $answer) {
+                if ($request->value == $answer->answer && $answer->is_answer == 1) {
+                    $score = 1;
+                }
+            };
+
+            $resultDetail->update([
+                'answer' => $validated['value'],
+                'score' => $score,
+                'display_time' => now(),
+            ]);
+
+            $totalScore = ResultDetail::where('result_id', $request->resultId)->sum('score');
+
+            $resultData = Result::find($request->resultId);
+            $resultData->update([
+                'total_score' => $totalScore,
+                'finish_time' => now(),
+            ]);
+
+            return view('quiz.result', compact('result'));
+        } catch (Exception $e) {
+            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
+        }
     }
+
+    public function showResult($resultId)
+    {
+        try {
+            // Ambil data hasil quiz berdasarkan ID dan user saat ini
+            $result = Result::where('id', $resultId)
+                ->where('user_id', Auth::id())
+                ->with('quiz') // Pastikan relasi ke tabel quiz tersedia
+                ->firstOrFail();
+
+            // Tampilkan view hasil kuis
+            return view('quiz.result', compact('result'));
+        } catch (\Exception $e) {
+            // Log error jika terjadi masalah
+            Log::error("Error saat menampilkan hasil quiz: " . $e->getMessage());
+
+            // Redirect ke halaman utama dengan pesan error
+            return redirect('/')->with('error', 'Gagal menampilkan hasil quiz.');
+        }
+    }
+
 
 
 

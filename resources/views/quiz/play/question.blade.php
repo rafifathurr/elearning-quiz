@@ -99,21 +99,11 @@
                                         {{ $total_question }}</p>
                                     @if ($active_question['question_number'] == $total_question)
                                         <div class="mx-2">
+                                            <button onclick="finishQuiz()" class="btn btn-success">Finish<i
+                                                    class="fas fa-arrow-right ml-2"></i></button>
 
-                                            <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
-                                                id="finish-form" method="post">
-                                                @csrf
-                                                @method('patch')
-                                                <button type="submit" class="btn btn-success">Selesai<i
-                                                        class="fas fa-check ml-2"></i></button>
-                                            </form>
                                         </div>
                                     @else
-                                        <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
-                                            id="finish-form" method="post">
-                                            @csrf
-                                            @method('patch')
-                                        </form>
                                         <div class="mx-2">
 
                                             <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i

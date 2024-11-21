@@ -15,7 +15,7 @@ class QuizQuestion extends Model
 
     public function quizAnswer()
     {
-        return $this->hasMany(QuizAnswer::class, 'quiz_question_id', 'id');
+        return $this->hasMany(QuizAnswer::class, 'quiz_question_id', 'id')->whereNull('deleted_at');
     }
 
     public function questionTypeQuiz()

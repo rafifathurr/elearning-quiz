@@ -13,7 +13,7 @@
                                     <div class="col-md-6 text-center">
                                         <h3 class="font-weight-bold">{{ $result->quiz->name }}</h3>
                                         <h5 class="font-weight-medium">Total Point : {{ $result->total_score }} Point </h5>
-                                        <h6>Waktu Submit: {{ $result->finish_time->format('H:i d-m-Y ') }}</h6>
+
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
                                                 <a href="{{ url('/') }}" class="btn btn-lg btn-danger"><i
