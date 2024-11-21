@@ -81,8 +81,10 @@
                                                 @endif
                                             </div>
                                         @else
-                                            <img src="{{ asset($quiz_question->attachment) }}" class="img-fluid"
-                                                style="max-height: 18rem;">
+                                            @if (!is_null($quiz_question->attachment))
+                                                <img src="{{ asset($quiz_question->attachment) }}" class="img-fluid"
+                                                    style="max-height: 18rem;">
+                                            @endif
                                         @endif
 
                                     </div>
