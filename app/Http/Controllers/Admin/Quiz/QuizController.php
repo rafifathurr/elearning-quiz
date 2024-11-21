@@ -624,17 +624,18 @@ class QuizController extends Controller
     {
         try {
 
-
             $validated = $request->validate([
-                'value' => 'required',
-                'q' => 'required|integer',
-                'resultId' => 'required|integer',
-                'questionId' => 'required|integer',
+                'q' => 'nullable|integer',
+                'resultId' => 'nullable|integer',
+                'questionId' => 'nullable|integer',
+                'value' => 'nullable',
             ]);
 
 
             Log::info('Question ID: ' . $request->questionId);
             Log::info('Result ID: ' . $request->resultId);
+            Log::info('Request Data:', $request->all());
+
 
             // Simpan jawaban pengguna
             $resultDetail = ResultDetail::where('question_id', $request->questionId)->where('result_id', $request->resultId)

@@ -144,6 +144,9 @@
                         let questionId = $('#question_id').val();
                         let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
 
+                        console.log("resultId:", resultId);
+                        console.log("questionId:", questionId);
+
                         // Kirim data terakhir ke server
                         $.ajax({
                             url: '{{ url('admin/quiz/finish') }}',
@@ -151,10 +154,10 @@
                             cache: false,
                             data: {
                                 _token: token,
-                                value: selectedAnswer,
+                                value: selectedAnswer || '',
                                 resultId: resultId,
                                 questionId: questionId,
-                                q: $('#active_question').data('question-number'),
+                                q: $('#active_question').data('question-number') || 0,
                             },
                             success: function() {
                                 const resultUrl =
@@ -162,7 +165,6 @@
                                     .replace('__RESULT_ID__', resultId);
                                 window.location.href = resultUrl;
                             },
-
                             error: function(xhr) {
                                 console.error("Error AJAX:", xhr);
                                 swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
@@ -171,6 +173,7 @@
                     }
                 });
             }
+
 
 
 
