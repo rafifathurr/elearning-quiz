@@ -1,30 +1,6 @@
 <div class="row">
-    <div class="col-lg-3 col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title mb-0 font-weight-bold my-auto">
-                    Nomor Soal
-                </h2>
-            </div>
-            <div class="card-body p-3">
-                <div class="d-flex flex-wrap justify-content-xl-center justify-content-md-center">
-                    @foreach ($questions as $quiz_question_list)
-                        <div class="p-0">
-                            <div
-                                class="card m-2 px-2 @if ($quiz_question_list['is_active']) bg-primary text-white @elseif($quiz_question_list['answered']) bg-gray text-white @endif ">
-                                <div class="card-body">
-                                    <h5 class="font-weight-bold text-center my-auto">
-                                        {{ $quiz_question_list['question_number'] }}
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-9 col-md-12">
+
+    <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
@@ -118,30 +94,37 @@
                                             value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] - 1 }}">
                                     </div>
                                 @endif
-                                @if ($active_question['question_number'] == $total_question)
-                                    <div class="mx-2">
+                                <div class="d-flex">
+                                    <p class="mt-2">{{ $active_question['question_number'] }} /
+                                        {{ $total_question }}</p>
+                                    @if ($active_question['question_number'] == $total_question)
+                                        <div class="mx-2">
+
+                                            <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
+                                                id="finish-form" method="post">
+                                                @csrf
+                                                @method('patch')
+                                                <button type="submit" class="btn btn-success">Selesai<i
+                                                        class="fas fa-check ml-2"></i></button>
+                                            </form>
+                                        </div>
+                                    @else
                                         <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
                                             id="finish-form" method="post">
                                             @csrf
                                             @method('patch')
-                                            <button type="submit" class="btn btn-success">Selesai<i
-                                                    class="fas fa-check ml-2"></i></button>
                                         </form>
-                                    </div>
-                                @else
-                                    <form action="{{ route('admin.quiz.finish', ['result' => $result->id]) }}"
-                                        id="finish-form" method="post">
-                                        @csrf
-                                        @method('patch')
-                                    </form>
-                                    <div class="mx-2">
-                                        <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
-                                                class="fas fa-arrow-right ml-2"></i></button>
-                                        <input type="hidden" id="url-next"
-                                            value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] + 1 }}">
+                                        <div class="mx-2">
 
-                                    </div>
-                                @endif
+                                            <button onclick="nextPage()" class="btn btn-primary">Selanjutnya<i
+                                                    class="fas fa-arrow-right ml-2"></i></button>
+                                            <input type="hidden" id="url-next"
+                                                value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] + 1 }}">
+
+                                        </div>
+                                    @endif
+                                </div>
+
                             </div>
                         </div>
                     </div>

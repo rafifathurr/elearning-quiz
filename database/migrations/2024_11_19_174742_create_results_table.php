@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('quiz_id');
             $table->integer('user_id');
             $table->integer('time_duration')->nullable();
+            $table->integer('total_score')->nullable();
             $table->timestamp('start_time')->useCurrent()->nullable();
             $table->timestamp('finish_time')->nullable();
             $table->timestamps();

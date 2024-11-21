@@ -11,18 +11,13 @@
                             <div class="card-body p-5">
                                 <div class="row justify-content-center">
                                     <div class="col-md-6 text-center">
-                                        <h3 class="font-weight-bold">{{ $quiz->name }}</h3>
-                                        <h5 class="font-weight-medium">Total Point : {{ $total_point }} Point </h5>
+                                        <h3 class="font-weight-bold">{{ $result->quiz->name }}</h3>
+                                        <h5 class="font-weight-medium">Total Point : {{ $result->total_score }} Point </h5>
+                                        <h6>Waktu Submit: {{ $result->finish_time->format('H:i d-m-Y ') }}</h6>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
                                                 <a href="{{ url('/') }}" class="btn btn-lg btn-danger"><i
                                                         class="fas fa-home mr-2"></i>Halaman Utama</a>
-                                            </div>
-                                            <div class="mx-2">
-                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
-                                                    class="btn btn-lg btn-success" id="mulaiKembali"><i
-                                                        class="fas fa-play mr-2"></i>Mulai
-                                                    Kembali</a>
                                             </div>
                                         </div>
                                     </div>

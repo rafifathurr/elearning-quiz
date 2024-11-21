@@ -454,6 +454,9 @@ class QuizController extends Controller
                     ]);
                 }
             }
+            ResultDetail::where('result_id', $result->id)->where('order', 1)->update([
+                'display_time' => now()
+            ]);
 
             // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
@@ -615,6 +618,18 @@ class QuizController extends Controller
             Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
             return response()->json(['message' => $e->getMessage()], 500);
         }
+    }
+
+    public function finish(Result $result, Request $request)
+    {
+        $totalScore = ResultDetail::where('result_id', $result->id)->sum('score');
+
+        $result->update([
+            'total_score' => $totalScore,
+            'finish_time' => now(),
+        ]);
+
+        return view('quiz.result', compact('result'));
     }
 
 
@@ -1125,71 +1140,71 @@ class QuizController extends Controller
     //     }
     // }
 
-    public function finish(Request $request, Quiz $quiz)
-    {
-        if (Session::has('quiz')) {
-            $quiz_session = Session::get('quiz');
+    // public function finish(Request $request, Quiz $quiz)
+    // {
+    //     if (Session::has('quiz')) {
+    //         $quiz_session = Session::get('quiz');
 
-            $data['quiz'] = $quiz;
-            $total_point = 0;
+    //         $data['quiz'] = $quiz;
+    //         $total_point = 0;
 
-            // Hitung total poin hanya dari jawaban terakhir yang dipilih
-            foreach ($quiz_session['quiz_question'] as $question) {
-                $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
-                if ($selected_answer) {
-                    $total_point += $selected_answer['point'];
-                }
-            }
+    //         // Hitung total poin hanya dari jawaban terakhir yang dipilih
+    //         foreach ($quiz_session['quiz_question'] as $question) {
+    //             $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
+    //             if ($selected_answer) {
+    //                 $total_point += $selected_answer['point'];
+    //             }
+    //         }
 
-            $data['total_point'] = $total_point;
+    //         $data['total_point'] = $total_point;
 
-            // Insert hasil ke database (misalnya pada QuizUserAnswer dan QuizUserResult)
-            $user_id = Auth::user()->id;
-            $attempt_number = session('quiz_attempt', 1);
+    //         // Insert hasil ke database (misalnya pada QuizUserAnswer dan QuizUserResult)
+    //         $user_id = Auth::user()->id;
+    //         $attempt_number = session('quiz_attempt', 1);
 
-            // Simpan hasil kuis
-            $quizUserResult =  QuizUserResult::create([
-                'quiz_id' => $quiz->id,
-                'user_id' => $user_id,
-                'total_score' => $total_point
-            ]);
+    //         // Simpan hasil kuis
+    //         $quizUserResult =  QuizUserResult::create([
+    //             'quiz_id' => $quiz->id,
+    //             'user_id' => $user_id,
+    //             'total_score' => $total_point
+    //         ]);
 
-            // Simpan data jawaban pengguna
-            foreach ($quiz_session['quiz_question'] as $question) {
-                $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
-                if ($selected_answer) {
-                    $quizUserAnswer = QuizUserAnswer::create([
-                        'quiz_id' => $quiz->id,
-                        'user_id' => $user_id,
-                        'quiz_question_id' => $question['id'],
-                        'quiz_answer_id' => $selected_answer['id'],
-                        'is_correct' => $selected_answer['is_answer'],
-                        'point' => $selected_answer['point'],
-                        'attempt_number' => $attempt_number,
-                    ]);
+    //         // Simpan data jawaban pengguna
+    //         foreach ($quiz_session['quiz_question'] as $question) {
+    //             $selected_answer = collect($question['quiz_answer'])->where('answered', true)->first();
+    //             if ($selected_answer) {
+    //                 $quizUserAnswer = QuizUserAnswer::create([
+    //                     'quiz_id' => $quiz->id,
+    //                     'user_id' => $user_id,
+    //                     'quiz_question_id' => $question['id'],
+    //                     'quiz_answer_id' => $selected_answer['id'],
+    //                     'is_correct' => $selected_answer['is_answer'],
+    //                     'point' => $selected_answer['point'],
+    //                     'attempt_number' => $attempt_number,
+    //                 ]);
 
-                    QuizUserAnswerResult::create([
-                        'quiz_user_answer_id' => $quizUserAnswer->id,
-                        'quiz_user_result_id' => $quizUserResult->id,
-                    ]);
-                }
-            }
+    //                 QuizUserAnswerResult::create([
+    //                     'quiz_user_answer_id' => $quizUserAnswer->id,
+    //                     'quiz_user_result_id' => $quizUserResult->id,
+    //                 ]);
+    //             }
+    //         }
 
 
 
-            // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
-            session(['quiz_attempt' => $attempt_number + 1]);
+    //         // Tambahkan 1 pada attempt_number untuk percakapan berikutnya
+    //         session(['quiz_attempt' => $attempt_number + 1]);
 
-            QuizAuthenticationAccess::where('key', Session::get('key'))->update([
-                'deleted_at' => date('Y-m-d H:i:s')
-            ]);
-            Session::forget('key');
-            Session::forget('quiz');
-            return view('quiz.result', $data);
-        } else {
-            return redirect()->route('admin.quiz.start', ['quiz' => $quiz->id])->with(['failed' => 'Sesi Anda Telah Habis']);
-        }
-    }
+    //         QuizAuthenticationAccess::where('key', Session::get('key'))->update([
+    //             'deleted_at' => date('Y-m-d H:i:s')
+    //         ]);
+    //         Session::forget('key');
+    //         Session::forget('quiz');
+    //         return view('quiz.result', $data);
+    //     } else {
+    //         return redirect()->route('admin.quiz.start', ['quiz' => $quiz->id])->with(['failed' => 'Sesi Anda Telah Habis']);
+    //     }
+    // }
 
 
 
