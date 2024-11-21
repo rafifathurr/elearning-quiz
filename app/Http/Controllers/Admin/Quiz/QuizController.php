@@ -479,15 +479,13 @@ class QuizController extends Controller
     public function getQuestion(Result $result, Request $request)
     {
         try {
-            // Log data permintaan untuk debugging
-            Log::info('Request Headers:', $request->headers->all()); // Melihat semua headers permintaan
-            Log::info('Request Data:', $request->all()); // Melihat data yang dikirimkan (POST data, query params, dll)
+            Log::info('Request Headers:', $request->headers->all());
+            Log::info('Request Data:', $request->all());
             Log::info('Request Accepts JSON: ' . ($request->wantsJson() ? 'Yes' : 'No'));
-
             Log::info('Result ID from route: ' . $result->id);
 
             // Ambil seluruh ResultDetail terkait quiz dan user
-            $resultDetails = $result->details()->get();
+            $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
 
             if ($resultDetails->isEmpty()) {
                 return response()->json(['message' => 'Tidak ada pertanyaan untuk kuis ini'], 404);
@@ -495,10 +493,8 @@ class QuizController extends Controller
 
             // Persiapkan data untuk setiap soal
             $questions = $resultDetails->map(function ($resultDetail) {
-                // Ambil data soal dari ResultDetail
                 $question = QuizQuestion::find($resultDetail->question_id);
 
-                // Ambil jawaban soal yang terkait melalui relasi
                 $quizAnswerArr = $question->quizAnswer->map(function ($quiz_answer) {
                     return [
                         'id' => $quiz_answer->id,
@@ -508,11 +504,11 @@ class QuizController extends Controller
                     ];
                 })->toArray();
 
-                // Proses jawaban soal
                 $questionDetail = json_decode($resultDetail->question_detail, true);
-                $questionData = [
+
+                return [
                     'id' => $resultDetail->question_id,
-                    'question_number' => $resultDetail->order, // Menambahkan order sebagai question_number
+                    'question_number' => $resultDetail->order,
                     'direction_question' => $questionDetail['direction_question'],
                     'question' => $questionDetail['question'],
                     'description' => $questionDetail['description'],
@@ -522,16 +518,17 @@ class QuizController extends Controller
                     'aspect_id' => $resultDetail->aspect_id,
                     'level' => $resultDetail->level,
                     'order' => $resultDetail->order,
+                    'display_time' => $resultDetail->display_time,
                     'quiz_answer' => $quizAnswerArr,
                     'is_active' => false,
-                    'answered' => false,
+                    'answered' => !empty($resultDetail->answer),
                 ];
-
-                return $questionData;
             });
 
-            // Update soal aktif
-            $activeQuestionNumber = max(1, min($questions->count(), (int) $request->input('q', 1)));
+            // Tentukan pertanyaan aktif
+            $activeQuestionNumber = $request->has('q')
+                ? (int) $request->input('q') // Jika `q` ada di request, gunakan nilai tersebut
+                : $resultDetails->first()->order; // Jika tidak ada, gunakan pertanyaan dengan display_time terbaru
 
             $questions = $questions->transform(function ($item) use ($activeQuestionNumber) {
                 $item['is_active'] = $item['question_number'] == $activeQuestionNumber;
@@ -540,9 +537,7 @@ class QuizController extends Controller
 
             $activeQuestion = $questions->firstWhere('is_active', true);
 
-
-            // Persiapkan data untuk API
-
+            // Persiapkan data untuk API atau tampilan
             $quizData = Quiz::find($result->quiz_id)->toArray();
             $data = [
                 'quiz' => $quizData,
@@ -552,12 +547,11 @@ class QuizController extends Controller
                 'total_question' => $questions->count(),
             ];
 
-
-            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+            if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {
                 Log::info('Sending JSON Response');
                 return response()->json(['result' => $data], 200);
             } else {
-                if (isset($request->q)) {
+                if ($request->has('q')) {
                     Log::info('Render Question');
                     return view('quiz.play.question', $data);
                 }
@@ -565,11 +559,11 @@ class QuizController extends Controller
                 return view('quiz.play.index', $data);
             }
         } catch (Exception $e) {
-            // Tangani error
             Log::error('Error: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
 
 
 
@@ -583,21 +577,22 @@ class QuizController extends Controller
                 'questionId' => 'required|integer',
             ]);
 
-
             Log::info('Question ID: ' . $request->questionId);
             Log::info('Result ID: ' . $request->resultId);
+            Log::info('Order: ' . $request->q);
 
             // Simpan jawaban pengguna
-            $resultDetail = ResultDetail::where('question_id', $request->questionId)->where('result_id', $request->resultId)
+            $resultDetail = ResultDetail::where('question_id', $request->questionId)
+                ->where('result_id', $request->resultId)
                 ->whereHas('result', function ($query) {
                     $query->where('user_id', Auth::user()->id);
                 })
                 ->firstOrFail();
 
-
             if (!$resultDetail) {
                 throw new Exception("Data result detail tidak ditemukan");
             }
+
             $question = QuizQuestion::find($request->questionId);
 
             $score = 0;
@@ -605,20 +600,36 @@ class QuizController extends Controller
                 if ($request->value == $answer->answer && $answer->is_answer == 1) {
                     $score = 1;
                 }
-            };
+            }
 
             $resultDetail->update([
                 'answer' => $validated['value'],
                 'score' => $score,
-                'display_time' => now(),
             ]);
+
+            // Tentukan pertanyaan berikutnya berdasarkan order
+            $nextResultDetail = ResultDetail::where('order', $request->q + 1)
+                ->where('result_id', $request->resultId)
+                ->whereHas('result', function ($query) {
+                    $query->where('user_id', Auth::user()->id);
+                })
+                ->first();
+
+            if ($nextResultDetail) {
+                $nextResultDetail->update([
+                    'display_time' => now(),
+                ]);
+            } else {
+                Log::info('Tidak ada pertanyaan berikutnya untuk order: ' . ($request->q + 1));
+            }
 
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
         } catch (Exception $e) {
-            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
+            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
 
     public function finish(Request $request)
     {
