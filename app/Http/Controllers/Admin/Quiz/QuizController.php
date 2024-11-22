@@ -521,8 +521,13 @@ class QuizController extends Controller
                     ];
                 })->toArray();
 
+
+
                 $questionDetail = json_decode($resultDetail->question_detail, true);
 
+                if ($questionDetail['is_random_answer']) {
+                    shuffle($quizAnswerArr);
+                }
                 return [
                     'id' => $resultDetail->question_id,
                     'question_number' => $resultDetail->order,
@@ -533,6 +538,7 @@ class QuizController extends Controller
                     'is_random_answer' => $questionDetail['is_random_answer'],
                     'is_generate_random_answer' => $questionDetail['is_generate_random_answer'],
                     'aspect_id' => $resultDetail->aspect_id,
+                    'aspect_name' => $resultDetail->aspect->name,
                     'level' => $resultDetail->level,
                     'order' => $resultDetail->order,
                     'display_time' => $resultDetail->display_time,
@@ -708,19 +714,14 @@ class QuizController extends Controller
     public function showResult($resultId)
     {
         try {
-            // Ambil data hasil quiz berdasarkan ID dan user saat ini
             $result = Result::where('id', $resultId)
                 ->where('user_id', Auth::id())
-                ->with('quiz') // Pastikan relasi ke tabel quiz tersedia
+                ->with('quiz')
                 ->firstOrFail();
 
-            // Tampilkan view hasil kuis
             return view('quiz.result', compact('result'));
         } catch (\Exception $e) {
-            // Log error jika terjadi masalah
             Log::error("Error saat menampilkan hasil quiz: " . $e->getMessage());
-
-            // Redirect ke halaman utama dengan pesan error
             return redirect('/')->with('error', 'Gagal menampilkan hasil quiz.');
         }
     }
