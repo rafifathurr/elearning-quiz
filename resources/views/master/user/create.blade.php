@@ -124,7 +124,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                {{-- <div class="form-group row">
                                     <label class="col-md-4 control-label text-left" for="id_payment_package">Paket
                                         Pembayaran
                                         <span class="text-danger">*</span></label>
@@ -151,15 +151,15 @@
                                             </div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="form-group row">
                                     <label class="col-md-4 control-label text-left" for="password">Password
                                         <span class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
-                                        <input type="password"
-                                            class="form-control @error('password') is-invalid @enderror" id="password"
-                                            name="password" placeholder="Password" value="{{ old('password') }}">
+                                        <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                            id="password" name="password" placeholder="Password"
+                                            value="{{ old('password') }}">
 
                                         @error('password')
                                             <div class="alert alert-danger mt-2">

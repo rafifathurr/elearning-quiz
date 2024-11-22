@@ -161,7 +161,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        {{-- <div class="col-md-12">
                             <div class="form-group">
                                 <div class="input-group">
                                     <select class="form-control @error('id_payment_package') is-invalid @enderror"
@@ -188,11 +188,10 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="row pt-3">
                             <div class="col-12">
-                                <button type="submit"
-                                    class="btn btn-primary btn-block font-weight-bold">Register</button>
+                                <button type="submit" class="btn btn-primary btn-block font-weight-bold">Register</button>
                             </div>
                         </div>
                         <div class="row justify-content-center mt-4">
