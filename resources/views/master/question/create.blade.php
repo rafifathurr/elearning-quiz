@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="form-group row">
+                                <div class="form-group row">
                                     <label for="" class="col-md-4 control-label text-left">&nbsp;
                                     </label>
                                     <div class="col-md-8 col-sm-12">
@@ -166,7 +166,7 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div> --}}
+                                </div>
                                 <div class="form-group row">
                                     <label for="" class="col-md-4 control-label text-left">&nbsp;
                                     </label>
@@ -285,6 +285,64 @@
                     });
                 }
             });
+
+            // Fungsi untuk memvalidasi form sebelum disubmit
+            function validateForm(event) {
+                let levelChecked = false;
+                let aspectChecked = false;
+
+                // Periksa jika "Pilih Semua Level" dicentang
+                const allLevelChecked = document.getElementById('all_level').checked;
+
+                // Periksa jika "Pilih Semua Aspek" dicentang
+                const allAspectChecked = document.getElementById('all_aspect').checked;
+
+                // Jika "Pilih Semua Level" tidak dicentang, periksa checkbox level
+                if (!allLevelChecked) {
+                    document.querySelectorAll('[name="level[]"]').forEach(function(checkbox) {
+                        if (checkbox.checked) {
+                            levelChecked = true;
+                        }
+                    });
+                } else {
+                    levelChecked = true; // Jika "Pilih Semua Level" dicentang, dianggap valid
+                }
+
+                // Jika "Pilih Semua Aspek" tidak dicentang, periksa checkbox aspect
+                if (!allAspectChecked) {
+                    document.querySelectorAll('[name="aspect[]"]').forEach(function(checkbox) {
+                        if (checkbox.checked) {
+                            aspectChecked = true;
+                        }
+                    });
+                } else {
+                    aspectChecked = true; // Jika "Pilih Semua Aspek" dicentang, dianggap valid
+                }
+
+                // Jika tidak ada level atau aspect yang dicentang, tampilkan alert
+                if (!levelChecked) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Peringatan',
+                        text: 'Pilih minimal satu level!',
+                    });
+                    event.preventDefault(); // Cegah form disubmit
+                    return false;
+                }
+
+                if (!aspectChecked) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Peringatan',
+                        text: 'Pilih minimal satu aspek!',
+                    });
+                    event.preventDefault(); // Cegah form disubmit
+                    return false;
+                }
+            }
+
+            // Tambahkan event listener untuk validasi sebelum form disubmit
+            document.querySelector('form').addEventListener('submit', validateForm);
         </script>
     @endpush
 @endsection

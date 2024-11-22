@@ -79,14 +79,8 @@ class QuestionController extends Controller
                 $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                 return $btn_action;
             })
-            ->addColumn('time_duration', function ($data) {
-                $time_duration = '<div>' .  $data->time_duration . ' Detik';
-
-                $time_duration .= '<div>';
-                return $time_duration;
-            })
-            ->only(['question', 'aspect', 'description', 'level', 'time_duration', 'action'])
-            ->rawColumns(['action', 'description', 'level', 'aspect', 'time_duration'])
+            ->only(['question', 'aspect', 'description', 'level', 'action'])
+            ->rawColumns(['action', 'description', 'level', 'aspect'])
             ->with('draw', request('draw'))
             ->make(true);
 

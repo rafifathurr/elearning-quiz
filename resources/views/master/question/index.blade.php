@@ -34,7 +34,6 @@
                                                 <th>Aspek Pertanyaan</th>
                                                 <th>Deskripsi</th>
                                                 <th>Level</th>
-                                                <th>Durasi Waktu</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

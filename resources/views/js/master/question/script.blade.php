@@ -57,10 +57,6 @@
                     defaultContent: '-'
                 },
                 {
-                    data: 'time_duration',
-                    defaultContent: '-'
-                },
-                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',
