@@ -4,7 +4,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
-                    Soal {{ $active_question['question_number'] }} || Aspek {{ $active_question['aspect_name'] }}
+                    Soal {{ $active_question['question_number'] }}
                 </h2>
             </div>
             <div id="active_question" data-question-number="{{ $active_question['question_number'] }}">

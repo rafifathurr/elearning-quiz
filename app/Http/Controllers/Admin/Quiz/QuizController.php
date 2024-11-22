@@ -533,7 +533,6 @@ class QuizController extends Controller
                     'is_random_answer' => $questionDetail['is_random_answer'],
                     'is_generate_random_answer' => $questionDetail['is_generate_random_answer'],
                     'aspect_id' => $resultDetail->aspect_id,
-                    'aspect_name' => $resultDetail->aspect->name,
                     'level' => $resultDetail->level,
                     'order' => $resultDetail->order,
                     'display_time' => $resultDetail->display_time,
