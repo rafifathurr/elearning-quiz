@@ -37,12 +37,12 @@
                                                 </p>
                                             @elseif ($aspect['percentage'] < 70 && $aspect['percentage'] >= 50)
                                                 <p style="color: orange">
-                                                    Anda masih kurang dalam aspek
+                                                    Anda masih <strong>kurang</strong> dalam aspek
                                                     <strong>{{ $aspect['aspect_name'] }}</strong>.
                                                 </p>
                                             @elseif ($aspect['percentage'] < 50)
                                                 <p class="text-danger">
-                                                    Anda masih kurang sekali dalam aspek
+                                                    Anda masih <strong>kurang sekali</strong> dalam aspek
                                                     <strong>{{ $aspect['aspect_name'] }}</strong>.
                                                 </p>
                                             @endif
