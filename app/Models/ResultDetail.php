@@ -20,4 +20,8 @@ class ResultDetail extends Model
     {
         return $this->belongsTo(QuizQuestion::class, 'question_id');
     }
+    public function aspect()
+    {
+        return $this->belongsTo(AspectQuestion::class, 'aspect_id');
+    }
 }

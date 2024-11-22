@@ -4,7 +4,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
-                    Soal {{ $active_question['question_number'] }}
+                    Soal {{ $active_question['question_number'] }} || Aspek {{ $active_question['aspect_name'] }}
                 </h2>
             </div>
             <div id="active_question" data-question-number="{{ $active_question['question_number'] }}">
@@ -23,7 +23,7 @@
                             </p>
                             @if (!is_null($active_question['attachment']))
                                 <img src="{{ asset($active_question['attachment']) }}" class="img-fluid"
-                                    style="max-height: 18rem;">
+                                    style="max-height: 14rem;">
                             @endif
                             {{-- @if ($active_question['is_generate_random_answer'])
                                 <div class="d-flex flex-wrap justify-content-center">

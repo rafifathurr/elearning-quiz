@@ -11,8 +11,12 @@
                             <div class="card-body p-5">
                                 <div class="row justify-content-center">
                                     <div class="col-md-6 text-center">
-                                        <h3 class="font-weight-bold">{{ $result->quiz->name }}</h3>
-                                        <h5 class="font-weight-medium">Total Point : {{ $result->total_score }} Point </h5>
+                                        <h5 class="font-weight-bold">{{ $result->quiz->name }}</h5>
+                                        <h3 class="font-weight-medium">Total Point : {{ $result->total_score }} Point </h3>
+
+                                        <h6>Waktu Submit:
+                                            {{ \Carbon\Carbon::parse($result->finish_time)->translatedFormat('H:i d F Y') }}
+                                        </h6>
 
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">

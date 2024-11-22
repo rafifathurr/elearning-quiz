@@ -418,10 +418,11 @@ class QuizController extends Controller
             Log::info('New result created with ID: ' . $result->id);
 
             $order = 0; // Pertanyaan pertama dimulai dari order 0
+            $questionAspectPairs = []; // Menyimpan pasangan pertanyaan dan aspek
 
-            // Simpan data soal berdasarkan level dan aspek
+            // Proses pengambilan soal dan pengacakan aspek
             foreach ($quiz->quizAspect as $aspect) {
-                // Ambil pertanyaan berdasarkan level dan aspect
+                // Ambil pertanyaan berdasarkan level dan aspek
                 $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
                     $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
                         ->orWhere('level', '0');
@@ -434,12 +435,11 @@ class QuizController extends Controller
                     ->limit($aspect->total_question)
                     ->get();
 
-                // Simpan hasil pertanyaan ke ResultDetail
                 foreach ($questionSet as $question) {
-                    $order++;
-                    ResultDetail::create([
-                        'result_id' => $result->id,
+                    $questionAspectPairs[] = [
                         'question_id' => $question->id,
+                        'aspect_id' => $aspect->aspect_id,
+                        'level' => $aspect->level,
                         'question_detail' => json_encode([
                             'direction_question' => $question->direction_question,
                             'description' => $question->description,
@@ -448,12 +448,27 @@ class QuizController extends Controller
                             'is_random_answer' => $question->is_random_answer,
                             'is_generate_random_answer' => $question->is_generate_random_answer,
                         ]),
-                        'aspect_id' => $aspect->aspect_id,
-                        'level' => $aspect->level,
-                        'order' => $order,
-                    ]);
+                    ];
                 }
             }
+
+            // Acak pasangan soal dan aspek
+            shuffle($questionAspectPairs);
+
+            // Simpan pasangan soal dan aspek ke result_details
+            foreach ($questionAspectPairs as $pair) {
+                $order++;
+                ResultDetail::create([
+                    'result_id' => $result->id,
+                    'question_id' => $pair['question_id'],
+                    'question_detail' => $pair['question_detail'],
+                    'aspect_id' => $pair['aspect_id'],
+                    'level' =>  $pair['level'],
+                    'order' => $order,
+                ]);
+            }
+
+            // Tampilkan waktu untuk pertanyaan pertama
             ResultDetail::where('result_id', $result->id)->where('order', 1)->update([
                 'display_time' => now()
             ]);
@@ -471,9 +486,11 @@ class QuizController extends Controller
             return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id]);
         } catch (Exception $e) {
             // Tangani error
+            Log::error('Error in starting quiz: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
 
 
     public function getQuestion(Result $result, Request $request)
@@ -516,6 +533,7 @@ class QuizController extends Controller
                     'is_random_answer' => $questionDetail['is_random_answer'],
                     'is_generate_random_answer' => $questionDetail['is_generate_random_answer'],
                     'aspect_id' => $resultDetail->aspect_id,
+                    'aspect_name' => $resultDetail->aspect->name,
                     'level' => $resultDetail->level,
                     'order' => $resultDetail->order,
                     'display_time' => $resultDetail->display_time,
