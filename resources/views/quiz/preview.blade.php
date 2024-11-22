@@ -15,36 +15,33 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <h3>Total Pertanyaan {{ $totalQuestions }}</h3>
+                                <h3>Total Pertanyaan: {{ $totalQuestions }}</h3>
                                 <ul>
-                                    @php $no = 0; @endphp
-                                    @foreach ($questions as $questionSet)
-                                        @foreach ($questionSet as $question)
-                                            @php $no++; @endphp
-                                            <li class="list-unstyled">
-                                                {{ $no }}. {{ $question->question }}
-                                                <ol style="list-style-type: lower-alpha;">
-                                                    @foreach ($question->quizAnswer as $answer)
-                                                        <li>{{ $answer->answer }}</li>
-                                                    @endforeach
-                                                </ol>
-                                            </li>
-                                        @endforeach
+                                    @php $no = 1; @endphp
+                                    @foreach ($shuffledQuestions as $question)
+                                        <li class="list-unstyled">
+                                            {{ $no++ }}.
+
+                                            {{ $question->question }}
+                                            <ol style="list-style-type: lower-alpha;">
+                                                @foreach ($question->quizAnswer as $answer)
+                                                    <li>{{ $answer->answer }}</li>
+                                                @endforeach
+                                            </ol>
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- /.row (main row) -->
-            </div><!-- /.container-fluid -->
-
+            </div>
         </section>
+
         <!-- /.content -->
     </div>
     {{-- <script>

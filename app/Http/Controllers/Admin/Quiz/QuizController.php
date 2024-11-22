@@ -331,10 +331,11 @@ class QuizController extends Controller
 
     public function showQuestion(Quiz $quiz)
     {
-        $questions = [];
-        foreach ($quiz->quizAspect as $aspect) {
+        $questions = collect();
 
-            $questions[] = QuizQuestion::where(function ($query) use ($aspect) {
+        // Ambil pertanyaan berdasarkan aspek dan level
+        foreach ($quiz->quizAspect as $aspect) {
+            $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
                 $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
                     ->orWhere('level', '0');
             })
@@ -345,21 +346,28 @@ class QuizController extends Controller
                 ->inRandomOrder()
                 ->limit($aspect->total_question)
                 ->get();
+
+
+
+            // Gabungkan semua pertanyaan ke dalam koleksi
+            $questions = $questions->merge($questionSet);
         }
 
-
-        foreach ($questions as $key => $questionSet) {
-            foreach ($questionSet as $question) {
-                $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
-            }
-        }
-
-        $totalQuestions = collect($questions)->sum(function ($questionSet) {
-            return $questionSet->count();
+        // Tambahkan jawaban untuk setiap pertanyaan
+        $questions->each(function ($question) {
+            $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
         });
 
-        return view('quiz.preview', compact('questions', 'totalQuestions'));
+        // Acak ulang seluruh pertanyaan (aspek, level, dan pertanyaan)
+        $shuffledQuestions = $questions->shuffle();
+
+        // Hitung total pertanyaan
+        $totalQuestions = $shuffledQuestions->count();
+
+        // Kirim ke view
+        return view('quiz.preview', compact('shuffledQuestions', 'totalQuestions'));
     }
+
 
     public function start(Quiz $quiz, Request $request)
     {
@@ -717,15 +725,39 @@ class QuizController extends Controller
         try {
             $result = Result::where('id', $resultId)
                 ->where('user_id', Auth::id())
-                ->with('quiz')
+                ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
                 ->firstOrFail();
 
-            return view('quiz.result', compact('result'));
+            // Hitung data per aspek
+            $questionsPerAspect = $result->details
+                ->groupBy('aspect_id')
+                ->map(function ($details, $aspectId) {
+                    $totalQuestions = $details->count();
+                    $correctQuestions = $details->where('score', 1)->count();
+                    $percentage = $totalQuestions > 0
+                        ? ($correctQuestions / $totalQuestions) * 100
+                        : 0;
+
+                    return [
+                        'aspect_name' => $details->first()->aspect->name ?? 'Unknown Aspect',
+                        'total_questions' => $totalQuestions,
+                        'correct_questions' => $correctQuestions,
+                        'percentage' => round($percentage, 2), // Dibulatkan 2 desimal
+                    ];
+                });
+
+            // Urutkan berdasarkan persentase tertinggi
+            $questionsPerAspect = $questionsPerAspect->sortByDesc('percentage');
+
+            return view('quiz.result', compact('result', 'questionsPerAspect'));
         } catch (\Exception $e) {
             Log::error("Error saat menampilkan hasil quiz: " . $e->getMessage());
             return redirect('/')->with('error', 'Gagal menampilkan hasil quiz.');
         }
     }
+
+
+
 
     public function listQuiz()
     {
@@ -1159,43 +1191,43 @@ class QuizController extends Controller
     /**
      * Preview quiz resource
      */
-    public function preview(Quiz $quiz, Request $request)
-    {
-        $quiz = Session::get('quiz');
-        Session::forget('quiz');
+    // public function preview(Quiz $quiz, Request $request)
+    // {
+    //     $quiz = Session::get('quiz');
+    //     Session::forget('quiz');
 
-        if (!isset($request->q) || is_null(collect($quiz['quiz_question'])->where('question_number', $request->q)->first())) {
-            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-                return response()->json(['failed' => 'Permintaan Tidak Sesuai'], 404);
-            } else {
-                return redirect()
-                    ->back()
-                    ->with(['failed' => 'Permintaan Tidak Sesuai']);
-            }
-        } else {
+    //     if (!isset($request->q) || is_null(collect($quiz['quiz_question'])->where('question_number', $request->q)->first())) {
+    //         if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+    //             return response()->json(['failed' => 'Permintaan Tidak Sesuai'], 404);
+    //         } else {
+    //             return redirect()
+    //                 ->back()
+    //                 ->with(['failed' => 'Permintaan Tidak Sesuai']);
+    //         }
+    //     } else {
 
-            $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
-            $current_quiz['is_active'] = true;
+    //         $current_quiz = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
+    //         $current_quiz['is_active'] = true;
 
-            foreach ($quiz['quiz_question'] as $index => $question) {
-                if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
-                    $quiz['quiz_question'][$index] = $current_quiz;
-                }
-            }
+    //         foreach ($quiz['quiz_question'] as $index => $question) {
+    //             if ($question['question_number'] == $current_quiz['question_number'] && $question['id'] == $current_quiz['id']) {
+    //                 $quiz['quiz_question'][$index] = $current_quiz;
+    //             }
+    //         }
 
-            Session::forget('quiz');
-            Session::put('quiz', $quiz);
+    //         Session::forget('quiz');
+    //         Session::put('quiz', $quiz);
 
-            $data['quiz'] = $quiz;
-            $data['quiz_question'] = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
+    //         $data['quiz'] = $quiz;
+    //         $data['quiz_question'] = collect($quiz['quiz_question'])->where('question_number', $request->q)->first();
 
-            if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
-                return response()->json(['result' => $data], 200);
-            } else {
-                return view('quiz.play.index', $data);
-            }
-        }
-    }
+    //         if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+    //             return response()->json(['result' => $data], 200);
+    //         } else {
+    //             return view('quiz.play.index', $data);
+    //         }
+    //     }
+    // }
 
     // public function answer(Request $request)
     // {

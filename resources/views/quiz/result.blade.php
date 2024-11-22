@@ -12,20 +12,67 @@
                                 <div class="row justify-content-center">
                                     <div class="col-md-6 text-center">
                                         <h5 class="font-weight-bold">{{ $result->quiz->name }}</h5>
-                                        <h3 class="font-weight-medium">Total Point : {{ $result->total_score }} Point </h3>
+                                        <h3 class="font-weight-medium">Total Point: {{ $result->total_score }} Point</h3>
 
                                         <h6>Waktu Submit:
                                             {{ \Carbon\Carbon::parse($result->finish_time)->translatedFormat('H:i d F Y') }}
                                         </h6>
+                                    </div>
+                                </div>
 
+                                <div class="row mt-3">
+                                    <div class="col-md-6 mx-auto">
+                                        @foreach ($questionsPerAspect as $aspect)
+                                            @if ($aspect['percentage'] >= 90)
+                                                <p class="text-success">Hasil Anda sudah <strong>baik</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 90 && $aspect['percentage'] >= 80)
+                                                <p class="text-success">Hasil Anda <strong>cukup baik</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 80 && $aspect['percentage'] >= 70)
+                                                <p class="text-success">Hasil Anda <strong>cukup</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 70 && $aspect['percentage'] >= 50)
+                                                <p style="color: orange">
+                                                    Anda masih kurang dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 50)
+                                                <p class="text-danger">
+                                                    Anda masih kurang sekali dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @endif
+                                        @endforeach
+
+                                        {{-- Menampilkan narasi tes dan konseling jika ada aspek dengan persentase kurang dari 70 --}}
+                                        @if (
+                                            $questionsPerAspect->pluck('percentage')->contains(function ($percentage) {
+                                                return $percentage < 70;
+                                            }))
+                                            <p><strong>Anda dapat mengikuti tes kembali ataupun mengikuti sesi konseling
+                                                    online dan
+                                                    offline.</strong></p>
+                                        @endif
+                                    </div>
+                                </div>
+
+
+                                <div class="row justify-content-center">
+                                    <div class="col-md-6 text-center">
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
-                                                <a href="{{ url('/') }}" class="btn btn-lg btn-danger"><i
-                                                        class="fas fa-home mr-2"></i>Halaman Utama</a>
+                                                <a href="{{ url('/') }}" class="btn btn-lg btn-danger">
+                                                    <i class="fas fa-home mr-2"></i>Halaman Utama
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
