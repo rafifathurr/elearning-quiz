@@ -726,7 +726,64 @@ class QuizController extends Controller
         }
     }
 
+    public function listQuiz()
+    {
+        QuizAuthenticationAccess::where('key', Session::get('key'))->update([
+            'deleted_at' => date('Y-m-d H:i:s')
+        ]);
 
+        Session::forget('key');
+        Session::forget('quiz');
+
+        $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
+
+        $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
+            $query->whereIn('type_user_id', $userTypeIds);
+        })->paginate(6);
+
+
+        return view('quiz.list.index', compact('quizes'));
+    }
+
+    public function historyQuiz()
+    {
+        $user_id = Auth::user()->id;
+
+        // Ambil semua attempt untuk user ini, paginate 3 data per halaman
+        $histories = Result::where('user_id', $user_id)
+            ->orderBy('quiz_id')
+            ->orderBy('id')
+            ->paginate(6);
+
+        // Menambahkan nomor attempt per quiz_id
+        $histories->getCollection()->transform(function ($history) {
+            $quiz_id = $history->quiz_id;
+            // Hitung nomor attempt untuk quiz_id yang sama
+            $attempt_number = Result::where('user_id', $history->user_id)
+                ->where('quiz_id', $quiz_id)
+                ->where('id', '<=', $history->id)
+                ->count();
+
+            $history->attempt_number = $attempt_number; // Menambahkan nomor attempt
+            return $history;
+        });
+
+        return view('quiz.list.history', ['histories' => $histories]);
+    }
+
+    public function reviewQuiz(string $id)
+    {
+        try {
+            $review = result::find($id);
+            if (!is_null($review)) {
+                return view('quiz.list.review', compact('review'));
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()]);
+        }
+    }
 
 
 
@@ -913,65 +970,9 @@ class QuizController extends Controller
     //     }
     // }
 
-    public function listQuiz()
-    {
-
-        QuizAuthenticationAccess::where('key', Session::get('key'))->update([
-            'deleted_at' => date('Y-m-d H:i:s')
-        ]);
-
-        Session::forget('key');
-        Session::forget('quiz');
-
-        $userTypeIds = Auth::user()->userTypeAccess->pluck('type_user_id');
-
-        $quizes = Quiz::whereHas('quizTypeUserAccess', function ($query) use ($userTypeIds) {
-            $query->whereIn('type_user_id', $userTypeIds);
-        })->paginate(6);
 
 
-        return view('quiz.list.index', compact('quizes'));
-    }
 
-    public function historyQuiz()
-    {
-        $user_id = Auth::user()->id;
-
-        // Ambil semua attempt untuk user ini, paginate 3 data per halaman
-        $histories = QuizUserResult::where('user_id', $user_id)
-            ->orderBy('quiz_id')
-            ->orderBy('id')
-            ->paginate(6);
-
-        // Menambahkan nomor attempt per quiz_id
-        $histories->getCollection()->transform(function ($history) {
-            $quiz_id = $history->quiz_id;
-            // Hitung nomor attempt untuk quiz_id yang sama
-            $attempt_number = QuizUserResult::where('user_id', $history->user_id)
-                ->where('quiz_id', $quiz_id)
-                ->where('id', '<=', $history->id)
-                ->count();
-
-            $history->attempt_number = $attempt_number; // Menambahkan nomor attempt
-            return $history;
-        });
-
-        return view('quiz.list.history', ['histories' => $histories]);
-    }
-
-    public function reviewQuiz(string $id)
-    {
-        try {
-            $review = QuizUserResult::find($id);
-            if (!is_null($review)) {
-                return view('quiz.list.review', compact('review'));
-            }
-        } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with(['failed' => $e->getMessage()]);
-        }
-    }
 
     /**
      * Start quiz resource

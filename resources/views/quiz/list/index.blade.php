@@ -9,9 +9,6 @@
                     @forelse ($quizes as $quiz)
                         <div class="col-md-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h3 class="card-title font-weight-bold">{{ $quiz->typeQuiz->name }} </h3>
-                                </div>
                                 <div class="card-body">
                                     <h5 class="card-title font-weight-bold mb-2">{{ $quiz->name }}</h5>
                                     @php
@@ -25,8 +22,20 @@
                                     @endphp
                                     <div class="d-flex mb-2 card-text">
                                         <p class="mr-3 mb-0">
-                                            <i class="bi bi-clock text-primary"></i> {{ $quiz->time_duration }} Menit
+                                            <i class="bi bi-clock text-primary"></i>
+                                            @if ($quiz->time_duration >= 3600)
+                                                {{ floor($quiz->time_duration / 3600) }} jam
+                                                {{ floor(($quiz->time_duration % 3600) / 60) }} menit
+
+                                                {{ $quiz->time_duration % 60 ? $quiz->time_duration % 60 . 'detik' : '' }}
+                                            @elseif ($quiz->time_duration >= 60)
+                                                {{ floor($quiz->time_duration / 60) }} menit
+                                                {{ $quiz->time_duration % 60 }} detik
+                                            @else
+                                                {{ $quiz->time_duration }} detik
+                                            @endif
                                         </p>
+
                                         <p class="mb-0">
                                             @if (
                                                 (!is_null($quiz->open_quiz) && $currentDateTime->lt($openQuizDateTime)) ||
@@ -50,15 +59,19 @@
 
                                 </div>
                                 <div class="card-footer bg-white my-3">
+                                    <div class="d-flex">
+
+                                        <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
+                                            class="btn btn-success" id="mulai"><i class="fas fa-play mr-2"></i>Mulai</a>
+                                    </div>
+
+                                </div>
+
+                                {{-- <div class="card-footer bg-white my-3">
                                     <div class="d-flex justify-content-between">
                                         <span class="font-weight-bold">Sisa Akses:
                                             {{ count($quiz->quizAuthenticationAccess->whereNull('deleted_at')) }}</span>
-                                        @if (
-                                            (is_null($openQuizDateTime) && (is_null($closeQuizDateTime) || $currentDateTime->lte($closeQuizDateTime))) ||
-                                                (!is_null($openQuizDateTime) &&
-                                                    !is_null($closeQuizDateTime) &&
-                                                    $currentDateTime->between($openQuizDateTime, $closeQuizDateTime)) ||
-                                                (!is_null($openQuizDateTime) && is_null($closeQuizDateTime) && $currentDateTime->gte($openQuizDateTime)))
+                                        @if ((is_null($openQuizDateTime) && (is_null($closeQuizDateTime) || $currentDateTime->lte($closeQuizDateTime))) || (!is_null($openQuizDateTime) && !is_null($closeQuizDateTime) && $currentDateTime->between($openQuizDateTime, $closeQuizDateTime)) || (!is_null($openQuizDateTime) && is_null($closeQuizDateTime) && $currentDateTime->gte($openQuizDateTime)))
                                             <button data-toggle="modal" data-target="#modal-{{ $quiz->id }}"
                                                 class="btn btn-sm btn-success"
                                                 @if (count($quiz->quizAuthenticationAccess->whereNull('deleted_at')) < 1) disabled @endif>
@@ -66,10 +79,11 @@
                                             </button>
                                         @endif
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
-                        <div id="modal-{{ $quiz->id }}" class="modal fade" tabindex="-1" role="dialog"
+
+                        {{-- <div id="modal-{{ $quiz->id }}" class="modal fade" tabindex="-1" role="dialog"
                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
@@ -102,7 +116,7 @@
                                     </form>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     @empty
                         <div class="col text-center ">
                             <div class="card  py-4">
