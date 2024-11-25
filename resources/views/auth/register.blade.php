@@ -139,56 +139,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <select class="form-control @error('type_of_user[]') is-invalid @enderror"
-                                        name="type_of_user[]" id="type_of_user" data-placeholder="Pilih Tipe User"
-                                        style="width: 100%;">
-                                        @foreach ($type_user as $type)
-                                            <option value="{{ $type->id }}">
-                                                {{ $type->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <div class="input-group-text">
-                                        <span class="fas fa-user"></span>
-                                    </div>
-                                    @error('type_of_user[]')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        {{-- <div class="col-md-12">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <select class="form-control @error('id_payment_package') is-invalid @enderror"
-                                        id="id_payment_package" name="id_payment_package" required>
-                                        <option disabled hidden></option>
-                                        @foreach ($payment_packages as $payment)
-                                            @if (!is_null(old('id_payment_package')) && old('id_payment_package') == $payment->id)
-                                                <option value="{{ $payment->id }}" selected>
-                                                    {{ $payment->name }}
-                                                </option>
-                                            @else
-                                                <option value="{{ $payment->id }}">{{ $payment->name }}
-                                                </option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                    <div class="input-group-text">
-                                        <span class="fas fa-wallet"></span>
-                                    </div>
-                                    @error('role')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="row pt-3">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-block font-weight-bold">Register</button>

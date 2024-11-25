@@ -35,7 +35,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'otp_expired_at' => 'datetime',
     ];
+
+
 
     public function userTypeAccess()
     {

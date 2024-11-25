@@ -57,6 +57,35 @@ class AuthController extends Controller
         }
     }
 
+    public function showVerifyForm(Request $request)
+    {
+        return view('auth.verify', ['email' => $request->email]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|numeric',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return redirect()->back()->with(['failed' => 'Email tidak ditemukan.']);
+        }
+
+        if ($user->otp === $request->otp && $user->otp_expired_at->isFuture()) {
+            $user->otp = null; // Reset OTP setelah berhasil
+            $user->otp_expired_at = null;
+            $user->save();
+
+            return redirect()->route('login')->with(['success' => 'Verifikasi berhasil.']);
+        } else {
+            return redirect()->back()->with(['failed' => 'OTP tidak valid atau telah kedaluwarsa.']);
+        }
+    }
+
 
     public function logout()
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\Register\SendMail;
+use App\Mail\SendOtpMail;
 use App\Models\HistoryPayment;
 use App\Models\PaymentPackage;
 use App\Models\Quiz\Quiz;
@@ -125,6 +126,8 @@ class UserController extends Controller
 
             if (is_null($username_check) && is_null($email_check)) {
                 DB::beginTransaction();
+                $otp = mt_rand(100000, 999999);
+                $otp_expiry = now()->addMinutes(10);
                 $add_user = User::lockforUpdate()->create([
                     'username' => $request->username,
                     'name' => $request->name,
@@ -133,33 +136,42 @@ class UserController extends Controller
                     'password' => bcrypt($request->password)
                 ]);
 
+
                 if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
                     $user_role = $add_user->assignRole($request->roles);
                 } else {
+                    $add_user->update([
+                        'otp' => $otp,
+                        'otp_expired_at' => $otp_expiry
+                    ]);
                     $user_role = $add_user->assignRole('user');
                 }
 
-                $type_user_access_request = [];
-                foreach ($request->type_of_user as $type_user_id) {
-                    $type_user_access_request[] = [
-                        'user_id' => $add_user->id,
-                        'type_user_id' => $type_user_id,
-                    ];
+                if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                    $type_user_access_request = [];
+                    foreach ($request->type_of_user as $type_user_id) {
+                        $type_user_access_request[] = [
+                            'user_id' => $add_user->id,
+                            'type_user_id' => $type_user_id,
+                        ];
+                    }
+
+                    TypeUserAccess::insert($type_user_access_request);
                 }
 
-                $user_type_access = TypeUserAccess::insert($type_user_access_request);
-
                 //nanti apus lagi
-                if ($add_user && $user_role && $user_type_access) {
-                    DB::commit();
+                if ($add_user && $user_role) {
                     if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                        DB::commit();
                         return redirect()
                             ->route('master.user.index')
                             ->with(['success' => 'Berhasilkan Menambahkan User']);
                     } else {
+                        Mail::to($request->email)->send(new SendOtpMail($otp));
+                        DB::commit();
                         return redirect()
-                            ->route('login')
-                            ->with(['success' => 'Berhasilkan Register Akun']);
+                            ->route('otp.verify', ['email' => $add_user->email])
+                            ->with(['success' => 'Registrasi berhasil. Silakan cek email untuk OTP.']);
                     }
                 } else {
                     return redirect()
@@ -167,89 +179,6 @@ class UserController extends Controller
                         ->with(['failed' => 'Registrasi Gagal'])
                         ->withInput();
                 }
-
-                // if ($add_user && $user_role && $user_type_access) {
-                //     $payment_package = PaymentPackage::where('id', $request->id_payment_package)->first();
-
-                //     $history_payment_request[] = [
-                //         'user_id' => $add_user->id,
-                //         'payment_package_id' => $request->id_payment_package,
-                //         'price' => $payment_package->price,
-                //     ];
-
-                //     $history_payment_add = HistoryPayment::insert($history_payment_request);
-
-                //     if ($history_payment_add) {
-
-                //         $list_of_quiz = QuizTypeUserAccess::whereIn('type_user_id', $request->type_of_user)->groupBy('quiz_id')->pluck('quiz_id');
-
-                //         foreach ($list_of_quiz->toArray() as $quiz_id) {
-                //             for ($num = 1; $num <= intval($payment_package->quota_access); $num++) {
-                //                 $code_access = Str::random(8);
-                //                 $password = Str::random(20);
-                //                 $key = Str::random(25);
-
-                //                 $quiz_name = Quiz::find($quiz_id)->name;
-
-                //                 $quiz_authentication_access[] = [
-                //                     'user_id' => $add_user->id,
-                //                     'quiz_id' => $quiz_id,
-                //                     'code_access' => $code_access,
-                //                     'password' => $password,
-                //                     'key' => $key,
-                //                 ];
-
-                //                 $quiz_data[] = [
-                //                     'quiz' => $quiz_name,
-                //                     'code_access' => $code_access,
-                //                     'password' => $password,
-                //                 ];
-                //             }
-                //         }
-
-                //         $quiz_authentication_access_add = QuizAuthenticationAccess::insert($quiz_authentication_access);
-
-                //         if ($quiz_authentication_access_add) {
-
-                //             $data['to'] = $add_user->email;
-                //             $data['name'] = $add_user->name;
-                //             $data['quiz'] = $quiz_data;
-
-                //             Mail::queue(new SendMail($data));
-
-                //             DB::commit();
-                //             if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
-                //                 return redirect()
-                //                     ->route('master.user.index')
-                //                     ->with(['success' => 'Berhasilkan Menambahkan User']);
-                //             } else {
-                //                 return redirect()
-                //                     ->route('login')
-                //                     ->with(['success' => 'Berhasilkan Register Akun']);
-                //             }
-                //         } else {
-                //             DB::rollBack();
-                //             return redirect()
-                //                 ->back()
-                //                 ->with(['failed' => 'Gagal Menambahkan User'])
-                //                 ->withInput();
-                //         }
-                //     } else {
-                //         DB::rollBack();
-                //         return redirect()
-                //             ->back()
-                //             ->with(['failed' => 'Gagal Menambahkan User'])
-                //             ->withInput();
-                //     }
-                // } else {
-                //     DB::rollBack();
-                //     return redirect()
-                //         ->back()
-                //         ->with(['failed' => 'Gagal Menambahkan User'])
-                //         ->withInput();
-                // }
-
-
             } else {
                 return redirect()
                     ->back()

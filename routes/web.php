@@ -32,6 +32,9 @@ Route::get('/', function () {
     return view(view: 'landingPage');
 })->name('landingPage');
 
+Route::get('otp-verify', [AuthController::class, 'showVerifyForm'])->name('otp.verify');
+Route::post('otp-verify', [AuthController::class, 'verifyOtp'])->name('otp.verify.post');
+
 Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
     Route::get('create', [UserController::class, 'create'])->name('create');
     Route::post('store', [UserController::class, 'store'])->name('store');
