@@ -29,7 +29,7 @@
         </nav>
 
         <div class="py-3 px-3">
-            <div class="row">
+            <div class="row mx-3    ">
                 <div class="col-md-8">
                     {{-- Carousel --}}
                     <div class="card">
