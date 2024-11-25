@@ -21,7 +21,8 @@
                 <!-- Right navbar links -->
                 <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                     <li class="nav-item">
-                        <a href="#" class="nav-link font-weight-bold">Login <i class="fa fa-sign-in-alt"></i></a>
+                        <a href="{{ route('login') }}" class="nav-link font-weight-bold">Login <i
+                                class="fa fa-sign-in-alt"></i></a>
                     </li>
                 </ul>
             </div>
