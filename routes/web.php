@@ -28,6 +28,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', function () {
+    return view(view: 'landingPage');
+})->name('landingPage');
 
 Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
     Route::get('create', [UserController::class, 'create'])->name('create');
@@ -36,7 +39,7 @@ Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
 
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/', function () {
+    Route::get('home', function () {
         return view(view: 'home');
     })->name('home');
 });

@@ -21,8 +21,8 @@
                     </div>
                     @hasrole('user')
                         <div class="col-md-12 mt-3">
-                            <h5 class="my-auto">Jika Ingin Melanjutkan Ke Halaman Quiz<a
-                                    href="{{ route('quiz.listQuiz') }}" class="btn btn-primary ml-3 font-weight-bold">Klik Disini</a></h5>
+                            <h5 class="my-auto">Jika Ingin Melanjutkan Ke Halaman Quiz<a href="{{ route('quiz.listQuiz') }}"
+                                    class="btn btn-primary ml-3 font-weight-bold">Klik Disini</a></h5>
                         </div>
                     @endhasrole
                 </div>
