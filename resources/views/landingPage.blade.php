@@ -44,15 +44,15 @@
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
                                         <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo1.png') }}" alt="First slide">
+                                            src="{{ asset('dist/adminlte/img/photo1.jpg') }}" alt="First slide">
                                     </div>
                                     <div class="carousel-item">
                                         <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo2.png') }}" alt="Second slide">
+                                            src="{{ asset('dist/adminlte/img/photo2.jpg') }}" alt="Second slide">
                                     </div>
                                     <div class="carousel-item">
                                         <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo1.png') }}" alt="Third slide">
+                                            src="{{ asset('dist/adminlte/img/photo3.jpg') }}" alt="Third slide">
                                     </div>
                                     <div class="carousel-item">
                                         <img class="d-block w-100 img-carousel" style="max-height: 450px"
@@ -144,37 +144,6 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <!-- Info Boxes Style 2 -->
-                    <div class="info-box mb-3 bg-warning">
-                        <span class="info-box-icon"><i class="fas fa-clipboard-list"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Total Quiz</span>
-                            <span class="info-box-number">400</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
-                    <!-- /.info-box -->
-
-                    <div class="info-box mb-3 bg-success">
-                        <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Total Kelas</span>
-                            <span class="info-box-number">90</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
-                    <!-- /.info-box -->
-
-                    <div class="info-box mb-3 bg-danger">
-                        <span class="info-box-icon"><i class="fas fa-users"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Total Pengguna</span>
-                            <span class="info-box-number">300</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
-
-
 
                     <!-- PRODUCT LIST -->
                     <div class="card">
@@ -224,7 +193,7 @@
                                             </span>
                                         </a>
                                         <span class="product-description">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing.
+                                            Lorem ipsum dolor sit amet consectetur.
                                         </span>
                                     </div>
                                 </li>
@@ -248,6 +217,31 @@
                         <!-- /.card-body -->
                         <!-- /.card-footer -->
                     </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Kontak Kita</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Google Maps iframe -->
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.147123000197!2d106.85284697409665!3d-6.244334161141676!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3b95d1599b7%3A0x71c3550e06bcd528!2sKorlantas%20Polri%20SIM%20International!5e0!3m2!1sid!2sid!4v1732530968618!5m2!1sid!2sid"
+                                width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+
+                            <!-- Kontak Details -->
+                            <div class="mt-3">
+                                <p><i class="fa fa-map-marker-alt text-danger"></i> Jl. Letjen M.T. Haryono No.37-38 8,
+                                    RT.6/RW.2, Cikoko, Kec. Pancoran, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta
+                                    12770</p>
+                                <p><i class="fa fa-phone-alt text-success"></i> (021)7891232</p>
+                                <p><i class="fa fa-envelope text-primary"></i> test@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- /.card -->
                 </div>
             </div>
