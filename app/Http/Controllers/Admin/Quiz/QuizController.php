@@ -818,6 +818,15 @@ class QuizController extends Controller
         }
     }
 
+    public function myTest()
+    {
+        return view('quiz.list.myTest');
+    }
+    public function myOrder()
+    {
+        return view('quiz.list.myOrder');
+    }
+
 
 
 

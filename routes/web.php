@@ -53,6 +53,8 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
         Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
         Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
+        Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
+        Route::get('my-order', [QuizController::class, 'myOrder'])->name('myOrder');
     });
 });
 
