@@ -824,7 +824,17 @@ class QuizController extends Controller
     }
     public function myOrder()
     {
-        return view('quiz.list.myOrder');
+        return view('order.index');
+    }
+
+    public function listOrder()
+    {
+        return view('order.admin');
+    }
+
+    public function listClass()
+    {
+        return view('class.index');
     }
 
 

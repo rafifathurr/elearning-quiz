@@ -54,6 +54,8 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
         Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
         Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
+    });
+    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('my-order', [QuizController::class, 'myOrder'])->name('myOrder');
     });
 });
@@ -101,5 +103,9 @@ Route::group(['middleware' => ['role:admin']], function () {
         });
         Route::resource('question', QuestionController::class)->parameters(['question' => 'id']);
         // Route::get('question/edit/{id}/{increment}', [QuestionController::class, 'edit'])->name('question.edit.increment');
+    });
+
+    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('list-order', [QuizController::class, 'listOrder'])->name('listOrder');
     });
 });

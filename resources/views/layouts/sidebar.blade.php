@@ -40,7 +40,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('quiz.myOrder') }}" class="nav-link">
+                        <a href="{{ route('order.myOrder') }}" class="nav-link">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
                                 My Order
@@ -90,15 +90,23 @@
                             </p>
                         </a>
                     </li>
-
                     <li class="nav-item">
+                        <a href="{{ route('order.listOrder') }}" class="nav-link">
+                            <i class="nav-icon fas fa-shopping-cart"></i>
+                            <p>
+                                Daftar Order
+                            </p>
+                        </a>
+                    </li>
+
+                    {{-- <li class="nav-item">
                         <a href="{{ route('master.payment.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-credit-card"></i>
                             <p>
                                 Payment Package
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
 
 
                     <li class="nav-item">

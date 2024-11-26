@@ -9,7 +9,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">My Order</h3>
+                                <h3 class="font-weight-bold">Daftar Order</h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
@@ -17,49 +17,65 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Nama Paket</th>
+                                                <th>Nama Pengguna</th>
+                                                <th>Paket Pembayaran</th>
                                                 <th>Harga</th>
-                                                <th>Jumlah Akses</th>
+                                                <th>Bukti Pembayaran</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
                                                 <td>1</td>
+                                                <td>Ilham J</td>
                                                 <td>Paket Pembayaran 1</td>
                                                 <td>Rp. 700.000</td>
-                                                <td>10 Kali</td>
-                                                <td><span class="text-danger">Pembayaran Batal</span></td>
+                                                <td> <label class="m-2">
+                                                        <a href="{{ asset('dist/adminlte/img/kelas2.jpg') }}"
+                                                            target="_blank">
+                                                            <i class="fas fa-download mr-1"></i>
+                                                            Bukti Pembayaran
+                                                        </a>
+                                                    </label></td>
+                                                <td><span class="text-danger">Ditolak</span></td>
                                             </tr>
                                             <tr>
                                                 <td>2</td>
+                                                <td>Bambang S</td>
                                                 <td>Paket Pembayaran 2</td>
                                                 <td>Rp. 800.000</td>
-                                                <td>12 Kali</td>
-                                                <td><button data-toggle="modal" data-target="#assignTo"
-                                                        class="btn btn-sm btn-primary">Bayar Sekarang</button></td>
+                                                <td> <label class="m-2">
+                                                        <a href="{{ asset('dist/adminlte/img/bukti.png') }}"
+                                                            target="_blank">
+                                                            <i class="fas fa-download mr-1"></i>
+                                                            Bukti Pembayaran
+                                                        </a>
+                                                    </label></td>
+                                                <td><span class="text-success">Diterima</span></td>
                                             </tr>
                                             <tr>
                                                 <td>3</td>
+                                                <td>Cinta Y</td>
                                                 <td>Paket Pembayaran 3</td>
                                                 <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><span class="text-success">Sudah Dibayar</span></td>
+                                                <td>-</td>
+                                                <td><span class="text-warning">Belum Bayar</span></td>
                                             </tr>
                                             <tr>
                                                 <td>4</td>
+                                                <td>Agus T</td>
                                                 <td>Paket Pembayaran 3</td>
                                                 <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><span class="text-success">Sudah Dibayar</span></td>
+                                                <td>-</td>
+                                                <td><span class="text-warning">Belum Bayar</span></td>
                                             </tr>
                                             <tr>
                                                 <td>5</td>
+                                                <td>Budi S</td>
                                                 <td>Paket Pembayaran 3</td>
                                                 <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><button data-toggle="modal" data-target="#assignTo"
-                                                        class="btn btn-sm btn-primary">Bayar Sekarang</button></td>
+                                                <td>-</td>
+                                                <td><span class="text-warning">Belum Bayar</span></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -71,33 +87,5 @@
 
             </div>
         </section>
-    </div>
-    {{-- Assign To --}}
-    <div class="modal fade" id="assignTo">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <form method="POST" id="assign-form" action="#" class="forms-control" enctype="multipart/form-data">
-                    @csrf
-                    @method('patch')
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="exampleModalLongTitle">Upload Bukti Pembayaran</h4>
-                    </div>
-                    <div class="modal-body">
-
-                        <div class="form-group">
-                            <label for="lampiran">Bukti Pembayaran<span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" name="lampiran[]"
-                                accept="image/jpeg,image/jpg,image/png" multiple="true" required>
-                            <p class="text-danger py-1">* .png .jpg .jpeg</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-sm btn-primary mx-2">
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 @endsection
