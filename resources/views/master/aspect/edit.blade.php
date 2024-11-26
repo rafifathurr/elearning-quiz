@@ -37,8 +37,28 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="description" class="col-md-4 control-label text-left">Deskripsi
+                                    <label for="description" class="col-md-4 control-label text-left">Tipe Aspek
                                         <span class="text-danger">*</span></label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select name="type_aspect" id="type_aspect" class="form-control">
+                                            <option value="">Pilih Tipe Aspek</option>
+                                            <option value="kecerdasan"
+                                                {{ $aspect->type_aspect == 'kecerdasan' ? 'selected' : '' }}>Kecerdasan
+                                            </option>
+                                            <option value="kepribadian"
+                                                {{ $aspect->type_aspect == 'kepribadian' ? 'selected' : '' }}>Kepribadian
+                                            </option>
+                                        </select>
+                                        @error('description')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="description" class="col-md-4 control-label text-left">Deskripsi
+                                    </label>
                                     <div class="col-md-8 col-sm-12">
                                         <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote">{{ old('description', $aspect->description) }}</textarea>
                                         @error('description')

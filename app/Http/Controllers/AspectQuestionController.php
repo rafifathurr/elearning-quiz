@@ -32,8 +32,8 @@ class AspectQuestionController extends Controller
                 return $btn_action;
             })
 
-            ->only(['name', 'description', 'action'])
-            ->rawColumns(['action', 'description'])
+            ->only(['name', 'type_aspect', 'action'])
+            ->rawColumns(['action'])
             ->make(true);
 
         return $dataTable;
@@ -50,11 +50,13 @@ class AspectQuestionController extends Controller
             DB::beginTransaction();
             $request->validate([
                 'name' => 'required',
+                'type_aspect' => 'required',
                 'description' => 'nullable'
             ]);
 
             $add_aspect = AspectQuestion::lockForUpdate()->create([
                 'name' => $request->name,
+                'type_aspect' => $request->type_aspect,
                 'description' => $request->description
             ]);
             if ($add_aspect) {
@@ -97,6 +99,7 @@ class AspectQuestionController extends Controller
 
                 $request->validate([
                     'name' => 'required',
+                    'type_aspect' => 'required',
                     'description' => 'nullable'
                 ]);
                 DB::beginTransaction();
@@ -104,6 +107,7 @@ class AspectQuestionController extends Controller
                 $aspect_update = AspectQuestion::where('id', $id)
                     ->update([
                         'name' => $request->name,
+                        'type_aspect' => $request->type_aspect,
                         'description' => $request->description
                     ]);
                 if ($aspect_update) {

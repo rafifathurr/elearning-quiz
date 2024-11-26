@@ -31,7 +31,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama</th>
-                                                <th>Deskripsi</th>
+                                                <th>Tipe Aspek</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

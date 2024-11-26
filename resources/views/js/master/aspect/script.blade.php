@@ -44,7 +44,7 @@
                     defaultContent: '-'
                 },
                 {
-                    data: 'description',
+                    data: 'type_aspect',
                     defaultContent: '-'
                 },
                 {

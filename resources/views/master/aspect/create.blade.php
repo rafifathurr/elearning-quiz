@@ -26,12 +26,26 @@
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('name') is-invalid @enderror" type="text"
-                                            name="name" id="name" value="{{ old('name') }}" required>
+                                            name="name" id="name" value="{{ old('name') }}"
+                                            placeholder="Aspek Pertanyaan" required>
                                         @error('name')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
                                         @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="name" class="col-md-4 control-label text-left">Tipe Aspek
+                                        <span class="text-danger ml-1">*</span>
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select name="type_aspect" id="type_aspect" class="form-control" required>
+                                            <option value="">Pilih Tipe Aspek</option>
+                                            <option value="kecerdasan">Kecerdasan</option>
+                                            <option value="kepribadian">Kepribadian</option>
+                                        </select>
                                     </div>
                                 </div>
 
