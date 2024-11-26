@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,18 +20,18 @@ class AuthController extends Controller
     public function authenticate(Request $request)
     {
         try {
-            // Memeriksa apakah input adalah email atau username
             $email_or_username = $request->input('username');
-            $fields = filter_var($email_or_username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+            $field = filter_var($email_or_username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+            $request->merge([$field => $email_or_username]);
 
             // Validasi input
             $request->validate([
                 'password' => 'required',
-                $fields => 'required',
+                $field => 'required',
             ]);
 
             // Mencari user berdasarkan email atau username, dengan kondisi deleted_at null
-            $user = User::where($fields, $email_or_username)
+            $user = User::where($field, $email_or_username)
                 ->whereNull('deleted_at') // Pastikan pengguna belum dihapus
                 ->first();
 
@@ -48,12 +49,14 @@ class AuthController extends Controller
             } else {
                 return redirect()
                     ->back()
-                    ->withErrors(['username' => 'These credentials do not match our records.'])
+                    ->with(['failed' => 'Email atau Username Salah'])
                     ->withInput();
             }
-        } catch (\Throwable $th) {
-            // Menangani kesalahan dengan memberikan pesan yang sesuai
-            return redirect()->back()->withErrors(['error' => 'An error occurred. Please try again later.'])->withInput();
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()])
+                ->withInput();
         }
     }
 
