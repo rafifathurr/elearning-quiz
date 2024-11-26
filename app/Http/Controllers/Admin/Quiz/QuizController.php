@@ -834,7 +834,7 @@ class QuizController extends Controller
 
     public function listClass()
     {
-        return view('class.index');
+        return view('master.class.index');
     }
 
 

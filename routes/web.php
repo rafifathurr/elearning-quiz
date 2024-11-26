@@ -108,4 +108,8 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('list-order', [QuizController::class, 'listOrder'])->name('listOrder');
     });
+
+    Route::group(['prefix' => 'class', 'as' => 'class.'], function () {
+        Route::get('list-class', [QuizController::class, 'listClass'])->name('listClass');
+    });
 });
