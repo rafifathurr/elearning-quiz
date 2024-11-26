@@ -1,5 +1,34 @@
 @extends('layouts.main')
 @section('section')
+    <style>
+        /* Menimpa gaya tercoret bawaan */
+        .todo-list>li.done .text {
+            text-decoration: none;
+            /* Hilangkan teks tercoret */
+            color: black;
+            /* Warna hijau */
+            font-weight: bold;
+        }
+
+        /* Menambahkan efek visual pada elemen */
+        .todo-list>li.done {
+            background-color: lightgreen
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 50px;
+            right: 30px;
+            display: none;
+            /* Tombol tidak muncul kecuali di-scroll */
+            z-index: 999;
+        }
+
+        .back-to-top.show {
+            display: block;
+            /* Tampilkan tombol saat ada scroll */
+        }
+    </style>
 
     <body class="hold-transition layout-top-nav">
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
@@ -27,55 +56,65 @@
                 </ul>
             </div>
         </nav>
-
+        {{-- Carousel --}}
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+            </ol>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
+                        src="{{ asset('dist/adminlte/img/photo1.jpg') }}" alt="First slide">
+                </div>
+                <div class="carousel-item">
+                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
+                        src="{{ asset('dist/adminlte/img/photo2.jpg') }}" alt="Second slide">
+                </div>
+                <div class="carousel-item">
+                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
+                        src="{{ asset('dist/adminlte/img/photo3.jpg') }}" alt="Third slide">
+                </div>
+                <div class="carousel-item">
+                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
+                        src="{{ asset('dist/adminlte/img/photo4.jpg') }}" alt="Fourth slide">
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-custom-icon" aria-hidden="true">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-custom-icon" aria-hidden="true">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
         <div class="py-3 px-3">
-            <div class="row mx-3    ">
+            <div class="row mx-3 ">
                 <div class="col-md-8">
-                    {{-- Carousel --}}
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                                <ol class="carousel-indicators">
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
-                                </ol>
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo1.jpg') }}" alt="First slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo2.jpg') }}" alt="Second slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo3.jpg') }}" alt="Third slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img class="d-block w-100 img-carousel" style="max-height: 450px"
-                                            src="{{ asset('dist/adminlte/img/photo4.jpg') }}" alt="Fourth slide">
-                                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Hello</h4>
                                 </div>
-                                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button"
-                                    data-slide="prev">
-                                    <span class="carousel-control-custom-icon" aria-hidden="true">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </span>
-                                    <span class="sr-only">Previous</span>
-                                </a>
-                                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button"
-                                    data-slide="next">
-                                    <span class="carousel-control-custom-icon" aria-hidden="true">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </span>
-                                    <span class="sr-only">Next</span>
-                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Hello</h4>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {{-- Quiz --}}
                     <div class="card">
                         <div class="card-header border-transparent">
                             <h3 class="card-title">Daftar Quiz</h3>
@@ -83,13 +122,14 @@
                         <!-- /.card-header -->
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table m-0">
+                                <table class="table m-0 text-center">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>Nama</th>
                                             <th>Harga</th>
                                             <th>Akses</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -100,6 +140,7 @@
                                             <td>
                                                 <i class="fa fa-key text-warning"></i> 10 Kali Akses
                                             </td>
+                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
                                         </tr>
                                         <tr>
                                             <td>2</td>
@@ -108,6 +149,7 @@
                                             <td>
                                                 <i class="fa fa-key text-warning"></i> 8 Kali Akses
                                             </td>
+                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
                                         </tr>
                                         <tr>
                                             <td>3</td>
@@ -116,6 +158,7 @@
                                             <td>
                                                 <i class="fa fa-key text-warning"></i> 12 Kali Akses
                                             </td>
+                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
                                         </tr>
                                         <tr>
                                             <td>4</td>
@@ -124,6 +167,7 @@
                                             <td>
                                                 <i class="fa fa-key text-warning"></i> 18 Kali Akses
                                             </td>
+                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
                                         </tr>
                                         <tr>
                                             <td>5</td>
@@ -132,6 +176,7 @@
                                             <td>
                                                 <i class="fa fa-key text-warning"></i> 20 Kali Akses
                                             </td>
+                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
                                         </tr>
 
                                     </tbody>
@@ -142,10 +187,74 @@
                         <!-- /.card-body -->
 
                     </div>
+
+                    <!-- FAQ -->
+                    <div class="col-12" id="accordion">
+                        <h4>Pertanyaan Seputar Quiz</h4>
+                        <div class="card card-primary card-outline">
+                            <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+                                <div class="card-header">
+                                    <h4 class="card-title w-100">
+                                        1. Bagaimana cara membeli paket di Elerning-Quiz?
+                                    </h4>
+                                </div>
+                            </a>
+                            <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                                <div class="card-body">
+                                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                    dolor.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-primary card-outline">
+                            <a class="d-block w-100" data-toggle="collapse" href="#collapseTwo">
+                                <div class="card-header">
+                                    <h4 class="card-title w-100">
+                                        2. Materi apa saja yang tersedia dalam soal soal quiz?
+                                    </h4>
+                                </div>
+                            </a>
+                            <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur
+                                    ridiculus mus.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-warning card-outline">
+                            <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+                                <div class="card-header">
+                                    <h4 class="card-title w-100">
+                                        3. Apa kelebihan yang didapat dengan mengikuti try out quiz?
+                                    </h4>
+                                </div>
+                            </a>
+                            <div id="collapseThree" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat
+                                    massa quis enim.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-warning card-outline">
+                            <a class="d-block w-100" data-toggle="collapse" href="#collapseFour">
+                                <div class="card-header">
+                                    <h4 class="card-title w-100">
+                                        4. Jika mengalami kendala dalam pembelian paket apa yang harus dilakukan?
+                                    </h4>
+                                </div>
+                            </a>
+                            <div id="collapseFour" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4">
 
-                    <!-- PRODUCT LIST -->
+                    <!-- Kelas LIST -->
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Kelas Terbaru</h3>
@@ -218,6 +327,87 @@
                         <!-- /.card-footer -->
                     </div>
 
+                    <!-- TO DO List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="ion ion-clipboard mr-1"></i>
+                                Pilihan Program
+                            </h3>
+
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <ul class="todo-list" data-widget="todo-list">
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo1" id="todoCheck1" />
+                                        <label for="todoCheck1"></label>
+                                    </div>
+                                    <span class="text">ASN</span>
+                                </li>
+                                <li>
+                                    <!-- checkbox -->
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo1" id="todoCheck2" />
+                                        <label for="todoCheck2"></label>
+                                    </div>
+                                    <!-- todo text -->
+                                    <span class="text">Polisi Tamtama</span>
+                                    <!-- Emphasis label -->
+
+                                    <!-- General tools such as edit or delete-->
+                                </li>
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo3" id="todoCheck3" />
+                                        <label for="todoCheck3"></label>
+                                    </div>
+                                    <span class="text">Polisi Bintara</span>
+
+
+                                </li>
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo3" id="todoCheck4" />
+                                        <label for="todoCheck4"></label>
+                                    </div>
+                                    <span class="text">Polisi Perwira</span>
+
+
+                                </li>
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo4" id="todoCheck5" />
+                                        <label for="todoCheck5"></label>
+                                    </div>
+                                    <span class="text">TNI Tamtama</span>
+
+
+                                </li>
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo5" id="todoCheck6" />
+                                        <label for="todoCheck6"></label>
+                                    </div>
+                                    <span class="text">TNI Bintara</span>
+
+
+                                </li>
+                                <li>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" value="" name="todo6" id="todoCheck7" />
+                                        <label for="todoCheck7"></label>
+                                    </div>
+                                    <span class="text">TNI Perwira</span>
+
+
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {{-- Contact Us --}}
                     <div class="card">
                         <div class="card-header">
                             <h5>Kontak Kita</h5>
@@ -240,12 +430,40 @@
                             </div>
                         </div>
                     </div>
-
-
-                    <!-- /.card -->
                 </div>
             </div>
-
         </div>
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
+            aria-label="Scroll to top">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const backToTopButton = document.querySelector('.back-to-top');
+
+                backToTopButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Mencegah tindakan default anchor
+
+                    // Scroll halus ke atas
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                const backToTopButton = document.querySelector('.back-to-top');
+
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 300px
+                        backToTopButton.classList.add('show');
+                    } else {
+                        backToTopButton.classList.remove('show');
+                    }
+                });
+            });
+        </script>
+
     </body>
 @endsection
