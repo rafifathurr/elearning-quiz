@@ -98,21 +98,125 @@
         <div class="py-3 px-3">
             <div class="row mx-3 ">
                 <div class="col-md-8">
+
+                    {{-- Best Seller --}}
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="card">
+                                <div class="ribbon-wrapper ribbon-lg">
+                                    <div class="ribbon bg-success text-lg">
+                                        Best Seller
+                                    </div>
+                                </div>
+                                <img src="{{ asset('dist/adminlte/img/kelas1.jpg') }}" class="card-img-top" alt="Kelas A">
+                                <div class="card-header">
+                                    <h5>Kelas A</h5>
+                                </div>
                                 <div class="card-body">
-                                    <h4>Hello</h4>
+                                    <ul class="list-unstyled">
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
+                                            Materi
+                                            Belajar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
+                                            Hari
+                                            Daily Quiz</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
+                                            HOTS
+                                        </li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Hasil
+                                            Ujian
+                                            Langsung Keluar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
+                                            Belajar
+                                            Premium</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Modul
+                                            Pembelajaran</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Akses
+                                            Selamanya</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="card">
+                                <div class="ribbon-wrapper ribbon-lg">
+                                    <div class="ribbon bg-success text-lg">
+                                        Best Seller
+                                    </div>
+                                </div>
+                                <img src="{{ asset('dist/adminlte/img/kelas2.jpg') }}" class="card-img-top"
+                                    alt="Kelas A">
+                                <div class="card-header">
+                                    <h5>Kelas B</h5>
+                                </div>
                                 <div class="card-body">
-                                    <h4>Hello</h4>
+                                    <ul class="list-unstyled">
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
+                                            Materi
+                                            Belajar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
+                                            Hari
+                                            Daily Quiz</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
+                                            HOTS
+                                        </li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
+                                            Hasil
+                                            Ujian
+                                            Langsung Keluar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
+                                            Belajar
+                                            Premium</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
+                                            Modul
+                                            Pembelajaran</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Akses
+                                            Selamanya</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="ribbon-wrapper ribbon-lg">
+                                    <div class="ribbon bg-success text-lg">
+                                        Best Seller
+                                    </div>
+                                </div>
+                                <img src="{{ asset('dist/adminlte/img/kelas3.jpg') }}" class="card-img-top"
+                                    alt="Kelas A">
+                                <div class="card-header">
+                                    <h5>Kelas C</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
+                                            Materi
+                                            Belajar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
+                                            Hari
+                                            Daily Quiz</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
+                                            HOTS
+                                        </li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
+                                            Hasil
+                                            Ujian
+                                            Langsung Keluar</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
+                                            Belajar
+                                            Premium</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
+                                            Modul
+                                            Pembelajaran</li>
+                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
+                                            Akses
+                                            Selamanya</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     {{-- Quiz --}}
                     <div class="card">
@@ -451,9 +555,6 @@
                         behavior: 'smooth'
                     });
                 });
-            });
-            document.addEventListener('DOMContentLoaded', function() {
-                const backToTopButton = document.querySelector('.back-to-top');
 
                 window.addEventListener('scroll', function() {
                     if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 300px
