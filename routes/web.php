@@ -47,18 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
     })->name('home');
 });
 
-Route::group(['middleware' => ['role:user']], function () {
-    Route::group(['prefix' => 'quiz', 'as' => 'quiz.'], function () {
-        Route::post('auth', [QuizController::class, 'auth'])->name('auth');
-        Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
-        Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
-        Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
-        Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
-    });
-    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('my-order', [QuizController::class, 'myOrder'])->name('myOrder');
-    });
-});
+
 
 Route::group(['middleware' => ['role:admin|user']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
@@ -72,6 +61,17 @@ Route::group(['middleware' => ['role:admin|user']], function () {
             Route::post('finish', 'finish')->name('finish');
             Route::get('result/{resultId}', 'showResult')->name('result');
         });
+    });
+
+    Route::group(['prefix' => 'quiz', 'as' => 'quiz.'], function () {
+        Route::post('auth', [QuizController::class, 'auth'])->name('auth');
+        Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
+        Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
+        Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
+        Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
+    });
+    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('my-order', [QuizController::class, 'myOrder'])->name('myOrder');
     });
 });
 

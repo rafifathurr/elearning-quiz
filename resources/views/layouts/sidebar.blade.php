@@ -30,24 +30,23 @@
                         </p>
                     </a>
                 </li>
-                @hasrole('user')
-                    <li class="nav-item">
-                        <a href="{{ route('quiz.myTest') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>
-                                My Test
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('order.myOrder') }}" class="nav-link">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>
-                                My Order
-                            </p>
-                        </a>
-                    </li>
-                    {{-- <li class="nav-item">
+                <li class="nav-item">
+                    <a href="{{ route('quiz.myTest') }}" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>
+                            My Test
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('order.myOrder') }}" class="nav-link">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>
+                            My Order
+                        </p>
+                    </a>
+                </li>
+                {{-- <li class="nav-item">
                         <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
                             <i class="nav-icon fas fa-book"></i>
                             <p>
@@ -63,7 +62,7 @@
                             </p>
                         </a>
                     </li> --}}
-                @endhasrole
+
                 @hasrole('admin')
                     <li class="nav-item">
                         <a href="{{ route('admin.quiz.index') }}" class="nav-link">
