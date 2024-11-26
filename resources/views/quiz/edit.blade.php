@@ -73,17 +73,21 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row">
-                                                <label for="description" class="col-md-4 control-label text-left">Deskripsi
-                                                </label>
+                                                <label for="type_aspect" class="col-md-4 control-label text-left">Tipe Aspek
+                                                    <span class="text-danger">*</span></label>
                                                 <div class="col-md-8 col-sm-12">
-                                                    <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote" {{ $disabled }}>{{ old('description', $quiz->description) }}</textarea>
-                                                    @error('description')
-                                                        <div class="alert alert-danger mt-2">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
+                                                    <select name="type_aspect" id="type_aspect" class="form-control">
+                                                        <option value="">Pilih Tipe Aspek</option>
+                                                        <option value="kecerdasan"
+                                                            {{ $quiz->type_aspect == 'kecerdasan' ? 'selected' : '' }}>
+                                                            Kecerdasan</option>
+                                                        <option value="kepribadian"
+                                                            {{ $quiz->type_aspect == 'kepribadian' ? 'selected' : '' }}>
+                                                            Kepribadian</option>
+                                                    </select>
                                                 </div>
                                             </div>
+
 
                                         </div>
                                     </div>
@@ -252,12 +256,14 @@
 
             function appendForm(aspect_quiz) {
                 aspect_increment++;
+                const type_aspect = $('#type_aspect').val();
                 $.ajax({
                     url: "{{ route('admin.quiz.append') }}",
                     type: "GET",
                     data: {
                         aspect_quiz: aspect_quiz,
                         increment: aspect_increment,
+                        type_aspect: type_aspect,
                     },
                     success: function(data) {
                         $('#aspect_list').append(data);

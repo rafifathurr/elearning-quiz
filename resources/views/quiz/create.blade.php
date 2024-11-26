@@ -68,16 +68,18 @@
                                                     @enderror
                                                 </div>
                                             </div>
+
                                             <div class="form-group row">
-                                                <label for="description" class="col-md-4 control-label text-left">Deskripsi
+                                                <label for="name" class="col-md-4 control-label text-left">Tipe Aspek
+                                                    <span class="text-danger ml-1">*</span>
                                                 </label>
                                                 <div class="col-md-8 col-sm-12">
-                                                    <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote"></textarea>
-                                                    @error('description')
-                                                        <div class="alert alert-danger mt-2">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
+                                                    <select name="type_aspect" id="type_aspect" class="form-control"
+                                                        required>
+                                                        <option value="">Pilih Tipe Aspek</option>
+                                                        <option value="kecerdasan">Kecerdasan</option>
+                                                        <option value="kepribadian">Kepribadian</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -231,14 +233,15 @@
             }
 
             function appendForm(aspect_quiz) {
-
                 aspect_increment++;
+                const type_aspect = $('#type_aspect').val();
                 $.ajax({
                     url: "{{ route('admin.quiz.append') }}",
                     type: "GET",
                     data: {
                         aspect_quiz: aspect_quiz,
                         increment: aspect_increment,
+                        type_aspect: type_aspect,
                     },
                     success: function(data) {
                         $('#aspect_list').append(data);

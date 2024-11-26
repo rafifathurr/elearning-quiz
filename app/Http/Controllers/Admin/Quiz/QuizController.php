@@ -75,18 +75,23 @@ class QuizController extends Controller
     {
         if (isset($request->aspect_quiz)) {
             if ($request->aspect_quiz) {
-                return $this->appendAspect(null, $request->increment);
+                $type_aspect = $request->type_aspect; // Ambil tipe aspek dari permintaan
+                return $this->appendAspect(null, $request->increment, '', $type_aspect);
             }
         } else {
             return response()->json(['message' => 'Gagal'], 400);
         }
     }
-    private function appendAspect(QuizAspect $quiz_aspect = null, $increment, $disabled = '')
+    private function appendAspect(QuizAspect $quiz_aspect = null, $increment, $disabled = '', $type_aspect = null)
     {
         $data['disabled'] = $disabled;
         $data['quiz_aspect'] = $quiz_aspect;
         $data['increment'] = $increment;
-        $data['aspect_question'] = AspectQuestion::whereNull('deleted_at')->get();
+        $query = AspectQuestion::whereNull('deleted_at');
+        if ($type_aspect) {
+            $query->where('type_aspect', $type_aspect);
+        }
+        $data['aspect_question'] = $query->get();
 
 
         return view('quiz.form.aspect', $data);
@@ -100,6 +105,7 @@ class QuizController extends Controller
             $quiz = Quiz::create([
                 'name' => $request->name,
                 'description' => $request->description,
+                'type_aspect' => $request->type_aspect,
                 'open_quiz' => isset($request->open_quiz) ? $request->open_quiz : null,
                 'close_quiz' => isset($request->close_quiz) ? $request->close_quiz : null,
                 'time_duration' => $request->time_duration,
@@ -177,11 +183,12 @@ class QuizController extends Controller
         $data['disabled'] = '';
         $data['quiz'] = $quiz;
         $data['type_user'] = TypeUser::whereNull('deleted_at')->get();
+        $data['type_aspect'] = $quiz->type_aspect;
 
         $data['quiz_aspect'] = '';
         foreach ($quiz->quizAspect as $index => $aspect) {
             if (is_null($aspect->deleted_at)) {
-                $data['quiz_aspect'] .= $this->appendAspect($aspect, $index + 1);
+                $data['quiz_aspect'] .= $this->appendAspect($aspect, $index + 1, '', $data['type_aspect']);
             }
         }
 
@@ -199,6 +206,7 @@ class QuizController extends Controller
             $quiz_update = $quiz->update([
                 'name' => $request->name,
                 'description' => $request->description,
+                'type_aspect' => $request->type_aspect,
                 'open_quiz' => isset($request->open_quiz) ? $request->open_quiz : null,
                 'close_quiz' => isset($request->close_quiz) ? $request->close_quiz : null,
                 'time_duration' => $request->time_duration,
@@ -373,23 +381,38 @@ class QuizController extends Controller
     {
 
 
-        $questions = [];
+        $questions = collect();
+
+        // Ambil pertanyaan berdasarkan aspek dan level
         foreach ($quiz->quizAspect as $aspect) {
-            $questions[] = QuizQuestion::where(function ($query) use ($aspect) {
-                $query->where('level', 'like', '%' . $aspect->level . '%')
-                    ->orWhere('level', 0);
+            $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
+                $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
+                    ->orWhere('level', '0');
             })
                 ->where(function ($query) use ($aspect) {
-                    $query->where('aspect', 'like', '%' . $aspect->aspect_id . '%')
-                        ->orWhere('aspect', 0);
+                    $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
+                        ->orWhere('aspect', '0');
                 })
+                ->inRandomOrder()
                 ->limit($aspect->total_question)
                 ->get();
+
+
+
+            // Gabungkan semua pertanyaan ke dalam koleksi
+            $questions = $questions->merge($questionSet);
         }
 
-        $totalQuestions = collect($questions)->sum(function ($questionSet) {
-            return $questionSet->count();
+        // Tambahkan jawaban untuk setiap pertanyaan
+        $questions->each(function ($question) {
+            $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
         });
+
+        // Acak ulang seluruh pertanyaan (aspek, level, dan pertanyaan)
+        $shuffledQuestions = $questions->shuffle();
+
+        // Hitung total pertanyaan
+        $totalQuestions = $shuffledQuestions->count();
 
         // Jika permintaan berbasis API (JSON)
         if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
