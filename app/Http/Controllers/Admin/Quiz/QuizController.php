@@ -39,14 +39,6 @@ class QuizController extends Controller
 
             return DataTables::of($quiz)
                 ->addIndexColumn()
-                ->addColumn('access', function ($data) {
-                    $list_view = '<ul>';
-                    foreach ($data->quizTypeUserAccess as $quiz_access) {
-                        $list_view .= '<li>' . $quiz_access->typeUser->name . '</li>';
-                    }
-                    $list_view .= '</ul>';
-                    return $list_view;
-                })
                 ->addColumn('action', function ($data) {
                     // $btn_action = '<a href="' . route('admin.quiz.show', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
                     $btn_action = '<a href="' . route('admin.quiz.edit', ['quiz' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
@@ -55,8 +47,8 @@ class QuizController extends Controller
                     $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                     return $btn_action;
                 })
-                ->only(['name', 'access', 'action'])
-                ->rawColumns(['access', 'action'])
+                ->only(['name', 'type_aspect', 'action'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
         return view('quiz.index');
@@ -135,7 +127,7 @@ class QuizController extends Controller
                         DB::rollBack();
                         return redirect()
                             ->back()
-                            ->with(['failed' => 'Gagal Simpan Aspek Quiz'])
+                            ->with(['failed' => 'Gagal Simpan Aspek Test'])
                             ->withInput();
                     }
                 }
@@ -143,11 +135,11 @@ class QuizController extends Controller
                 DB::commit();
                 return redirect()
                     ->route('admin.quiz.index')
-                    ->with(['success' => 'Berhasil Simpan Quiz']);
+                    ->with(['success' => 'Berhasil Simpan Test']);
             } else {
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Gagal Simpan Quiz'])
+                    ->with(['failed' => 'Gagal Simpan Test'])
                     ->withInput();
             }
         } catch (\Exception $e) {
@@ -246,7 +238,7 @@ class QuizController extends Controller
                                 DB::rollBack();
                                 return redirect()
                                     ->back()
-                                    ->with(['failed' => 'Gagal Simpan Aspek Quiz'])
+                                    ->with(['failed' => 'Gagal Simpan Aspek Test'])
                                     ->withInput();
                             }
 
@@ -268,7 +260,7 @@ class QuizController extends Controller
                                 DB::rollBack();
                                 return redirect()
                                     ->back()
-                                    ->with(['failed' => 'Gagal Simpan Aspek Quiz'])
+                                    ->with(['failed' => 'Gagal Simpan Aspek Test'])
                                     ->withInput();
                             }
                         }
@@ -282,7 +274,7 @@ class QuizController extends Controller
                             DB::rollBack();
                             return redirect()
                                 ->back()
-                                ->with(['failed' => 'Gagal Hapus Aspek Quiz'])
+                                ->with(['failed' => 'Gagal Hapus Aspek Test'])
                                 ->withInput();
                         }
                     }
@@ -290,17 +282,17 @@ class QuizController extends Controller
                     DB::commit();
                     return redirect()
                         ->route('admin.quiz.index')
-                        ->with(['success' => 'Berhasil Simpan Quiz']);
+                        ->with(['success' => 'Berhasil Simpan Test']);
                 } else {
                     return redirect()
                         ->back()
-                        ->with(['failed' => 'Gagal Perbarui Akses Quiz'])
+                        ->with(['failed' => 'Gagal Perbarui Akses Test'])
                         ->withInput();
                 }
             } else {
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Gagal Perbarui Quiz'])
+                    ->with(['failed' => 'Gagal Perbarui Test'])
                     ->withInput();
             }
         } catch (\Exception $e) {

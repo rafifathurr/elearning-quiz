@@ -68,7 +68,7 @@
                         <a href="{{ route('admin.quiz.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-file"></i>
                             <p>
-                                Menu Quiz
+                                Daftar Tes
                             </p>
                         </a>
                     </li>

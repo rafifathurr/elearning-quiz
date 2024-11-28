@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Quiz</h1>
+                        <h1 class="m-0">Daftar Test</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -22,7 +22,7 @@
                             <div class="card-body">
                                 <a href="{{ route('admin.quiz.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus mr-1"></i>
-                                    Tambah Quiz
+                                    Tambah Test
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url" value="{{ url()->current() }}">
@@ -30,8 +30,8 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Nama Quiz</th>
-                                                <th>Akses</th>
+                                                <th>Nama Test</th>
+                                                <th>Tipe Pertanyaan</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -63,7 +63,7 @@
                         data: 'name',
                     },
                     {
-                        data: 'access',
+                        data: 'type_aspect',
                     },
                     {
                         data: 'action',

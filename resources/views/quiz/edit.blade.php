@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $disabled == '' ? 'Ubah' : 'Detail' }} Quiz</h1>
+                        <h1 class="m-0">{{ $disabled == '' ? 'Ubah' : 'Detail' }} Test</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -26,13 +26,13 @@
                                     <div class="card">
                                         <div class="card-header bg-gray-light">
                                             <h2 class="card-title mb-0 font-weight-bold">
-                                                Konfigurasi Quiz
+                                                Konfigurasi Test
                                             </h2>
                                         </div>
                                         <div class="card-body pb-0">
                                             <div class="form-group row">
                                                 <label for="name" class="col-md-4 control-label text-left">Judul
-                                                    Quiz
+                                                    Test
                                                     <span class="text-danger ml-1">*</span>
                                                 </label>
                                                 <div class="col-md-8 col-sm-12">
@@ -100,7 +100,7 @@
                                         <div class="card-body">
                                             <div class="form-group row">
                                                 <label for="open_quiz" class="col-md-4 control-label text-left">
-                                                    Waktu Quiz Dibuka
+                                                    Waktu Test Dibuka
                                                     <span class="text-danger ml-1">*</span>
                                                 </label>
                                                 <div class="col-lg-3 col-md-6 col-sm-12">
@@ -134,7 +134,7 @@
                                             </div>
                                             <div class="form-group row">
                                                 <label for="name" class="col-md-4 control-label text-left">
-                                                    Waktu Quiz Ditutup
+                                                    Waktu Test Ditutup
                                                     <span class="text-danger ml-1">*</span>
                                                 </label>
                                                 <div class="col-lg-3 col-md-6 col-sm-12">
@@ -194,7 +194,7 @@
                                     <div class="card">
                                         <div class="card-header bg-gray-light" id="headingTwo">
                                             <h2 class="card-title mb-0 font-weight-bold">
-                                                Daftar Aspek Quiz
+                                                Daftar Aspek Test
                                             </h2>
                                         </div>
                                         <div class="card-body">
