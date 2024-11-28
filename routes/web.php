@@ -58,6 +58,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
             Route::get('getQuestion/{result}', 'getQuestion')->name('getQuestion');
             Route::get('showQuestion/{quiz}', 'showQuestion')->name('showQuestion');
             Route::post('answer', 'answer')->name('answer');
+            Route::post('lastQuestion', 'lastQuestion')->name('lastQuestion');
             Route::post('finish', 'finish')->name('finish');
             Route::get('result/{resultId}', 'showResult')->name('result');
         });

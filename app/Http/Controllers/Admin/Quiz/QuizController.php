@@ -623,21 +623,17 @@ class QuizController extends Controller
     }
 
 
-
-
     public function answer(Request $request)
     {
         try {
             $validated = $request->validate([
                 'value' => 'required',
-                'q' => 'required|integer',
                 'resultId' => 'required|integer',
                 'questionId' => 'required|integer',
             ]);
 
             Log::info('Question ID: ' . $request->questionId);
             Log::info('Result ID: ' . $request->resultId);
-            Log::info('Order: ' . $request->q);
 
             // Simpan jawaban pengguna
             $resultDetail = ResultDetail::where('question_id', $request->questionId)
@@ -665,8 +661,26 @@ class QuizController extends Controller
                 'score' => $score,
             ]);
 
+            return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
+        } catch (Exception $e) {
+            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function lastQuestion(Request $request)
+    {
+        try {
+            $request->validate([
+                'q' => 'required|integer',
+                'resultId' => 'required|integer',
+            ]);
+
+            Log::info('Order: ' . $request->q);
+
+            // Simpan jawaban pengguna
             // Tentukan pertanyaan berikutnya berdasarkan order
-            $nextResultDetail = ResultDetail::where('order', $request->q + 1)
+            $nextResultDetail = ResultDetail::where('order', $request->q)
                 ->where('result_id', $request->resultId)
                 ->whereHas('result', function ($query) {
                     $query->where('user_id', Auth::user()->id);
@@ -678,15 +692,19 @@ class QuizController extends Controller
                     'display_time' => now(),
                 ]);
             } else {
-                Log::info('Tidak ada pertanyaan berikutnya untuk order: ' . ($request->q + 1));
+                Log::info('Tidak ada pertanyaan berikutnya untuk order: ' . ($request->q));
             }
 
-            return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
+
+            return response()->json(['message' => 'Berhasil Pindah Halaman'], 200);
         } catch (Exception $e) {
-            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage());
+            Log::error('Error pada pindah halaman: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
+
+
 
 
     public function finish(Request $request)

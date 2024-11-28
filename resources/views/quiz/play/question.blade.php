@@ -32,7 +32,8 @@
                                 @foreach ($active_question['quiz_answer'] as $quiz_answer)
                                     <div class="form-check py-3">
                                         <input class="form-check-input" type="radio" name="answer_list"
-                                            class="form-control" value="{{ $quiz_answer['answer'] }}"
+                                            onchange="answer(this)" class="form-control"
+                                            value="{{ $quiz_answer['answer'] }}"
                                             @if ($active_question['answered'] && $active_question['user_answer'] == $quiz_answer['answer']) checked @endif>
                                         <label class="form-check-label">{{ $quiz_answer['answer'] }}</label>
                                     </div>
@@ -93,7 +94,7 @@
                         @else bg-light text-dark @endif"
                                 onclick="navigateToQuestion(this)"
                                 data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
-                                style="cursor: pointer;">
+                                data-q="{{ $quiz_question_list['question_number'] }}" style="cursor: pointer;">
                                 <div class="card-body">
                                     <h5 class="font-weight-bold text-center my-auto">
                                         {{ $quiz_question_list['question_number'] }}
@@ -102,24 +103,6 @@
                             </div>
                         </div>
                     @endforeach
-
-
-                    {{-- <div class="p-0">
-                            <a
-                                href="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}">
-                                <div
-                                    class="card m-2 px-2 
-                                    @if ($quiz_question_list['is_active']) bg-primary text-white 
-                                    @elseif($quiz_question_list['answered']) bg-success text-white 
-                                    @else bg-light text-dark @endif">
-                                    <div class="card-body">
-                                        <h5 class="font-weight-bold text-center my-auto">
-                                            {{ $quiz_question_list['question_number'] }}
-                                        </h5>
-                                    </div>
-                                </div>
-                            </a>
-                        </div> --}}
                 </div>
             </div>
         </div>
