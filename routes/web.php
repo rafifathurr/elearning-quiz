@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Quiz\QuizController;
 use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 
 use App\Models\Quiz\Quiz;
@@ -103,7 +104,12 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('append', 'append')->name('append');
         });
         Route::resource('question', QuestionController::class)->parameters(['question' => 'id']);
-        // Route::get('question/edit/{id}/{increment}', [QuestionController::class, 'edit'])->name('question.edit.increment');
+
+
+        Route::group(['controller' => PackageController::class, 'prefix' => 'package', 'as' => 'package.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
     });
 
     Route::group(['prefix' => 'order', 'as' => 'order.'], function () {

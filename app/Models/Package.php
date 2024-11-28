@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Package extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function packageTest()
+    {
+        return $this->hasMany(PackageTest::class, 'package_id', 'id');
+    }
 }

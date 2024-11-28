@@ -90,6 +90,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('master.package.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-gift"></i>
+                            <p>
+                                Daftar Paket
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('order.listOrder') }}" class="nav-link">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->integer('id')->autoIncrement();
+            $table->string('name');
             $table->integer('class');
             $table->integer('price');
             $table->timestamp('created_at')->useCurrent();
