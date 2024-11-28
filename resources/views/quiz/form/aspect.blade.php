@@ -83,7 +83,7 @@
                     class="form-control @error('quiz_aspect[{{ $increment }}][total_question]') is-invalid @enderror"
                     type="number" min="1" name="quiz_aspect[{{ $increment }}][total_question]"
                     value="{{ old('quiz_aspect.' . $increment . '.total_question', $quiz_aspect->total_question ?? '') }}"
-                    {{ $disabled }}>
+                    {{ $disabled }} required>
                 @error('quiz_aspect[' . $increment . '][total_question]')
                     <div class="alert alert-danger mt-2">
                         {{ $message }}

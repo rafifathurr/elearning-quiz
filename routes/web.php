@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Quiz\QuizController;
 use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 
@@ -43,9 +44,7 @@ Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
 
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('home', function () {
-        return view(view: 'home');
-    })->name('home');
+    Route::get('home', [DashboardController::class, 'index'])->name('home');
 });
 
 
