@@ -1,6 +1,6 @@
 <div class="row">
 
-    <div class="col-lg-12 col-md-12">
+    <div class="col-lg-9 col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
@@ -33,10 +33,11 @@
                                     <div class="form-check py-3">
                                         <input class="form-check-input" type="radio" name="answer_list"
                                             class="form-control" value="{{ $quiz_answer['answer'] }}"
-                                            @if ($active_question['answered']) checked @endif>
+                                            @if ($active_question['answered'] && $active_question['user_answer'] == $quiz_answer['answer']) checked @endif>
                                         <label class="form-check-label">{{ $quiz_answer['answer'] }}</label>
                                     </div>
                                 @endforeach
+
                             </div>
                         </div>
                         <div class="card-footer py-3">
@@ -50,9 +51,6 @@
                                             value="{{ route('admin.quiz.getQuestion', ['result' => $result->id]) . '?q=' . $active_question['question_number'] - 1 }}">
                                     </div>
                                 @endif
-
-                                <p class="mt-2">{{ $active_question['question_number'] }} /
-                                    {{ $total_question }}</p>
                                 @if ($active_question['question_number'] == $total_question)
                                     <div class="mx-2">
                                         <button onclick="finishQuiz()" class="btn btn-success">Finish<i
@@ -78,4 +76,37 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-3 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0 font-weight-bold my-auto">
+                    Nomor Soal
+                </h2>
+            </div>
+            <div class="card-body p-3">
+                <div class="d-flex flex-wrap justify-content-xl-center justify-content-md-center">
+                    @foreach ($questionList as $quiz_question_list)
+                        <div class="p-0">
+                            <a
+                                href="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}">
+                                <div
+                                    class="card m-2 px-2 
+                                    @if ($quiz_question_list['is_active']) bg-primary text-white 
+                                    @elseif($quiz_question_list['answered']) bg-success text-white 
+                                    @else bg-light text-dark @endif">
+                                    <div class="card-body">
+                                        <h5 class="font-weight-bold text-center my-auto">
+                                            {{ $quiz_question_list['question_number'] }}
+                                        </h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>

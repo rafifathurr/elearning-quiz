@@ -577,6 +577,7 @@ class QuizController extends Controller
                     'quiz_answer' => $quizAnswerArr,
                     'is_active' => false,
                     'answered' => !empty($resultDetail->answer),
+                    'user_answer' => $resultDetail->answer,
                 ];
             });
 
@@ -591,6 +592,7 @@ class QuizController extends Controller
             });
 
             $activeQuestion = $questions->firstWhere('is_active', true);
+            $questionList = $questions->sortBy('question_number')->values();
 
             // Persiapkan data untuk API atau tampilan
             $quizData = Quiz::find($result->quiz_id)->toArray();
@@ -598,6 +600,7 @@ class QuizController extends Controller
                 'quiz' => $quizData,
                 'result' => $result,
                 'questions' => $questions,
+                'questionList' => $questionList,
                 'active_question' => $activeQuestion,
                 'total_question' => $questions->count(),
             ];
