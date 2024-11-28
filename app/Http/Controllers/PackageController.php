@@ -90,12 +90,12 @@ class PackageController extends Controller
 
             if ($add_package && $add_package_test) {
                 DB::commit();
-                return redirect()->route('master.package.index')->with(['success' => 'Berhasil Menambahkan Aspek Pertanyaan']);
+                return redirect()->route('master.package.index')->with(['success' => 'Berhasil Menambahkan Paket Test']);
             } else {
                 DB::rollBack();
                 return redirect()
                     ->back()
-                    ->with(['failed' => 'Gagal Menambahkan Aspek Pertanyaan'])
+                    ->with(['failed' => 'Gagal Menambahkan Paket Test'])
                     ->withInput();
             }
         } catch (Exception $e) {
@@ -109,8 +109,9 @@ class PackageController extends Controller
     public function edit(string $id)
     {
         try {
-            $package = Package::find($id);
-            return view('master.package_payment.edit', compact('package'));
+            $data['package'] = Package::find($id);
+            $data['quizes'] = Quiz::whereNull('deleted_at')->get();
+            return view('master.package_payment.edit', $data);
         } catch (Exception $e) {
             return redirect()
                 ->back()
@@ -128,27 +129,46 @@ class PackageController extends Controller
 
                 $request->validate([
                     'name' => 'required',
-                    'type_aspect' => 'required',
-                    'description' => 'nullable'
+                    'price' => 'required',
+                    'class' => 'required',
+                    'quiz_id' => 'required'
                 ]);
                 DB::beginTransaction();
 
-                $aspect_update = Package::where('id', $id)
+                $package_update = Package::where('id', $id)
                     ->update([
                         'name' => $request->name,
-                        'type_aspect' => $request->type_aspect,
-                        'description' => $request->description
+                        'price' => $request->price,
+                        'class' => $request->class
                     ]);
-                if ($aspect_update) {
-                    DB::commit();
-                    return redirect()
-                        ->route('master.package.index')
-                        ->with(['success' => 'Berhasil Mengubah Data Aspek Pertanyaan']);
+                $deleted_package_test = PackageTest::where('package_id', $package->id)->delete();
+                if ($package_update && $deleted_package_test) {
+                    $packages_test = [];
+                    foreach ($request->quiz_id as $quiz) {
+                        $packages_test[] = [
+                            'package_id' => $package->id,
+                            'quiz_id' => $quiz
+                        ];
+                    }
+                    $add_package_test = PackageTest::insert($packages_test);
+                    if ($add_package_test) {
+
+                        DB::commit();
+                        return redirect()
+                            ->route('master.package.index')
+                            ->with(['success' => 'Berhasil Mengubah Data Paket Test']);
+                    } else {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Mengubah Data Paket Test'])
+                            ->withInput();
+                    }
                 } else {
                     DB::rollBack();
                     return redirect()
                         ->back()
-                        ->with(['failed' => 'Gagal Mengubah Data Aspek Pertanyaan'])
+                        ->with(['failed' => 'Gagal Mengubah Data Paket Test'])
                         ->withInput();
                 }
             }
@@ -167,16 +187,16 @@ class PackageController extends Controller
             $package = Package::find($id);
 
             if (!is_null($package)) {
-                $aspect_deleted = Package::where('id', $id)->update([
+                $package_deleted = Package::where('id', $id)->update([
                     'deleted_at' => date('Y-m-d H:i:s')
                 ]);
 
-                if ($aspect_deleted) {
+                if ($package_deleted) {
                     DB::commit();
-                    session()->flash('success', 'Berhasil Menghapus Data Aspek Pertanyaan');
+                    session()->flash('success', 'Berhasil Menghapus Data Paket Test');
                 } else {
                     DB::rollBack();
-                    session()->flash('failed', 'Gagal Menghapus Data Aspek Pertanyaan');
+                    session()->flash('failed', 'Gagal Menghapus Data Paket Test');
                 }
             }
         } catch (Exception $e) {

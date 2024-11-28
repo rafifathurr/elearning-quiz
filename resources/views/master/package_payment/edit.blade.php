@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Edit Aspek Pertanyaan #{{ $aspect->id }}</h1>
+                    <h1 class="m-0">Edit Paket Test #{{ $package->id }}</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -16,18 +16,19 @@
                     <div class="card ">
 
                         <!-- form start -->
-                        <form method="post" action="{{ route('master.aspect.update', [($id = $aspect->id)]) }}">
+                        <form method="post" action="{{ route('master.package.update', [($id = $package->id)]) }}">
                             @csrf
                             @method('PATCH')
                             <div class="card-body">
 
                                 <div class="form-group row">
-                                    <label for="name" class="col-md-4 control-label text-left">Aspek Pertanyaan
+                                    <label for="name" class="col-md-4 control-label text-left">Paket Test
                                         <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('name') is-invalid @enderror" type="text"
-                                            name="name" id="name" value="{{ old('name', $aspect->name) }}" required>
+                                            name="name" id="name" value="{{ old('name', $package->name) }}"
+                                            required>
                                         @error('name')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
@@ -35,33 +36,30 @@
                                         @enderror
                                     </div>
                                 </div>
-
                                 <div class="form-group row">
-                                    <label for="description" class="col-md-4 control-label text-left">Tipe Aspek
-                                        <span class="text-danger">*</span></label>
-                                    <div class="col-md-8 col-sm-12">
-                                        <select name="type_aspect" id="type_aspect" class="form-control">
-                                            <option value="">Pilih Tipe Aspek</option>
-                                            <option value="kecerdasan"
-                                                {{ $aspect->type_aspect == 'kecerdasan' ? 'selected' : '' }}>Kecerdasan
-                                            </option>
-                                            <option value="kepribadian"
-                                                {{ $aspect->type_aspect == 'kepribadian' ? 'selected' : '' }}>Kepribadian
-                                            </option>
-                                        </select>
-                                        @error('description')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="description" class="col-md-4 control-label text-left">Deskripsi
+                                    <label for="class" class="col-md-4 control-label text-left">Jumlah Pertemuan
+                                        <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <textarea id="quiz_summernote" name="description" id="description" class="form-control summernote">{{ old('description', $aspect->description) }}</textarea>
-                                        @error('description')
+                                        <input class="form-control @error('class') is-invalid @enderror" type="number"
+                                            name="class" id="class" value="{{ old('class', $package->class) }}"
+                                            required>
+                                        @error('class')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="price" class="col-md-4 control-label text-left">Harga Paket
+                                        <span class="text-danger ml-1">*</span>
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <input class="form-control @error('price') is-invalid @enderror" type="text"
+                                            name="price" id="price" value="{{ old('price', $package->price) }}"
+                                            required>
+                                        @error('price')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
@@ -69,9 +67,26 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group row">
+                                    <label for="quiz_id" class="col-md-4 control-label text-left">Pilih Test
+                                        <span class="text-danger ml-1">*</span>
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <input type="hidden" id="value_quiz"
+                                            value="{{ json_encode($package->packageTest->pluck('quiz_id')->toArray()) }}">
+                                        <select class="form-control @error('quiz_id[]') is-invalid @enderror"
+                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Tipe User"
+                                            style="width: 100%;" required>
+                                            @foreach ($quizes as $quiz)
+                                                <option value="{{ $quiz->id }}" selected>
+                                                    {{ $quiz->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="pt-3 d-flex">
-                                    <a href="{{ route('master.aspect.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                    <a href="{{ route('master.package.index') }}" class="btn btn-danger mr-2"> Back</a>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </div>
@@ -83,6 +98,14 @@
         </div>
     </div>
     @push('javascript-bottom')
-        @include('js.master.aspect.script')
+        <script>
+            $('#quiz_id').select2({
+                multiple: true,
+            });
+
+            $('#quiz_id').val('').trigger('change');
+            $('#quiz_id').val(JSON.parse($('#value_quiz').val())).trigger('change');
+        </script>
+        @include('js.master.package_payment.script')
     @endpush
 @endsection
