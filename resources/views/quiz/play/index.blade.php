@@ -12,14 +12,25 @@
                                 <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto px-3 py-2">
                                     {{ $quiz['name'] }}
                                 </h2>
+                                <input type="hidden" id="type_aspect" value="{{ $quiz['type_aspect'] }}">
                             </div>
-                            <div class="p-2">
-                                <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
-                                    <input type="hidden" value="{{ $quiz['time_duration'] }}" id="time">
-                                    <span id="hour_time">--</span> : <span id="minute_time">--</span> : <span
-                                        id="second_time">--</span>
-                                </h2>
+                            <div class="d-flex">
+                                <div class="p-2">
+                                    <div class="mx-2">
+                                        <button onclick="finishQuiz()" class="btn btn-success">Selesai<i
+                                                class="fas fa-flag ml-2"></i></button>
+
+                                    </div>
+                                </div>
+                                <div class="p-2">
+                                    <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
+                                        <input type="hidden" value="{{ $quiz['time_duration'] }}" id="time">
+                                        <span id="hour_time">--</span> : <span id="minute_time">--</span> : <span
+                                            id="second_time">--</span>
+                                    </h2>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -138,19 +149,24 @@
             }
 
             function nextPage() {
-                let allowed = false;
+                const typeAspect = $('#type_aspect').val();
 
-                // Pastikan pengguna memilih salah satu jawaban
-                $('#answer_list').each(function() {
-                    if ($(this).find('input[type="radio"]:checked').length > 0) {
-                        allowed = true;
+                if (typeAspect == 'kecerdasan') {
+                    let allowed = false;
+
+                    // Pastikan pengguna memilih salah satu jawaban
+                    $('#answer_list').each(function() {
+                        if ($(this).find('input[type="radio"]:checked').length > 0) {
+                            allowed = true;
+                        }
+                    });
+
+                    if (!allowed) {
+                        swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!');
+                        return false;
                     }
-                });
-
-                if (!allowed) {
-                    swalError('Harap Menjawab Pertanyaan Terlebih Dahulu!');
-                    return false;
                 }
+
 
                 let resultId = $('#result_id').val();
                 let questionNumber = $('#active_question').data('question-number');
@@ -239,7 +255,7 @@
 
             function timeExpired() {
                 Swal.fire({
-                    title: 'Waktu Quiz Anda Telah Habis!',
+                    title: 'Waktu tes Anda Telah Habis!',
                     icon: 'warning',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
@@ -326,7 +342,7 @@
 
             function finishQuiz() {
                 Swal.fire({
-                    title: 'Apakah Anda yakin ingin menyelesaikan quiz ini?',
+                    title: 'Apakah Anda yakin ingin menyelesaikan tes ini?',
                     icon: 'question',
                     showCancelButton: true,
                     allowOutsideClick: false,
@@ -339,10 +355,13 @@
                     cancelButtonText: 'Tidak',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+                        let token = $('meta[name="csrf-token"]').attr('content');
                         let resultId = $('#result_id').val();
                         let questionId = $('#question_id').val();
-                        let token = $('meta[name="csrf-token"]').attr('content');
+                        let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+
+                        console.log("resultId:", resultId);
+                        console.log("questionId:", questionId);
 
                         // Kirim data terakhir ke server
                         $.ajax({
@@ -351,10 +370,10 @@
                             cache: false,
                             data: {
                                 _token: token,
-                                value: selectedAnswer,
+                                value: selectedAnswer || '',
                                 resultId: resultId,
                                 questionId: questionId,
-                                q: $('#active_question').data('question-number'),
+                                q: $('#active_question').data('question-number') || 0,
                             },
                             success: function() {
                                 const resultUrl =
@@ -362,7 +381,6 @@
                                     .replace('__RESULT_ID__', resultId);
                                 window.location.href = resultUrl;
                             },
-
                             error: function(xhr) {
                                 console.error("Error AJAX:", xhr);
                                 swalError('Gagal menyelesaikan quiz, silakan coba lagi.');

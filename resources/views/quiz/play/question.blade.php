@@ -43,8 +43,8 @@
                         </div>
                         <div class="card-footer py-3">
                             <div
-                                class="d-flex  @if ($active_question['question_number'] != 1) justify-content-between @else justify-content-end @endif">
-                                @if ($active_question['question_number'] != 1)
+                                class="d-flex  @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kepribadian') justify-content-between @else justify-content-end @endif">
+                                @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kepribadian')
                                     <div class="mx-2">
                                         <button onclick="backPage()" class="btn btn-danger"><i
                                                 class="fas fa-arrow-left mr-2"></i>Kembali</button>
@@ -53,11 +53,6 @@
                                     </div>
                                 @endif
                                 @if ($active_question['question_number'] == $total_question)
-                                    <div class="mx-2">
-                                        <button onclick="finishQuiz()" class="btn btn-success">Finish<i
-                                                class="fas fa-arrow-right ml-2"></i></button>
-
-                                    </div>
                                 @else
                                     <div class="mx-2">
 
@@ -92,9 +87,9 @@
                         @if ($quiz_question_list['is_active']) bg-primary text-white 
                         @elseif($quiz_question_list['answered']) bg-success text-white 
                         @else bg-light text-dark @endif"
-                                onclick="navigateToQuestion(this)"
-                                data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
-                                data-q="{{ $quiz_question_list['question_number'] }}" style="cursor: pointer;">
+                                @if ($quiz['type_aspect'] == 'kepribadian') onclick="navigateToQuestion(this)"
+                        data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
+                        data-q="{{ $quiz_question_list['question_number'] }}" style="cursor: pointer;" @endif>
                                 <div class="card-body">
                                     <h5 class="font-weight-bold text-center my-auto">
                                         {{ $quiz_question_list['question_number'] }}
