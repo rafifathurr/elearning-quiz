@@ -70,7 +70,7 @@ class PackageController extends Controller
             $request->validate([
                 'name' => 'required',
                 'price' => 'required',
-                'class' => 'required',
+                'class' => 'nullable',
                 'quiz_id' => 'required'
             ]);
 
@@ -130,7 +130,7 @@ class PackageController extends Controller
                 $request->validate([
                     'name' => 'required',
                     'price' => 'required',
-                    'class' => 'required',
+                    'class' => 'nullable',
                     'quiz_id' => 'required'
                 ]);
                 DB::beginTransaction();

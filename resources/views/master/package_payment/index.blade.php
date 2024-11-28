@@ -31,7 +31,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
-                                                <th>Kelas</th>
+                                                <th>Pertemuan</th>
                                                 <th>Harga</th>
                                                 <th>Daftar Test</th>
                                                 <th>Action</th>

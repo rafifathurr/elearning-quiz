@@ -37,12 +37,11 @@
                                 </div>
                                 <div class="form-group row">
                                     <label for="class" class="col-md-4 control-label text-left">Jumlah Pertemuan
-                                        <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('class') is-invalid @enderror" type="number"
                                             name="class" id="class" value="{{ old('class') }}"
-                                            placeholder="Jumlah Pertemuan" required>
+                                            placeholder="Jumlah Pertemuan">
                                         @error('class')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
