@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('total_price');
             $table->string('payment_method');
             $table->timestamp('payment_date')->nullable();
+            $table->string('status');
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('deleted_at')->nullable();
