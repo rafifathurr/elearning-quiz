@@ -240,7 +240,7 @@
                             questionId: questionId,
                         },
                         success: function(data) {
-                            console.log("Jawaban berhasil disimpan:", data);
+                            console.log("Jawaban berhasil disimpan:", data.value);
                         },
                         error: function(xhr) {
                             console.log("Error AJAX:", xhr); // Melihat error dari server

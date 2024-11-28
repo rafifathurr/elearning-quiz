@@ -644,6 +644,7 @@ class QuizController extends Controller
                 ->firstOrFail();
 
             if (!$resultDetail) {
+                Log::error('Data Result Tidak ditemukan: ');
                 throw new Exception("Data result detail tidak ditemukan");
             }
 
@@ -660,6 +661,8 @@ class QuizController extends Controller
                 'answer' => $validated['value'],
                 'score' => $score,
             ]);
+            Log::info('Jawaban yang disimpan: ' . $resultDetail->answer);
+            Log::info('Skor yang disimpan: ' . $resultDetail->score);
 
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
         } catch (Exception $e) {
