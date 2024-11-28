@@ -87,6 +87,24 @@
                 <div class="d-flex flex-wrap justify-content-xl-center justify-content-md-center">
                     @foreach ($questionList as $quiz_question_list)
                         <div class="p-0">
+                            <div class="card m-2 px-2 
+                        @if ($quiz_question_list['is_active']) bg-primary text-white 
+                        @elseif($quiz_question_list['answered']) bg-success text-white 
+                        @else bg-light text-dark @endif"
+                                onclick="navigateToQuestion(this)"
+                                data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
+                                style="cursor: pointer;">
+                                <div class="card-body">
+                                    <h5 class="font-weight-bold text-center my-auto">
+                                        {{ $quiz_question_list['question_number'] }}
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+
+                    {{-- <div class="p-0">
                             <a
                                 href="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}">
                                 <div
@@ -101,8 +119,7 @@
                                     </div>
                                 </div>
                             </a>
-                        </div>
-                    @endforeach
+                        </div> --}}
                 </div>
             </div>
         </div>

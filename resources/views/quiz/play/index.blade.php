@@ -61,6 +61,57 @@
 
             }
 
+            function navigateToQuestion(element) {
+                const url = $(element).data('url'); // Ambil URL dari atribut data-url
+                // Jika user yakin, langsung ambil data jawaban yang dipilih
+                let selectedAnswer = $('#answer_list input[type="radio"]:checked').val();
+                let resultId = $('#result_id').val();
+                let questionId = $('#question_id').val();
+                let questionNumber = $('#active_question').data('question-number');
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                    url: '{{ url('admin/quiz/answer') }}',
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        _token: token,
+                        value: selectedAnswer,
+                        resultId: resultId,
+                        questionId: questionId,
+                        q: questionNumber,
+                    },
+                    success: function(data) {
+                        console.log("Jawaban berhasil disimpan:", data);
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            cache: false,
+                            success: function(data) {
+                                $('#question_box').html(
+                                    data); // Replace isi `#question_box` dengan respons
+                            },
+                            error: function(xhr) {
+                                console.error(xhr); // Tampilkan informasi error di console
+                                if (xhr.status == 401) {
+                                    swalError('Sesi Anda Telah Habis');
+                                    window.location.href =
+                                        '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
+                                } else if (xhr.status == 500) {
+                                    swalError('Terjadi Kesalahan Koneksi');
+                                }
+                            },
+                        });
+                    },
+                    error: function(xhr) {
+                        console.log("Error AJAX:", xhr); // Melihat error dari server
+                        swalError('Gagal mengirim jawaban, silakan coba lagi.');
+                    },
+                });
+
+            }
+
+
 
             function nextPage() {
                 let allowed = false;
