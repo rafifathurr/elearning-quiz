@@ -65,29 +65,47 @@ class QuizController extends Controller
 
     public function append(Request $request)
     {
-        if (isset($request->aspect_quiz)) {
-            if ($request->aspect_quiz) {
-                $type_aspect = $request->type_aspect; // Ambil tipe aspek dari permintaan
-                return $this->appendAspect(null, $request->increment, '', $type_aspect);
-            }
-        } else {
-            return response()->json(['message' => 'Gagal'], 400);
+        // Debugging untuk memastikan data diterima
+        Log::info("Data request: ", $request->all());
+
+        // Cek apakah type_aspect dan increment ada
+        if ($request->has('type_aspect') && $request->has('increment')) {
+            $type_aspect = $request->type_aspect; // Ambil tipe aspek
+            $increment = $request->increment; // Ambil increment
+
+            // Lakukan pemrosesan untuk menambahkan aspek
+            return $this->appendAspect(null, $increment, '', $type_aspect);
         }
+
+        // Jika tidak ada type_aspect atau increment
+        return response()->json(['message' => 'Bad Request: Missing parameters'], 400);
     }
-    private function appendAspect(QuizAspect $quiz_aspect = null, $increment, $disabled = '', $type_aspect = null)
+
+
+    private function appendAspect($quiz_aspect = null, $increment, $disabled = '', $type_aspect = null)
     {
+        // Pastikan type_aspect ada dan valid
+        if ($type_aspect) {
+            // Ambil aspek berdasarkan type_aspect
+            $query = AspectQuestion::whereNull('deleted_at')->where('type_aspect', $type_aspect);
+            $aspect_question = $query->get();
+        } else {
+            // Jika tidak ada type_aspect, ambil semua
+            $aspect_question = AspectQuestion::whereNull('deleted_at')->get();
+        }
+
+        // Kirim data ke view
         $data['disabled'] = $disabled;
         $data['quiz_aspect'] = $quiz_aspect;
         $data['increment'] = $increment;
-        $query = AspectQuestion::whereNull('deleted_at');
-        if ($type_aspect) {
-            $query->where('type_aspect', $type_aspect);
-        }
-        $data['aspect_question'] = $query->get();
+        $data['aspect_question'] = $aspect_question;
 
-
+        // Return view
         return view('quiz.form.aspect', $data);
     }
+
+
+
 
     public function store(Request $request)
     {
