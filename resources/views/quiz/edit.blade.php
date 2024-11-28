@@ -76,7 +76,8 @@
                                                 <label for="type_aspect" class="col-md-4 control-label text-left">Tipe Aspek
                                                     <span class="text-danger">*</span></label>
                                                 <div class="col-md-8 col-sm-12">
-                                                    <select name="type_aspect" id="type_aspect" class="form-control">
+                                                    <select name="type_aspect" id="type_aspect" class="form-control"
+                                                        disabled>
                                                         <option value="">Pilih Tipe Aspek</option>
                                                         <option value="kecerdasan"
                                                             {{ $quiz->type_aspect == 'kecerdasan' ? 'selected' : '' }}>
