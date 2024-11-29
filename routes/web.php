@@ -72,10 +72,12 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
         Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
     });
-    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('index', [OrderController::class, 'index'])->name('index');
-        Route::post('checkout/{id}', [OrderController::class, 'checkout'])->name('checkout');
+
+    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::post('checkout/{id}', 'checkout')->name('checkout');
     });
+    Route::resource('order', OrderController::class)->parameters(['order' => 'id']);
 });
 
 Route::group(['middleware' => ['role:admin']], function () {

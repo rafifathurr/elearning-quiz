@@ -13,55 +13,19 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
-                                    <table class="table  table-hover w-100 datatable text-center">
+                                    <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
+                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-order">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
                                                 <th>Harga</th>
-                                                <th>Jumlah Akses</th>
+                                                <th>Jumlah Pertemuan</th>
+                                                <th>Metode Pembayaran</th>
                                                 <th>Status</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td>Paket Pembayaran 1</td>
-                                                <td>Rp. 700.000</td>
-                                                <td>10 Kali</td>
-                                                <td><span class="text-danger">Pembayaran Batal</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Paket Pembayaran 2</td>
-                                                <td>Rp. 800.000</td>
-                                                <td>12 Kali</td>
-                                                <td><button data-toggle="modal" data-target="#proofPayment"
-                                                        class="btn btn-sm btn-primary">Bayar Sekarang</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>3</td>
-                                                <td>Paket Pembayaran 3</td>
-                                                <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><span class="text-success">Sudah Dibayar</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>4</td>
-                                                <td>Paket Pembayaran 3</td>
-                                                <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><span class="text-success">Sudah Dibayar</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>5</td>
-                                                <td>Paket Pembayaran 3</td>
-                                                <td>Rp. 400.000</td>
-                                                <td>4 Kali</td>
-                                                <td><button data-toggle="modal" data-target="#proofPayment"
-                                                        class="btn btn-sm btn-primary">Bayar Sekarang</button></td>
-                                            </tr>
-                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -73,32 +37,10 @@
         </section>
     </div>
 
-
-    <div class="modal fade" id="proofPayment">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <form method="POST" id="assign-form" action="#" class="forms-control" enctype="multipart/form-data">
-                    @csrf
-                    @method('patch')
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="exampleModalLongTitle">Upload Bukti Pembayaran</h4>
-                    </div>
-                    <div class="modal-body">
-
-                        <div class="form-group">
-                            <label for="lampiran">Bukti Pembayaran<span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" name="lampiran[]"
-                                accept="image/jpeg,image/jpg,image/png" multiple="true" required>
-                            <p class="text-danger py-1">* .png .jpg .jpeg</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-sm btn-primary mx-2">
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    @push('javascript-bottom')
+        @include('js.order.script')
+        <script>
+            dataTable();
+        </script>
+    @endpush
 @endsection
