@@ -75,9 +75,12 @@ Route::group(['middleware' => ['role:admin|user']], function () {
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
+        Route::post('payment/{id}', 'payment')->name('payment');
+        Route::post('approve/{id}', 'approve')->name('approve');
+        Route::post('reject/{id}', 'reject')->name('reject');
     });
-    Route::resource('order', OrderController::class)->parameters(['order' => 'id']);
 });
 
 Route::group(['middleware' => ['role:admin']], function () {

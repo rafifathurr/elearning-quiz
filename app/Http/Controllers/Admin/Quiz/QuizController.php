@@ -478,19 +478,26 @@ class QuizController extends Controller
                     ->get();
 
                 foreach ($questionSet as $question) {
-                    $questionAspectPairs[] = [
-                        'question_id' => $question->id,
-                        'aspect_id' => $aspect->aspect_id,
-                        'level' => $aspect->level,
-                        'question_detail' => json_encode([
-                            'direction_question' => $question->direction_question,
-                            'description' => $question->description,
-                            'question' => $question->question,
-                            'attachment' => $question->attachment,
-                            'is_random_answer' => $question->is_random_answer,
-                            'is_generate_random_answer' => $question->is_generate_random_answer,
-                        ]),
-                    ];
+                    $exists = ResultDetail::where('result_id', $result->id)
+                        ->where('question_id', $question->id)
+                        ->exists();
+                    if (!$exists) {
+                        $questionAspectPairs[] = [
+                            'question_id' => $question->id,
+                            'aspect_id' => $aspect->aspect_id,
+                            'level' => $aspect->level,
+                            'question_detail' => json_encode([
+                                'direction_question' => $question->direction_question,
+                                'description' => $question->description,
+                                'question' => $question->question,
+                                'attachment' => $question->attachment,
+                                'is_random_answer' => $question->is_random_answer,
+                                'is_generate_random_answer' => $question->is_generate_random_answer,
+                            ]),
+                        ];
+                    } else {
+                        Log::info('Duplicate question skipped for result_id: ' . $result->id . ' and question_id: ' . $question->id);
+                    }
                 }
             }
 

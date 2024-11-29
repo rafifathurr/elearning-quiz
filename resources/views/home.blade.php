@@ -97,58 +97,6 @@
         </section>
     </div>
     @push('javascript-bottom')
-        <script>
-            function checkOut(id, name) {
-                console.log('Checkout ID:', id); // Debugging
-                let token = $('meta[name="csrf-token"]').attr('content');
-
-                Swal.fire({
-                    title: `Checkout Paket: ${name}`,
-                    input: 'select',
-                    inputOptions: {
-                        non_tunai: "Non Tunai",
-                        tunai: "Tunai",
-                    },
-                    inputPlaceholder: "Pilih Metode Pembayaran",
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    customClass: {
-                        confirmButton: 'btn btn-primary mr-2 mb-3',
-                        cancelButton: 'btn btn-danger mb-3',
-                    },
-                    buttonsStyling: false,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'Cancel',
-                    preConfirm: (paymentMethod) => {
-                        if (!paymentMethod) {
-                            Swal.showValidationMessage('Harap pilih metode pembayaran');
-                        }
-                        return paymentMethod;
-                    },
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        console.log('Metode Pembayaran:', result.value); // Debugging
-                        swalProcess();
-                        $.ajax({
-                            url: '{{ url('order/checkout') }}/' + id,
-                            type: 'POST',
-                            cache: false,
-                            data: {
-                                _token: token,
-                                payment_method: result.value,
-                            },
-                            success: function(data) {
-                                console.log('Success Response:', data); // Debugging
-                                location.reload();
-                            },
-                            error: function(xhr, error, code) {
-                                console.log('Error:', xhr, error, code); // Debugging
-                                swalError(error);
-                            }
-                        });
-                    }
-                });
-            }
-        </script>
+        @include('js.order.script')
     @endpush
 @endsection

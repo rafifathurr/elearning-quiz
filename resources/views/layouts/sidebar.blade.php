@@ -42,7 +42,11 @@
                     <a href="{{ route('order.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
-                            My Order
+                            @hasrole('admin')
+                                Daftar Order
+                            @else
+                                My Order
+                            @endhasrole
                         </p>
                     </a>
                 </li>
@@ -94,14 +98,6 @@
                             <i class="nav-icon fas fa-gift"></i>
                             <p>
                                 Daftar Paket
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('order.listOrder') }}" class="nav-link">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>
-                                Daftar Order
                             </p>
                         </a>
                     </li>

@@ -9,7 +9,13 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">My Order</h3>
+                                <h3 class="font-weight-bold">
+                                    @role('user')
+                                        My Order
+                                    @else
+                                        Daftar Order
+                                    @endrole
+                                </h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
@@ -22,8 +28,12 @@
                                                 <th>Harga</th>
                                                 <th>Jumlah Pertemuan</th>
                                                 <th>Metode Pembayaran</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                @hasrole('user')
+                                                    <th>Status</th>
+                                                @else
+                                                    <th>Bukti Pembayaran</th>
+                                                @endhasrole
+                                                <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -39,8 +49,14 @@
 
     @push('javascript-bottom')
         @include('js.order.script')
-        <script>
-            dataTable();
-        </script>
+        @role('admin')
+            <script>
+                dataTableAdmin();
+            </script>
+        @else
+            <script>
+                dataTable();
+            </script>
+        @endrole
     @endpush
 @endsection
