@@ -879,10 +879,7 @@ class QuizController extends Controller
     {
         return view('quiz.list.myTest');
     }
-    public function myOrder()
-    {
-        return view('order.index');
-    }
+
 
     public function listOrder()
     {

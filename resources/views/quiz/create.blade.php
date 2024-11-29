@@ -319,12 +319,6 @@
                 });
             }
 
-
-
-
-
-
-
             function remove(target) {
                 $('#'.concat(target)).remove();
             }
