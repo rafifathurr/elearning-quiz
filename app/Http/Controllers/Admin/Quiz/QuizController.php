@@ -447,6 +447,7 @@ class QuizController extends Controller
 
     public function play(Quiz $quiz, Request $request)
     {
+        DB::beginTransaction();
         try {
             // Buat entri Result baru
             $result = Result::create([
@@ -478,26 +479,19 @@ class QuizController extends Controller
                     ->get();
 
                 foreach ($questionSet as $question) {
-                    $exists = ResultDetail::where('result_id', $result->id)
-                        ->where('question_id', $question->id)
-                        ->exists();
-                    if (!$exists) {
-                        $questionAspectPairs[] = [
-                            'question_id' => $question->id,
-                            'aspect_id' => $aspect->aspect_id,
-                            'level' => $aspect->level,
-                            'question_detail' => json_encode([
-                                'direction_question' => $question->direction_question,
-                                'description' => $question->description,
-                                'question' => $question->question,
-                                'attachment' => $question->attachment,
-                                'is_random_answer' => $question->is_random_answer,
-                                'is_generate_random_answer' => $question->is_generate_random_answer,
-                            ]),
-                        ];
-                    } else {
-                        Log::info('Duplicate question skipped for result_id: ' . $result->id . ' and question_id: ' . $question->id);
-                    }
+                    $questionAspectPairs[] = [
+                        'question_id' => $question->id,
+                        'aspect_id' => $aspect->aspect_id,
+                        'level' => $aspect->level,
+                        'question_detail' => json_encode([
+                            'direction_question' => $question->direction_question,
+                            'description' => $question->description,
+                            'question' => $question->question,
+                            'attachment' => $question->attachment,
+                            'is_random_answer' => $question->is_random_answer,
+                            'is_generate_random_answer' => $question->is_generate_random_answer,
+                        ]),
+                    ];
                 }
             }
 
@@ -506,15 +500,22 @@ class QuizController extends Controller
 
             // Simpan pasangan soal dan aspek ke result_details
             foreach ($questionAspectPairs as $pair) {
-                $order++;
-                ResultDetail::create([
-                    'result_id' => $result->id,
-                    'question_id' => $pair['question_id'],
-                    'question_detail' => $pair['question_detail'],
-                    'aspect_id' => $pair['aspect_id'],
-                    'level' =>  $pair['level'],
-                    'order' => $order,
-                ]);
+                try {
+
+                    $order++;
+                    ResultDetail::create([
+                        'result_id' => $result->id,
+                        'question_id' => $pair['question_id'],
+                        'question_detail' => $pair['question_detail'],
+                        'aspect_id' => $pair['aspect_id'],
+                        'level' =>  $pair['level'],
+                        'order' => $order,
+                    ]);
+                } catch (Exception $e) {
+                    // Tangani duplikat tanpa menghentikan proses
+                    Log::warning('Duplicate question skipped for result_id: ' . $result->id . ' and question_id: ' . $pair['question_id']);
+                    $order--; // Kurangi order jika gagal menyimpan
+                }
             }
 
             // Tampilkan waktu untuk pertanyaan pertama
@@ -522,6 +523,7 @@ class QuizController extends Controller
                 'display_time' => now()
             ]);
 
+            DB::commit();
             // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
                 return response()->json([
@@ -534,6 +536,7 @@ class QuizController extends Controller
             // Mengarahkan ke halaman soal pertama
             return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id]);
         } catch (Exception $e) {
+            DB::rollBack();
             // Tangani error
             Log::error('Error in starting quiz: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
