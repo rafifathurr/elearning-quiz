@@ -7,6 +7,7 @@ use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 
@@ -72,7 +73,8 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
     });
     Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('my-order', [QuizController::class, 'myOrder'])->name('myOrder');
+        Route::get('index', [OrderController::class, 'index'])->name('index');
+        Route::post('checkout/{id}', [OrderController::class, 'checkout'])->name('checkout');
     });
 });
 

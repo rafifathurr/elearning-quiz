@@ -39,7 +39,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('order.myOrder') }}" class="nav-link">
+                    <a href="{{ route('order.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             My Order
