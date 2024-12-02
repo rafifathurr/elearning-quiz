@@ -10,33 +10,52 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">
-                                    My Order
+                                    @hasrole('user')
+                                        My Order
+                                    @else
+                                        Daftar Order
+                                    @endhasrole
                                 </h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-order">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Nama Paket</th>
-                                                <th>Harga Paket</th>
-                                                <th class="text-center">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tfoot class="bg-gray-light">
-                                            <tr>
-                                                <th colspan="2" class="text-right">Total:</th>
-                                                <th class="text-left"id="totalPrice"></th>
-                                                <th class="text-center">
-                                                    <button class="btn btn-sm btn-success" id="payButton"
-                                                        style="display:none">Bayar Sekarang
-                                                    </button>
-                                                </th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                    @hasrole('user')
+                                        <table class="table table-bordered table-hover w-100 datatable" id="dt-order">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Nama Paket</th>
+                                                    <th>Harga Paket</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot class="bg-gray-light">
+                                                <tr>
+                                                    <th colspan="2" class="text-right">Total:</th>
+                                                    <th class="text-left"id="totalPrice"></th>
+                                                    <th class="text-center">
+                                                        <button class="btn btn-sm btn-success" id="payButton"
+                                                            style="display:none">Bayar Sekarang
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    @else
+                                        <table class="table table-bordered table-hover w-100 datatable" id="dt-order">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Nama Pengguna</th>
+                                                    <th>Total Harga</th>
+                                                    <th>Metode Pembayaran</th>
+                                                    <th>Waktu Pembayaran</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    @endhasrole
                                 </div>
                             </div>
                         </div>

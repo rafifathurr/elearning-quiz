@@ -69,6 +69,52 @@
         });
     }
 
+    function dataTableAdmin() {
+        const url = $('#url_dt').val();
+        $('#dt-order').DataTable({
+            responsive: true,
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: url,
+                error: function(xhr, error, code) {
+                    swalError(xhr.statusText);
+                }
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    width: '5%',
+                    searchable: false
+                },
+                {
+                    data: 'user',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'total_price',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'payment_method',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'payment_date',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'action',
+                    width: '20%',
+                    defaultContent: '-',
+                    orderable: false,
+                    searchable: false
+                },
+            ]
+
+        });
+
+    }
 
 
 
@@ -158,7 +204,8 @@
         let token = $('meta[name="csrf-token"]').attr('content');
 
         let totalHarga = $('#totalPrice').text();
-        let totalHargaNumeric = parseInt(totalHarga.replace('Rp. ', '').replace(/,/g, ''));
+        let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
+
 
 
         Swal.fire({

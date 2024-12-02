@@ -75,6 +75,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('datatable2', 'dataTable2')->name('dataTable2');
         Route::get('index', 'index')->name('index');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');

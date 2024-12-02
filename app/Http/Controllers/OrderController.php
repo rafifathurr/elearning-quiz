@@ -19,7 +19,11 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $datatable_route = route('order.dataTable');
+        if (User::find(Auth::user()->id)->hasRole('user')) {
+            $datatable_route = route('order.dataTable');
+        } else {
+            $datatable_route = route('order.dataTable2');
+        }
         return view('order.index', compact('datatable_route'));
     }
 
@@ -51,6 +55,7 @@ class OrderController extends Controller
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
             })
+
             ->addColumn('action', function ($data) {
                 return '<div align="center">
                             <button class="btn btn-sm btn-danger ml-2" onclick="cancelOrder(' . $data->id . ')" title="Hapus">Hapus</button>
@@ -59,8 +64,44 @@ class OrderController extends Controller
             ->addColumn('order_id', function () use ($order_id) {
                 return $order_id ? $order_id : '-';
             })
+
             ->with('totalPrice', 'Rp. ' . number_format($totalPrice, 0, ',', '.'))
             ->rawColumns(['price', 'action'])
+            ->make(true);
+    }
+
+    public function dataTable2()
+    {
+        $order = Order::whereNull('deleted_at')->where('status', 10)->get();
+
+        return DataTables::of($order)
+            ->addIndexColumn()
+            ->addColumn('user', function ($data) {
+                return $data->user->name;
+            })
+            ->addColumn('total_price', function ($data) {
+                return 'Rp. ' . number_format($data->total_price, 0, ',', '.');
+            })
+            ->addColumn('payment_method', function ($data) {
+                $payment = ($data->payment_method == 'non_tunai') ? 'Non Tunai' : 'Tunai';
+
+                return $payment;
+            })
+            ->addColumn('payment_date', function ($data) {
+                $date = \Carbon\Carbon::parse($data->payment_date)->translatedFormat('d F Y H:i');
+                return $date;
+            })
+            ->addColumn('action', function ($data) {
+                $btn_action = '<div align="center">';
+
+                $btn_action .= '<button class="btn btn-sm btn-success ml-2" onclick="approveOrder(' . $data->id . ')" title="Terima">Terima</button>';
+                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="rejectOrder(' . $data->id . ')" title="Tolak">Tolak</button>';
+
+                $btn_action .= '</div>';
+                return $btn_action;
+            })
+            ->only(['user', 'total_price', 'payment_method', 'payment_date', 'action'])
+            ->rawColumns(['total_price', 'action'])
             ->make(true);
     }
 
@@ -109,7 +150,7 @@ class OrderController extends Controller
             $order = Order::find($id);
             if ($order) {
                 $update_order = Order::where('id', $id)->update([
-                    'status' => 100,
+                    'status' => 10,
                     'total_price' => (int) $request->totalPrice,
                     'payment_method' => $request->payment_method,
                     'payment_date' => now(),
@@ -138,18 +179,23 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
             if ($order) {
                 $approve_order = $order->update([
-                    'status' => 'Berhasil Dikonfirmasi',
+                    'status' => 100,
                 ]);
                 if ($approve_order) {
+                    $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
                     $order_detail = [];
-                    foreach ($order->package->packageTest as $packageTest) {
-                        $quiz = $packageTest->quiz;
-                        if ($quiz) {
-                            $order_detail[] = [
-                                'order_id' => $id,
-                                'package_id' => $order->package_id,
-                                'quiz_id' => $quiz->id
-                            ];
+                    foreach ($order_package as $item) {
+                        if ($item->package && $item->package->packageTest) {
+                            foreach ($item->package->packageTest as $packageTest) {
+                                $quiz = $packageTest->quiz;
+                                if ($quiz) {
+                                    $order_detail[] = [
+                                        'order_id' => $id,
+                                        'package_id' => $item->package_id,
+                                        'quiz_id' => $quiz->id
+                                    ];
+                                }
+                            }
                         }
                     }
                     $add_order_detail = OrderDetail::insert($order_detail);
@@ -180,7 +226,7 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
 
             $reject_order = $order->update([
-                'status' => 'Bukti Ditolak'
+                'status' => 1
             ]);
             if ($reject_order) {
                 DB::commit();
