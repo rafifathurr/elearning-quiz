@@ -8,6 +8,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 
@@ -80,6 +81,11 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');
+    });
+
+    Route::group(['controller' => OrderDetailController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
     });
 });
 
