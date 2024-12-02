@@ -78,8 +78,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('index', 'index')->name('index');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
-        Route::post('approve/{id}', 'approve')->name('approve');
-        Route::post('reject/{id}', 'reject')->name('reject');
+        Route::delete('delete/{id}', 'destroy')->name('destroy');
     });
 });
 
@@ -118,8 +117,9 @@ Route::group(['middleware' => ['role:admin']], function () {
         Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
     });
 
-    Route::group(['prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('list-order', [QuizController::class, 'listOrder'])->name('listOrder');
+    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        Route::post('approve/{id}', 'approve')->name('approve');
+        Route::post('reject/{id}', 'reject')->name('reject');
     });
 
     Route::group(['prefix' => 'class', 'as' => 'class.'], function () {

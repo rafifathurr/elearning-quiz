@@ -10,11 +10,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">
-                                    @role('user')
-                                        My Order
-                                    @else
-                                        Daftar Order
-                                    @endrole
+                                    My Order
                                 </h3>
                             </div>
                             <div class="card-body">
@@ -25,17 +21,21 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
-                                                <th>Harga</th>
-                                                <th>Jumlah Pertemuan</th>
-                                                <th>Metode Pembayaran</th>
-                                                @hasrole('user')
-                                                    <th>Status</th>
-                                                @else
-                                                    <th>Bukti Pembayaran</th>
-                                                @endhasrole
+                                                <th>Harga Paket</th>
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
+                                        <tfoot class="bg-gray-light">
+                                            <tr>
+                                                <th colspan="2" class="text-right">Total:</th>
+                                                <th class="text-left"id="totalPrice"></th>
+                                                <th class="text-center">
+                                                    <button class="btn btn-sm btn-success" id="payButton"
+                                                        style="display:none">Bayar Sekarang
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>

@@ -10,8 +10,8 @@ class Order extends Model
     use HasFactory;
     protected $guarded = [];
 
-    public function package()
+    public function orderPackages()
     {
-        return $this->belongsTo(Package::class, 'package_id');
+        return $this->hasMany(OrderPackage::class, 'order_id', 'id');
     }
 }

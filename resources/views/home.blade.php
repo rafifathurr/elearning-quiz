@@ -84,7 +84,7 @@
                                         <div class="card-footer bg-white">
                                             <div class="d-flex justify-content-end">
                                                 <button onclick="checkOut({{ $class->id }}, '{{ $class->name }}')"
-                                                    class="btn btn-sm btn-primary">Gabung</button>
+                                                    class="btn btn-sm btn-primary">Checkout</button>
                                             </div>
                                         </div>
                                     </div>
