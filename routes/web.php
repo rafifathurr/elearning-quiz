@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizQuestion;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,10 +30,20 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::get('login', function () {
+    if (Auth::check()) {
+        return redirect()->back()->with('failed', 'Anda sudah login. Harap logout terlebih dahulu.');
+    }
+    return view('auth.login');
+})->name('login');
+
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('home');
+    }
     return view(view: 'landingPage');
 })->name('landingPage');
 
@@ -47,8 +58,8 @@ Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [DashboardController::class, 'index'])->name('home');
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 });
-
 
 
 Route::group(['middleware' => ['role:admin|user']], function () {
