@@ -39,6 +39,14 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('mytest.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-chalkboard"></i>
+                        <p>
+                            My Class
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <?php
                     $orderIds = App\Models\Order::whereNull('deleted_at')
                         ->where('user_id', Auth::user()->id)

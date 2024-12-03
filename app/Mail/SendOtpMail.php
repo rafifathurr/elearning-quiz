@@ -28,7 +28,7 @@ class SendOtpMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Kode OTP Anda')
+        return $this->subject('Kode Verifikasi Anda')
             ->view('auth.mail.send-otp')
             ->with(['otp' => $this->otp]);
     }

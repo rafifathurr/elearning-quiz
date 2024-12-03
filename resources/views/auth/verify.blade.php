@@ -15,14 +15,14 @@
             <!-- /.login-logo -->
             <div class="card card-outline card-primary">
                 <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Verifikasi OTP</label>
+                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Verifikasi Akun</label>
                     <form action="{{ route('otp.verify.post') }}" method="post">
                         @csrf
                         <div class="form-group">
                             <input type="hidden" name="email" value="{{ $email }}">
                             <div class="input-group">
                                 <input type="text" name="otp" class="form-control @error('otp') is-invalid @enderror"
-                                    placeholder="Kode OTP">
+                                    placeholder="Kode Verifikasi">
                                 <div class="input-group-append">
                                     <div class="input-group-text">
                                         <span class="fas fa-envelope"></span>

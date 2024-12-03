@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <p>Berikut adalah kode OTP untuk verifikasi akun Anda:</p>
+    <p>Berikut adalah kode untuk verifikasi akun Anda:</p>
     <h2>{{ $otp }}</h2>
     <p>Kode ini akan kedaluwarsa dalam 10 menit.</p>
     <p>Terima kasih!</p>

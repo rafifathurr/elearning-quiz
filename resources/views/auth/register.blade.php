@@ -31,7 +31,7 @@
                                 <div class="input-group">
                                     <input type="text" name="name"
                                         class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap"
-                                        value="{{ old('name') }}">
+                                        oninput="this.value = this.value.toUpperCase();" value="{{ old('name') }}">
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>

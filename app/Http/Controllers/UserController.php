@@ -171,7 +171,7 @@ class UserController extends Controller
                         DB::commit();
                         return redirect()
                             ->route('otp.verify', ['email' => $add_user->email])
-                            ->with(['success' => 'Registrasi berhasil. Silakan cek email untuk OTP.']);
+                            ->with(['success' => 'Registrasi berhasil. Silakan cek email untuk Verifikasi.']);
                     }
                 } else {
                     return redirect()
