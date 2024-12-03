@@ -55,6 +55,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'class',
+                    defaultContent: '-'
+                },
+                {
                     data: 'price',
                     defaultContent: '-'
                 },

@@ -39,13 +39,21 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <?php
+                    $orderIds = App\Models\Order::whereNull('deleted_at')
+                        ->where('user_id', Auth::user()->id)
+                        ->where('status', 1)
+                        ->pluck('id');
+                    $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                    ?>
                     <a href="{{ route('order.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             @hasrole('admin')
                                 Daftar Order
                             @else
-                                My Order
+                                My Order <span
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 1 ? $orderPackage : '' }}</span>
                             @endhasrole
                         </p>
                     </a>

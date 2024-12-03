@@ -390,7 +390,6 @@ class QuizController extends Controller
     public function start(Quiz $quiz, Request $request)
     {
 
-
         $questions = collect();
 
         // Ambil pertanyaan berdasarkan aspek dan level

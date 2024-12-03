@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderDetailController extends Controller
@@ -15,7 +17,8 @@ class OrderDetailController extends Controller
     }
     public function dataTable()
     {
-        $order_detail = OrderDetail::whereNull('deleted_at')->get();
+        $orderIds = Order::where('user_id', Auth::user()->id)->whereNull('deleted_at')->where('status', 100)->pluck('id');
+        $order_detail = OrderDetail::whereNull('deleted_at')->whereIn('order_id', $orderIds)->get();
 
         return DataTables::of($order_detail)
             ->addIndexColumn()

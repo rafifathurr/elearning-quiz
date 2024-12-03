@@ -52,6 +52,9 @@ class OrderController extends Controller
             ->addColumn('name', function ($data) {
                 return $data->package->name;
             })
+            ->addColumn('class', function ($data) {
+                return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
+            })
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
             })

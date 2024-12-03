@@ -1,5 +1,14 @@
 @extends('layouts.section')
 @section('content')
+    <style>
+        .equal-height {
+            min-height: 350px;
+            /* Sesuaikan nilai sesuai kebutuhan */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
     <div class=" py-1">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -24,7 +33,7 @@
                         <div class="row mx-2">
                             @foreach ($tests as $test)
                                 <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
+                                    <div class="card h-100 equal-height">
                                         <div class="card-header">
                                             <h6>{{ $test->name }}</h6>
                                         </div>
@@ -44,7 +53,8 @@
                                         <div class="card-footer bg-white">
                                             <div class="d-flex justify-content-end">
                                                 <button onclick="checkOut({{ $test->id }}, '{{ $test->name }}')"
-                                                    class="btn btn-sm btn-primary">Checkout</button>
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-shopping-cart"></i> Checkout</button>
 
                                             </div>
                                         </div>
@@ -62,7 +72,7 @@
                         <div class="row mx-2">
                             @foreach ($classes as $class)
                                 <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
+                                    <div class="card h-100 equal-height">
                                         <div class="card-header">
                                             <h6>{{ $class->name }}</h6>
                                         </div>
@@ -84,7 +94,8 @@
                                         <div class="card-footer bg-white">
                                             <div class="d-flex justify-content-end">
                                                 <button onclick="checkOut({{ $class->id }}, '{{ $class->name }}')"
-                                                    class="btn btn-sm btn-primary">Checkout</button>
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-shopping-cart"></i> Checkout</button>
                                             </div>
                                         </div>
                                     </div>
@@ -98,5 +109,24 @@
     </div>
     @push('javascript-bottom')
         @include('js.order.script')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const cards = document.querySelectorAll('.equal-height');
+                let maxHeight = 0;
+
+                // Cari tinggi maksimum
+                cards.forEach(card => {
+                    const cardHeight = card.offsetHeight;
+                    if (cardHeight > maxHeight) {
+                        maxHeight = cardHeight;
+                    }
+                });
+
+                // Terapkan tinggi maksimum ke semua card
+                cards.forEach(card => {
+                    card.style.height = maxHeight + 'px';
+                });
+            });
+        </script>
     @endpush
 @endsection
