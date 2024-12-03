@@ -182,7 +182,7 @@
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: `/order/delete/${id}`,
+                    url: '{{ url('order/delete') }}/' + id,
                     type: 'DELETE',
                     cache: false,
                     data: {
