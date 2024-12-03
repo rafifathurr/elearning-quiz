@@ -282,7 +282,7 @@
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: `/order/approve/${id}`,
+                    url: '{{ url('order/approve') }}/' + id,
                     type: 'POST',
                     cache: false,
                     data: {
@@ -318,7 +318,7 @@
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: `/order/reject/${id}`,
+                    url: '{{ url('order/reject') }}/' + id,
                     type: 'POST',
                     cache: false,
                     data: {
