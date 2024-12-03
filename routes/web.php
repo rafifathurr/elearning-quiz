@@ -7,6 +7,7 @@ use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\myClassAdminController;
 use App\Http\Controllers\myClassController;
 use App\Http\Controllers\myTestController;
 use App\Http\Controllers\OrderController;
@@ -147,7 +148,10 @@ Route::group(['middleware' => ['role:admin']], function () {
         Route::post('reject/{id}', 'reject')->name('reject');
     });
 
-    Route::group(['prefix' => 'class', 'as' => 'class.'], function () {
-        Route::get('list-class', [QuizController::class, 'listClass'])->name('listClass');
+    Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
+        Route::get('detail/{id}', 'detail')->name('detail');
+        Route::post('store', 'store')->name('store');
     });
 });

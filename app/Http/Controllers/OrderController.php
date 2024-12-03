@@ -121,6 +121,7 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
+                    'current_class' => 0,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -131,6 +132,7 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $new_order->id,
                     'class' => $package->class,
+                    'current_class' => 0,
                 ]);
             }
 

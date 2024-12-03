@@ -122,7 +122,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('class.listClass') }}" class="nav-link">
+                        <a href="{{ route('class.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
                                 My Class

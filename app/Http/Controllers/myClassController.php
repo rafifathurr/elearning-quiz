@@ -40,7 +40,7 @@ class myClassController extends Controller
 
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $data->order_id, 'packageId' => $data->package_id]) . '" class="btn btn-sm btn-success">Detail Paket</a>';
+                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $data->order_id, 'packageId' => $data->package_id]) . '" class="btn btn-sm btn-success">Test</a>';
                 $btn_action .= '</div>';
                 return $btn_action;
             })
