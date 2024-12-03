@@ -55,12 +55,14 @@
                         ->where('status', 1)
                         ->pluck('id');
                     $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                    $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
                     ?>
                     <a href="{{ route('order.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             @hasrole('admin')
-                                Daftar Order
+                                Daftar Order <span
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 1 ? $orderList : '' }}</span>
                             @else
                                 My Order <span
                                     class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 1 ? $orderPackage : '' }}</span>
