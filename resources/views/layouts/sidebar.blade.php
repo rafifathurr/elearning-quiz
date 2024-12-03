@@ -40,7 +40,7 @@
                 </li>
                 @hasrole('user')
                     <li class="nav-item">
-                        <a href="{{ route('mytest.index') }}" class="nav-link">
+                        <a href="{{ route('myclass.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
                                 My Class
@@ -62,10 +62,10 @@
                         <p>
                             @hasrole('admin')
                                 Daftar Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 1 ? $orderList : '' }}</span>
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
                             @else
                                 My Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 1 ? $orderPackage : '' }}</span>
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
                             @endhasrole
                         </p>
                     </a>

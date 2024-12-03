@@ -7,8 +7,9 @@ use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\myClassController;
+use App\Http\Controllers\myTestController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 
@@ -82,7 +83,6 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('list-quiz', [QuizController::class, 'listQuiz'])->name('listQuiz');
         Route::get('history-quiz', [QuizController::class, 'historyQuiz'])->name('historyQuiz');
         Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
-        Route::get('my-test', [QuizController::class, 'myTest'])->name('myTest');
     });
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
@@ -94,9 +94,16 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::delete('delete/{id}', 'destroy')->name('destroy');
     });
 
-    Route::group(['controller' => OrderDetailController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
+    Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
+    });
+
+    Route::group(['controller' => myClassController::class, 'prefix' => 'myclass', 'as' => 'myclass.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
+        Route::get('detail/{orderId}/{packageId}', 'detail')->name('detail');
+        Route::get('datatable2/{orderId}/{packageId}', 'dataTableDetail')->name('dataTableDetail');
     });
 });
 
