@@ -44,7 +44,8 @@ class myClassAdminController extends Controller
     public function detail($id)
     {
         try {
-            $packageOrder = OrderPackage::where('package_id', $id)->whereNull('deleted_at')->get();
+            $orderId = Order::where('status', 100)->pluck('id');
+            $packageOrder = OrderPackage::whereIn('order_id', $orderId)->where('package_id', $id)->whereNull('deleted_at')->whereColumn('current_class', '<=', 'class')->get();
             if ($packageOrder->isEmpty()) {
                 session()->flash('failed', 'Belum Ada Pembeli Paket');
                 return redirect()->back();
