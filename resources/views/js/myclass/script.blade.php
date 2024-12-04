@@ -1,4 +1,7 @@
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('#table-member').DataTable();
+    });
     $('form').submit(function(e) {
         e.preventDefault();
         Swal.fire({

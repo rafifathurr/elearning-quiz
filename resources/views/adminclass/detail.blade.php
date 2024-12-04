@@ -15,7 +15,7 @@
                                 <form method="post" action="{{ route('class.store') }}">
                                     @csrf
                                     <div class="table-responsive py-3">
-                                        <table class="table table-bordered table-hover w-50 datatable text-center">
+                                        <table id="table-member" class="table table-bordered table-hover text-center">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
