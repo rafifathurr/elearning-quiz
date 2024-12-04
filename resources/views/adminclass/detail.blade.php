@@ -6,6 +6,8 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
+                        <a href="{{ route('class.index') }}" class="btn btn-primary btn-sm my-2"><i
+                                class="fas fa-arrow-left"></i> Kembali</a>
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">{{ $packageOrder->first()->package->name }}</h3>
@@ -32,7 +34,8 @@
                                                         <td>
                                                             <input type="checkbox" name="user[]"
                                                                 value="{{ $package->order->user->id }}"
-                                                                id="user_{{ $index }}">
+                                                                id="user_{{ $index }}"
+                                                                {{ $package->current_class == $package->class ? 'disabled' : '' }}>
                                                         </td>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $package->order->user->name }}</td>
