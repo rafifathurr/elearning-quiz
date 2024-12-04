@@ -36,7 +36,9 @@
                                                         </td>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $package->order->user->name }}</td>
-                                                        <td>Pertemuan {{ $package->current_class }}</td>
+                                                        <td>
+                                                            {{ $package->current_class == 0 ? 'Belum Ada Pertemuan' : 'Pertemuan ' . $package->current_class }}
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
