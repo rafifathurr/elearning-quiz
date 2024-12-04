@@ -29,6 +29,32 @@
             /* Tampilkan tombol saat ada scroll */
         }
 
+        .list-unstyled {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .list-unstyled .package-item {
+            position: relative;
+            padding-left: 30px;
+            /* Space for the icon */
+        }
+
+        .list-unstyled .package-item::before {
+            content: "\f00c";
+            /* FontAwesome checkmark icon */
+            font-family: "Font Awesome 5 Free";
+            /* Font Awesome family */
+            font-weight: 900;
+            /* Required for solid icons */
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: green;
+            /* Icon color */
+        }
+
         @media (min-width: 768px) {
             .best-seller {
                 height: 100%;
@@ -135,8 +161,7 @@
                                         </h6>
                                         <ul class="list-unstyled">
                                             @foreach ($class->packageTest as $package)
-                                                <li class="font-weight-normal mb-1"><i
-                                                        class="fas fa-check text-success"></i>
+                                                <li class="package-item font-weight-normal mb-1">
                                                     {{ $package->quiz->name . ' (' . $package->quiz->type_aspect . ')' }}
                                                 </li>
                                             @endforeach
@@ -154,12 +179,12 @@
                     {{-- Quiz --}}
                     <div class="card">
                         <div class="card-header border-transparent">
-                            <h3 class="card-title">Daftar Test</h3>
+                            <h2 class="card-title font-weight-bold">Daftar Test</h2>
                         </div>
                         <!-- /.card-header -->
-                        <div class="card-body p-0">
+                        <div class="card-body ">
                             <div class="table-responsive">
-                                <table class="table m-0 text-center">
+                                <table id="table-test" class="table text-center">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -415,31 +440,45 @@
             <i class="fas fa-chevron-up"></i>
         </a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const backToTopButton = document.querySelector('.back-to-top');
 
-                backToTopButton.addEventListener('click', function(e) {
-                    e.preventDefault(); // Mencegah tindakan default anchor
-
-                    // Scroll halus ke atas
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
+        @push('javascript-bottom')
+            <script>
+                $(document).ready(function() {
+                    $('#table-test').DataTable({
+                        language: {
+                            info: "" //ngilangin tulisan show 1 of 4 dibawah
+                        },
+                        columnDefs: [{
+                            orderable: false,
+                            targets: [1, 3, 4]
+                        }]
                     });
                 });
+                document.addEventListener('DOMContentLoaded', function() {
+                    const backToTopButton = document.querySelector('.back-to-top');
 
-                window.addEventListener('scroll', function() {
-                    if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 300px
-                        backToTopButton.classList.add('show');
-                    } else {
-                        backToTopButton.classList.remove('show');
-                    }
+                    backToTopButton.addEventListener('click', function(e) {
+                        e.preventDefault(); // Mencegah tindakan default anchor
+
+                        // Scroll halus ke atas
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 300px
+                            backToTopButton.classList.add('show');
+                        } else {
+                            backToTopButton.classList.remove('show');
+                        }
+                    });
+
+
                 });
-
-
-            });
-        </script>
+            </script>
+        @endpush
 
     </body>
 @endsection
