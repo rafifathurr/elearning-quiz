@@ -446,12 +446,13 @@
                 $(document).ready(function() {
                     $('#table-test').DataTable({
                         language: {
-                            info: "" //ngilangin tulisan show 1 of 4 dibawah
+                            lengthMenu: "" //ngilangin sort diatas
                         },
                         columnDefs: [{
                             orderable: false,
                             targets: [1, 3, 4]
-                        }]
+                        }],
+                        pageLength: 4
                     });
                 });
                 document.addEventListener('DOMContentLoaded', function() {
