@@ -309,7 +309,7 @@
                                                 class="img-size-50">
                                         </div>
                                         <div class="product-info">
-                                            <a href="#" class="product-title">
+                                            <a href="{{ route('login') }}" class="product-title">
                                                 {{ $class->name }}
                                                 <span
                                                     class="badge float-right {{ $loop->iteration % 3 == 1 ? 'badge-warning' : ($loop->iteration % 3 == 2 ? 'badge-success' : 'badge-primary') }}">
