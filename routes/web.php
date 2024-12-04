@@ -46,8 +46,10 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('home');
     }
-    return view(view: 'landingPage');
-})->name('landingPage');
+    return redirect()->route('landingPage');
+});
+
+Route::get('landing-page', [DashboardController::class, 'landingPage'])->name('landingPage');
 
 Route::get('otp-verify', [AuthController::class, 'showVerifyForm'])->name('otp.verify');
 Route::post('otp-verify', [AuthController::class, 'verifyOtp'])->name('otp.verify.post');

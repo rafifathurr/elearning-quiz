@@ -15,4 +15,12 @@ class DashboardController extends Controller
 
         return view('home', $data);
     }
+
+    public function landingPage()
+    {
+        $data['tests'] = Package::whereNull('class')->whereNull('deleted_at')->get();
+        $data['classes'] = Package::whereNotNull('class')->whereNull('deleted_at')->get();
+
+        return view('landingPage', $data);
+    }
 }

@@ -57,6 +57,7 @@
                                     <label for="name">Nama <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
                                         id="name" name="name" placeholder="Nama"
+                                        oninput="this.value = this.value.toUpperCase();"
                                         value="{{ old('name', $user->name) }}">
                                     @error('name')
                                         <div class="alert alert-danger mt-2">

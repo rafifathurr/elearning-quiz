@@ -28,6 +28,18 @@
             display: block;
             /* Tampilkan tombol saat ada scroll */
         }
+
+        @media (min-width: 768px) {
+            .best-seller {
+                height: 100%;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .best-seller {
+                height: auto;
+            }
+        }
     </style>
 
     <body class="hold-transition layout-top-nav">
@@ -100,128 +112,49 @@
                 <div class="col-md-8">
 
                     {{-- Best Seller --}}
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="ribbon-wrapper ribbon-lg">
-                                    <div class="ribbon bg-success text-lg">
-                                        Best Seller
-                                    </div>
-                                </div>
-                                <img src="{{ asset('dist/adminlte/img/kelas1.jpg') }}" class="card-img-top" alt="Kelas A">
-                                <div class="card-header">
-                                    <h5>Kelas A</h5>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-unstyled">
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
-                                            Materi
-                                            Belajar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
-                                            Hari
-                                            Daily Quiz</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
-                                            HOTS
-                                        </li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Hasil
-                                            Ujian
-                                            Langsung Keluar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
-                                            Belajar
-                                            Premium</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Modul
-                                            Pembelajaran</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Akses
-                                            Selamanya</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="ribbon-wrapper ribbon-lg">
-                                    <div class="ribbon bg-success text-lg">
-                                        Best Seller
-                                    </div>
-                                </div>
-                                <img src="{{ asset('dist/adminlte/img/kelas2.jpg') }}" class="card-img-top"
-                                    alt="Kelas A">
-                                <div class="card-header">
-                                    <h5>Kelas B</h5>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-unstyled">
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
-                                            Materi
-                                            Belajar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
-                                            Hari
-                                            Daily Quiz</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
-                                            HOTS
-                                        </li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
-                                            Hasil
-                                            Ujian
-                                            Langsung Keluar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
-                                            Belajar
-                                            Premium</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
-                                            Modul
-                                            Pembelajaran</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-times text-danger"></i> Akses
-                                            Selamanya</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="ribbon-wrapper ribbon-lg">
-                                    <div class="ribbon bg-success text-lg">
-                                        Best Seller
-                                    </div>
-                                </div>
-                                <img src="{{ asset('dist/adminlte/img/kelas3.jpg') }}" class="card-img-top"
-                                    alt="Kelas A">
-                                <div class="card-header">
-                                    <h5>Kelas C</h5>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-unstyled">
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 45+
-                                            Materi
-                                            Belajar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> 30
-                                            Hari
-                                            Daily Quiz</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Soal
-                                            HOTS
-                                        </li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
-                                            Hasil
-                                            Ujian
-                                            Langsung Keluar</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i> Grup
-                                            Belajar
-                                            Premium</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
-                                            Modul
-                                            Pembelajaran</li>
-                                        <li class="font-weight-normal mb-1"><i class="fas fa-check text-success"></i>
-                                            Akses
-                                            Selamanya</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row mb-4">
 
+                        @foreach ($classes->take(3) as $class)
+                            <div class="col-md-4 ">
+                                <div class="card best-seller">
+                                    <div class="ribbon-wrapper ribbon-lg">
+                                        <div class="ribbon bg-success text-lg">
+                                            Best Seller
+                                        </div>
+                                    </div>
+                                    <img src="{{ asset('dist/adminlte/img/kelas' . $loop->iteration . '.jpg') }}"
+                                        class="card-img-top" alt="Kelas A">
+                                    <div class="card-header">
+                                        <h5>{{ $class->name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bolder text-cyan "><i class="fas fa-chalkboard-teacher "></i>
+                                            <span class="ml-1">
+                                                {{ $class->class }} Kali Pertemuan
+                                            </span>
+                                        </h6>
+                                        <ul class="list-unstyled">
+                                            @foreach ($class->packageTest as $package)
+                                                <li class="font-weight-normal mb-1"><i
+                                                        class="fas fa-check text-success"></i>
+                                                    {{ $package->quiz->name . ' (' . $package->quiz->type_aspect . ')' }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="{{ route('login') }}" class="btn btn-sm btn-primary ">Daftar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                     {{-- Quiz --}}
                     <div class="card">
                         <div class="card-header border-transparent">
-                            <h3 class="card-title">Daftar Quiz</h3>
+                            <h3 class="card-title">Daftar Test</h3>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body p-0">
@@ -230,58 +163,36 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama</th>
+                                            <th>Nama Paket</th>
                                             <th>Harga</th>
-                                            <th>Akses</th>
+                                            <th>Daftar Test</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Quiz 1</td>
-                                            <td><i class="fa fa-tags text-danger"></i> Rp. 780.000</td>
-                                            <td>
-                                                <i class="fa fa-key text-warning"></i> 10 Kali Akses
-                                            </td>
-                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Quiz 2</td>
-                                            <td><i class="fa fa-tags text-danger"></i> Rp. 480.000</td>
-                                            <td>
-                                                <i class="fa fa-key text-warning"></i> 8 Kali Akses
-                                            </td>
-                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>Quiz 3</td>
-                                            <td><i class="fa fa-tags text-danger"></i> Rp. 880.000</td>
-                                            <td>
-                                                <i class="fa fa-key text-warning"></i> 12 Kali Akses
-                                            </td>
-                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>Quiz 4</td>
-                                            <td><i class="fa fa-tags text-danger"></i> Rp. 1.000.000</td>
-                                            <td>
-                                                <i class="fa fa-key text-warning"></i> 18 Kali Akses
-                                            </td>
-                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td>Quiz 5</td>
-                                            <td><i class="fa fa-tags text-danger"></i> Rp. 2.050.000</td>
-                                            <td>
-                                                <i class="fa fa-key text-warning"></i> 20 Kali Akses
-                                            </td>
-                                            <td><a href="#" class="btn btn-sm btn-primary">Daftar</a></td>
-                                        </tr>
+                                        @foreach ($tests as $test)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $test->name }}</td>
+                                                <td><i class="fa fa-tags text-danger"></i>
+                                                    {{ 'Rp. ' . number_format($test->price, 0, ',', '.') }}</td>
+                                                <td class="justify-content-center">
+                                                    @foreach ($test->packageTest as $package)
+                                                        <ul class="list-unstyled">
+                                                            <li><i class="fas fa-graduation-cap text-success"></i>
+                                                                {{ $package->quiz->name . ' (' . $package->quiz->type_aspect . ')' }}
+                                                            </li>
+
+
+
+                                                        </ul>
+                                                    @endforeach
+                                                </td>
+                                                <td><a href="{{ route('login') }}"
+                                                        class="btn btn-sm btn-primary">Daftar</a></td>
+                                            </tr>
+                                        @endforeach
+
 
                                     </tbody>
                                 </table>
@@ -366,67 +277,29 @@
                         <!-- /.card-header -->
                         <div class="card-body p-0">
                             <ul class="products-list product-list-in-card pl-2 pr-2">
-                                <li class="item">
-                                    <div class="product-img">
-                                        <img src="{{ asset('dist/adminlte/img/kelas1.jpg') }}" alt="Product Image"
-                                            class="img-size-50">
-                                    </div>
-                                    <div class="product-info">
-                                        <a href="#" class="product-title">Kelas 1
-                                            <span class="badge badge-warning float-right">Rp. 4.000.000</span></a>
-                                        <span class="product-description">
-                                            Lorem ipsum dolor sit.
-                                        </span>
-                                    </div>
-                                </li>
-                                <!-- /.item -->
-                                <li class="item">
-                                    <div class="product-img">
-                                        <img src="{{ asset('dist/adminlte/img/kelas2.jpg') }}" alt="Product Image"
-                                            class="img-size-50">
-                                    </div>
-                                    <div class="product-info">
-                                        <a href="#" class="product-title">Kelas 2
-                                            <span class="badge badge-info float-right">Rp. 3.000.000</span></a>
-                                        <span class="product-description">
-                                            Lorem, ipsum dolor.
-                                        </span>
-                                    </div>
-                                </li>
-                                <!-- /.item -->
-                                <li class="item">
-                                    <div class="product-img">
-                                        <img src="{{ asset('dist/adminlte/img/kelas3.jpg') }}" alt="Product Image"
-                                            class="img-size-50">
-                                    </div>
-                                    <div class="product-info">
-                                        <a href="#" class="product-title">
-                                            Kelas 3<span class="badge badge-danger float-right">
-                                                Rp. 2.200.000
+                                @foreach ($classes->sortByDesc('id') as $class)
+                                    <li class="item">
+                                        <div class="product-img">
+                                            <img src="{{ asset('dist/adminlte/img/kelas1.jpg') }}" alt="Product Image"
+                                                class="img-size-50">
+                                        </div>
+                                        <div class="product-info">
+                                            <a href="#" class="product-title">
+                                                {{ $class->name }}
+                                                <span
+                                                    class="badge float-right {{ $loop->iteration % 3 == 1 ? 'badge-warning' : ($loop->iteration % 3 == 2 ? 'badge-success' : 'badge-primary') }}">
+                                                    {{ 'Rp. ' . number_format($class->price, 0, ',', '.') }}
+                                                </span>
+                                            </a>
+                                            <span class="product-description">
+                                                {{ $class->class }}x Pertemuan (Online dan Offline)
                                             </span>
-                                        </a>
-                                        <span class="product-description">
-                                            Lorem ipsum dolor sit amet consectetur.
-                                        </span>
-                                    </div>
-                                </li>
-                                <!-- /.item -->
-                                <li class="item">
-                                    <div class="product-img">
-                                        <img src="{{ asset('dist/adminlte/img/kelas4.jpg') }}" alt="Product Image"
-                                            class="img-size-50">
-                                    </div>
-                                    <div class="product-info">
-                                        <a href="#" class="product-title">Kelas 4
-                                            <span class="badge badge-success float-right">Rp. 3.100.000</span></a>
-                                        <span class="product-description">
-                                            Lorem ipsum dolor sit.
-                                        </span>
-                                    </div>
-                                </li>
-                                <!-- /.item -->
+                                        </div>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
+
                         <!-- /.card-body -->
                         <!-- /.card-footer -->
                     </div>
@@ -563,6 +436,8 @@
                         backToTopButton.classList.remove('show');
                     }
                 });
+
+
             });
         </script>
 

@@ -60,7 +60,8 @@
                                             class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
                                         <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                            id="name" name="name" placeholder="Nama" value="{{ old('name') }}">
+                                            id="name" name="name" placeholder="Nama"
+                                            oninput="this.value = this.value.toUpperCase();" value="{{ old('name') }}">
                                         @error('name')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
