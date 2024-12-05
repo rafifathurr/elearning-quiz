@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
+use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -52,10 +53,31 @@ class myTestController extends Controller
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
 
-                $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->quiz->id]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                $result = Result::where('quiz_id', $data->quiz->id)
+                    ->where('user_id', Auth::user()->id)
+                    ->whereNull('finish_time')
+                    ->first();
+
+
+                if ($result) {
+                    $currentDateTime = \Carbon\Carbon::now();
+                    $startTime = \Carbon\Carbon::parse($result->start_time);
+                    $endTime = $startTime->copy()->addSeconds($result->time_duration);
+
+
+                    if ($currentDateTime->lte($endTime)) {
+                        $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                    } else {
+                        $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->quiz->id]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                    }
+                } else {
+                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->quiz->id]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                }
+
                 $btn_action .= '</div>';
                 return $btn_action;
             })
+
             ->only(['package', 'quiz', 'type_quiz', 'action'])
             ->rawColumns(['action'])
             ->make(true);
