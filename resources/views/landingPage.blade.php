@@ -140,7 +140,7 @@
                     {{-- Best Seller --}}
                     <div class="row mb-4">
 
-                        @foreach ($classes->take(3) as $class)
+                        @foreach ($best_seller as $class)
                             <div class="col-md-4 ">
                                 <div class="card best-seller">
                                     <div class="ribbon-wrapper ribbon-lg">
