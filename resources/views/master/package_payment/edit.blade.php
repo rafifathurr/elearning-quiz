@@ -73,7 +73,7 @@
                                         <input type="hidden" id="value_quiz"
                                             value="{{ json_encode($package->packageTest->pluck('quiz_id')->toArray()) }}">
                                         <select class="form-control @error('quiz_id[]') is-invalid @enderror"
-                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Tipe User"
+                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Jenis Test"
                                             style="width: 100%;" required>
                                             @foreach ($quizes as $quiz)
                                                 <option value="{{ $quiz->id }}" selected>

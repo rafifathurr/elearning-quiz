@@ -8,6 +8,7 @@ use App\Models\Quiz\QuizQuestion;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -126,12 +127,19 @@ class QuestionController extends Controller
 
     private function appendAnswer(QuizAnswer $quiz_answer = null, $increment, $parent, $disabled = '')
     {
+        // Jika increment tidak valid, hitung ulang berdasarkan jawaban yang sudah ada
+        if (is_null($increment) || $increment <= 0) {
+            $existingAnswers = QuizAnswer::where('parent_id', $parent)->count();
+            $increment = $existingAnswers + 1; // Hitung jumlah jawaban + 1
+        }
+
         $data['disabled'] = $disabled;
         $data['quiz_answer'] = $quiz_answer;
         $data['increment'] = $increment;
         $data['parent'] = $parent;
         return view('master.question.form.answer', $data);
     }
+
 
     public function store(Request $request)
     {
@@ -184,12 +192,30 @@ class QuestionController extends Controller
                 }
 
                 foreach ($request->quiz_answer as $quiz_answer_request) {
-                    QuizAnswer::create([
+                    $add_quiz_answer = QuizAnswer::create([
                         'quiz_question_id' => $quiz_question->id,
                         'answer' => $quiz_answer_request['answer'],
                         'point' => $quiz_answer_request['point'],
                         'is_answer' => isset($quiz_answer_request['is_answer']),
                     ]);
+
+                    if (isset($quiz_answer_request['answer_image'])) {
+
+                        $path = 'public/answer/images' .  $add_quiz_answer->id;
+                        $path_store = 'storage/answer/images' .  $add_quiz_answer->id;
+
+                        if (!Storage::exists($path)) {
+                            Storage::makeDirectory($path);
+                        }
+
+                        $file_name = $add_quiz_answer->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' .  $quiz_answer_request['answer_image']->getClientOriginalExtension();
+                        $quiz_answer_request['answer_image']->storePubliclyAs($path, $file_name);
+                        $answer_image = $path_store . '/' . $file_name;
+
+                        $add_quiz_answer->update([
+                            'answer_image' => $answer_image,
+                        ]);
+                    }
                 }
 
                 DB::commit();
@@ -326,6 +352,7 @@ class QuestionController extends Controller
                         $quiz_answer = QuizAnswer::where('id', $quiz_answer_request['id'])->update([
                             'quiz_question_id' => $question->id,
                             'answer' => $quiz_answer_request['answer'],
+                            'answer_image' => $quiz_answer_request['answer_image'],
                             'point' => $quiz_answer_request['point'],
                             'is_answer' => isset($quiz_answer_request['is_answer']),
                         ]);
@@ -337,8 +364,32 @@ class QuestionController extends Controller
                         $quiz_answer = QuizAnswer::create([
                             'quiz_question_id' => $question->id,
                             'answer' => $quiz_answer_request['answer'],
+                            'answer_image' => $quiz_answer_request['answer_image'],
                             'point' => $quiz_answer_request['point'],
                             'is_answer' => isset($quiz_answer_request['is_answer']),
+                        ]);
+                    }
+
+                    if (isset($quiz_answer_request['answer_image']) && $quiz_answer_request['answer_image'] instanceof UploadedFile) {
+
+                        $path = 'public/answer/images' .  $quiz_answer->id;
+                        $path_store = 'storage/answer/images' .  $quiz_answer->id;
+
+                        if (!Storage::exists($path)) {
+                            Storage::makeDirectory($path);
+                        }
+
+                        $file_name = $quiz_answer->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' .  $quiz_answer_request['answer_image']->getClientOriginalExtension();
+
+                        if (Storage::exists($path . '/' . $file_name)) {
+                            Storage::delete($path . '/' . $file_name);
+                        }
+
+                        $quiz_answer_request['answer_image']->storePubliclyAs($path, $file_name);
+                        $answer_image = $path_store . '/' . $file_name;
+
+                        $quiz_answer->update([
+                            'answer_image' => $answer_image,
                         ]);
                     }
                     if (!$quiz_answer) {

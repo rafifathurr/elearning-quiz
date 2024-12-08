@@ -28,9 +28,10 @@
                                                 @endif
                                             </div>
                                             <div class="mx-2">
-                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) }}"
-                                                    class="btn btn-lg btn-success" id="mulai"><i
-                                                        class="fas fa-play mr-2"></i>Mulai</a>
+                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?order_detail_id=' . encrypt($orderDetailId) }}"
+                                                    class="btn btn-lg btn-success" id="mulai">
+                                                    <i class="fas fa-play mr-2"></i>Mulai
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

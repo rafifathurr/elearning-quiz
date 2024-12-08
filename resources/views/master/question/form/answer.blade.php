@@ -2,7 +2,7 @@
 
 
     <div class="card-header">
-        <h2 class="card-title mt-2">Jawaban </h2>
+        <h2 class="card-title mt-2">Jawaban {{ $increment }}</h2>
 
         @if ($disabled == '')
             <div class="dropdown text-black">
@@ -19,13 +19,37 @@
     <div class="card-body">
         <!-- Answer Field -->
         <div class="form-group row">
-            <label class="col-md-4 control-label text-left">Jawaban <span class="text-danger ml-1">*</span></label>
+            <label class="col-md-4 control-label text-left">Jawaban </label>
             <div class="col-md-8 col-sm-12">
                 <input type="text" name="quiz_answer[{{ $increment }}][answer]"
                     class="form-control @error('quiz_answer.{{ $increment }}.answer') is-invalid @enderror"
-                    value="{{ old('quiz_answer.' . $increment . '.answer', $quiz_answer->answer ?? '') }}" required
+                    value="{{ old('quiz_answer.' . $increment . '.answer', $quiz_answer->answer ?? '') }}"
                     {{ $disabled }} />
                 @error('quiz_answer.{{ $increment }}.answer')
+                    <div class="alert alert-danger mt-2">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-4 control-label text-left">Gambar </label>
+            <div class="col-md-8 col-sm-12">
+                <input type="hidden" name="quiz_answer[{{ $increment }}][answer_image]"
+                    value="{{ old('quiz_answer.' . $increment . '.answer_image', $quiz_answer->answer_image ?? '') }}">
+                <input type="file"
+                    class="form-control @error('quiz_answer.{{ $increment }}.answer_image') is-invalid @enderror"
+                    name="quiz_answer[{{ $increment }}][answer_image]" id="documentInput"
+                    accept="image/jpeg,image/jpg,image/png" {{ $disabled }}>
+                <p class="text-danger py-1">* .jpg .jpeg .png</p>
+                @if (!empty($quiz_answer->answer_image))
+                    <label class="m-2">
+                        <a href="{{ asset($quiz_answer->answer_image) }}" target="_blank">
+                            <i class="fas fa-download mr-1"></i>
+                            Gambar Terlampir
+                        </a>
+                    </label>
+                @endif
+
+                @error('quiz_answer.{{ $increment }}.answer_image')
                     <div class="alert alert-danger mt-2">{{ $message }}</div>
                 @enderror
             </div>
@@ -53,6 +77,7 @@
                         @if (old('quiz_answer.' . $increment . '.is_answer', $quiz_answer->is_answer ?? false)) checked @endif {{ $disabled }} />
                     <label class="custom-control-label" for="is_answer_{{ $increment }}">Benar</label>
                 </div>
+
             </div>
         </div>
     </div>

@@ -32,10 +32,19 @@
                                 @foreach ($active_question['quiz_answer'] as $quiz_answer)
                                     <div class="form-check py-3">
                                         <input class="form-check-input" type="radio" name="answer_list"
-                                            onchange="answer(this)" class="form-control"
-                                            value="{{ $quiz_answer['answer'] }}"
-                                            @if ($active_question['answered'] && $active_question['user_answer'] == $quiz_answer['answer']) checked @endif>
-                                        <label class="form-check-label">{{ $quiz_answer['answer'] }}</label>
+                                            onchange="answer(this)"
+                                            value="{{ $quiz_answer['answer'] ?? $quiz_answer['answer_image'] }}"
+                                            @if (
+                                                $active_question['answered'] &&
+                                                    ($active_question['user_answer'] == $quiz_answer['answer'] ||
+                                                        $active_question['user_answer'] == $quiz_answer['answer_image'])) checked @endif>
+                                        <label class="form-check-label">
+                                            {{ $quiz_answer['answer'] ?? '' }}
+                                        </label> <br />
+                                        @if (!is_null($quiz_answer['answer_image']))
+                                            <img src="{{ asset($quiz_answer['answer_image']) }}" class="img-fluid"
+                                                style="max-height: 10rem;">
+                                        @endif
                                     </div>
                                 @endforeach
 

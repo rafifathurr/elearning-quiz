@@ -100,6 +100,9 @@ Route::group(['middleware' => ['role:admin|user']], function () {
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
+        Route::get('datatable-history', 'dataTableHistory')->name('dataTableHistory');
+        Route::get('history', 'history')->name('history');
+        Route::get('review/{id}', 'review')->name('review');
     });
 
     Route::group(['controller' => myClassController::class, 'prefix' => 'myclass', 'as' => 'myclass.'], function () {

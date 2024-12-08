@@ -355,7 +355,7 @@
                 allAspectCheckbox.addEventListener('change', updateAspectCheckboxes);
             });
 
-            let answer_increment = 0;
+
 
             function enabledEvent(element, target) {
                 if (element.checked) {
@@ -367,48 +367,36 @@
                 }
             }
 
+            let answer_increment = 0;
+
             function appendForm(question, arr_of_answer) {
                 if (arr_of_answer[0]) {
-                    if ($('#question_answer_'.concat(arr_of_answer[2])).val() !== undefined) {
-                        answer_increment = parseInt($('#question_answer_'.concat(arr_of_answer[2])).val()) + 1;
-                        $.ajax({
-                            url: "{{ route('master.question.append') }}",
-                            type: "GET",
-                            data: {
-                                question: 0,
-                                answer: arr_of_answer[0],
-                                parent: arr_of_answer[2],
-                                increment: answer_increment,
-                            },
-                            success: function(data) {
-                                $('#question_answer_'.concat(arr_of_answer[2])).val(answer_increment);
-                                $('#'.concat(arr_of_answer[1])).append(data);
-                            },
-                            error: function(xhr, status, error) {
-                                swalError(error);
-                            }
-                        });
-                    } else {
-                        answer_increment++;
-                        $.ajax({
-                            url: "{{ route('master.question.append') }}",
-                            type: "GET",
-                            data: {
-                                question: 0,
-                                answer: arr_of_answer[0],
-                                parent: arr_of_answer[2],
-                                increment: answer_increment,
-                            },
-                            success: function(data) {
-                                $('#'.concat(arr_of_answer[1])).append(data);
-                            },
-                            error: function(xhr, status, error) {
-                                swalError(error);
-                            }
-                        });
-                    }
+                    const parentId = arr_of_answer[2];
+                    const answersContainer = $(`#${arr_of_answer[1]}`);
+                    const existingAnswers = answersContainer.find('.card').length; // Hitung jumlah jawaban
+
+                    // Hitung increment berdasarkan jumlah jawaban yang ada
+                    answer_increment = existingAnswers + 1;
+
+                    $.ajax({
+                        url: "{{ route('master.question.append') }}",
+                        type: "GET",
+                        data: {
+                            question: 0,
+                            answer: arr_of_answer[0],
+                            parent: parentId,
+                            increment: answer_increment, // Kirim nilai increment
+                        },
+                        success: function(data) {
+                            answersContainer.append(data); // Tambahkan jawaban baru ke container
+                        },
+                        error: function(xhr, status, error) {
+                            swalError(error);
+                        }
+                    });
                 }
             }
+
 
 
             function remove(target) {

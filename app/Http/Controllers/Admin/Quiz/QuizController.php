@@ -43,7 +43,7 @@ class QuizController extends Controller
                     // $btn_action = '<a href="' . route('admin.quiz.show', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
                     $btn_action = '<a href="' . route('admin.quiz.edit', ['quiz' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
                     $btn_action .= '<a href="' . route('admin.quiz.showQuestion', ['quiz' => $data->id]) . '" class="btn btn-sm btn-info my-1 ml-1"><i class="fas fa-search"></i></a>';
-                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => $data->id]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
+                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->id)]) . '" class="btn btn-sm btn-success my-1 ml-1"><i class="fas fa-play"></i></a>';
                     $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
                     return $btn_action;
                 })
@@ -387,8 +387,24 @@ class QuizController extends Controller
     }
 
 
-    public function start(Quiz $quiz, Request $request)
+    public function start($encryptedQuizId, Request $request)
     {
+        try {
+            // Dekripsi ID quiz yang diterima melalui URL
+            $quizId = decrypt($encryptedQuizId);
+            $quiz = Quiz::findOrFail($quizId);  // Temukan quiz berdasarkan ID yang didekripsi
+
+            // Inisialisasi orderDetailId sebagai null
+            $orderDetailId = null;
+
+            // Cek jika order_detail_id ada di request dan dekripsi jika ada
+            if ($request->has('order_detail_id')) {
+                $encryptedOrderDetailId = $request->get('order_detail_id');
+                $orderDetailId = decrypt($encryptedOrderDetailId);
+            }
+        } catch (\Exception $e) {
+            abort(403, 'Invalid ID');
+        }
 
         $questions = collect();
 
@@ -406,9 +422,6 @@ class QuizController extends Controller
                 ->limit($aspect->total_question)
                 ->get();
 
-
-
-            // Gabungkan semua pertanyaan ke dalam koleksi
             $questions = $questions->merge($questionSet);
         }
 
@@ -417,10 +430,8 @@ class QuizController extends Controller
             $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
         });
 
-        // Acak ulang seluruh pertanyaan (aspek, level, dan pertanyaan)
+        // Acak ulang seluruh pertanyaan
         $shuffledQuestions = $questions->shuffle();
-
-        // Hitung total pertanyaan
         $totalQuestions = $shuffledQuestions->count();
 
         // Jika permintaan berbasis API (JSON)
@@ -430,16 +441,12 @@ class QuizController extends Controller
                 'total_questions' => $totalQuestions,
             ], 200);
         } else {
-            // Jika permintaan berbasis browser
-            if (!empty($request->all())) {
-                return redirect()->route('quiz.start', ['quiz' => $quiz->id]);
-            }
-
             // Kirim data ke tampilan
-            $data['quiz'] = $quiz;
-            $data['totalQuestions'] = $totalQuestions;
-
-            return view('quiz.play.start', $data);
+            return view('quiz.play.start', [
+                'quiz' => $quiz,
+                'orderDetailId' => $orderDetailId,
+                'totalQuestions' => $totalQuestions,
+            ]);
         }
     }
 
@@ -448,12 +455,16 @@ class QuizController extends Controller
     {
         DB::beginTransaction();
         try {
+
+            $encryptedId = $request->get('order_detail_id');
+            $orderDetailId = decrypt($encryptedId);
             // Buat entri Result baru
             $result = Result::create([
                 'quiz_id' => $quiz->id,
                 'user_id' => Auth::user()->id,
                 'start_time' => now(),
                 'time_duration' => $quiz->time_duration,
+                'order_detail_id' => $orderDetailId,
             ]);
 
             Log::info('New result created with ID: ' . $result->id);
@@ -555,6 +566,11 @@ class QuizController extends Controller
             // Ambil seluruh ResultDetail terkait quiz dan user
             $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
 
+            if ($result->user_id != Auth::user()->id) {
+                session()->flash('failed', 'Tidak Dibenarkan Mengakses Test Orang Lain');
+                return redirect()->back();
+            }
+
             if ($resultDetails->isEmpty()) {
                 return response()->json(['message' => 'Tidak ada pertanyaan untuk kuis ini'], 404);
             }
@@ -567,6 +583,7 @@ class QuizController extends Controller
                     return [
                         'id' => $quiz_answer->id,
                         'answer' => $quiz_answer->answer,
+                        'answer_image' => $quiz_answer->answer_image,
                         'is_answer' => intval($quiz_answer->is_answer),
                         'answered' => false,
                     ];
@@ -671,10 +688,14 @@ class QuizController extends Controller
 
             $score = 0;
             foreach ($question->quizAnswer as $answer) {
-                if ($request->value == $answer->answer && $answer->is_answer == 1) {
+
+                if ((!is_null($answer->answer) && $request->value == $answer->answer) ||
+                    (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1)
+                ) {
                     $score = 1;
                 }
             }
+
 
             $resultDetail->update([
                 'answer' => $validated['value'],
@@ -726,9 +747,6 @@ class QuizController extends Controller
     }
 
 
-
-
-
     public function finish(Request $request)
     {
         try {
@@ -761,10 +779,13 @@ class QuizController extends Controller
 
             $score = 0;
             foreach ($question->quizAnswer as $answer) {
-                if ($request->value == $answer->answer && $answer->is_answer == 1) {
+
+                if ((!is_null($answer->answer) && $request->value == $answer->answer) ||
+                    (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1)
+                ) {
                     $score = 1;
                 }
-            };
+            }
 
             $resultDetail->update([
                 'answer' => $validated['value'],
@@ -870,24 +891,6 @@ class QuizController extends Controller
         return view('quiz.list.history', ['histories' => $histories]);
     }
 
-    public function reviewQuiz(string $id)
-    {
-        try {
-            $review = result::find($id);
-            if (!is_null($review)) {
-                return view('quiz.list.review', compact('review'));
-            }
-        } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with(['failed' => $e->getMessage()]);
-        }
-    }
-
-    public function listClass()
-    {
-        return view('master.class.index');
-    }
 
 
 
