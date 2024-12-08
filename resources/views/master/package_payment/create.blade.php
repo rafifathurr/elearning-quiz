@@ -71,7 +71,7 @@
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <select class="form-control @error('quiz_id[]') is-invalid @enderror"
-                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Daftar Test"
+                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Jenis Test"
                                             style="width: 100%;" required>
                                             @foreach ($quizes as $quiz)
                                                 <option value="{{ $quiz->id }}">
