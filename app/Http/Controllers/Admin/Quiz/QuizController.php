@@ -116,22 +116,11 @@ class QuizController extends Controller
                 'name' => $request->name,
                 'description' => $request->description,
                 'type_aspect' => $request->type_aspect,
-                'open_quiz' => isset($request->open_quiz) ? $request->open_quiz : null,
-                'close_quiz' => isset($request->close_quiz) ? $request->close_quiz : null,
                 'time_duration' => $request->time_duration,
             ]);
 
-            $quiz_type_user_access_request = [];
-            foreach ($request->quiz_type_user as $type_user_id) {
-                $quiz_type_user_access_request[] = [
-                    'quiz_id' => $quiz->id,
-                    'type_user_id' => $type_user_id,
-                ];
-            }
 
-            $quiz_type_user_access = QuizTypeUserAccess::insert($quiz_type_user_access_request);
-
-            if ($quiz && $quiz_type_user_access) {
+            if ($quiz) {
                 foreach ($request->quiz_aspect as $quiz_aspect_request) {
 
                     $quiz_aspect = QuizAspect::create([
@@ -217,96 +206,75 @@ class QuizController extends Controller
                 'name' => $request->name,
                 'description' => $request->description,
                 'type_aspect' => $request->type_aspect,
-                'open_quiz' => isset($request->open_quiz) ? $request->open_quiz : null,
-                'close_quiz' => isset($request->close_quiz) ? $request->close_quiz : null,
                 'time_duration' => $request->time_duration,
             ]);
 
             /**
              * Clear Last Record
              */
-            $deleted_quiz_type_user_access = QuizTypeUserAccess::where('quiz_id', $quiz->id)->delete();
             $last_quiz_aspect = $quiz->quizAspect->pluck('id')->toArray();
 
-            if ($quiz_update && $deleted_quiz_type_user_access) {
+            if ($quiz_update) {
+                foreach ($request->quiz_aspect as  $quiz_aspect_request) {
 
-                $quiz_type_user_access_request = [];
-                foreach ($request->quiz_type_user as $type_user_id) {
-                    $quiz_type_user_access_request[] = [
-                        'quiz_id' => $quiz->id,
-                        'type_user_id' => $type_user_id,
-                    ];
-                }
-                $quiz_type_user_access = QuizTypeUserAccess::insert($quiz_type_user_access_request);
+                    if (isset($quiz_aspect_request['id'])) {
 
+                        $quiz_aspect = QuizAspect::where('id', $quiz_aspect_request['id'])->update([
+                            'quiz_id' => $quiz->id,
+                            'level' => $quiz_aspect_request['level'],
+                            'aspect_id' => $quiz_aspect_request['aspect_id'],
+                            'total_question' => $quiz_aspect_request['total_question'],
+                        ]);
 
-                if ($quiz_type_user_access) {
-                    foreach ($request->quiz_aspect as  $quiz_aspect_request) {
-
-                        if (isset($quiz_aspect_request['id'])) {
-
-                            $quiz_aspect = QuizAspect::where('id', $quiz_aspect_request['id'])->update([
-                                'quiz_id' => $quiz->id,
-                                'level' => $quiz_aspect_request['level'],
-                                'aspect_id' => $quiz_aspect_request['aspect_id'],
-                                'total_question' => $quiz_aspect_request['total_question'],
-                            ]);
-
-                            if (!$quiz_aspect) {
-                                DB::rollBack();
-                                return redirect()
-                                    ->back()
-                                    ->with(['failed' => 'Gagal Simpan Aspek Test'])
-                                    ->withInput();
-                            }
-
-
-
-                            if (($key_question_array = array_search($quiz_aspect_request['id'], $last_quiz_aspect)) !== false) {
-                                unset($last_quiz_aspect[$key_question_array]);
-                            }
-                        } else {
-
-                            $quiz_aspect = QuizAspect::create([
-                                'quiz_id' => $quiz->id,
-                                'level' => $quiz_aspect_request['level'],
-                                'aspect_id' => $quiz_aspect_request['aspect_id'],
-                                'total_question' => $quiz_aspect_request['total_question'],
-                            ]);
-
-                            if (!$quiz_aspect) {
-                                DB::rollBack();
-                                return redirect()
-                                    ->back()
-                                    ->with(['failed' => 'Gagal Simpan Aspek Test'])
-                                    ->withInput();
-                            }
-                        }
-                    }
-
-                    if (!empty($last_quiz_aspect)) {
-                        $quiz_aspect_destroy = QuizAspect::whereIn('id', $last_quiz_aspect)
-                            ->update(['deleted_at' => date('Y-m-d H:i:s')]);
-
-                        if (!$quiz_aspect_destroy) {
+                        if (!$quiz_aspect) {
                             DB::rollBack();
                             return redirect()
                                 ->back()
-                                ->with(['failed' => 'Gagal Hapus Aspek Test'])
+                                ->with(['failed' => 'Gagal Simpan Aspek Test'])
+                                ->withInput();
+                        }
+
+
+
+                        if (($key_question_array = array_search($quiz_aspect_request['id'], $last_quiz_aspect)) !== false) {
+                            unset($last_quiz_aspect[$key_question_array]);
+                        }
+                    } else {
+
+                        $quiz_aspect = QuizAspect::create([
+                            'quiz_id' => $quiz->id,
+                            'level' => $quiz_aspect_request['level'],
+                            'aspect_id' => $quiz_aspect_request['aspect_id'],
+                            'total_question' => $quiz_aspect_request['total_question'],
+                        ]);
+
+                        if (!$quiz_aspect) {
+                            DB::rollBack();
+                            return redirect()
+                                ->back()
+                                ->with(['failed' => 'Gagal Simpan Aspek Test'])
                                 ->withInput();
                         }
                     }
-
-                    DB::commit();
-                    return redirect()
-                        ->route('admin.quiz.index')
-                        ->with(['success' => 'Berhasil Simpan Test']);
-                } else {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => 'Gagal Perbarui Akses Test'])
-                        ->withInput();
                 }
+
+                if (!empty($last_quiz_aspect)) {
+                    $quiz_aspect_destroy = QuizAspect::whereIn('id', $last_quiz_aspect)
+                        ->update(['deleted_at' => date('Y-m-d H:i:s')]);
+
+                    if (!$quiz_aspect_destroy) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Hapus Aspek Test'])
+                            ->withInput();
+                    }
+                }
+
+                DB::commit();
+                return redirect()
+                    ->route('admin.quiz.index')
+                    ->with(['success' => 'Berhasil Simpan Test']);
             } else {
                 return redirect()
                     ->back()
