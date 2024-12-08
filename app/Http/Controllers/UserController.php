@@ -49,14 +49,6 @@ class UserController extends Controller
                 $user_role = ucwords(implode(' ', $exploded_raw_role));
                 return $user_role;
             })
-            ->addColumn('tipe', function ($data) {
-                $list_view = '<ul>';
-                foreach ($data->userTypeAccess as $user_access) {
-                    $list_view .= '<li>' . $user_access->typeUser->name . '</li>';
-                }
-                $list_view .= '</ul>';
-                return $list_view;
-            })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
                 $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
@@ -71,8 +63,8 @@ class UserController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['name', 'username', 'email', 'role', 'tipe', 'action'])
-            ->rawColumns(['action', 'tipe'])
+            ->only(['name', 'username', 'email', 'role', 'action'])
+            ->rawColumns(['action'])
             ->make(true);
 
         return $dataTable;
@@ -145,18 +137,6 @@ class UserController extends Controller
                         'otp_expired_at' => $otp_expiry
                     ]);
                     $user_role = $add_user->assignRole('user');
-                }
-
-                if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
-                    $type_user_access_request = [];
-                    foreach ($request->type_of_user as $type_user_id) {
-                        $type_user_access_request[] = [
-                            'user_id' => $add_user->id,
-                            'type_user_id' => $type_user_id,
-                        ];
-                    }
-
-                    TypeUserAccess::insert($type_user_access_request);
                 }
 
                 //nanti apus lagi
@@ -256,21 +236,6 @@ class UserController extends Controller
                     /**
                      * Validation Password Request
                      */
-                    $deleted_user_type_access = TypeUserAccess::where('user_id', $user->id)->delete();
-
-                    // Cek jika berhasil menghapus atau memang tidak ada data
-                    if ($deleted_user_type_access !== false) {
-                        $type_user_access_request = [];
-                        foreach ($request->type_of_user as $type_user_id) {
-                            $type_user_access_request[] = [
-                                'user_id' => $user->id,
-                                'type_user_id' => $type_user_id,
-                            ];
-                        }
-                        TypeUserAccess::insert($type_user_access_request);
-                    }
-
-
 
                     if (isset($request->password)) {
 

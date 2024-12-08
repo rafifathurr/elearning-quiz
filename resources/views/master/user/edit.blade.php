@@ -35,25 +35,6 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="type_of_user">Tipe User <span class="text-danger">*</span></label>
-                                    <input type="hidden" id="value_type_user"
-                                        value="{{ json_encode($user->userTypeAccess->pluck('type_user_id')->toArray()) }}">
-                                    <select class="form-control @error('type_of_user[]') is-invalid @enderror"
-                                        name="type_of_user[]" id="type_of_user" data-placeholder="Pilih Tipe User"
-                                        style="width: 100%;" required {{ $disabled }}>
-                                        @foreach ($type_user as $type_of_user)
-                                            <option value="{{ $type_of_user->id }}" selected>
-                                                {{ $type_of_user->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('type_of_user[]')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
                                     <label for="name">Nama <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
                                         id="name" name="name" placeholder="Nama"
@@ -80,8 +61,8 @@
 
                                 <div class="form-group">
                                     <label for="roles">Role <span class="text-danger">*</span></label>
-                                    <select class="form-control select2bs4 @error('roles') is-invalid @enderror"
-                                        id="roles" name="roles" required>
+                                    <select class="form-control @error('roles') is-invalid @enderror" id="roles"
+                                        name="roles" required>
                                         <option disabled hidden selected>Pilih Peran</option>
                                         @foreach ($roles as $role)
                                             @if (old('roles', $user->getRoleNames()[0]) == $role->name)
@@ -152,12 +133,7 @@
     </div>
     @push('javascript-bottom')
         <script>
-            $('#type_of_user').select2({
-                multiple: true,
-            });
-
-            $('#type_of_user').val('').trigger('change');
-            $('#type_of_user').val(JSON.parse($('#value_type_user').val())).trigger('change');
+            $('#roles').select2();
         </script>
         @include('js.master.user.script')
     @endpush

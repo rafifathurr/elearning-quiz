@@ -36,26 +36,6 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-md-4 control-label text-left" for="type_of_user">Tipe User <span
-                                            class="text-danger">*</span></label>
-                                    <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('type_of_user[]') is-invalid @enderror"
-                                            name="type_of_user[]" id="type_of_user" data-placeholder="Pilih Tipe User"
-                                            style="width: 100%;">
-                                            @foreach ($type_user as $type)
-                                                <option value="{{ $type->id }}">
-                                                    {{ $type->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('type_of_user[]')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
                                     <label class="col-md-4 control-label text-left" for="name">Nama <span
                                             class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
@@ -175,9 +155,8 @@
                                         Password <span class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
                                         <input type="password"
-                                            class="form-control @error('re_password') is-invalid @enderror"
-                                            id="re_password" name="re_password" placeholder="Re Password"
-                                            value="{{ old('re_password') }}">
+                                            class="form-control @error('re_password') is-invalid @enderror" id="re_password"
+                                            name="re_password" placeholder="Re Password" value="{{ old('re_password') }}">
 
                                         @error('re_password')
                                             <div class="alert alert-danger mt-2">

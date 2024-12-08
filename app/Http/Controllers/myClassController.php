@@ -161,4 +161,41 @@ class myClassController extends Controller
             return response()->json(['error' => 'Invalid ID'], 403);
         }
     }
+
+    // public function dataTable()
+    // {
+    //     $orderIds = Order::where('user_id', Auth::user()->id)
+    //         ->whereNull('deleted_at')
+    //         ->where('status', 100)
+    //         ->pluck('id');
+
+
+    //     $myClass = OrderPackage::whereIn('order_id', $orderIds)
+    //         ->whereNull('deleted_at')
+    //         ->whereNotNull('class')
+    //         ->get();
+
+    //     return DataTables::of($myClass)
+    //         ->addIndexColumn()
+    //         ->addColumn('package', function ($data) {
+    //             return $data->package->name;
+    //         })
+    //         ->addColumn('class', function ($data) {
+    //             return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
+    //         })
+
+    //         ->addColumn('action', function ($data) {
+    //             $encryptedOrderId = encrypt($data->order_id);
+    //             $encryptedPackageId = encrypt($data->package_id);
+
+    //             $btn_action = '<div align="center">';
+    //             $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $encryptedOrderId, 'packageId' => $encryptedPackageId]) . '" class="btn btn-sm btn-success">Test</a>';
+    //             $btn_action .= '</div>';
+    //             return $btn_action;
+    //         })
+
+    //         ->only(['package', 'class', 'action'])
+    //         ->rawColumns(['action'])
+    //         ->make(true);
+    // }
 }

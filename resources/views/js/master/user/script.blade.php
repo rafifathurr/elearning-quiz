@@ -57,10 +57,6 @@
                     defaultContent: '-',
                 },
                 {
-                    data: 'tipe',
-                    defaultContent: '-',
-                },
-                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',
