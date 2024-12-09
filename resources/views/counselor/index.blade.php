@@ -21,12 +21,14 @@
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-classadmin">
+                                    <table class="table table-bordered table-hover w-100 datatable text-center"
+                                        id="dt-classadmin">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
                                                 <th>Pertemuan Ke</th>
+                                                <th>Total Pertemuan</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

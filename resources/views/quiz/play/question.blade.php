@@ -1,6 +1,6 @@
 <div class="row">
 
-    <div class="col-lg-9 col-md-12">
+    <div class="col-lg-7 col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
@@ -81,7 +81,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-12">
+    <div class="col-lg-5 col-md-12">
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
