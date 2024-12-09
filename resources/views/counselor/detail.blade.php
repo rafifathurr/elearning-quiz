@@ -8,11 +8,18 @@
                         <a href="{{ route('class.index') }}" class="btn btn-primary btn-sm my-2"><i
                                 class="fas fa-arrow-left"></i> Kembali</a>
                         <div class="card">
-                            <div class="card-header">
-                                <h3 class="font-weight-bold">{{ $class->package->name }}</h3>
+                            <div class="card-header ">
+                                <div class="d-flex justify-content-between">
+                                    <h4 class="font-weight-bold">{{ $class->package->name }}</h4>
+                                    <h4 class="font-weight-bold">
+                                        {{ $class->current_meeting == 0 ? 'Belum Memulai Kelas' : 'Pertemuan Terakhir: Pertemuan ' . $class->current_meeting }}
+                                    </h4>
+                                </div>
+
                             </div>
                             <div class="card-body">
-                                <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3">Tambah
+                                <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
+                                    {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Tambah
                                     Test</button>
                                 @if ($listClass->isEmpty())
                                     <form action="{{ route('class.storeMember') }}" method="POST">
@@ -79,9 +86,7 @@
                                                                     <input type="hidden" name="class_id"
                                                                         value="{{ $class->id }}">
                                                                     <td>
-                                                                        <input type="checkbox" name="order_package_id[]"
-                                                                            value="{{ $member->order_package_id }}"
-                                                                            id="order_package{{ $index }}">
+                                                                        <input type="checkbox" name="present">
                                                                     </td>
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ $member->orderPackage->order->user->name }}</td>
@@ -93,7 +98,9 @@
                                             </div>
                                         </div>
 
-                                        <button class="btn btn-success">Mulai</button>
+                                        <button class="btn btn-success"
+                                            {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Mulai
+                                            Kelas</button>
                                     </form>
                                 @endif
                             </div>

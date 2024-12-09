@@ -102,48 +102,98 @@ class myClassAdminController extends Controller
     public function show($id)
     {
         try {
+
             $class = ClassPackage::find($id);
 
-            $listOrder = OrderPackage::whereNull('deleted_at')->where('package_id', $class->package_id)->get();
+            $listOrder = OrderPackage::whereHas('order', function ($query) {
+                $query->whereNull('deleted_at')->where('status', 100);
+            })->whereNull('deleted_at')
+                ->where('package_id', $class->package_id)
+                ->get();
 
-            $listClass = ClassAttendance::where('class_id', $id)->get();
+            $listClass = ClassAttendance::where('class_id', $id)
+                ->select('order_package_id')
+                ->distinct()
+                ->with(['orderPackage.order.user'])
+                ->get();
+
 
             return view('counselor.detail', compact('class', 'listClass', 'listOrder'));
         } catch (Exception $e) {
-            session()->flash('failed', $e->getMessage());
+
+            dd($e->getMessage());
         }
     }
 
 
 
+
     public function storeMember(Request $request)
     {
-        DB::beginTransaction(); // Mulai transaksi
+        DB::beginTransaction();
+
         try {
+            $request->validate([
+                'class_id' => 'required|exists:class_packages,id',
+                'order_package_id.*' => 'nullable|exists:order_packages,id'
+            ]);
+
             $class_attendance = [];
 
-            foreach ($request->order_package_id as $order) {
-                $class_attendance[] = [
-                    'order_package_id' => $order,
-                    'class_id' => $request->class_id,
-                ];
-            };
+            $class = ClassPackage::find($request->class_id);
+            $currentMeeting = $class->current_meeting ?? 0;
+            $class_update = $class->update([
+                'current_meeting' => $currentMeeting + 1
+            ]);
+
+
+            if (isset($request->order_package_id)) {
+                foreach ($request->order_package_id as $order) {
+                    $class_attendance[] = [
+                        'order_package_id' => $order,
+                        'class_id' => $request->class_id,
+                        'attendance' => 'present',
+                        'attendance_date' => now()
+                    ];
+                }
+            } else {
+                $present = $request->has('present') ? 'present' : 'not present';
+
+                ClassAttendance::where('class_id', $request->class_id)
+                    ->select('order_package_id', 'class_id') // Pilih kolom yang relevan
+                    ->distinct() // Hindari data duplikat berdasarkan kolom yang dipilih
+                    ->chunk(100, function ($attendances) use (&$class_attendance, $present) {
+                        foreach ($attendances as $attendance) {
+                            $class_attendance[] = [
+                                'order_package_id' => $attendance->order_package_id,
+                                'class_id' => $attendance->class_id,
+                                'attendance' => $present,
+                                'attendance_date' => now()
+                            ];
+                        }
+                    });
+            }
+
+            if (empty($class_attendance)) {
+                DB::rollBack();
+                return redirect()->back()->with(['failed' => 'Tidak ada data kehadiran untuk ditambahkan.']);
+            }
 
             $add_class_attendance = ClassAttendance::insert($class_attendance);
+
 
             if (Session::has('test')) {
                 $test = Session::get('test');
 
 
-                if (!isset($test['quiz_id'], $test['open_quiz'], $test['close_quiz'])) {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => 'Tidak Ditemukan']);
-                }
-
-
                 foreach ($class_attendance as $attendance) {
                     $orderPackage = OrderPackage::find($attendance['order_package_id']);
+
+                    if (!$orderPackage) {
+                        DB::rollBack();
+                        return redirect()->back()->with(['failed' => 'Order Package tidak ditemukan.']);
+                    }
+
                     $updated = OrderDetail::where('order_id', $orderPackage->order_id)
                         ->where('package_id', $orderPackage->package_id)
                         ->where('quiz_id', $test['quiz_id'])
@@ -153,30 +203,31 @@ class myClassAdminController extends Controller
                         ]);
 
                     if (!$updated) {
-                        return redirect()
-                            ->back()
-                            ->with(['failed' => 'Gagal Menambahkan Anggota Kelas.']);
+                        DB::rollBack();
+                        return redirect()->back()->with(['failed' => 'Gagal memperbarui detail order untuk Order ID: ' . $orderPackage->order_id]);
                     }
                 }
+
+
                 Session::forget('test');
             }
 
 
-            if ($add_class_attendance) {
-                DB::commit(); // Commit transaksi
-                return redirect()
-                    ->back()
-                    ->with(['success' => 'Berhasil Menambahkan Anggota Kelas']);
+
+            if ($add_class_attendance && $class_update) {
+                DB::commit();
+                return redirect()->back()->with(['success' => 'Berhasil Menambahkan Anggota Kelas']);
             } else {
                 DB::rollBack();
-                return redirect()
-                    ->back()
-                    ->with(['failed' => 'Gagal Menambahkan Anggota Kelas']);
+                return redirect()->back()->with(['failed' => 'Gagal Menambahkan Anggota Kelas']);
             }
         } catch (Exception $e) {
+            DB::rollBack();
             session()->flash('failed', $e->getMessage());
+            return redirect()->back();
         }
     }
+
 
     public function storeTest(Request $request)
     {
