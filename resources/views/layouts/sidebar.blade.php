@@ -30,15 +30,17 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('mytest.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-book"></i>
-                        <p>
-                            My Test
-                        </p>
-                    </a>
-                </li>
+
                 @hasrole('user')
+                    <li class="nav-item">
+                        <a href="{{ route('mytest.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>
+                                My Test
+                            </p>
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a href="{{ route('myclass.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>
@@ -48,44 +50,43 @@
                         </a>
                     </li>
                 @endhasrole
-                <li class="nav-item">
-                    <?php
-                    $orderIds = App\Models\Order::whereNull('deleted_at')
-                        ->where('user_id', Auth::user()->id)
-                        ->where('status', 1)
-                        ->pluck('id');
-                    $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
-                    $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
-                    ?>
-                    <a href="{{ route('order.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-shopping-cart"></i>
-                        <p>
-                            @hasrole('admin')
-                                Daftar Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
-                            @else
-                                My Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
-                            @endhasrole
-                        </p>
-                    </a>
-                </li>
-                {{-- <li class="nav-item">
-                        <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
+
+                @hasanyrole('admin|user')
+                    <li class="nav-item">
+                        <?php
+                        $orderIds = App\Models\Order::whereNull('deleted_at')
+                            ->where('user_id', Auth::user()->id)
+                            ->where('status', 1)
+                            ->pluck('id');
+                        $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                        $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
+                        ?>
+                        <a href="{{ route('order.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
-                                Daftar Quiz
+                                @hasrole('admin')
+                                    Daftar Order <span
+                                        class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
+                                @else
+                                    My Order <span
+                                        class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
+                                @endhasrole
                             </p>
                         </a>
                     </li>
+                @endhasanyrole
+
+
+                @hasrole('counselor')
                     <li class="nav-item">
-                        <a href="{{ route('quiz.historyQuiz') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
+                        <a href="{{ route('class.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
-                                Riwayat Quiz
+                                My Class
                             </p>
                         </a>
-                    </li> --}}
+                    </li>
+                @endhasrole
 
                 @hasrole('admin')
                     <li class="nav-item">
@@ -121,24 +122,6 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('class.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-chalkboard"></i>
-                            <p>
-                                My Class
-                            </p>
-                        </a>
-                    </li>
-
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('master.payment.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-credit-card"></i>
-                            <p>
-                                Payment Package
-                            </p>
-                        </a>
-                    </li> --}}
-
 
                     <li class="nav-item">
                         <a href="{{ route('master.user.index') }}" class="nav-link">
@@ -161,5 +144,32 @@
         </nav>
         <!-- /.sidebar-menu -->
     </div>
+
     <!-- /.sidebar -->
 </aside>
+
+{{-- <li class="nav-item">
+    <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
+        <i class="nav-icon fas fa-book"></i>
+        <p>
+            Daftar Quiz
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ route('quiz.historyQuiz') }}" class="nav-link">
+        <i class="nav-icon fas fa-book"></i>
+        <p>
+            Riwayat Quiz
+        </p>
+    </a>
+</li> --}}
+
+{{-- <li class="nav-item">
+    <a href="{{ route('master.payment.index') }}" class="nav-link">
+        <i class="nav-icon fas fa-credit-card"></i>
+        <p>
+            Payment Package
+        </p>
+    </a>
+</li> --}}

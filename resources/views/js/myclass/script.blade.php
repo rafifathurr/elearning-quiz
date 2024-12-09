@@ -121,11 +121,11 @@
                     searchable: false
                 },
                 {
-                    data: 'name',
+                    data: 'package',
                     defaultContent: '-'
                 },
                 {
-                    data: 'class',
+                    data: 'current_meeting',
                     defaultContent: '-'
                 },
                 {

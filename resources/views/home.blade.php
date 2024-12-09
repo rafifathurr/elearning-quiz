@@ -52,10 +52,11 @@
                                         </div>
                                         <div class="card-footer bg-white">
                                             <div class="d-flex justify-content-end">
-                                                <button onclick="checkOut({{ $test->id }}, '{{ $test->name }}')"
-                                                    class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-shopping-cart"></i> Checkout</button>
-
+                                                @hasrole('user')
+                                                    <button onclick="checkOut({{ $test->id }}, '{{ $test->name }}')"
+                                                        class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-shopping-cart"></i> Checkout</button>
+                                                @endhasrole
                                             </div>
                                         </div>
                                     </div>
@@ -93,9 +94,11 @@
                                         </div>
                                         <div class="card-footer bg-white">
                                             <div class="d-flex justify-content-end">
-                                                <button onclick="checkOut({{ $class->id }}, '{{ $class->name }}')"
-                                                    class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-shopping-cart"></i> Checkout</button>
+                                                @hasrole('user')
+                                                    <button onclick="checkOut({{ $class->id }}, '{{ $class->name }}')"
+                                                        class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-shopping-cart"></i> Checkout</button>
+                                                @endhasrole
                                             </div>
                                         </div>
                                     </div>

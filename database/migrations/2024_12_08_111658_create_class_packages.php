@@ -15,9 +15,8 @@ return new class extends Migration
             $table->engine = 'InnoDB';
             $table->integer('id')->autoIncrement();
             $table->integer('user_id');
-            $table->integer('order_package_id');
-            $table->string('attendance')->nullable();
-            $table->integer('current_meeting');
+            $table->integer('package_id');
+            $table->integer('current_meeting')->default(0);
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('deleted_at')->nullable();
@@ -25,7 +24,7 @@ return new class extends Migration
 
             // Foreign Key
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('order_package_id')->references('id')->on('order_packages');
+            $table->foreign('package_id')->references('id')->on('packages');
         });
     }
 

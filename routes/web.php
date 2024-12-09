@@ -152,11 +152,13 @@ Route::group(['middleware' => ['role:admin']], function () {
         Route::post('approve/{id}', 'approve')->name('approve');
         Route::post('reject/{id}', 'reject')->name('reject');
     });
+});
 
+Route::group(['middleware' => ['role:counselor']], function () {
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('index', 'index')->name('index');
-        Route::get('detail/{id}', 'detail')->name('detail');
-        Route::post('store', 'store')->name('store');
+        Route::post('store-member', 'storeMember')->name('storeMember');
+        Route::post('store-class', 'storeClass')->name('storeClass');
     });
+    Route::resource('class', myClassAdminController::class)->parameters(['class' => 'id']);
 });
