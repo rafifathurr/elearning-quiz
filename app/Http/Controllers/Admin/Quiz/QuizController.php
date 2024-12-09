@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Quiz;
 
 use App\Http\Controllers\Controller;
 use App\Models\AspectQuestion;
+use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizAnswer;
 use App\Models\Quiz\QuizAuthenticationAccess;
@@ -300,9 +301,10 @@ class QuizController extends Controller
 
             // Destroy with Softdelete
             $quiz_destroy = $quiz->update(['deleted_at' => date('Y-m-d H:i:s')]);
+            $deleted_package_test = PackageTest::where('quiz_id', $quiz->id)->delete();
 
             // Validation Destroy Quiz
-            if ($quiz_destroy) {
+            if ($quiz_destroy && $deleted_package_test) {
                 DB::commit();
                 session()->flash('success', 'Berhasil Hapus Quiz');
             } else {
