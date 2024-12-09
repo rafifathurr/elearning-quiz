@@ -306,11 +306,11 @@ class QuizController extends Controller
             // Validation Destroy Quiz
             if ($quiz_destroy && $deleted_package_test) {
                 DB::commit();
-                session()->flash('success', 'Berhasil Hapus Quiz');
+                session()->flash('success', 'Berhasil Hapus Test');
             } else {
                 // Failed and Rollback
                 DB::rollBack();
-                session()->flash('failed', 'Gagal Hapus Quiz');
+                session()->flash('failed', 'Gagal Hapus Test');
             }
         } catch (\Exception $e) {
             session()->flash('failed', $e->getMessage());
