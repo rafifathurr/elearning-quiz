@@ -31,16 +31,20 @@
                     </a>
                 </li>
 
-                @hasrole('user')
-                    <li class="nav-item">
-                        <a href="{{ route('mytest.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>
+                <li class="nav-item">
+                    <a href="{{ route('mytest.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>
+                            @hasrole('user')
                                 My Test
-                            </p>
-                        </a>
-                    </li>
+                            @else
+                                Riwayat Test
+                            @endhasrole
+                        </p>
+                    </a>
+                </li>
 
+                @hasrole('user')
                     <li class="nav-item">
                         <a href="{{ route('myclass.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>

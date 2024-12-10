@@ -153,50 +153,35 @@ class myClassController extends Controller
                             ->whereNull('finish_time')
                             ->first();
 
+                        $review = Result::where('quiz_id', $data->quiz->id)
+                            ->where('user_id', Auth::user()->id)
+                            ->where('order_detail_id', $data->id)
+                            ->whereNotNull('finish_time')
+                            ->first();
+
                         if ($result) {
                             $startTime = \Carbon\Carbon::parse($result->start_time);
                             $endTime = $startTime->copy()->addSeconds($result->time_duration);
 
-                            // Jika waktu sekarang lebih dari endTime, update finish_time
-                            if ($currentDateTime->gt($endTime)) {
+
+                            if ($currentDateTime->lte($endTime)) {
+                                $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            } else {
+                                // Update finish_time jika waktu habis
                                 $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
                                 $result->update([
                                     'finish_time' => $endTime,
                                     'total_score' => $total_score
                                 ]);
+
+                                // Setelah waktu habis, langsung tampilkan tombol Review
+                                $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($result->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                             }
-                        }
-
-                        // Cek ulang apakah result ada dan belum selesai
-                        $result = Result::where('quiz_id', $data->quiz->id)
-                            ->where('user_id', Auth::user()->id)
-                            ->where('order_detail_id', $data->id)
-                            ->whereNull('finish_time')
-                            ->first();
-
-                        if ($result) {
-                            $currentDateTime = \Carbon\Carbon::now();
-                            $startTime = \Carbon\Carbon::parse($result->start_time);
-                            $endTime = $startTime->copy()->addSeconds($result->time_duration);
-
-                            if ($currentDateTime->lte($endTime)) {
-                                $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
-                            } else {
-                                $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
-                            }
+                        } elseif ($review) {
+                            $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                         } else {
                             $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
                         }
-                    }
-                    //ada riwayat test
-                    $hasHistory = Result::where('quiz_id', $data->quiz->id)
-                        ->where('user_id', Auth::user()->id)
-                        ->where('order_detail_id', $data->id)
-                        ->whereNotNull('finish_time')
-                        ->exists();
-
-                    if ($hasHistory) {
-                        $btn_action .= '<a href="' . route('mytest.history', ['order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-primary mx-2">Riwayat</a>';
                     }
 
                     $btn_action .= '</div>';

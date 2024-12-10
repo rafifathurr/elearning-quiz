@@ -8,6 +8,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Result;
 use App\Models\ResultDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -21,25 +22,41 @@ class myTestController extends Controller
     }
     public function dataTable()
     {
-        $orderIds = Order::where('user_id', Auth::user()->id)
-            ->whereNull('deleted_at')
-            ->where('status', 100)
-            ->pluck('id');
+        if (User::find(Auth::user()->id)->hasRole('user')) {
+            $orderIds = Order::where('user_id', Auth::user()->id)
+                ->whereNull('deleted_at')
+                ->where('status', 100)
+                ->pluck('id');
+            $orderPackageIds = OrderPackage::whereIn('order_id', $orderIds)
+                ->whereNull('deleted_at')
+                ->whereNull('class')
+                ->pluck('package_id');
+
+            $myTest = OrderDetail::whereIn('order_id', $orderIds)
+                ->whereIn('package_id', $orderPackageIds)
+                ->whereNull('deleted_at')
+                ->get();
+        } else {
+            $orderIds = Order::whereNull('deleted_at')
+                ->where('status', 100)
+                ->pluck('id');
+
+            $orderPackageIds = OrderPackage::whereIn('order_id', $orderIds)
+                ->whereNull('deleted_at')
+                ->pluck('package_id');
+
+            $orderDetailIds = Result::whereNotNull('finish_time')
+                ->pluck('order_detail_id');
+
+            $myTest = OrderDetail::whereIn('id', $orderDetailIds)
+                ->whereIn('order_id', $orderIds)
+                ->whereIn('package_id', $orderPackageIds)
+                ->whereNull('deleted_at')
+                ->get();
+        }
 
 
-        $orderPackageIds = OrderPackage::whereIn('order_id', $orderIds)
-            ->whereNull('deleted_at')
-            ->whereNull('class')
-            ->pluck('package_id');
-
-
-        $orderDetails = OrderDetail::whereIn('order_id', $orderIds)
-            ->whereIn('package_id', $orderPackageIds)
-            ->whereNull('deleted_at')
-            ->get();
-
-
-        return DataTables::of($orderDetails)
+        return DataTables::of($myTest)
             ->addIndexColumn()
             ->addColumn('package', function ($data) {
                 return $data->package->name;
@@ -54,42 +71,49 @@ class myTestController extends Controller
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
 
-                $result = Result::where('quiz_id', $data->quiz->id)
-                    ->where('user_id', Auth::user()->id)
-                    ->where('order_detail_id', $data->id)
-                    ->whereNull('finish_time')
-                    ->first();
+                if (User::find(Auth::user()->id)->hasRole('user')) {
+                    $result = Result::where('quiz_id', $data->quiz->id)
+                        ->where('user_id', Auth::user()->id)
+                        ->where('order_detail_id', $data->id)
+                        ->whereNull('finish_time')
+                        ->first();
 
-                $review = Result::where('quiz_id', $data->quiz->id)
-                    ->where('user_id', Auth::user()->id)
-                    ->where('order_detail_id', $data->id)
-                    ->whereNotNull('finish_time')
-                    ->first();
+                    $review = Result::where('quiz_id', $data->quiz->id)
+                        ->where('user_id', Auth::user()->id)
+                        ->where('order_detail_id', $data->id)
+                        ->whereNotNull('finish_time')
+                        ->first();
 
-                if ($result) {
-                    $currentDateTime = \Carbon\Carbon::now();
-                    $startTime = \Carbon\Carbon::parse($result->start_time);
-                    $endTime = $startTime->copy()->addSeconds($result->time_duration);
+                    if ($result) {
+                        $currentDateTime = \Carbon\Carbon::now();
+                        $startTime = \Carbon\Carbon::parse($result->start_time);
+                        $endTime = $startTime->copy()->addSeconds($result->time_duration);
 
-                    if ($currentDateTime->lte($endTime)) {
-                        $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                        if ($currentDateTime->lte($endTime)) {
+                            $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                        } else {
+                            // Update finish_time jika waktu habis
+                            $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
+                            $result->update([
+                                'finish_time' => $endTime,
+                                'total_score' => $total_score
+                            ]);
+
+                            // Setelah waktu habis, langsung tampilkan tombol Review
+                            $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($result->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                        }
+                    } elseif ($review) {
+                        $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                     } else {
-                        // Update finish_time jika waktu habis
-                        $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
-                        $result->update([
-                            'finish_time' => $endTime,
-                            'total_score' => $total_score
-                        ]);
-
-                        // Setelah waktu habis, langsung tampilkan tombol Review
-                        $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($result->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                        $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
                     }
-                } elseif ($review) {
-                    $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                 } else {
-                    $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                    $review = Result::where('quiz_id', $data->quiz->id)
+                        ->where('order_detail_id', $data->id)
+                        ->whereNotNull('finish_time')
+                        ->first();
+                    $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                 }
-
                 $btn_action .= '</div>';
                 return $btn_action;
             })
