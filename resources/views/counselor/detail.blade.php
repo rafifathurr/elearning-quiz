@@ -1,5 +1,15 @@
 @extends('layouts.section')
 @section('content')
+    <style>
+        input[type="checkbox"].custom-disabled:disabled:checked {
+            background-color: #007bff;
+            /* Warna biru */
+            border-color: #007bff;
+            pointer-events: none;
+            opacity: 1;
+            /* Supaya tidak abu-abu */
+        }
+    </style>
     <div class="px-3 py-4">
         <section class="content">
             <div class="container-fluid">
@@ -118,6 +128,25 @@
                                     <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
                                         {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
                                         Test</button>
+
+
+                                    <div class="col-lg-4 my-3">
+                                        <form method="get" id="filter-form"
+                                            action="{{ route('class.show', $class->id) }}">
+                                            <select name="filter_data" id="filter_data" class="form-control"
+                                                onchange="document.getElementById('filter-form').submit();">
+                                                <option value="">Pilih Tanggal</option>
+                                                @foreach ($filterDate as $filter)
+                                                    <option value="{{ $filter->attendance_date }}"
+                                                        {{ $selectedDate == $filter->attendance_date ? 'selected' : '' }}>
+                                                        {{ \Carbon\Carbon::parse($filter->attendance_date)->translatedFormat('d F Y') }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    </div>
+
+
                                     <form method="post" id="form-daftar-peserta"
                                         action="{{ route('class.storeAttendance') }}">
                                         @csrf
@@ -131,7 +160,7 @@
                                                         class="table table-bordered table-hover text-center">
                                                         <thead>
                                                             <tr>
-                                                                <th>#</th>
+                                                                <th>Kehadiran</th>
                                                                 <th>No</th>
                                                                 <th>Nama Anggota</th>
                                                             </tr>
@@ -144,7 +173,10 @@
                                                                     <td>
                                                                         <input type="checkbox"
                                                                             name="attendance[{{ $member->orderPackage->id }}]"
-                                                                            value="1">
+                                                                            value="1"
+                                                                            class="{{ $selectedDate ? 'custom-disabled' : '' }}"
+                                                                            {{ $member->attendance == 1 ? 'checked' : '' }}
+                                                                            {{ $selectedDate ? 'disabled' : '' }}>
                                                                     </td>
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ $member->orderPackage->order->user->name }}</td>
@@ -156,9 +188,11 @@
                                             </div>
                                         </div>
 
-                                        <button class="btn btn-success my-3"
-                                            {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
+                                        @if (!$selectedDate)
+                                            <button class="btn btn-success my-3">Absensi</button>
+                                        @endif
                                     </form>
+
                                 @endif
                             </div>
                         </div>

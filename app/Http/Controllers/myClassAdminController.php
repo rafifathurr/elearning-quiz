@@ -99,10 +99,9 @@ class myClassAdminController extends Controller
     }
 
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         try {
-
             $class = ClassPackage::find($id);
 
             $listOrder = OrderPackage::whereHas('order', function ($query) {
@@ -111,23 +110,42 @@ class myClassAdminController extends Controller
                 ->where('package_id', $class->package_id)
                 ->get();
 
-            $listClass = ClassAttendance::where('class_id', $id)
-                ->select('order_package_id')
+            $filterDate = ClassAttendance::where('class_id', $id)
+                ->select('attendance_date')
                 ->distinct()
-                ->with(['orderPackage.order.user'])
+                ->orderBy('attendance_date', 'asc')
                 ->get();
+
+            // Filter data berdasarkan tanggal yang dipilih
+            $selectedDate = $request->get('filter_data');
+
+            if ($selectedDate) {
+                $listClass = ClassAttendance::where('class_id', $id)
+                    ->when($selectedDate, function ($query, $selectedDate) {
+                        return $query->where('attendance_date', $selectedDate);
+                    })
+                    ->with(['orderPackage.order.user'])
+                    ->get();
+            } else {
+                $listClass = ClassAttendance::where('class_id', $id)
+                    ->select('order_package_id')
+                    ->distinct()
+                    ->with(['orderPackage.order.user'])
+                    ->get();
+            }
+
+
             $listMember = null;
             if (Session::has('new_member')) {
                 $listMember = Session::get('new_member');
             }
 
-
-            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'listMember'));
+            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate'));
         } catch (Exception $e) {
-
             dd($e->getMessage());
         }
     }
+
 
 
 
