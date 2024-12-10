@@ -1,6 +1,6 @@
 <div class="row">
 
-    <div class="col-lg-7 col-md-12">
+    <div class="col-lg-8 col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
@@ -81,29 +81,27 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-5 col-md-12">
+
+    <div class="col-lg-4 col-md-12">
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title mb-0 font-weight-bold my-auto">
                     Nomor Soal
                 </h2>
             </div>
-            <div class="card-body p-3">
-                <div class="d-flex flex-wrap justify-content-xl-center justify-content-md-center">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-center" style="gap: 8px;">
                     @foreach ($questionList as $quiz_question_list)
-                        <div class="p-0">
-                            <div class="card m-2 px-2 
-                        @if ($quiz_question_list['is_active']) bg-primary text-white 
+                        <div class="card" style="width: 18%;">
+                            <div class="card-body d-flex justify-content-center align-items-center  @if ($quiz_question_list['is_active']) bg-primary text-white 
                         @elseif($quiz_question_list['answered']) bg-success text-white 
                         @else bg-light text-dark @endif"
                                 @if ($quiz['type_aspect'] == 'kepribadian') onclick="navigateToQuestion(this)"
                         data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
                         data-q="{{ $quiz_question_list['question_number'] }}" style="cursor: pointer;" @endif>
-                                <div class="card-body">
-                                    <h5 class="font-weight-bold text-center my-auto">
-                                        {{ $quiz_question_list['question_number'] }}
-                                    </h5>
-                                </div>
+                                <h5 class="font-weight-bold text-center mb-0">
+                                    {{ $quiz_question_list['question_number'] }}
+                                </h5>
                             </div>
                         </div>
                     @endforeach
