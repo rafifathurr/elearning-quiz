@@ -118,7 +118,8 @@
                                     <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
                                         {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
                                         Test</button>
-                                    <form method="post" action="{{ route('class.storeAttendance') }}">
+                                    <form method="post" id="form-daftar-peserta"
+                                        action="{{ route('class.storeAttendance') }}">
                                         @csrf
                                         <div class="card">
                                             <div class="card-header bg-gradient-gray">
