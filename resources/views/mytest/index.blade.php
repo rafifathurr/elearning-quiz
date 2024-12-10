@@ -12,7 +12,13 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">My Test</h3>
+                                <h3 class="font-weight-bold">
+                                    @hasrole('user')
+                                        My Test
+                                    @else
+                                        Riwayat Test
+                                    @endhasrole
+                                </h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
