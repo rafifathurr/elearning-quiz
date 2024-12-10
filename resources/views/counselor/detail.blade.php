@@ -2,12 +2,33 @@
 @section('content')
     <style>
         input[type="checkbox"].custom-disabled:disabled:checked {
-            background-color: #007bff;
-            /* Warna biru */
-            border-color: #007bff;
-            pointer-events: none;
-            opacity: 1;
-            /* Supaya tidak abu-abu */
+            appearance: none;
+            /* Hilangkan tampilan default browser */
+            -webkit-appearance: none;
+
+            width: 20px;
+            /* Ukuran kotak checkbox */
+            height: 20px;
+            /* Sesuaikan dengan kebutuhan */
+            display: inline-block;
+            position: relative;
+            cursor: not-allowed;
+            /* Menandakan checkbox tidak bisa diubah */
+        }
+
+        input[type="checkbox"].custom-disabled:disabled:checked::after {
+            content: '✔';
+            /* Tanda centang */
+            color: white;
+            /* Warna centang */
+            font-size: 14px;
+            display: block;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
     </style>
     <div class="px-3 py-4">
@@ -178,6 +199,7 @@
                                                                             {{ $member->attendance == 1 ? 'checked' : '' }}
                                                                             {{ $selectedDate ? 'disabled' : '' }}>
                                                                     </td>
+
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ $member->orderPackage->order->user->name }}</td>
                                                                 </tr>
