@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassAttendance;
+use App\Models\ClassPackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -116,14 +118,18 @@ class OrderController extends Controller
             $user_id = Auth::user()->id;
             $package  = Package::find($id);
 
-            $on_going_class = OrderPackage::whereHas('order', function ($query) use ($user_id) {
+            $orderPackageId = OrderPackage::whereHas('order', function ($query) use ($user_id) {
                 $query->where('user_id', $user_id)
                     ->where('status', 100);
             })
                 ->whereNull('deleted_at')
                 ->whereNotNull('class')
                 ->where('package_id', $id)
-                ->whereColumn('current_class', '<', 'class')
+                ->pluck('id');
+
+            $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
+            $on_going_class = ClassPackage::whereIn('id', $classId)
+                ->whereColumn('current_meeting', '<', 'total_meeting')
                 ->exists();
 
             if ($on_going_class) {
