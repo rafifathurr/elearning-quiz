@@ -152,26 +152,24 @@ class myClassAdminController extends Controller
                     $class_attendance[] = [
                         'order_package_id' => $order,
                         'class_id' => $request->class_id,
-                        'attendance' => 'present',
+                        'attendance' => 1,
                         'attendance_date' => now()
                     ];
                 }
             } else {
-                $present = $request->has('present') ? 'present' : 'not present';
-
-                ClassAttendance::where('class_id', $request->class_id)
-                    ->select('order_package_id', 'class_id') // Pilih kolom yang relevan
-                    ->distinct() // Hindari data duplikat berdasarkan kolom yang dipilih
-                    ->chunk(100, function ($attendances) use (&$class_attendance, $present) {
-                        foreach ($attendances as $attendance) {
-                            $class_attendance[] = [
-                                'order_package_id' => $attendance->order_package_id,
-                                'class_id' => $attendance->class_id,
-                                'attendance' => $present,
-                                'attendance_date' => now()
-                            ];
-                        }
-                    });
+                $attendances = $request->input('attendance', []); // Default kosong jika tidak ada data
+                $class_order_packages = ClassAttendance::where('class_id', $request->class_id)
+                    ->select('order_package_id', 'class_id')
+                    ->distinct()
+                    ->get();
+                foreach ($class_order_packages as $attendance) {
+                    $class_attendance[] = [
+                        'order_package_id' => $attendance->order_package_id,
+                        'class_id' => $attendance->class_id,
+                        'attendance' => isset($attendances[$attendance->order_package_id]) ? 1 : 0,
+                        'attendance_date' => now(),
+                    ];
+                }
             }
 
             if (empty($class_attendance)) {
@@ -223,7 +221,7 @@ class myClassAdminController extends Controller
             }
         } catch (Exception $e) {
             DB::rollBack();
-            session()->flash('failed', $e->getMessage());
+            dd($e->getMessage());
             return redirect()->back();
         }
     }

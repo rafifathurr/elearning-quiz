@@ -25,6 +25,9 @@
                                                 <th>No</th>
                                                 <th>Nama Test</th>
                                                 <th>Tipe Test</th>
+                                                <th>Waktu Test Dibuka</th>
+                                                <th>Waktu Test Ditutup</th>
+                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassAttendance;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -21,13 +22,18 @@ class myClassController extends Controller
     }
     public function dataTable()
     {
+        // Ambil semua `order_id` yang sesuai dengan user saat ini
         $orderIds = Order::where('user_id', Auth::user()->id)
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->pluck('id');
 
+        // Ambil semua `order_package_id` yang ada di `ClassAttendance`
+        $orderPackageIdsInClass = ClassAttendance::pluck('order_package_id')->toArray();
 
+        // Filter `OrderPackage` berdasarkan `order_id` dan `order_package_id` yang ada di `ClassAttendance`
         $myClass = OrderPackage::whereIn('order_id', $orderIds)
+            ->whereIn('id', $orderPackageIdsInClass) // filter
             ->whereNull('deleted_at')
             ->whereNotNull('class')
             ->get();
@@ -40,7 +46,6 @@ class myClassController extends Controller
             ->addColumn('class', function ($data) {
                 return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
             })
-
             ->addColumn('action', function ($data) {
                 $encryptedOrderId = encrypt($data->order_id);
                 $encryptedPackageId = encrypt($data->package_id);
@@ -50,11 +55,11 @@ class myClassController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-
             ->only(['package', 'class', 'action'])
             ->rawColumns(['action'])
             ->make(true);
     }
+
 
     public function detail($orderId, $packageId)
     {
@@ -87,6 +92,8 @@ class myClassController extends Controller
             $detailPackage = OrderDetail::where('order_id', $decryptedOrderId)
                 ->where('package_id', $decryptedPackageId)
                 ->whereNull('deleted_at')
+                ->whereNotNull('open_quiz')
+                ->whereNotNull('close_quiz')
                 ->get();
 
             return DataTables::of($detailPackage)
@@ -97,50 +104,91 @@ class myClassController extends Controller
                 ->addColumn('type_quiz', function ($data) {
                     return $data->quiz->type_aspect;
                 })
+                ->addColumn('open_quiz', function ($data) {
+                    return \Carbon\Carbon::parse($data->open_quiz)->translatedFormat('d F Y H:i');
+                })
+                ->addColumn('close_quiz', function ($data) {
+                    return \Carbon\Carbon::parse($data->close_quiz)->translatedFormat('d F Y H:i');
+                })
+                ->addColumn('status', function ($data) {
+                    $currentDateTime = \Carbon\Carbon::now();
+                    $openQuizDateTime = $data->open_quiz
+                        ? \Carbon\Carbon::parse($data->open_quiz)
+                        : null;
+                    $closeQuizDateTime = $data->close_quiz
+                        ? \Carbon\Carbon::parse($data->close_quiz)
+                        : null;
+
+                    if (
+                        $openQuizDateTime && $closeQuizDateTime &&
+                        $currentDateTime->gte($openQuizDateTime) &&
+                        $currentDateTime->lte($closeQuizDateTime)
+                    ) {
+                        return '<div class="text-success">Buka</div>';
+                    } else {
+                        return '<div class="text-danger">Tutup</div>';
+                    }
+                })
                 ->addColumn('action', function ($data) {
                     $btn_action = '<div align="center">';
 
-                    $result = Result::where('quiz_id', $data->quiz->id)
-                        ->where('user_id', Auth::user()->id)
-                        ->where('order_detail_id', $data->id)
-                        ->whereNull('finish_time')
-                        ->first();
+                    //waktu ipen dan close
+                    $currentDateTime = \Carbon\Carbon::now();
+                    $openQuizDateTime = $data->open_quiz
+                        ? \Carbon\Carbon::parse($data->open_quiz)
+                        : null;
+                    $closeQuizDateTime = $data->close_quiz
+                        ? \Carbon\Carbon::parse($data->close_quiz)
+                        : null;
 
-                    if ($result) {
-                        $currentDateTime = \Carbon\Carbon::now();
-                        $startTime = \Carbon\Carbon::parse($result->start_time);
-                        $endTime = $startTime->copy()->addSeconds($result->time_duration);
+                    if (
+                        $openQuizDateTime && $closeQuizDateTime &&
+                        $currentDateTime->gte($openQuizDateTime) &&
+                        $currentDateTime->lt($closeQuizDateTime)
+                    ) {
 
-                        // Jika waktu sekarang lebih dari endTime, update finish_time
-                        if ($currentDateTime->gt($endTime)) {
-                            $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
-                            $result->update([
-                                'finish_time' => $endTime,
-                                'total_score' => $total_score
-                            ]);
+                        $result = Result::where('quiz_id', $data->quiz->id)
+                            ->where('user_id', Auth::user()->id)
+                            ->where('order_detail_id', $data->id)
+                            ->whereNull('finish_time')
+                            ->first();
+
+                        if ($result) {
+                            $startTime = \Carbon\Carbon::parse($result->start_time);
+                            $endTime = $startTime->copy()->addSeconds($result->time_duration);
+
+                            // Jika waktu sekarang lebih dari endTime, update finish_time
+                            if ($currentDateTime->gt($endTime)) {
+                                $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
+                                $result->update([
+                                    'finish_time' => $endTime,
+                                    'total_score' => $total_score
+                                ]);
+                            }
                         }
-                    }
 
-                    // Cek ulang apakah result ada dan belum selesai
-                    $result = Result::where('quiz_id', $data->quiz->id)
-                        ->where('user_id', Auth::user()->id)
-                        ->where('order_detail_id', $data->id)
-                        ->whereNull('finish_time')
-                        ->first();
+                        // Cek ulang apakah result ada dan belum selesai
+                        $result = Result::where('quiz_id', $data->quiz->id)
+                            ->where('user_id', Auth::user()->id)
+                            ->where('order_detail_id', $data->id)
+                            ->whereNull('finish_time')
+                            ->first();
 
-                    if ($result) {
-                        $currentDateTime = \Carbon\Carbon::now();
-                        $startTime = \Carbon\Carbon::parse($result->start_time);
-                        $endTime = $startTime->copy()->addSeconds($result->time_duration);
+                        if ($result) {
+                            $currentDateTime = \Carbon\Carbon::now();
+                            $startTime = \Carbon\Carbon::parse($result->start_time);
+                            $endTime = $startTime->copy()->addSeconds($result->time_duration);
 
-                        if ($currentDateTime->lte($endTime)) {
-                            $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            if ($currentDateTime->lte($endTime)) {
+                                $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            } else {
+                                $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                            }
                         } else {
                             $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
                         }
-                    } else {
-                        $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
                     }
+                    //ada riwayat test
                     $hasHistory = Result::where('quiz_id', $data->quiz->id)
                         ->where('user_id', Auth::user()->id)
                         ->where('order_detail_id', $data->id)
@@ -154,8 +202,8 @@ class myClassController extends Controller
                     $btn_action .= '</div>';
                     return $btn_action;
                 })
-                ->only(['package', 'quiz', 'type_quiz', 'action'])
-                ->rawColumns(['action'])
+                ->only(['package', 'quiz', 'type_quiz', 'open_quiz', 'close_quiz', 'status', 'action'])
+                ->rawColumns(['status', 'action'])
                 ->make(true);
         } catch (Exception $e) {
             return response()->json(['error' => 'Invalid ID'], 403);

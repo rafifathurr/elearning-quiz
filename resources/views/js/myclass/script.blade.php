@@ -90,6 +90,18 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'open_quiz',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'close_quiz',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'status',
+                    defaultContent: '-'
+                },
+                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',
@@ -185,8 +197,8 @@
                 cancelButton: 'btn btn-danger mb-3',
             },
             buttonsStyling: false,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
             preConfirm: () => {
                 console.log('PreConfirm triggered');
                 const testId = document.getElementById('test').value;

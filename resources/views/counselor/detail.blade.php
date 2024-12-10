@@ -86,7 +86,9 @@
                                                                     <input type="hidden" name="class_id"
                                                                         value="{{ $class->id }}">
                                                                     <td>
-                                                                        <input type="checkbox" name="present">
+                                                                        <input type="checkbox"
+                                                                            name="attendance[{{ $member->orderPackage->id }}]"
+                                                                            value="1">
                                                                     </td>
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ $member->orderPackage->order->user->name }}</td>
