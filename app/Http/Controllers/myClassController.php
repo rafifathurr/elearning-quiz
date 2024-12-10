@@ -17,8 +17,22 @@ class myClassController extends Controller
 {
     public function index()
     {
+        // Ambil semua `order_id` yang sesuai dengan user saat ini
+        $orderIds = Order::where('user_id', Auth::user()->id)
+            ->whereNull('deleted_at')
+            ->where('status', 100)
+            ->pluck('id');
+
+        $orderPackageIdsInClass = ClassAttendance::pluck('order_package_id')->toArray();
+
+        $myClass = OrderPackage::whereIn('order_id', $orderIds)
+            ->whereNotIn('id', $orderPackageIdsInClass) // filter
+            ->whereNull('deleted_at')
+            ->whereNotNull('class')
+            ->get();
+
         $datatable_route = route('myclass.dataTable');
-        return view('myclass.index', compact('datatable_route'));
+        return view('myclass.index', compact('datatable_route', 'myClass'));
     }
     public function dataTable()
     {

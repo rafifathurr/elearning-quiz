@@ -10,6 +10,16 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
+                        @if ($myClass && $myClass->isNotEmpty())
+                            <div class="alert alert-default-info" role="alert">
+                                <h4 class="alert-heading"> Kelas yang belum dimulai</h4>
+                                <hr>
+                                @foreach ($myClass as $class)
+                                    <p class="mb-1">{{ $loop->iteration . '. ' . $class->package->name }}</p>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">My Class</h3>
