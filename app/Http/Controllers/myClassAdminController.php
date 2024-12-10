@@ -116,9 +116,13 @@ class myClassAdminController extends Controller
                 ->distinct()
                 ->with(['orderPackage.order.user'])
                 ->get();
+            $listMember = null;
+            if (Session::has('new_member')) {
+                $listMember = Session::get('new_member');
+            }
 
 
-            return view('counselor.detail', compact('class', 'listClass', 'listOrder'));
+            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'listMember'));
         } catch (Exception $e) {
 
             dd($e->getMessage());
@@ -128,7 +132,7 @@ class myClassAdminController extends Controller
 
 
 
-    public function storeMember(Request $request)
+    public function storeAttendance(Request $request)
     {
         DB::beginTransaction();
 
@@ -205,19 +209,18 @@ class myClassAdminController extends Controller
                         return redirect()->back()->with(['failed' => 'Gagal memperbarui detail order untuk Order ID: ' . $orderPackage->order_id]);
                     }
                 }
-
-
                 Session::forget('test');
             }
 
 
 
             if ($add_class_attendance && $class_update) {
+                Session::forget('new_member');
                 DB::commit();
-                return redirect()->back()->with(['success' => 'Berhasil Menambahkan Anggota Kelas']);
+                return redirect()->back()->with(['success' => 'Berhasil Melakukan Absensi']);
             } else {
                 DB::rollBack();
-                return redirect()->back()->with(['failed' => 'Gagal Menambahkan Anggota Kelas']);
+                return redirect()->back()->with(['failed' => 'Gagal Melakukan Absensi']);
             }
         } catch (Exception $e) {
             DB::rollBack();
@@ -275,6 +278,81 @@ class myClassAdminController extends Controller
             session()->flash('failed', $e->getMessage());
         }
     }
+
+
+    public function storeMember(Request $request)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'order_package_id' => 'required|array', // Harus array
+                'order_package_id.*' => 'exists:order_packages,id', // Validasi ID di database
+                'class_id' => 'required|exists:class_packages,id' // Validasi class_id di database
+            ]);
+
+            // Ambil data yang sudah ada di session
+            $existingMembers = Session::get('new_member', []); // Ambil data lama, default []
+
+            // Data baru
+            $order_packages = [];
+            foreach ($validatedData['order_package_id'] as $package) {
+                $orderPackage = OrderPackage::with('order')->find($package);
+
+                // Periksa apakah kombinasi class_id dan order_package_id sudah ada
+                $isDuplicate = collect($existingMembers)->contains(function ($member) use ($validatedData, $orderPackage) {
+                    return $member['class_id'] == $validatedData['class_id'] && $member['order_package_id'] == $orderPackage->id;
+                });
+
+                // Jika tidak duplikat, tambahkan ke array baru
+                if (!$isDuplicate) {
+                    $order_packages[] = [
+                        'order_package_id' => $orderPackage->id,
+                        'class_id' => $validatedData['class_id'],
+                        'user_name' => $orderPackage->order->user->name
+                    ];
+                }
+            }
+
+            // Gabungkan data baru dengan data lama
+            Session::put('new_member', array_merge($existingMembers, $order_packages));
+
+            // Periksa hasil dari sesi
+            $updatedMembers = Session::get('new_member');
+
+            if (!empty($order_packages)) {
+                return redirect()
+                    ->back()
+                    ->with(['success' => 'Peserta Berhasil Ditambahkan']);
+            } else {
+                return redirect()
+                    ->back()
+                    ->with(['failed' => 'Tidak ada peserta baru yang ditambahkan (semua data sudah ada).']);
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+
+    public function removeMember($index)
+    {
+        $members = Session::get('new_member', []);
+        if (isset($members[$index])) {
+            unset($members[$index]);
+            Session::put('new_member', array_values($members)); // Reset array index
+            session()->flash('success', 'Berhasil Hapus Data Peserta');
+        }
+        session()->flash('failed', 'Gagal Hapus Data Peserta');
+    }
+
+
+
+
+
+
+
 
 
 

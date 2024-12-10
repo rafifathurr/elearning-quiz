@@ -2,10 +2,11 @@
     $(document).ready(function() {
         $('#table-member').DataTable();
     });
-    $('form').submit(function(e) {
+
+    $('#form-tambah-peserta').submit(function(e) {
         e.preventDefault();
         Swal.fire({
-            title: 'Apakah Anda Ingin Memilih Anggota Ini?',
+            title: 'Apakah Anda Ingin Menambahkan Peserta Ini?',
             icon: 'question',
             showCancelButton: true,
             allowOutsideClick: false,
@@ -19,9 +20,32 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 swalProcess();
-                $('form').unbind('submit').submit();
+                $('#form-tambah-peserta').unbind('submit').submit();
             }
-        })
+        });
+    });
+
+
+    $('#form-daftar-peserta').submit(function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Apakah Anda Yakin Ingin Melakukan Absensi?',
+            icon: 'question',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn btn-primary mr-2 mb-3',
+                cancelButton: 'btn btn-danger mb-3',
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalProcess();
+                $('#form-daftar-peserta').unbind('submit').submit()
+            }
+        });
     });
 
     function dataTable() {
@@ -253,5 +277,41 @@
                 });
             }
         });
+    }
+
+    function removeMember(index) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        Swal.fire({
+            title: 'Apakah Anda Yakin Ingin Menghapus Data Ini?',
+            icon: 'question',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn btn-primary mr-2 mb-3',
+                cancelButton: 'btn btn-danger mb-3',
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalProcess();
+                $.ajax({
+                    url: '{{ url('class/remove-member') }}/' + index,
+                    type: 'DELETE',
+                    cache: false,
+                    data: {
+                        _token: token
+                    },
+                    success: function(data) {
+                        location.reload();
+                    },
+                    error: function(xhr, error, code) {
+                        swalError(error);
+                    }
+                });
+            }
+        })
     }
 </script>

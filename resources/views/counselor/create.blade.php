@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Tambah Kelas</h1>
+                    <h1 class="m-0">Buka Kelas</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -50,7 +50,7 @@
                                     <div class="d-flex justify-content-end mt-3">
 
                                         <a href="{{ route('class.index') }}" class="btn btn-danger mr-2">
-                                            Back</a>
+                                            Kembali</a>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </div>
