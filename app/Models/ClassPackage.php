@@ -11,6 +11,6 @@ class ClassPackage extends Model
     protected $guarded = [];
     public function package()
     {
-        return $this->belongsTo(package::class, 'package_id');
+        return $this->belongsTo(Package::class, 'package_id');
     }
 }
