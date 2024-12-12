@@ -162,6 +162,7 @@ Route::group(['middleware' => ['role:counselor']], function () {
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::post('store-attendance', 'storeAttendance')->name('storeAttendance');
+        Route::post('update-attendance', 'updateAttendance')->name('updateAttendance');
         Route::post('store-test', 'storeTest')->name('storeTest');
         Route::post('store-member', 'storeMember')->name('storeMember');
         Route::delete('remove-member/{index}', 'removeMember')->name('removeMember');

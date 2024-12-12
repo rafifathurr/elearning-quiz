@@ -167,52 +167,60 @@
                                         </form>
                                     </div>
 
-
-                                    <form method="post" id="form-daftar-peserta"
-                                        action="{{ route('class.storeAttendance') }}">
-                                        @csrf
-                                        <div class="card">
-                                            <div class="card-header bg-gradient-gray">
-                                                <h5><i class="fas fa-user-friends"></i> DAFTAR ANGGOTA</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="table-responsive py-3">
-                                                    <table id="table-member"
-                                                        class="table table-bordered table-hover text-center">
-                                                        <thead>
+                                    @if ($latestAttendance)
+                                        <form method="post" id="form-daftar-peserta"
+                                            action="{{ route('class.updateAttendance') }}">
+                                        @else
+                                            <form method="post" id="form-daftar-peserta"
+                                                action="{{ route('class.storeAttendance') }}">
+                                    @endif
+                                    @csrf
+                                    <div class="card">
+                                        <div class="card-header bg-gradient-gray">
+                                            <h5><i class="fas fa-user-friends"></i> DAFTAR ANGGOTA</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive py-3">
+                                                <table id="table-member"
+                                                    class="table table-bordered table-hover text-center">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Kehadiran</th>
+                                                            <th>No</th>
+                                                            <th>Nama Anggota</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($listClass as $index => $member)
                                                             <tr>
-                                                                <th>Kehadiran</th>
-                                                                <th>No</th>
-                                                                <th>Nama Anggota</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($listClass as $index => $member)
-                                                                <tr>
-                                                                    <input type="hidden" name="class_id"
-                                                                        value="{{ $class->id }}">
-                                                                    <td>
-                                                                        <input type="checkbox"
-                                                                            name="attendance[{{ $member->orderPackage->id }}]"
-                                                                            value="1"
-                                                                            class="{{ $selectedDate ? 'custom-disabled' : '' }}"
-                                                                            {{ $member->attendance == 1 ? 'checked' : '' }}
-                                                                            {{ $selectedDate ? 'disabled' : '' }}>
-                                                                    </td>
+                                                                <input type="hidden" name="class_id"
+                                                                    value="{{ $class->id }}">
+                                                                <td>
+                                                                    <input type="checkbox"
+                                                                        name="attendance[{{ $member->orderPackage->id }}]"
+                                                                        value="1"
+                                                                        class="{{ $selectedDate ? 'custom-disabled' : '' }}"
+                                                                        {{ $member->attendance == 1 ? 'checked' : '' }}
+                                                                        {{ $selectedDate ? 'disabled' : '' }}>
+                                                                </td>
 
-                                                                    <td>{{ $loop->iteration }}</td>
-                                                                    <td>{{ $member->orderPackage->order->user->name }}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td>{{ $member->orderPackage->order->user->name }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        @if (!$selectedDate)
-                                            <button class="btn btn-success my-3">Absensi</button>
+                                    @if (!$selectedDate)
+                                        <button class="btn btn-success my-3"
+                                            {{ $latestAttendance ? 'disabled' : '' }}>Absensi</button>
+                                        @if ($latestAttendance)
+                                            <button class="btn btn-warning my-3">Ubah Absensi</button>
                                         @endif
+                                    @endif
                                     </form>
 
                                 @endif

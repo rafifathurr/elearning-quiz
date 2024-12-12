@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -119,7 +120,19 @@ class myClassAdminController extends Controller
             // Filter data berdasarkan tanggal yang dipilih
             $selectedDate = $request->get('filter_data');
 
-            if ($selectedDate) {
+            // Cek apakah ada kehadiran terakhir untuk hari yang sama
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $latestAttendance = ClassAttendance::where('class_id', $id)
+                ->whereDate('attendance_date', $currentDate)
+                ->latest('attendance_date')
+                ->first();
+
+            if ($latestAttendance) {
+                $listClass = ClassAttendance::where('class_id', $id)
+                    ->where('attendance_date', $latestAttendance->attendance_date)
+                    ->with(['orderPackage.order.user'])
+                    ->get();
+            } elseif ($selectedDate) {
                 $listClass = ClassAttendance::where('class_id', $id)
                     ->when($selectedDate, function ($query, $selectedDate) {
                         return $query->where('attendance_date', $selectedDate);
@@ -140,14 +153,11 @@ class myClassAdminController extends Controller
                 $listMember = Session::get('new_member');
             }
 
-            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate'));
+            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
         } catch (Exception $e) {
             dd($e->getMessage());
         }
     }
-
-
-
 
 
     public function storeAttendance(Request $request)
@@ -246,6 +256,47 @@ class myClassAdminController extends Controller
             return redirect()->back();
         }
     }
+
+    public function updateAttendance(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $request->validate([
+                'class_id' => 'required|exists:class_packages,id',
+                'attendance' => 'nullable|array',
+            ]);
+
+            $attendances = $request->input('attendance', []); // Default kosong jika tidak ada data
+
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $latestAttendance = ClassAttendance::where('class_id', $request->class_id)
+                ->whereDate('attendance_date', $currentDate)
+                ->latest('attendance_date')
+                ->first();
+
+            if (!$latestAttendance) {
+                return redirect()->back()->with(['failed' => 'Tidak ada data absensi untuk hari ini.']);
+            }
+
+            $class_order_packages = ClassAttendance::where('class_id', $request->class_id)
+                ->where('attendance_date', $latestAttendance->attendance_date)
+                ->get();
+
+            foreach ($class_order_packages as $attendance) {
+                $attendance->update([
+                    'attendance' => isset($attendances[$attendance->order_package_id]) ? 1 : 0,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->back()->with(['success' => 'Berhasil Mengubah Absensi']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with(['failed' => 'Gagal Mengubah Absensi: ' . $e->getMessage()]);
+        }
+    }
+
 
 
     public function storeTest(Request $request)
