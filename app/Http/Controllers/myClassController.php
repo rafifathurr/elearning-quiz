@@ -189,10 +189,10 @@ class myClassController extends Controller
                                 ]);
 
                                 // Setelah waktu habis, langsung tampilkan tombol Review
-                                $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($result->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                                $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
                             }
                         } elseif ($review) {
-                            $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                            $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
                         } else {
                             $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
                         }
