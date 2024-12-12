@@ -16,7 +16,8 @@
                             </div>
                             <div class="card-body">
                                 @foreach ($review->details->sortBy('order') as $detail)
-                                    <p>{{ $detail->order }}. {{ $detail->resultQuestion->question }}
+                                    <p>{{ $detail->order }}.
+                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : '' }}
                                         @if (is_null($detail->answer))
                                             <span class="ml-2 text-danger font-weight-light">
                                                 <i class="fas fa-times">
@@ -25,6 +26,10 @@
                                             </span>
                                         @endif
                                     </p>
+                                    @if (!is_null($detail->resultQuestion->attachment))
+                                        <img src="{{ asset($detail->resultQuestion->attachment) }}"
+                                            class="img img-fluid mb-4" style="max-height: 12rem;">
+                                    @endif
                                     <ol style="list-style-type: lower-alpha;">
                                         @foreach ($detail->resultQuestion->quizAnswer as $answer)
                                             <li class="{{ $answer->is_answer ? 'text-success font-weight-bolder' : '' }}">
