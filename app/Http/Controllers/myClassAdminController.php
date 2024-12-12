@@ -83,7 +83,7 @@ class myClassAdminController extends Controller
 
             if ($add_class) {
                 DB::commit();
-                return redirect()->route('class.index')->with(['success' => 'Berhasil Menambahkan Kelas']);
+                return redirect()->route('class.show', ['id' => $add_class->id])->with(['success' => 'Berhasil Menambahkan Kelas']);
             } else {
                 DB::rollBack();
                 return redirect()
