@@ -658,14 +658,14 @@ class QuizController extends Controller
 
             $score = 0;
             foreach ($question->quizAnswer as $answer) {
+                if (!is_null($answer->answer) && $request->value == $answer->answer && $answer->is_answer == 1) {
+                    $score = 1;
+                }
 
-                if ((!is_null($answer->answer) && $request->value == $answer->answer) ||
-                    (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1)
-                ) {
+                if (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1) {
                     $score = 1;
                 }
             }
-
 
             $resultDetail->update([
                 'answer' => $validated['value'],
@@ -749,10 +749,11 @@ class QuizController extends Controller
 
             $score = 0;
             foreach ($question->quizAnswer as $answer) {
+                if (!is_null($answer->answer) && $request->value == $answer->answer && $answer->is_answer == 1) {
+                    $score = 1;
+                }
 
-                if ((!is_null($answer->answer) && $request->value == $answer->answer) ||
-                    (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1)
-                ) {
+                if (!is_null($answer->answer_image) && $request->value == $answer->answer_image && $answer->is_answer == 1) {
                     $score = 1;
                 }
             }
