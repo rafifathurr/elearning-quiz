@@ -10,14 +10,46 @@
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="font-weight-bold">Review Riwayat Test - {{ $review->quiz->name }}</h5>
-                                <h6 class="font-weight-bolder">Persentase Benar:
-                                    {{ ($review->total_score / $review->details->count()) * 100 . '%' }}
-                                </h6>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        @foreach ($questionsPerAspect as $aspect)
+                                            @if ($aspect['percentage'] >= 90)
+                                                <p class="text-success">{{ $review->user->name }} sudah
+                                                    <strong>baik</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 90 && $aspect['percentage'] >= 80)
+                                                <p class="text-success">{{ $review->user->name }} <strong>cukup
+                                                        baik</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 80 && $aspect['percentage'] >= 70)
+                                                <p class="text-success">{{ $review->user->name }} <strong>cukup</strong>
+                                                    dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 70 && $aspect['percentage'] >= 50)
+                                                <p style="color: orange">
+                                                    {{ $review->user->name }} masih <strong>kurang</strong> dalam aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @elseif ($aspect['percentage'] < 50)
+                                                <p class="text-danger">
+                                                    {{ $review->user->name }} masih <strong>kurang sekali</strong> dalam
+                                                    aspek
+                                                    <strong>{{ $aspect['aspect_name'] }}</strong>.
+                                                </p>
+                                            @endif
+                                        @endforeach
+
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 @foreach ($review->details->sortBy('order') as $detail)
                                     <p>{{ $detail->order }}.
-                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : '' }}
+                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : $detail->resultQuestion->direction_question }}
                                         @if (is_null($detail->answer))
                                             <span class="ml-2 text-danger font-weight-light">
                                                 <i class="fas fa-times">

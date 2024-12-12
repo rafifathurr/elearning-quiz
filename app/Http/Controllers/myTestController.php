@@ -127,8 +127,31 @@ class myTestController extends Controller
     function review(string $id)
     {
         $decryptId = decrypt($id);
-        $review = Result::find($decryptId);
-        return view('mytest.review', compact('review'));
+        $review = Result::where('id', $decryptId)
+            ->with(['quiz', 'details.aspect'])
+            ->firstOrFail();
+
+        // Hitung data per aspek
+        $questionsPerAspect = $review->details
+            ->groupBy('aspect_id')
+            ->map(function ($details) {
+                $totalQuestions = $details->count();
+                $correctQuestions = $details->where('score', 1)->count();
+                $percentage = $totalQuestions > 0
+                    ? ($correctQuestions / $totalQuestions) * 100
+                    : 0;
+
+                return [
+                    'aspect_name' => $details->first()->aspect->name ?? 'Unknown Aspect',
+                    'total_questions' => $totalQuestions,
+                    'correct_questions' => $correctQuestions,
+                    'percentage' => round($percentage, 2), // Dibulatkan 2 desimal
+                ];
+            });
+
+        // Urutkan berdasarkan persentase tertinggi
+        $questionsPerAspect = $questionsPerAspect->sortByDesc('percentage');
+        return view('mytest.review', compact('review', 'questionsPerAspect'));
     }
 
     // function history(Request $request)
