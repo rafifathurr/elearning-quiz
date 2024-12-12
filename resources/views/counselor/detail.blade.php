@@ -42,9 +42,25 @@
                             <div class="card-header ">
                                 <div class="d-flex justify-content-between">
                                     <h4 class="font-weight-bold">{{ $class->package->name }}</h4>
-                                    <h4 class="font-weight-bold">
-                                        {{ 'Pertemuan ' . $class->current_meeting + 1 }}
-                                    </h4>
+                                    @if ($listClass->isEmpty())
+                                        <h4 class="font-weight-bold">
+                                            {{ 'Pertemuan ' . $class->current_meeting + 1 }}
+                                        </h4>
+                                    @else
+                                        <form method="get" id="filter-form"
+                                            action="{{ route('class.show', $class->id) }}">
+                                            <select name="filter_data" id="filter_data" class="form-control"
+                                                onchange="document.getElementById('filter-form').submit();">
+                                                <option value="">Pilih Tanggal</option>
+                                                @foreach ($filterDate as $filter)
+                                                    <option value="{{ $filter->attendance_date }}"
+                                                        {{ $selectedDate == $filter->attendance_date ? 'selected' : '' }}>
+                                                        {{ \Carbon\Carbon::parse($filter->attendance_date)->translatedFormat('d F Y') }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    @endif
                                 </div>
 
                             </div>
@@ -150,23 +166,6 @@
                                         {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
                                         Test</button>
 
-
-                                    <div class="col-lg-4 my-3">
-                                        <form method="get" id="filter-form"
-                                            action="{{ route('class.show', $class->id) }}">
-                                            <select name="filter_data" id="filter_data" class="form-control"
-                                                onchange="document.getElementById('filter-form').submit();">
-                                                <option value="">Pilih Tanggal</option>
-                                                @foreach ($filterDate as $filter)
-                                                    <option value="{{ $filter->attendance_date }}"
-                                                        {{ $selectedDate == $filter->attendance_date ? 'selected' : '' }}>
-                                                        {{ \Carbon\Carbon::parse($filter->attendance_date)->translatedFormat('d F Y') }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                    </div>
-
                                     @if ($latestAttendance)
                                         <form method="post" id="form-daftar-peserta"
                                             action="{{ route('class.updateAttendance') }}">
@@ -174,6 +173,7 @@
                                             <form method="post" id="form-daftar-peserta"
                                                 action="{{ route('class.storeAttendance') }}">
                                     @endif
+
                                     @csrf
                                     <div class="card">
                                         <div class="card-header bg-gradient-gray">
@@ -216,7 +216,7 @@
 
                                     @if (!$selectedDate)
                                         <button class="btn btn-success my-3"
-                                            {{ $latestAttendance ? 'disabled' : '' }}>Absensi</button>
+                                            {{ $latestAttendance || $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
                                         @if ($latestAttendance)
                                             <button class="btn btn-warning my-3">Ubah Absensi</button>
                                         @endif

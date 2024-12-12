@@ -128,10 +128,19 @@ class myClassAdminController extends Controller
                 ->first();
 
             if ($latestAttendance) {
-                $listClass = ClassAttendance::where('class_id', $id)
-                    ->where('attendance_date', $latestAttendance->attendance_date)
-                    ->with(['orderPackage.order.user'])
-                    ->get();
+                if ($selectedDate) {
+                    $listClass = ClassAttendance::where('class_id', $id)
+                        ->when($selectedDate, function ($query, $selectedDate) {
+                            return $query->where('attendance_date', $selectedDate);
+                        })
+                        ->with(['orderPackage.order.user'])
+                        ->get();
+                } else {
+                    $listClass = ClassAttendance::where('class_id', $id)
+                        ->where('attendance_date', $latestAttendance->attendance_date)
+                        ->with(['orderPackage.order.user'])
+                        ->get();
+                }
             } elseif ($selectedDate) {
                 $listClass = ClassAttendance::where('class_id', $id)
                     ->when($selectedDate, function ($query, $selectedDate) {
