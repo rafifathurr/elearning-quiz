@@ -127,15 +127,20 @@ class OrderController extends Controller
                 ->where('package_id', $id)
                 ->pluck('id');
 
-            $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
-            $on_going_class = ClassPackage::whereIn('id', $classId)
-                ->whereColumn('current_meeting', '<', 'total_meeting')
-                ->exists();
 
-            if ($on_going_class) {
-                DB::rollBack();
-                session()->flash('failed', 'Kelas sedang berjalan. Selesaikan kelas Anda terlebih dahulu.');
-                return;
+            if (!is_null($package->class)) {
+                if (!is_null($orderPackageId) && $orderPackageId->isNotEmpty()) {
+                    $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
+                    $on_going_class = ClassPackage::whereIn('id', $classId)
+                        ->whereColumn('current_meeting', '<', 'total_meeting')
+                        ->exists();
+
+                    if ($on_going_class) {
+                        DB::rollBack();
+                        session()->flash('failed', 'Kelas sedang berjalan. Selesaikan kelas Anda terlebih dahulu.');
+                        return;
+                    }
+                }
             }
 
             $exist_order = Order::where('user_id',  $user_id)->where('status', 1)->first();
