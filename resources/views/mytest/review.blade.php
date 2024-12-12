@@ -30,6 +30,7 @@
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
                                             class="img img-fluid mb-4" style="max-height: 12rem;">
                                     @endif
+                                    {!! $detail->resultQuestion->description !!}
                                     <ol style="list-style-type: lower-alpha;">
                                         @foreach ($detail->resultQuestion->quizAnswer as $answer)
                                             <li class="{{ $answer->is_answer ? 'text-success font-weight-bolder' : '' }}">
