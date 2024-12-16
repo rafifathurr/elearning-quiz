@@ -105,6 +105,12 @@ class myClassAdminController extends Controller
         try {
             $class = ClassPackage::find($id);
 
+            if ($class->user_id != Auth::user()->id) {
+                return redirect()
+                    ->back()
+                    ->with('failed', 'Anda Tidak Bisa Akses Kelas Ini');
+            }
+
             $listOrder = OrderPackage::whereHas('order', function ($query) {
                 $query->whereNull('deleted_at')->where('status', 100);
             })->whereNull('deleted_at')
@@ -164,7 +170,9 @@ class myClassAdminController extends Controller
 
             return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
         } catch (Exception $e) {
-            dd($e->getMessage());
+            return redirect()
+                ->back()
+                ->with('failed', $e->getMessage());
         }
     }
 
