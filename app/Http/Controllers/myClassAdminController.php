@@ -112,11 +112,23 @@ class myClassAdminController extends Controller
                     ->with('failed', 'Anda Tidak Bisa Akses Kelas Ini');
             }
 
+
+            $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
+                $query->whereColumn('current_meeting', '<', 'total_meeting');
+            })
+                ->pluck('order_package_id');
+
+
             $listOrder = OrderPackage::whereHas('order', function ($query) {
-                $query->whereNull('deleted_at')->where('status', 100);
-            })->whereNull('deleted_at')
+                $query->whereNull('deleted_at')
+                    ->where('status', 100);
+            })
+                ->whereNull('deleted_at')
                 ->where('package_id', $class->package_id)
+                ->whereNotIn('id', $orderPackageIdInAttendance)
                 ->get();
+
+
 
             $filterDate = ClassAttendance::where('class_id', $id)
                 ->select('attendance_date')

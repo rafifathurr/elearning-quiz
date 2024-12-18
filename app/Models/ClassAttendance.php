@@ -14,4 +14,9 @@ class ClassAttendance extends Model
     {
         return $this->belongsTo(OrderPackage::class, 'order_package_id');
     }
+
+    public function class()
+    {
+        return $this->belongsTo(ClassPackage::class, 'class_id');
+    }
 }
