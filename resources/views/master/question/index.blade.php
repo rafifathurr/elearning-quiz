@@ -24,6 +24,16 @@
                                     <i class="fas fa-plus mr-1"></i>
                                     Tambah Pertanyaan
                                 </a>
+                                <div class="form-group my-3">
+                                    <label for="filter-aspect">Filter Aspek</label>
+                                    <select id="filter-aspect" class="form-control w-25">
+                                        <option value="">-- Pilih Aspek --</option>
+                                        @foreach ($aspects as $aspect)
+                                            <option value="{{ $aspect->id }}">{{ $aspect->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="dt-question">

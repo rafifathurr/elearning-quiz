@@ -19,12 +19,21 @@ class QuestionController extends Controller
     public function index()
     {
         $datatable_route = route('master.question.dataTable');
-        return view('master.question.index', compact('datatable_route'));
+        $aspects = AspectQuestion::all(); // Ambil semua aspek
+        return view('master.question.index', compact('datatable_route', 'aspects'));
     }
+
 
     public function dataTable()
     {
+        $aspectFilter = request()->get('aspect');
         $question = QuizQuestion::query()->whereNull('deleted_at');
+
+        if ($aspectFilter) {
+            $question->where(function ($query) use ($aspectFilter) {
+                $query->where('aspect', 'LIKE', "%{$aspectFilter}%");
+            });
+        }
 
         $dataTable = DataTables::of($question)
             ->addIndexColumn()
@@ -59,6 +68,10 @@ class QuestionController extends Controller
                 return $text;
             })
 
+            ->filterColumn('question', function ($query, $keyword) {
+                $query->whereRaw("LOWER(REPLACE(quiz_question.question, '<', '')) LIKE ?", ["%" . strtolower($keyword) . "%"]);
+            })
+
             ->addColumn('aspect', function ($data) {
                 $list_view = '<ul>';
                 $aspects = explode('|', $data->aspect);
@@ -82,6 +95,18 @@ class QuestionController extends Controller
                 $list_view .= '</ul>';
                 return $list_view;
             })
+            ->filterColumn('aspect', function ($query, $keyword) {
+                // Cari nama aspek berdasarkan ID di kolom `aspect`
+                $aspectIds = AspectQuestion::where('name', 'LIKE', '%' . $keyword . '%')->pluck('id')->toArray();
+
+                // Filter query untuk mencocokkan ID aspek dengan kolom `aspect`
+                $query->where(function ($subQuery) use ($aspectIds) {
+                    foreach ($aspectIds as $aspectId) {
+                        $subQuery->orWhere('aspect', 'LIKE', '%' . $aspectId . '%');
+                    }
+                });
+            })
+
             ->addColumn('action', function ($data) {
                 $btn_action = '<a href="' . route('master.question.show', ['id' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
                 $btn_action .= '<a href="' . route('master.question.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';

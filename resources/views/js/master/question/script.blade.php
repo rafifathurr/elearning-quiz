@@ -23,13 +23,16 @@
 
     function dataTable() {
         const url = $('#url_dt').val();
-        $('#dt-question').DataTable({
+        const table = $('#dt-question').DataTable({
             responsive: true,
             autoWidth: false,
             processing: true,
             serverSide: true,
             ajax: {
                 url: url,
+                data: function(d) {
+                    d.aspect = $('#filter-aspect').val();
+                },
                 error: function(xhr, error, code) {
                     swalError(xhr.statusText);
                 }
@@ -65,6 +68,9 @@
                 },
             ]
 
+        });
+        $('#filter-aspect').on('change', function() {
+            table.draw();
         });
     }
 
