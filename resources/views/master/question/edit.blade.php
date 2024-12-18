@@ -48,7 +48,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="question" class="col-md-4 control-label text-left">Deskripsi
+                                        <label for="question" class="col-md-4 control-label text-left">Pertanyaan
                                         </label>
                                         <div class="col-md-8 col-sm-12">
                                             <textarea id="question" name="question" class="form-control question summernote" {{ $disabled }}>{{ old('question', $quiz_question->question ?? '') }}</textarea>

@@ -19,7 +19,7 @@ class QuestionController extends Controller
     public function index()
     {
         $datatable_route = route('master.question.dataTable');
-        $aspects = AspectQuestion::all(); // Ambil semua aspek
+        $aspects = AspectQuestion::whereNull('deleted_at')->get();
         return view('master.question.index', compact('datatable_route', 'aspects'));
     }
 
