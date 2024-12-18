@@ -34,19 +34,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="question" class="col-md-4 control-label text-left">
-                                        Pertanyaan
-                                    </label>
+                                    <label for="question" class="col-md-4 control-label text-left">Pertanyaan</label>
                                     <div class="col-md-8 col-sm-12">
-                                        <input class="form-control @error('question') is-invalid @enderror" type="text"
-                                            name="question" value="{{ old('question') }}">
+                                        <textarea name="question" class="form-control question summernote">{{ old('question') }}</textarea>
                                         @error('question')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
+                                            <div class="alert alert-danger mt-2">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label for="attachment" class="col-md-4 control-label text-left">Gambar </label>
                                     <div class="col-md-8 col-sm-12">

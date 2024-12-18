@@ -42,7 +42,30 @@
 @stack('javascript-bottom')
 {{-- @include('sweetalert::alert') --}}
 <script>
-    $('.summernote').summernote({
-        height: 150,
+    $(document).ready(function() {
+        // Aturan khusus untuk elemen dengan kelas 'question.summernote'
+        $('.question.summernote').summernote({
+            height: 150,
+            airMode: false,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']]
+            ],
+            callbacks: {
+                onImageUpload: function() {
+                    alert('Upload gambar tidak diperbolehkan!');
+                    return false;
+                }
+            }
+        });
+
+        // Aturan default untuk elemen lain dengan kelas 'summernote'
+        $('.summernote').not('.question').summernote({
+            height: 150
+        });
     });
 </script>

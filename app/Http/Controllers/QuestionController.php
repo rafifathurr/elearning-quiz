@@ -50,6 +50,14 @@ class QuestionController extends Controller
                 $list_view .= '</ul>';
                 return $list_view;
             })
+            ->addColumn('question', function ($data) {
+                $text = strip_tags($data->question);
+                $words = explode(' ', $text);
+                if (count($words) > 30) {
+                    $text = implode(' ', array_slice($words, 0, 30)) . '...';
+                }
+                return $text;
+            })
 
             ->addColumn('aspect', function ($data) {
                 $list_view = '<ul>';
@@ -81,7 +89,7 @@ class QuestionController extends Controller
                 return $btn_action;
             })
             ->only(['question', 'aspect', 'description', 'level', 'action'])
-            ->rawColumns(['action', 'description', 'level', 'aspect'])
+            ->rawColumns(['action', 'question', 'description', 'level', 'aspect'])
             ->with('draw', request('draw'))
             ->make(true);
 
