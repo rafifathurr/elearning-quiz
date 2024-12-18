@@ -34,6 +34,9 @@ class PackageController extends Controller
                 $btn_action .= '<div>';
                 return $btn_action;
             })
+            ->addColumn('class', function ($data) {
+                return !is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-';
+            })
             ->addColumn('price', function ($data) {
                 $price = '<div>' . 'Rp. ' . number_format($data->price, 0, ',', '.');
 

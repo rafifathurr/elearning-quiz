@@ -304,7 +304,7 @@ class QuizController extends Controller
             $deleted_package_test = PackageTest::where('quiz_id', $quiz->id)->delete();
 
             // Validation Destroy Quiz
-            if ($quiz_destroy && $deleted_package_test) {
+            if ($quiz_destroy) {
                 DB::commit();
                 session()->flash('success', 'Berhasil Hapus Test');
             } else {

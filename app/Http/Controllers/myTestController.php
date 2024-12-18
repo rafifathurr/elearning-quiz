@@ -29,7 +29,10 @@ class myTestController extends Controller
                 ->pluck('id');
             $orderPackageIds = OrderPackage::whereIn('order_id', $orderIds)
                 ->whereNull('deleted_at')
-                ->whereNull('class')
+                ->where(function ($query) {
+                    $query->whereNull('class')
+                        ->orWhere('class', 0);
+                })
                 ->pluck('package_id');
 
             $myTest = OrderDetail::whereIn('order_id', $orderIds)

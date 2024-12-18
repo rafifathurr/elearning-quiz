@@ -60,6 +60,9 @@
                                                         <option value="kepribadian"
                                                             {{ $quiz->type_aspect == 'kepribadian' ? 'selected' : '' }}>
                                                             Kepribadian</option>
+                                                        <option value="kecermatan"
+                                                            {{ $quiz->type_aspect == 'kecermatan' ? 'selected' : '' }}>
+                                                            Kecermatan</option>
                                                     </select>
                                                     <input type="hidden" name="type_aspect"
                                                         value="{{ $quiz->type_aspect }}">

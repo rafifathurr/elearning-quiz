@@ -55,7 +55,7 @@ class OrderController extends Controller
                 return $data->package->name;
             })
             ->addColumn('class', function ($data) {
-                return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
+                return (!is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-');
             })
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
@@ -123,7 +123,7 @@ class OrderController extends Controller
                     ->where('status', 100);
             })
                 ->whereNull('deleted_at')
-                ->whereNotNull('class')
+                ->where('class', '>', 0)
                 ->where('package_id', $id)
                 ->pluck('id');
 
@@ -148,7 +148,7 @@ class OrderController extends Controller
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
                     ->where('package_id', $id)
                     ->whereNull('deleted_at')
-                    ->whereNotNull('class')
+                    ->where('class', '>', 0)
                     ->exists();
 
                 if ($duplicate_package) {

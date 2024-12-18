@@ -58,10 +58,11 @@ class myClassAdminController extends Controller
     {
         $classPackageId = ClassPackage::whereNull('deleted_at')
             ->whereColumn('current_meeting', '<', 'total_meeting')
+            ->where('user_id', Auth::user()->id)
             ->pluck('package_id');
 
         $packages = Package::whereNull('deleted_at')
-            ->whereNotNull('class')
+            ->where('class', '>', 0)
             ->whereNotIn('id', $classPackageId)
             ->get();
 

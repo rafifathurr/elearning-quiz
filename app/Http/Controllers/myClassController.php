@@ -28,7 +28,7 @@ class myClassController extends Controller
         $myClass = OrderPackage::whereIn('order_id', $orderIds)
             ->whereNotIn('id', $orderPackageIdsInClass) // filter
             ->whereNull('deleted_at')
-            ->whereNotNull('class')
+            ->where('class', '>', 0)
             ->get();
 
         $datatable_route = route('myclass.dataTable');
@@ -49,7 +49,7 @@ class myClassController extends Controller
         $myClass = OrderPackage::whereIn('order_id', $orderIds)
             ->whereIn('id', $orderPackageIdsInClass) // filter
             ->whereNull('deleted_at')
-            ->whereNotNull('class')
+            ->where('class', '>', 0)
             ->get();
 
         return DataTables::of($myClass)
@@ -219,7 +219,7 @@ class myClassController extends Controller
 
     //     $myClass = OrderPackage::whereIn('order_id', $orderIds)
     //         ->whereNull('deleted_at')
-    //         ->whereNotNull('class')
+    //         ->where('class', '>', 0)
     //         ->get();
 
     //     return DataTables::of($myClass)
