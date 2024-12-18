@@ -25,6 +25,57 @@
                                 <img src="{{ asset($active_question['attachment']) }}" class="img-fluid"
                                     style="max-height: 14rem;">
                             @endif
+                            @if ($active_question['is_generate_random_answer'])
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    @php
+                                        $index_new = 0;
+                                    @endphp
+                                    @foreach ($active_question['quiz_answer'] as $quiz_answer)
+                                        <div class="p-2 text-center">
+                                            <h3>
+                                                {{ $quiz_answer['answer'] }}
+                                            </h3>
+                                            <div class="card m-2 px-2 bg-primary text-white">
+                                                <div class="card-body">
+                                                    <h5 class="font-weight-bold text-center my-auto">
+                                                        {{ chr(substr('000' . ($index_new + 65), -3)) }}
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @php
+                                            $index_new++;
+                                        @endphp
+                                    @endforeach
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-center mt-3">
+                                    @php
+                                        $index_new = 0;
+                                        $randomized_answers = $active_question['quiz_answer'];
+                                        shuffle($randomized_answers);
+                                    @endphp
+
+                                    @foreach ($randomized_answers as $quiz_answer)
+                                        @if ($quiz_answer['is_answer'] == 0)
+                                            <div class="p-2 text-center">
+                                                <h3>
+                                                    {{ $quiz_answer['answer'] }}
+                                                </h3>
+                                                <div class="card m-2 px-2 bg-primary text-white">
+                                                    <div class="card-body">
+                                                        <h5 class="font-weight-bold text-center my-auto">
+                                                            {{ chr(substr('000' . ($index_new + 65), -3)) }}
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @php
+                                                $index_new++;
+                                            @endphp
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
                             <div class="mt-3">
                                 {!! $active_question['description'] !!}
                             </div>

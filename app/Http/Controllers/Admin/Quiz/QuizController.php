@@ -549,19 +549,59 @@ class QuizController extends Controller
             $questions = $resultDetails->map(function ($resultDetail) {
                 $question = QuizQuestion::find($resultDetail->question_id);
 
-                $quizAnswerArr = $question->quizAnswer->map(function ($quiz_answer) {
-                    return [
-                        'id' => $quiz_answer->id,
-                        'answer' => $quiz_answer->answer,
-                        'answer_image' => $quiz_answer->answer_image,
-                        'is_answer' => intval($quiz_answer->is_answer),
-                        'answered' => false,
-                    ];
-                })->toArray();
-
-
-
                 $questionDetail = json_decode($resultDetail->question_detail, true);
+
+
+                if ($questionDetail['is_generate_random_answer']) {
+                    $quizAnswerArr = []; // Menyimpan jawaban untuk pertanyaan ini
+
+                    // Ambil jawaban asli yang memiliki is_answer = 1
+                    $correctAnswer = $question->quizAnswer->where('is_answer', 1)->first();
+
+                    if (!is_null($correctAnswer)) {
+                        // Tambahkan jawaban asli ke array jawaban
+                        $correctAnswer['answered'] = false; // Menandai jawaban belum dijawab
+                        $correctAnswer['is_answer'] = intval($correctAnswer['is_answer']); // Pastikan is_answer berupa integer
+                        $quizAnswerArr[] = $correctAnswer;
+
+                        // Generate jawaban random lainnya
+                        $answerList = [intval($correctAnswer['answer'])]; // Daftar jawaban untuk menghindari duplikasi
+                        $rangeNumMin = 10 ** (strlen($correctAnswer['answer']) - 1); // Nilai minimum (contoh: 100 untuk angka 3 digit)
+                        $rangeNumMax = (10 ** strlen($correctAnswer['answer'])) - 1; // Nilai maksimum (contoh: 999 untuk angka 3 digit)
+
+                        for ($i = 1; $i <= 4; $i++) { // Tambahkan 4 jawaban random
+                            $randomAnswer = $this->generateAnswerRandom($rangeNumMin, $rangeNumMax, $answerList);
+
+                            $quizAnswerArr[] = [
+                                'quiz_question_id' => $correctAnswer['quiz_question_id'],
+                                'answer' => $randomAnswer,
+                                'attachment' => null,
+                                'is_answer' => 0, // Jawaban ini bukan jawaban yang benar
+                                'answered' => false,
+                                'point' => 0,
+                                'created_at' => $correctAnswer['created_at'],
+                                'updated_at' => $correctAnswer['updated_at'],
+                                'answer_image' => $correctAnswer['answer_image'],
+                            ];
+
+                            $answerList[] = $randomAnswer; // Tambahkan jawaban ke daftar untuk menghindari duplikasi
+                        }
+                    }
+
+                    // Acak urutan jawaban sebelum mengembalikan
+                    shuffle($quizAnswerArr);
+                } else {
+                    $quizAnswerArr = $question->quizAnswer->map(function ($quiz_answer) {
+                        return [
+                            'id' => $quiz_answer->id,
+                            'answer' => $quiz_answer->answer,
+                            'answer_image' => $quiz_answer->answer_image,
+                            'is_answer' => intval($quiz_answer->is_answer),
+                            'answered' => false,
+                        ];
+                    })->toArray();
+                }
+
 
                 if ($questionDetail['is_random_answer']) {
                     shuffle($quizAnswerArr);
@@ -814,6 +854,14 @@ class QuizController extends Controller
         }
     }
 
+    private function generateAnswerRandom(int $min, int $max, array $exception)
+    {
+        do {
+            $answer = rand($min, $max);
+        } while (in_array($answer, $exception)); // Cek apakah angka sudah ada di daftar pengecualian
+
+        return $answer;
+    }
 
 
 
@@ -861,6 +909,7 @@ class QuizController extends Controller
 
         return view('quiz.list.history', ['histories' => $histories]);
     }
+
 
 
 
