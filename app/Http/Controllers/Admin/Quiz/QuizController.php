@@ -455,8 +455,11 @@ class QuizController extends Controller
                     })
                     ->whereNull('deleted_at')
                     ->inRandomOrder()
-                    ->limit($aspect->total_question)
+                    ->when($aspect->total_question > 0, function ($query) use ($aspect) {
+                        return $query->limit($aspect->total_question);
+                    })
                     ->get();
+
 
                 foreach ($questionSet as $question) {
                     $questionAspectPairs[] = [

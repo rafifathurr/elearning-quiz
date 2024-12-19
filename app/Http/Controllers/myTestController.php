@@ -103,7 +103,7 @@ class myTestController extends Controller
                             ]);
 
                             // Setelah waktu habis, langsung tampilkan tombol Review
-                            $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
+                            $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $result->id]) . '" class="btn btn-sm btn-primary">Review</a>';
                         }
                     } elseif ($review) {
                         $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
