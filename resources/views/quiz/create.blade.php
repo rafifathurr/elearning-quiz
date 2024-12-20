@@ -183,16 +183,16 @@
                                 $('#aspect_list').html(''); // Menghapus daftar aspek
                                 updateAspectList(current_type_aspect);
                             } else {
-                                $('#type_aspect').val(previous_type_aspect);
+                                $('#type_aspect').val(previous_type_aspect).trigger('change');
                             }
                         });
                     } else {
                         updateAspectList(current_type_aspect);
+                        previous_type_aspect = current_type_aspect;
                     }
                 }
 
-                // Update previous_type_aspect dengan nilai yang baru
-                previous_type_aspect = current_type_aspect;
+
             });
 
             // Event listener untuk form quiz_aspect, periksa apakah pengguna sudah memilih aspek
