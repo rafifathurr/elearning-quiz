@@ -195,25 +195,42 @@
         Swal.fire({
             title: 'Tambah Test',
             html: `
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <label for="test" style="width: 30%; margin-right: 10px;">Pilih Test</label>
-                <select id="test" class="swal2-select" style="width: 70%; padding: 8px;">
-                    ${Object.entries(options).map(([id, name]) => `
-                        <option value="${id}">${name}</option>
-                    `).join('')}
-                </select>
-            </div>
+    <style>
+        @media (max-width: 768px) {
+            .responsive-label,
+            .responsive-input {
+                width: 100% !important;
+                margin-right: 0 !important; /* Menghapus margin agar label/input tidak tumpang tindih */
+            }
+            .responsive-label {
+                text-align: left !important; /* Pastikan label rata kiri */
+            }
+            .responsive-container {
+                flex-direction: column; /* Atur container agar elemen vertikal */
+                align-items: flex-start; /* Pastikan elemen berada di kiri */
+            }
+        }
+    </style>
+    <div class="responsive-container" style="display: flex; align-items: center; margin-bottom: 10px;">
+        <label for="test" class="responsive-label" style="width: 30%; margin-right: 10px;">Pilih Test</label>
+        <select id="test" class="swal2-select responsive-input" style="width: 70%; padding: 8px;">
+            ${Object.entries(options).map(([id, name]) => `
+                <option value="${id}">${name}</option>
+            `).join('')}
+        </select>
+    </div>
 
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <label for="open_quiz" style="width: 30%; margin-right: 10px;">Tanggal Mulai</label>
-                <input id="open_quiz" type="datetime-local" class="swal2-input" style="width: 70%; padding: 8px;" required>
-            </div>
+    <div class="responsive-container" style="display: flex; align-items: center; margin-bottom: 10px;">
+        <label for="open_quiz" class="responsive-label" style="width: 30%; margin-right: 10px;">Tanggal Mulai</label>
+        <input id="open_quiz" type="datetime-local" class="swal2-input responsive-input" style="width: 70%; padding: 8px;" required>
+    </div>
 
-            <div style="display: flex; align-items: center;">
-                <label for="close_quiz" style="width: 30%; margin-right: 10px;">Tanggal Tutup</label>
-                <input id="close_quiz" type="datetime-local" class="swal2-input" style="width: 70%; padding: 8px;" required>
-            </div>
-        `,
+    <div class="responsive-container" style="display: flex; align-items: center;">
+        <label for="close_quiz" class="responsive-label" style="width: 30%; margin-right: 10px;">Tanggal Tutup</label>
+        <input id="close_quiz" type="datetime-local" class="swal2-input responsive-input" style="width: 70%; padding: 8px;" required>
+    </div>
+`,
+
             showCancelButton: true,
             allowOutsideClick: false,
             customClass: {

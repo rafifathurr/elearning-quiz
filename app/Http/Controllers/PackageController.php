@@ -28,8 +28,8 @@ class PackageController extends Controller
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
                 // $btn_action .= '<a href="' . route('master.package.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
-                $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit">Edit</a>';
-                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete">Delete</button>';
+                $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
 
                 $btn_action .= '<div>';
                 return $btn_action;
@@ -44,11 +44,11 @@ class PackageController extends Controller
                 return $price;
             })
             ->addColumn('quiz', function ($data) {
-                $list_view = '<ul>';
+                $list_view = '<div align="center">';
                 foreach ($data->packageTest as $package) {
-                    $list_view .= '<li>' . $package->quiz->name . '</li>';
+                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . $package->quiz->name . '</span>';
                 };
-                $list_view .= '</ul>';
+                $list_view .= '</div>';
                 return $list_view;
             })
 

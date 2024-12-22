@@ -19,7 +19,7 @@
                         </div>
                         <div class="card-body">
                             <p>
-                                {{ $active_question['question'] ?? '' }}
+                                {!! $active_question['question'] ?? '' !!}
                             </p>
                             @if (!is_null($active_question['attachment']))
                                 <img src="{{ asset($active_question['attachment']) }}" class="img-fluid"

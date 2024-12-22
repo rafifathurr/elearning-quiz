@@ -26,7 +26,7 @@
                                         <li class="list-unstyled">
                                             {{ $no++ }}.
 
-                                            {{ $question->question }}
+                                            {!! $question->question !!}
                                             <ol style="list-style-type: lower-alpha;">
                                                 @foreach ($question->quizAnswer as $answer)
                                                     <li>{{ $answer->answer }}</li>

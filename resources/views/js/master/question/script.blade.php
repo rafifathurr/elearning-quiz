@@ -45,19 +45,23 @@
                 },
                 {
                     data: 'question',
-                    defaultContent: '-'
+                    defaultContent: '-',
+                    orderable: false
                 },
                 {
                     data: 'aspect',
-                    defaultContent: '-'
+                    defaultContent: '-',
+                    orderable: false
                 },
                 {
                     data: 'description',
-                    defaultContent: '-'
+                    defaultContent: '-',
+                    orderable: false
                 },
                 {
                     data: 'level',
-                    defaultContent: '-'
+                    defaultContent: '-',
+                    orderable: false
                 },
                 {
                     data: 'action',

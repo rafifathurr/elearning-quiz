@@ -38,25 +38,25 @@ class QuestionController extends Controller
         $dataTable = DataTables::of($question)
             ->addIndexColumn()
             ->addColumn('level', function ($data) {
-                $list_view = '<ul>';
+                $list_view = '<div class="text-center">';
 
                 // Jika level 0, tampilkan semua level (Level 1, Level 2, Level 3)
                 if ($data->level == 0) {
-                    $list_view .= '<li>' . 'Level 1' . '</li>';
-                    $list_view .= '<li>' . 'Level 2' . '</li>';
-                    $list_view .= '<li>' . 'Level 3' . '</li>';
+                    $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . 'Level 1' . '</span>';
+                    $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . 'Level 2' . '</span>';
+                    $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . 'Level 3' . '</span>';
                 } else {
                     // Jika level bukan 0, tampilkan level yang sesuai dari data yang ada
                     $levels = explode('|', $data->level);
                     foreach ($levels as $level) {
                         // Pastikan level hanya menampilkan data yang valid
                         if (in_array($level, [1, 2, 3])) {
-                            $list_view .= '<li>' . 'Level ' . $level . '</li>';
+                            $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . 'Level ' . $level . '</span>';
                         }
                     }
                 }
 
-                $list_view .= '</ul>';
+                $list_view .= '</div>';
                 return $list_view;
             })
             ->addColumn('question', function ($data) {
@@ -73,14 +73,14 @@ class QuestionController extends Controller
             })
 
             ->addColumn('aspect', function ($data) {
-                $list_view = '<ul>';
+                $list_view = '<div class="text-justify">';
                 $aspects = explode('|', $data->aspect);
                 $found = false;
 
                 foreach ($aspects as $aspect) {
                     $aspectQuestion = AspectQuestion::where('id', $aspect)->first();
                     if ($aspectQuestion) {
-                        $list_view .= '<li>' . $aspectQuestion->name . '</li>';
+                        $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . $aspectQuestion->name . '</span >';
                         $found = true;
                     }
                 }
@@ -88,11 +88,11 @@ class QuestionController extends Controller
                 if (!$found) {
                     $allAspects = AspectQuestion::all();
                     foreach ($allAspects as $aspect) {
-                        $list_view .= '<li>' . $aspect->name . '</li>';
+                        $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.7rem; font-weight: bold;">' . $aspect->name . '</span>';
                     }
                 }
 
-                $list_view .= '</ul>';
+                $list_view .= '</div>';
                 return $list_view;
             })
             ->filterColumn('aspect', function ($query, $keyword) {
@@ -108,9 +108,11 @@ class QuestionController extends Controller
             })
 
             ->addColumn('action', function ($data) {
-                $btn_action = '<a href="' . route('master.question.show', ['id' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
+                $btn_action = '<div align="center">';
+                $btn_action .= '<a href="' . route('master.question.show', ['id' => $data->id]) . '" class="btn btn-sm btn-info my-1"><i class="fas fa-eye"></i></a>';
                 $btn_action .= '<a href="' . route('master.question.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning my-1 ml-1"><i class="fas fa-pencil-alt"></i></a>';
                 $btn_action .= '<button onclick="destroyRecord(' . $data->id . ')" class="btn btn-sm btn-danger my-1 ml-1"><i class="fas fa-trash"></i></button>';
+                $btn_action .= '</div>';
                 return $btn_action;
             })
             ->only(['question', 'aspect', 'description', 'level', 'action'])
