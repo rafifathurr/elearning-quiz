@@ -423,39 +423,29 @@
             let interval = setInterval(updateTimestamp, 1000);
 
             function updateTimestamp() {
-
-                if (time % 60 > 9) {
-                    $('#second_time').html(time % 60);
-                } else {
-                    $('#second_time').html('0'.concat(time % 60));
-                }
-
                 if (time > 0) {
+                    // Hitung detik
+                    let seconds = time % 60;
+                    $('#second_time').html(seconds > 9 ? seconds : '0' + seconds);
 
-                    if (Math.floor(time / 60) > 0) {
-                        if (Math.floor(time / 60) > 9) {
-                            $('#minute_time').html(Math.floor(time / 60));
-                        } else {
-                            $('#minute_time').html('0'.concat(Math.floor(time / 60)))
-                        }
-                    } else {
-                        $('#minute_time').html('00');
-                    }
+                    // Hitung menit
+                    let minutes = Math.floor((time % 3600) / 60);
+                    $('#minute_time').html(minutes > 9 ? minutes : '0' + minutes);
 
-                    if (Math.floor(time / 3600) > 0) {
-                        $('#hour_time').html(Math.floor(time / 3600));
-                    } else {
-                        $('#hour_time').html('00');
-                    }
+                    // Hitung jam
+                    let hours = Math.floor(time / 3600);
+                    $('#hour_time').html(hours > 9 ? hours : '0' + hours);
 
                     // Simpan waktu yang tersisa ke localStorage
                     localStorage.setItem('remainingTime', time);
+
                     time--;
                 } else {
                     clearInterval(interval);
                     timeExpired();
                 }
             }
+
 
             function finishQuiz() {
                 Swal.fire({
