@@ -166,12 +166,15 @@ class KecermatanController extends Controller
         DB::beginTransaction();
         try {
 
-            // Buat entri Result baru
+            $encryptedId = $request->get('order_detail_id');
+            $orderDetailId = decrypt($encryptedId);
+
             $result = Result::create([
                 'quiz_id' => $quiz->id,
                 'user_id' => Auth::user()->id,
                 'start_time' => now(),
-                'time_duration' => $quiz->time_duration
+                'time_duration' => $quiz->time_duration,
+                'order_detail_id' => $orderDetailId
             ]);
 
             Log::info('New result created with ID: ' . $result->id);

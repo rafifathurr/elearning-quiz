@@ -30,7 +30,7 @@
                                             </div>
                                             <div class="mx-2">
                                                 @if ($quiz->type_aspect == 'kecermatan')
-                                                    <a href="{{ route('kecermatan.play', ['quiz' => $quiz->id]) }}"
+                                                    <a href="{{ route('kecermatan.play', ['quiz' => $quiz->id]) . '?order_detail_id=' . encrypt($orderDetailId) }}"
                                                         class="btn btn-lg btn-success" id="mulai">
                                                         <i class="fas fa-play mr-2"></i>Mulai Kecermatan
                                                     </a>
