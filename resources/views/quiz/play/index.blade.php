@@ -13,6 +13,7 @@
                                     {{ $quiz['name'] }}
                                 </h2>
                                 <input type="hidden" id="type_aspect" value="{{ $quiz['type_aspect'] }}">
+                                <input type="hidden" id="total_question" value="{{ $total_question }}">
                             </div>
                             <div class="d-flex">
                                 <div class="p-2">
@@ -248,6 +249,122 @@
                         },
                     });
                 }
+            }
+
+
+            function answerKecermatan(element) {
+                let selectedAnswer = $(element).find('input[name="answer_list"]').val();
+                let resultId = $('#result_id').val(); // Ambil resultId dari input hidden
+                let questionId = $('#question_id').val();
+                let token = $('meta[name="csrf-token"]').attr('content');
+                let questionNumber = $('#active_question').data('question-number');
+                let totalQuestion = $('#total_question').val();
+
+                console.log('Current Question Number:', questionNumber);
+                console.log('Total Question:', totalQuestion);
+
+                let isLastQuestion = questionNumber == totalQuestion;
+                console.log('isLastQuestion:', isLastQuestion);
+
+
+                $.ajax({
+                    url: '{{ url('admin/quiz/answer') }}',
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        _token: token,
+                        value: selectedAnswer,
+                        resultId: resultId,
+                        questionId: questionId,
+                    },
+                    success: function(data) {
+                        console.log("Jawaban berhasil disimpan:", data.value);
+
+                        $('#answer_list .card').removeClass('bg-success').addClass('bg-primary');
+                        $(element).removeClass('bg-primary').addClass('bg-success');
+
+
+                        console.log('Cek apakah ini pertanyaan terakhir...');
+                        if (isLastQuestion) {
+                            console.log('Pertanyaan terakhir!');
+
+                            $.ajax({
+                                url: '{{ url('admin/quiz/finish') }}',
+                                type: 'POST',
+                                cache: false,
+                                data: {
+                                    _token: token,
+                                    value: selectedAnswer || '',
+                                    resultId: resultId,
+                                    questionId: questionId,
+                                    q: $('#active_question').data('question-number') || 0,
+                                },
+                                success: function() {
+                                    const resultUrl =
+                                        `{{ route('admin.quiz.result', ['resultId' => '__RESULT_ID__']) }}`
+                                        .replace('__RESULT_ID__', resultId);
+                                    window.location.href = resultUrl;
+                                },
+                                error: function(xhr) {
+                                    console.error("Error AJAX:", xhr);
+                                    swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
+                                },
+                            });
+                            return;
+
+                        }
+                        console.log('Bukan pertanyaan terakhir.');
+
+                        // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
+                        let questionNumber = $('#active_question').data('question-number');
+                        $.ajax({
+                            url: '{{ url('admin/quiz/lastQuestion') }}',
+                            type: 'POST',
+                            cache: false,
+                            data: {
+                                _token: token,
+                                resultId: resultId,
+                                q: questionNumber + 1,
+                            },
+                            success: function(data) {
+                                console.log("Berhasil memperbarui display time:", data);
+
+                                // Ambil pertanyaan berikutnya
+                                $.ajax({
+                                    url: $('#url-next').val(),
+                                    type: 'GET',
+                                    cache: false,
+                                    success: function(data) {
+                                        console.log(data);
+                                        if (data) {
+                                            $('#question_box').html(data);
+                                        } else {
+                                            swalError('Tidak ada pertanyaan berikutnya.');
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        console.log(xhr);
+                                        if (xhr.status == 401) {
+                                            swalError('Sesi Anda telah habis.');
+                                            window.location.href =
+                                                '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
+                                        } else if (xhr.status == 500) {
+                                            swalError('Terjadi kesalahan koneksi.');
+                                        }
+                                    },
+                                });
+                            },
+                            error: function(xhr) {
+                                console.log("Error AJAX:", xhr);
+                                swalError('Gagal memperbarui display time.');
+                            },
+                        });
+                    },
+                    error: function(xhr) {
+                        console.log("Error AJAX:", xhr);
+                        swalError('Gagal mengirim jawaban, silakan coba lagi.');
+                    },
+                });
             }
 
 

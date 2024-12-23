@@ -13,8 +13,9 @@
                                     <div class="col-md-6 text-center">
                                         <h3 class="font-weight-bold">{{ $quiz->name }}</h3>
                                         <h5 class="font-weight-medium">Durasi : {{ $quiz->time_duration . ' Detik' }}</h5>
-                                        <h5 class="font-weight-medium">Total Pertanyaan :
-                                            {{ $totalQuestions . ' Soal' }}</h5>
+                                        <h5 class="font-weight-medium">
+                                            {{ $totalQuestions > 0 ? 'Total Pertanyaan :' . $totalQuestions . ' Soal' : 'Jawab Pertanyaan Sebanyak-banyaknya' }}
+                                        </h5>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
                                                 @if (auth()->user()->hasRole('admin'))
@@ -28,10 +29,17 @@
                                                 @endif
                                             </div>
                                             <div class="mx-2">
-                                                <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?order_detail_id=' . encrypt($orderDetailId) }}"
-                                                    class="btn btn-lg btn-success" id="mulai">
-                                                    <i class="fas fa-play mr-2"></i>Mulai
-                                                </a>
+                                                @if ($quiz->type_aspect == 'kecermatan')
+                                                    <a href="{{ route('kecermatan.play', ['quiz' => $quiz->id]) }}"
+                                                        class="btn btn-lg btn-success" id="mulai">
+                                                        <i class="fas fa-play mr-2"></i>Mulai Kecermatan
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('admin.quiz.play', ['quiz' => $quiz->id]) . '?order_detail_id=' . encrypt($orderDetailId) }}"
+                                                        class="btn btn-lg btn-success" id="mulai">
+                                                        <i class="fas fa-play mr-2"></i>Mulai
+                                                    </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

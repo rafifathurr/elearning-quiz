@@ -7,6 +7,7 @@ use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KecermatanController;
 use App\Http\Controllers\myClassAdminController;
 use App\Http\Controllers\myClassController;
 use App\Http\Controllers\myTestController;
@@ -97,6 +98,15 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::delete('delete/{id}', 'destroy')->name('destroy');
     });
 
+    Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
+        Route::get('play/{quiz}', 'play')->name('play');
+        Route::get('getQuestion/{result}', 'getQuestion')->name('getQuestion');
+        Route::post('answer', 'answer')->name('answer');
+        Route::post('nextQuestion', 'nextQuestion')->name('nextQuestion');
+        Route::post('finish', 'finish')->name('finish');
+        Route::get('result/{resultId}', 'showResult')->name('result');
+    });
+
     Route::group(['controller' => myClassController::class, 'prefix' => 'myclass', 'as' => 'myclass.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
@@ -150,6 +160,14 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
+
+
+        Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
+            Route::get('create', 'create')->name('create');
+            Route::post('store', 'store')->name('store');
+            Route::get('edit/{quiz}', 'edit')->name('edit');
+            Route::patch('update/{quiz}', 'update')->name('update');
+        });
     });
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {

@@ -20,10 +20,18 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <a href="{{ route('admin.quiz.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Tambah Test
-                                </a>
+                                <div class="d-flex">
+                                    <a href="{{ route('admin.quiz.create') }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Tambah Test
+                                    </a>
+                                    <a href="{{ route('master.kecermatan.create') }}" class="btn btn-info btn-sm ml-3">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Tambah Test Kecermatan
+
+                                    </a>
+                                </div>
+
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url" value="{{ url()->current() }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="datatable">

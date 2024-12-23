@@ -25,7 +25,7 @@
                                 <img src="{{ asset($active_question['attachment']) }}" class="img-fluid"
                                     style="max-height: 14rem;">
                             @endif
-                            @if ($active_question['is_generate_random_answer'])
+                            {{-- @if ($active_question['is_generate_random_answer'])
                                 <div class="d-flex flex-wrap justify-content-center">
                                     @php
                                         $index_new = 0;
@@ -75,7 +75,7 @@
                                         @endif
                                     @endforeach
                                 </div>
-                            @endif
+                            @endif --}}
                             <div class="mt-3">
                                 {!! $active_question['description'] !!}
                             </div>
