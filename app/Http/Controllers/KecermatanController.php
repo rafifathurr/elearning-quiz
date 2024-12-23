@@ -265,14 +265,10 @@ class KecermatanController extends Controller
         } else {
             // Generate random alphabetic answers
             $length = strlen($correctAnswer['answer']);
+            $answerList[] = $correctAnswer['answer']; // Tambahkan huruf benar ke daftar pengecualian
 
             for ($i = 1; $i <= 4; $i++) {
                 $randomAnswer = $this->generateAnswerRandomLetters($answerList, $length);
-
-                // Pastikan tidak ada duplikasi
-                while (in_array($randomAnswer, $answerList)) {
-                    $randomAnswer = $this->generateAnswerRandomLetters($answerList, $length);
-                }
 
                 $quizAnswerArr[] = [
                     'answer' => $randomAnswer,
@@ -284,7 +280,7 @@ class KecermatanController extends Controller
                     'updated_at' => now(),
                 ];
 
-                $answerList[] = $randomAnswer;
+                $answerList[] = $randomAnswer; // Tambahkan jawaban yang sudah dihasilkan ke pengecualian
             }
         }
 
@@ -436,19 +432,21 @@ class KecermatanController extends Controller
 
     private function generateAnswerRandomLetters(array $exception, int $length = 1)
     {
-        do {
-            // Buat string huruf acak dengan panjang tertentu menggunakan random_int untuk keamanan lebih
-            $letters = implode('', array_map(function () {
-                return chr(random_int(65, 90)); // ASCII 65-90 adalah huruf kapital A-Z
-            }, range(1, $length)));
+        $alphabet = range('A', 'Z'); // Semua huruf kapital A-Z
+        $validLetters = array_diff($alphabet, $exception); // Eksklusikan huruf yang ada dalam pengecualian
 
-            // Log untuk memeriksa jawaban yang dihasilkan
-            Log::info("Generated random letter: $letters");
-        } while (in_array($letters, $exception)); // Cek apakah huruf sudah ada di daftar pengecualian
+        if (empty($validLetters)) {
+            throw new Exception('No valid letters available to generate random answer.');
+        }
 
-        // Log untuk memeriksa daftar pengecualian
-        Log::info("Exception list: " . implode(', ', $exception));
+        // Ambil huruf acak dari daftar valid
+        $letters = '';
+        for ($i = 0; $i < $length; $i++) {
+            $letters .= $validLetters[array_rand($validLetters)];
+        }
 
+        // Log hasil untuk debug
+        Log::info("Generated random letter: $letters");
         return $letters;
     }
 }
