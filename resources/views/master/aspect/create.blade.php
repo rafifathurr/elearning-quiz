@@ -45,7 +45,6 @@
                                             <option value="">Pilih Tipe Aspek</option>
                                             <option value="kecerdasan">Kecerdasan</option>
                                             <option value="kepribadian">Kepribadian</option>
-                                            <option value="kecermatan">Kecermatan</option>
                                         </select>
                                     </div>
                                 </div>

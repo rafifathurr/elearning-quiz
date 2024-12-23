@@ -48,9 +48,6 @@
                                             <option value="kepribadian"
                                                 {{ $aspect->type_aspect == 'kepribadian' ? 'selected' : '' }}>Kepribadian
                                             </option>
-                                            <option value="kecermatan"
-                                                {{ $aspect->type_aspect == 'kecermatan' ? 'selected' : '' }}>Kecermatan
-                                            </option>
                                         </select>
                                         @error('description')
                                             <div class="alert alert-danger mt-2">
