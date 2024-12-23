@@ -18,4 +18,8 @@ class OrderDetail extends Model
     {
         return $this->belongsTo(Quiz::class, 'quiz_id', 'id');
     }
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
 }

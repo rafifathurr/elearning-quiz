@@ -61,6 +61,9 @@ class myTestController extends Controller
 
         return DataTables::of($myTest)
             ->addIndexColumn()
+            ->addColumn('name', function ($data) {
+                return $data->order->user->name;
+            })
             ->addColumn('package', function ($data) {
                 return $data->package->name;
             })
@@ -115,14 +118,18 @@ class myTestController extends Controller
                         ->where('order_detail_id', $data->id)
                         ->whereNotNull('finish_time')
                         ->first();
-                    $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                    if ($data->quiz->type_aspect == 'kecermatan') {
+                        $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
+                    } else {
+                        $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
+                    }
                 }
                 $btn_action .= '</div>';
                 return $btn_action;
             })
 
 
-            ->only(['package', 'quiz', 'type_quiz', 'action'])
+            ->only(['name', 'package', 'quiz', 'type_quiz', 'action'])
             ->rawColumns(['action'])
             ->make(true);
     }

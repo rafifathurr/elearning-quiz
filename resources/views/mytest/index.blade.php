@@ -28,6 +28,9 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
+                                                @hasrole('admin')
+                                                    <th>Nama Pengguna</th>
+                                                @endhasrole
                                                 <th>Nama Test</th>
                                                 <th>Tipe Test</th>
                                                 <th>Action</th>
@@ -47,8 +50,14 @@
     </div>
     @push('javascript-bottom')
         @include('js.mytest.script')
-        <script>
-            dataTable();
-        </script>
-    @endpush
-@endsection
+        @hasrole('admin')
+            <script>
+                dataTableAdmin();
+            </script>
+        @else
+            <script>
+                dataTable();
+            </script>
+            @endif
+        @endpush
+    @endsection

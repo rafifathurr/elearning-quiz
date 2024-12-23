@@ -795,11 +795,16 @@ class QuizController extends Controller
     public function showResult($resultId)
     {
         try {
-            $result = Result::where('id', $resultId)
-                ->where('user_id', Auth::id())
-                ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
-                ->firstOrFail();
-
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $result = Result::where('id', $resultId)
+                    ->where('user_id', Auth::id())
+                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->firstOrFail();
+            } else {
+                $result = Result::where('id', $resultId)
+                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->firstOrFail();
+            }
             // Hitung data per aspek
             $questionsPerAspect = $result->details
                 ->groupBy('aspect_id')
