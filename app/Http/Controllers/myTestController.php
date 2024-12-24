@@ -96,7 +96,11 @@ class myTestController extends Controller
                         $endTime = $startTime->copy()->addSeconds($result->time_duration);
 
                         if ($currentDateTime->lte($endTime)) {
-                            $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            if ($data->quiz->type_aspect == 'kecermatan') {
+                                $btn_action .= '<a href="' . route('kecermatan.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            } else {
+                                $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                            }
                         } else {
                             // Update finish_time jika waktu habis
                             $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
