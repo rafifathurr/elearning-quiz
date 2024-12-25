@@ -52,6 +52,7 @@
                                 <div id="questions-container">
                                     <div class="card mb-3 question-item">
                                         <div class="card-body">
+                                            <input type="hidden" name="nama_kombinasi[]" value="kombinasi_1">
                                             <h4>Pertanyaan</h4>
                                             <div class="form-group row">
                                                 <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
@@ -84,6 +85,23 @@
                                                     @enderror
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="durasi_kombinasi"
+                                                    class="col-md-4 control-label text-left">Durasi Waktu (Detik)
+                                                    <span class="text-danger ml-1">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <input
+                                                        class="form-control @error('durasi_kombinasi.*') is-invalid @enderror"
+                                                        type="number" name="durasi_kombinasi[]" required
+                                                        placeholder="Durasi Waktu">
+                                                    @error('durasi_kombinasi.*')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -100,11 +118,15 @@
                         </form>
 
                         <script>
+                            let questionCount = 1; // Untuk memberikan nomor pada nama_kombinasi
+
                             document.getElementById('add-question').addEventListener('click', function() {
                                 const container = document.getElementById('questions-container');
+                                questionCount++; // Increment nomor kombinasi
                                 const questionTemplate = `
                                     <div class="card mb-3 question-item">
                                         <div class="card-body">
+                                            <input type="hidden" name="nama_kombinasi[]" value="kombinasi_${questionCount}">
                                             <h4>Pertanyaan</h4>
                                             <div class="form-group row">
                                                 <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
@@ -126,6 +148,18 @@
                                                     <input type="number" name="qty[]" placeholder="Jumlah Pertanyaan" class="form-control" required>
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="durasi_kombinasi"
+                                                    class="col-md-4 control-label text-left">Durasi Waktu (Detik)
+                                                    <span class="text-danger ml-1">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <input
+                                                        class="form-control"
+                                                        type="number" name="durasi_kombinasi[]"
+                                                        placeholder="Durasi Waktu" required>
+                                                </div>
+                                            </div>
                                             <button type="button" class="btn btn-danger remove-question">Hapus Pertanyaan</button>
                                         </div>
                                     </div>
@@ -139,6 +173,7 @@
                                 }
                             });
                         </script>
+
 
                     </div>
                 </div>

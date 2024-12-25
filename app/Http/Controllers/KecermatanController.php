@@ -27,38 +27,59 @@ class KecermatanController extends Controller
             'type_random_question.*' => 'required|string|in:angka,huruf',
             'qty' => 'required|array',
             'qty.*' => 'required|integer|min:1',
+            'durasi_kombinasi' => 'required|array',
+            'durasi_kombinasi.*' => 'required|integer|min:1',
         ]);
 
         try {
-            // Proses data untuk question_kecermatan
             $questions = [];
-
             foreach ($request->type_random_question as $index => $type) {
                 $qty = $request->qty[$index];
+                $durasi_kombinasi = $request->durasi_kombinasi[$index];
+                $nama_kombinasi = 'kombinasi' . ($index + 1);
+
+                // Generate 5 unique answers
                 if ($type === 'angka') {
-                    for ($i = 0; $i < $qty; $i++) {
-                        $questions[] = [
-                            'correct_answer' => rand(1, 99), // Angka acak 1-99
-                        ];
+                    // Generate 5 unique random numbers between 1 and 99
+                    $unique_answers = array_unique(array_map(fn() => rand(1, 99), range(1, 5)));
+                    // Ensure there are exactly 5 unique answers
+                    while (count($unique_answers) < 5) {
+                        $unique_answers[] = rand(1, 99);
+                        $unique_answers = array_unique($unique_answers); // Remove duplicates
                     }
-                } elseif ($type === 'huruf') {
-                    for ($i = 0; $i < $qty; $i++) {
-                        $questions[] = [
-                            'correct_answer' => chr(rand(65, 90)), // Huruf acak A-Z
-                        ];
+                } else {
+                    // Generate 5 unique random letters
+                    $unique_answers = array_unique(array_map(fn() => chr(rand(65, 90)), range(1, 5)));
+                    // Ensure there are exactly 5 unique letters
+                    while (count($unique_answers) < 5) {
+                        $unique_answers[] = chr(rand(65, 90));
+                        $unique_answers = array_unique($unique_answers); // Remove duplicates
                     }
                 }
-            }
 
-            // Acak urutan pertanyaan
-            shuffle($questions);
+                // Repeat unique answers and shuffle to fill the number of questions (qty)
+                $correct_answers = [];
+                for ($i = 0; $i < $qty; $i++) {
+                    $correct_answers[] = $unique_answers[$i % count($unique_answers)];
+                }
+                shuffle($correct_answers); // Acak ulang jawaban agar tidak mengikuti pola
+
+                // Create questions
+                foreach ($correct_answers as $correct_answer) {
+                    $questions[] = [
+                        'correct_answer' => $correct_answer,
+                        'durasi_kombinasi' => $durasi_kombinasi,
+                        'nama_kombinasi' => $nama_kombinasi,
+                    ];
+                }
+            }
 
             // Tambahkan nomor urut ke setiap pertanyaan
             foreach ($questions as $index => &$question) {
                 $question['order'] = $index + 1;
             }
 
-            // Simpan data ke dalam database
+            // Simpan data ke database
             $kecermatan = Quiz::create([
                 'name' => $request->name,
                 'type_aspect' => 'kecermatan',
@@ -77,6 +98,11 @@ class KecermatanController extends Controller
                 ->with('failed', $e->getMessage());
         }
     }
+
+
+
+
+
 
     public function edit(Quiz $quiz)
     {
@@ -134,8 +160,6 @@ class KecermatanController extends Controller
                 }
             }
 
-            // Acak urutan pertanyaan
-            shuffle($questions);
 
             // Tambahkan nomor urut ke setiap pertanyaan
             foreach ($questions as $index => &$question) {
@@ -202,14 +226,21 @@ class KecermatanController extends Controller
 
     public function getQuestion(Result $result, Request $request)
     {
-        // Decode the question data from the quiz
         $questionKecermatan = json_decode($result->quiz->question_kecermatan, true);
+
+        Log::info('Decoded question data:', ['question_kecermatan' => $questionKecermatan]);
 
         if (!is_array($questionKecermatan) || empty($questionKecermatan)) {
             throw new Exception('Invalid question data');
         }
 
-        // Ambil nomor pertanyaan aktif
+        $durasiKombinasi = collect($questionKecermatan)
+            ->groupBy(fn($question) => $question['nama_kombinasi'] ?? null)
+            ->map(fn($questions) => $questions->first()['durasi_kombinasi'] ?? 0)
+            ->toArray();
+
+        Log::info('Durasi Kombinasi:', ['durasi_kombinasi' => $durasiKombinasi]);
+
         $activeQuestionNumber = 1; // Default value
         if ($request->has('q')) {
 
@@ -220,94 +251,115 @@ class KecermatanController extends Controller
             $activeQuestionNumber = $resultDetails->first()->order + 1;
         }
 
+        Log::info('Active Question Number:', ['active_question_number' => $activeQuestionNumber]);
 
-        // Cari pertanyaan aktif berdasarkan "order"
         $activeQuestion = collect($questionKecermatan)->firstWhere('order', $activeQuestionNumber);
 
-        if (!$activeQuestion || !isset($activeQuestion['correct_answer'])) {
+        if (!$activeQuestion || !isset($activeQuestion['nama_kombinasi'])) {
+            throw new Exception('Combination not found for active question');
+        }
+
+        $currentCombination = $activeQuestion['nama_kombinasi'];
+
+
+        $questionsInCombination = array_filter($questionKecermatan, function ($question) use ($currentCombination) {
+            return $question['nama_kombinasi'] === $currentCombination;
+        });
+
+        $currentCombinationIndex = array_search($currentCombination, array_keys($durasiKombinasi));
+        $isLastCombination = $currentCombinationIndex === (count($durasiKombinasi) - 1);
+
+        if ($isLastCombination && $activeQuestionNumber > max(array_column($questionsInCombination, 'order'))) {
+            // Arahkan ke fungsi finish jika sudah di kombinasi terakhir
+            // Create a request to pass the resultId
+            $request = new Request();
+            $request->merge([
+                'resultId' => $result->id,  // Pass the resultId here
+            ]);
+
+            return $this->finish($request);  // Pass the request object to finish
+        }
+
+        Log::info('Questions in Current Combination:', ['questions_in_combination' => $questionsInCombination]);
+
+        // Hapus unique_answers lama di session saat berpindah kombinasi
+        $previousCombination = session()->get('previous_combination');
+        if ($previousCombination !== $currentCombination) {
+            session()->forget('unique_answers');
+            session()->put('previous_combination', $currentCombination);
+        }
+
+        // Ambil unique_answers dari session atau generate baru jika tidak ada
+        $uniqueAnswers = session()->get('unique_answers', []);
+        if (empty($uniqueAnswers)) {
+            $uniqueAnswers = $this->generateUniqueAnswersSet($questionsInCombination, $currentCombination);
+
+            if (empty($uniqueAnswers)) {
+                Log::warning('Unique Answers is empty. Generating fallback data.');
+                $uniqueAnswers = array_unique(array_column($questionKecermatan, 'correct_answer'));
+            }
+            shuffle($uniqueAnswers);
+            session()->put('unique_answers', $uniqueAnswers);
+        }
+
+        Log::info('Unique Answers:', ['unique_answers' => $uniqueAnswers]);
+
+        $correctAnswer = $activeQuestion['correct_answer'] ?? null;
+
+        if (!$correctAnswer) {
             throw new Exception('Correct answer not found in question data');
         }
 
-        // Ambil jawaban benar
-        $correctAnswer = [
-            'answer' => $activeQuestion['correct_answer'],
-            'attachment' => null,
-            'answered' => false,
-            'is_answer' => 1,
-            'point' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
+        Log::info('Correct Answer:', ['correct_answer' => $correctAnswer]);
 
-        $quizAnswerArr = [$correctAnswer];
-        $answerList = [intval($correctAnswer['answer'])]; // Untuk menghindari duplikasi
+        $wrongAnswers = array_values(array_filter($uniqueAnswers, function ($answer) use ($correctAnswer) {
+            return $answer !== $correctAnswer;
+        }));
 
-        if (is_numeric($correctAnswer['answer'])) {
-            // Generate random numeric answers
-            $rangeNumMin = 10 ** (strlen($correctAnswer['answer']) - 1);
-            $rangeNumMax = (10 ** strlen($correctAnswer['answer'])) - 1;
+        $wrongAnswers = array_slice($wrongAnswers, 0, 4);
 
-            for ($i = 1; $i <= 4; $i++) {
-                $randomAnswer = $this->generateAnswerRandom($rangeNumMin, $rangeNumMax, $answerList);
+        Log::info('Wrong Answers:', ['wrong_answers' => $wrongAnswers]);
 
-                $quizAnswerArr[] = [
-                    'answer' => $randomAnswer,
-                    'attachment' => null,
-                    'answered' => false,
-                    'point' => 0,
-                    'is_answer' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-
-                $answerList[] = $randomAnswer;
-            }
-        } else {
-            // Generate random alphabetic answers
-            $length = strlen($correctAnswer['answer']);
-            $answerList[] = $correctAnswer['answer']; // Tambahkan huruf benar ke daftar pengecualian
-
-            for ($i = 1; $i <= 4; $i++) {
-                $randomAnswer = $this->generateAnswerRandomLetters($answerList, $length);
-
-                $quizAnswerArr[] = [
-                    'answer' => $randomAnswer,
-                    'attachment' => null,
-                    'answered' => false,
-                    'point' => 0,
-                    'is_answer' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-
-                $answerList[] = $randomAnswer; // Tambahkan jawaban yang sudah dihasilkan ke pengecualian
-            }
+        $quizAnswerArr = [];
+        foreach ($wrongAnswers as $answer) {
+            $quizAnswerArr[] = [
+                'answer' => $answer,
+                'attachment' => null,
+                'answered' => false,
+                'point' => 0,
+                'is_answer' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
 
-        // Acak urutan jawaban sebelum mengembalikan
         shuffle($quizAnswerArr);
 
+        $display_time = ResultDetail::where('result_id', $result->id)->count() + 1;
         $activeQuestion = [
-            'question_number' => $activeQuestion['order'], // Menggunakan 'order'
-            'direction_question' => $activeQuestion['direction_question'] ?? '', // Tambahkan petunjuk soal
+            'question_number' => $activeQuestion['order'],
+            'direction_question' => $activeQuestion['direction_question'] ?? '',
             'quiz_answer' => $quizAnswerArr,
-            'is_active' => true
+            'correct_answer' => $correctAnswer,
+            'is_active' => true,
+            'nama_kombinasi' => $currentCombination,
+            'display_time' => $display_time,
+            'durasi_kombinasi' => $durasiKombinasi[$currentCombination] ?? 0,
         ];
 
-        // Siapkan data untuk respons
-        $quizData = $result->quiz->toArray();
         $data = [
-            'quiz' => $quizData,
+            'quiz' => $result->quiz->toArray(),
             'result' => $result,
             'questions' => $questionKecermatan,
             'active_question' => $activeQuestion,
             'total_question' => count($questionKecermatan),
-            'quiz_answer' => $quizAnswerArr,
+            'unique_answers' => $uniqueAnswers,
+            'durasi_kombinasi' => $durasiKombinasi,
+            'soal_data' => $questionKecermatan,
+            'currentCombination' => $currentCombination,
         ];
 
-        // Return the response based on request type
         if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {
-            Log::info('Sending JSON Response');
             return response()->json(['result' => $data], 200);
         } else {
             if ($request->has('q')) {
@@ -319,6 +371,32 @@ class KecermatanController extends Controller
             return view('master.kecermatan.play.index', $data);
         }
     }
+
+    private function generateUniqueAnswersSet($questions, $currentCombination)
+    {
+        $uniqueAnswers = [];
+
+        $filteredQuestions = array_filter($questions, function ($question) use ($currentCombination) {
+            return isset($question['nama_kombinasi']) && $question['nama_kombinasi'] === $currentCombination;
+        });
+
+        Log::info('Filtered Questions for Combination:', ['filtered_questions' => $filteredQuestions]);
+
+        foreach ($filteredQuestions as $question) {
+            if (isset($question['correct_answer']) && !in_array($question['correct_answer'], $uniqueAnswers)) {
+                $uniqueAnswers[] = $question['correct_answer'];
+            }
+        }
+
+        Log::info('Generated Unique Answers:', ['unique_answers' => $uniqueAnswers]);
+
+        return $uniqueAnswers;
+    }
+
+
+
+
+
 
     public function answer(Request $request)
     {
@@ -390,7 +468,7 @@ class KecermatanController extends Controller
             Log::info('Request Data:', $request->all());
 
 
-
+            session()->forget('unique_answers');
             $totalScore = ResultDetail::where('result_id', $request->resultId)->sum('score');
 
             $resultData = Result::find($request->resultId);

@@ -60,6 +60,7 @@
 
                 // Hapus waktu dari localStorage ketika tombol "Mulai" diklik
                 localStorage.removeItem('remainingTime');
+                localStorage.removeItem('waktuSisa');
 
                 // Setelah menghapus, pindahkan halaman secara manual
                 window.location.href = this.href;
