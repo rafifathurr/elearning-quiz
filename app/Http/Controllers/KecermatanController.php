@@ -32,6 +32,7 @@ class KecermatanController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
             $questions = [];
             foreach ($request->type_random_question as $index => $type) {
                 $qty = $request->qty[$index];
@@ -40,22 +41,21 @@ class KecermatanController extends Controller
 
                 // Generate 5 unique answers
                 if ($type === 'angka') {
-                    // Generate 5 unique random numbers between 1 and 99
-                    $unique_answers = array_unique(array_map(fn() => rand(1, 99), range(1, 5)));
-                    // Ensure there are exactly 5 unique answers
-                    while (count($unique_answers) < 5) {
-                        $unique_answers[] = rand(1, 99);
-                        $unique_answers = array_unique($unique_answers); // Remove duplicates
-                    }
+                    // Generate an array of unique numbers, ensuring exactly 5 unique numbers
+                    $unique_answers = range(1, 99);
+                    shuffle($unique_answers);
+                    $unique_answers = array_slice($unique_answers, 0, 5); // Ambil 5 angka unik
                 } else {
-                    // Generate 5 unique random letters
-                    $unique_answers = array_unique(array_map(fn() => chr(rand(65, 90)), range(1, 5)));
-                    // Ensure there are exactly 5 unique letters
+                    // Generate 5 unique letters
+                    $unique_answers = [];
                     while (count($unique_answers) < 5) {
-                        $unique_answers[] = chr(rand(65, 90));
-                        $unique_answers = array_unique($unique_answers); // Remove duplicates
+                        $letter = chr(rand(65, 90)); // Generate a random letter A-Z
+                        if (!in_array($letter, $unique_answers)) {
+                            $unique_answers[] = $letter; // Add unique letter
+                        }
                     }
                 }
+
 
                 // Repeat unique answers and shuffle to fill the number of questions (qty)
                 $correct_answers = [];
@@ -87,6 +87,8 @@ class KecermatanController extends Controller
                 'question_kecermatan' => json_encode($questions), // Simpan dalam format JSON
             ]);
 
+            DB::commit();
+
             if ($kecermatan) {
                 return redirect()
                     ->route('admin.quiz.index')
@@ -104,30 +106,30 @@ class KecermatanController extends Controller
 
 
 
-    public function edit(Quiz $quiz)
-    {
-        // Decode JSON data from the database
-        $questions = collect(json_decode($quiz->question_kecermatan, true));
 
-        // Group by type and count occurrences
-        $groupedQuestions = $questions->map(function ($item) {
-            return [
-                'type_random_question' => is_numeric($item['correct_answer']) ? 'angka' : 'huruf',
-            ];
-        })->groupBy('type_random_question')->map(function ($group, $key) {
-            return [
-                'type_random_question' => $key,
-                'qty' => $group->count()
-            ];
-        })->values();
+    public function edit($id)
+    {
+        // Ambil data quiz berdasarkan ID
+        $quiz = Quiz::findOrFail($id);
+
+        // Decode data pertanyaan (yang disimpan dalam format JSON)
+        $questions = json_decode($quiz->question_kecermatan, true);
+
+        // Group questions by 'nama_kombinasi'
+        $groupedQuestions = [];
+        foreach ($questions as $question) {
+            $groupedQuestions[$question['nama_kombinasi']][] = $question;
+        }
 
         return view('master.kecermatan.edit', compact('quiz', 'groupedQuestions'));
     }
 
 
 
+
     public function update(Request $request, string $id)
     {
+
         $request->validate([
             'name' => 'required|string|max:255',
             'time_duration' => 'required|integer|min:1',
@@ -135,31 +137,56 @@ class KecermatanController extends Controller
             'type_random_question.*' => 'required|string|in:angka,huruf',
             'qty' => 'required|array',
             'qty.*' => 'required|integer|min:1',
+            'durasi_kombinasi' => 'required|array',
+            'durasi_kombinasi.*' => 'required|integer|min:1',
         ]);
 
+
+
         try {
+            DB::beginTransaction();
             $quiz = Quiz::findOrFail($id);
 
-            // Proses data baru
             $questions = [];
-
             foreach ($request->type_random_question as $index => $type) {
                 $qty = $request->qty[$index];
+                $durasi_kombinasi = $request->durasi_kombinasi[$index];
+                $nama_kombinasi = 'kombinasi' . ($index + 1);
+
+                // Generate 5 unique answers
                 if ($type === 'angka') {
-                    for ($i = 0; $i < $qty; $i++) {
-                        $questions[] = [
-                            'correct_answer' => rand(1, 99), // Angka acak 1-99
-                        ];
-                    }
-                } elseif ($type === 'huruf') {
-                    for ($i = 0; $i < $qty; $i++) {
-                        $questions[] = [
-                            'correct_answer' => chr(rand(65, 90)), // Huruf acak A-Z
-                        ];
+                    // Generate an array of unique numbers, ensuring exactly 5 unique numbers
+                    $unique_answers = range(1, 99);
+                    shuffle($unique_answers);
+                    $unique_answers = array_slice($unique_answers, 0, 5); // Ambil 5 angka unik
+                } else {
+                    // Generate 5 unique letters
+                    $unique_answers = [];
+                    while (count($unique_answers) < 5) {
+                        $letter = chr(rand(65, 90)); // Generate a random letter A-Z
+                        if (!in_array($letter, $unique_answers)) {
+                            $unique_answers[] = $letter; // Add unique letter
+                        }
                     }
                 }
-            }
 
+
+                // Repeat unique answers and shuffle to fill the number of questions (qty)
+                $correct_answers = [];
+                for ($i = 0; $i < $qty; $i++) {
+                    $correct_answers[] = $unique_answers[$i % count($unique_answers)];
+                }
+                shuffle($correct_answers); // Acak ulang jawaban agar tidak mengikuti pola
+
+                // Create questions
+                foreach ($correct_answers as $correct_answer) {
+                    $questions[] = [
+                        'correct_answer' => $correct_answer,
+                        'durasi_kombinasi' => $durasi_kombinasi,
+                        'nama_kombinasi' => $nama_kombinasi,
+                    ];
+                }
+            }
 
             // Tambahkan nomor urut ke setiap pertanyaan
             foreach ($questions as $index => &$question) {
@@ -169,10 +196,11 @@ class KecermatanController extends Controller
             // Update quiz data
             $quiz->update([
                 'name' => $request->name,
+                'type_aspect' => 'kecermatan',
                 'time_duration' => $request->time_duration,
                 'question_kecermatan' => json_encode($questions),
             ]);
-
+            DB::commit();
             return redirect()
                 ->route('admin.quiz.index')
                 ->with(['success' => 'Berhasil Edit Test Kecermatan']);

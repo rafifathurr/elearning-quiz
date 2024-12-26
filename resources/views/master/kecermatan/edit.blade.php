@@ -51,9 +51,14 @@
                                 </div>
 
                                 <div id="questions-container">
-                                    @foreach ($groupedQuestions as $question)
+                                    @foreach ($groupedQuestions as $nama_kombinasi => $questions)
+                                        @php
+                                            // Ambil data pertama dalam setiap kelompok untuk menentukan type_random_question dan durasi_kombinasi
+                                            $firstQuestion = $questions[0];
+                                        @endphp
                                         <div class="card mb-3 question-item">
                                             <div class="card-body">
+                                                <input type="hidden" name="nama_kombinasi[]" value="{{ $nama_kombinasi }}">
                                                 <h4>Pertanyaan</h4>
                                                 <div class="form-group row">
                                                     <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
@@ -63,11 +68,12 @@
                                                         <select name="type_random_question[]" class="form-control" required>
                                                             <option value="">Pilih Tipe Pertanyaan</option>
                                                             <option value="angka"
-                                                                {{ $question['type_random_question'] == 'angka' ? 'selected' : '' }}>
+                                                                {{ is_numeric($firstQuestion['correct_answer']) ? 'selected' : '' }}>
                                                                 Angka</option>
                                                             <option value="huruf"
-                                                                {{ $question['type_random_question'] == 'huruf' ? 'selected' : '' }}>
+                                                                {{ ctype_alpha($firstQuestion['correct_answer']) ? 'selected' : '' }}>
                                                                 Huruf</option>
+
                                                         </select>
                                                     </div>
                                                 </div>
@@ -76,11 +82,22 @@
                                                         <span class="text-danger ml-1">*</span>
                                                     </label>
                                                     <div class="col-md-8 col-sm-12">
-                                                        <input type="number" name="qty[]" placeholder="Jumlah Pertanyaan"
-                                                            class="form-control" value="{{ $question['qty'] }}" required>
+                                                        <input type="number" name="qty[]" value="{{ count($questions) }}"
+                                                            placeholder="Jumlah Pertanyaan" class="form-control" required>
                                                     </div>
                                                 </div>
-                                                <button type="button" class="btn btn-sm btn-danger remove-question">Hapus
+                                                <div class="form-group row">
+                                                    <label for="durasi_kombinasi"
+                                                        class="col-md-4 control-label text-left">Durasi Waktu (Detik)
+                                                        <span class="text-danger ml-1">*</span>
+                                                    </label>
+                                                    <div class="col-md-8 col-sm-12">
+                                                        <input class="form-control" type="number" name="durasi_kombinasi[]"
+                                                            value="{{ $firstQuestion['durasi_kombinasi'] }}"
+                                                            placeholder="Durasi Waktu" required>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn btn-danger remove-question">Hapus
                                                     Pertanyaan</button>
                                             </div>
                                         </div>
@@ -89,10 +106,10 @@
 
 
 
-                                <button type="button" id="add-question" class="btn btn-success btn-sm mb-3">Tambah
+                                <button type="button" id="add-question" class="btn btn-success mb-3">Tambah
                                     Pertanyaan</button>
 
-                                <div class="pt-3 d-flex justify-content-end">
+                                <div class="pt-3 d-flex">
                                     <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Back</a>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
@@ -101,39 +118,54 @@
                         </form>
 
                         <script>
+                            let questionCount = 1; // Untuk memberikan nomor pada nama_kombinasi
+
                             document.getElementById('add-question').addEventListener('click', function() {
                                 const container = document.getElementById('questions-container');
+                                questionCount++; // Increment nomor kombinasi
                                 const questionTemplate = `
-        <div class="card mb-3 question-item">
-            <div class="card-body">
-                <h4>Pertanyaan</h4>
-                <div class="form-group row">
-                    <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
-                        <span class="text-danger ml-1">*</span>
-                    </label>
-                    <div class="col-md-8 col-sm-12">
-                        <select name="type_random_question[]" class="form-control" required>
-                            <option value="">Pilih Tipe Pertanyaan</option>
-                            <option value="angka">Angka</option>
-                            <option value="huruf">Huruf</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-md-4 control-label text-left">Jumlah Pertanyaan
-                        <span class="text-danger ml-1">*</span>
-                    </label>
-                    <div class="col-md-8 col-sm-12">
-                        <input type="number" name="qty[]" placeholder="Jumlah Pertanyaan" class="form-control" required>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-danger remove-question">Hapus Pertanyaan</button>
-            </div>
-        </div>
-    `;
+                                    <div class="card mb-3 question-item">
+                                        <div class="card-body">
+                                            <input type="hidden" name="nama_kombinasi[]" value="kombinasi_${questionCount}">
+                                            <h4>Pertanyaan</h4>
+                                            <div class="form-group row">
+                                                <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
+                                                    <span class="text-danger ml-1">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <select name="type_random_question[]" class="form-control" required>
+                                                        <option value="">Pilih Tipe Pertanyaan</option>
+                                                        <option value="angka">Angka</option>
+                                                        <option value="huruf">Huruf</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-4 control-label text-left">Jumlah Pertanyaan
+                                                    <span class="text-danger ml-1">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <input type="number" name="qty[]" placeholder="Jumlah Pertanyaan" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="durasi_kombinasi"
+                                                    class="col-md-4 control-label text-left">Durasi Waktu (Detik)
+                                                    <span class="text-danger ml-1">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <input
+                                                        class="form-control"
+                                                        type="number" name="durasi_kombinasi[]"
+                                                        placeholder="Durasi Waktu" required>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-danger remove-question">Hapus Pertanyaan</button>
+                                        </div>
+                                    </div>
+                                `;
                                 container.insertAdjacentHTML('beforeend', questionTemplate);
                             });
-
 
                             document.addEventListener('click', function(event) {
                                 if (event.target.classList.contains('remove-question')) {
@@ -141,7 +173,6 @@
                                 }
                             });
                         </script>
-
                     </div>
                 </div>
             </div>
