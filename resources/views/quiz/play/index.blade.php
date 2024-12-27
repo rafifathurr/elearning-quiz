@@ -152,7 +152,7 @@
             function nextPage() {
                 const typeAspect = $('#type_aspect').val();
 
-                if (typeAspect == 'kecerdasan') {
+                if (typeAspect == 'kepribadian') {
                     let allowed = false;
 
                     // Pastikan pengguna memilih salah satu jawaban

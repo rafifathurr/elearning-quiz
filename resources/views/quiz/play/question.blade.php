@@ -103,8 +103,8 @@
                         </div>
                         <div class="card-footer py-3">
                             <div
-                                class="d-flex  @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kepribadian') justify-content-between @else justify-content-end @endif">
-                                @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kepribadian')
+                                class="d-flex  @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kecerdasan') justify-content-between @else justify-content-end @endif">
+                                @if ($active_question['question_number'] != 1 && $quiz['type_aspect'] == 'kecerdasan')
                                     <div class="mx-2">
                                         <button onclick="backPage()" class="btn btn-danger"><i
                                                 class="fas fa-arrow-left mr-2"></i>Kembali</button>
@@ -147,7 +147,7 @@
                             <div class="card-body d-flex justify-content-center align-items-center  @if ($quiz_question_list['is_active']) bg-primary text-white 
                         @elseif($quiz_question_list['answered']) bg-success text-white 
                         @else bg-light text-dark @endif"
-                                @if ($quiz['type_aspect'] == 'kepribadian') onclick="navigateToQuestion(this)"
+                                @if ($quiz['type_aspect'] == 'kecerdasan') onclick="navigateToQuestion(this)"
                         data-url="{{ route('admin.quiz.getQuestion', ['result' => $result->id, 'q' => $quiz_question_list['question_number']]) }}"
                         data-q="{{ $quiz_question_list['question_number'] }}" style="cursor: pointer;" @endif>
                                 <h5 class="font-weight-bold text-center mb-0">
