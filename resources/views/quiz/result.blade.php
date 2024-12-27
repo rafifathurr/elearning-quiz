@@ -105,66 +105,68 @@
             });
         </script>
 
-        <script>
-            // Ambil data dari PHP dan kirim ke JavaScript
-            const combinations = @json($questionsPerCombination->pluck('combination_name'));
-            const totalQuestions = @json($questionsPerCombination->pluck('total_questions'));
-            const correctQuestions = @json($questionsPerCombination->pluck('correct_questions'));
+        @if ($result->quiz->type_aspect == 'kecermatan')
+            <script>
+                // Ambil data dari PHP dan kirim ke JavaScript
+                const combinations = @json($questionsPerCombination->pluck('combination_name'));
+                const totalQuestions = @json($questionsPerCombination->pluck('total_questions'));
+                const correctQuestions = @json($questionsPerCombination->pluck('correct_questions'));
 
-            const formattedCombinations = combinations.map(combination =>
-                combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
-            );
+                const formattedCombinations = combinations.map(combination =>
+                    combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
+                );
 
-            const ctx = document.getElementById('combinationChart').getContext('2d');
-            const combinationChart = new Chart(ctx, {
-                type: 'line', // Tipe chart
-                data: {
-                    labels: formattedCombinations, // Nama kombinasi untuk sumbu X
-                    datasets: [{
-                            label: 'Jumlah Jawaban',
-                            data: totalQuestions, // Data total pertanyaan
-                            borderColor: 'rgba(75, 192, 192, 1)', // Warna garis
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Warna latar belakang
-                            tension: 0.4, // Smooth line
-                        },
-                        {
-                            label: 'Jawaban Benar',
-                            data: correctQuestions, // Data jawaban benar
-                            borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Warna latar belakang
-                            tension: 0.4, // Smooth line
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true, // Responsive design
-                    plugins: {
-                        legend: {
-                            position: 'top', // Posisi legenda
-                        },
-                        title: {
-                            display: true,
-                            text: 'Hasil Jawaban Per Kombinasi', // Judul Chart
-                        },
+                const ctx = document.getElementById('combinationChart').getContext('2d');
+                const combinationChart = new Chart(ctx, {
+                    type: 'line', // Tipe chart
+                    data: {
+                        labels: formattedCombinations, // Nama kombinasi untuk sumbu X
+                        datasets: [{
+                                label: 'Jumlah Jawaban',
+                                data: totalQuestions, // Data total pertanyaan
+                                borderColor: 'rgba(75, 192, 192, 1)', // Warna garis
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Warna latar belakang
+                                tension: 0.4, // Smooth line
+                            },
+                            {
+                                label: 'Jawaban Benar',
+                                data: correctQuestions, // Data jawaban benar
+                                borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Warna latar belakang
+                                tension: 0.4, // Smooth line
+                            },
+                        ],
                     },
-                    scales: {
-                        y: {
+                    options: {
+                        responsive: true, // Responsive design
+                        plugins: {
+                            legend: {
+                                position: 'top', // Posisi legenda
+                            },
                             title: {
                                 display: true,
-                                text: 'Jumlah', // Label sumbu Y
+                                text: 'Hasil Jawaban Per Kombinasi', // Judul Chart
                             },
-                            beginAtZero: true, // Mulai dari 0
-                            ticks: {
-                                // Tampilkan hanya bilangan bulat
-                                callback: function(value) {
-                                    return Number.isInteger(value) ? value : null;
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Jumlah', // Label sumbu Y
                                 },
-                                stepSize: 1, // Langkah antar nilai
+                                beginAtZero: true, // Mulai dari 0
+                                ticks: {
+                                    // Tampilkan hanya bilangan bulat
+                                    callback: function(value) {
+                                        return Number.isInteger(value) ? value : null;
+                                    },
+                                    stepSize: 1, // Langkah antar nilai
+                                },
                             },
                         },
                     },
-                },
-            });
-        </script>
+                });
+            </script>
+        @endif
     @endpush
 @endsection
