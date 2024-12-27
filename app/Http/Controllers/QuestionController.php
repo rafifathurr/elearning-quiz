@@ -27,6 +27,7 @@ class QuestionController extends Controller
     public function dataTable()
     {
         $aspectFilter = request()->get('aspect');
+        $typeAspectFilter = request()->get('type_aspect');
         $question = QuizQuestion::query()->whereNull('deleted_at');
 
         if ($aspectFilter) {
@@ -34,6 +35,17 @@ class QuestionController extends Controller
                 $query->where('aspect', 'LIKE', "%{$aspectFilter}%");
             });
         }
+
+        if ($typeAspectFilter) {
+            $question->where(function ($query) use ($typeAspectFilter) {
+                $aspectIds = AspectQuestion::where('type_aspect', $typeAspectFilter)->pluck('id')->toArray();
+
+                foreach ($aspectIds as $aspectId) {
+                    $query->orWhere('aspect', 'LIKE', "%|{$aspectId}|%");
+                }
+            });
+        }
+
 
         $dataTable = DataTables::of($question)
             ->addIndexColumn()

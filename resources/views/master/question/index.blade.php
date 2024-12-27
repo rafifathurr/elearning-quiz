@@ -25,6 +25,15 @@
                                     Tambah Pertanyaan
                                 </a>
                                 <div class="form-group my-3">
+                                    <label for="filter-type_aspect">Filter Tipe Aspek</label>
+                                    <select id="filter-type_aspect" class="form-control w-25">
+                                        <option value="">-- Pilih Tipe Aspek --</option>
+                                        <option value="kecerdasan">Kecerdasan</option>
+                                        <option value="kepribadian">Kepribadian</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group my-3">
                                     <label for="filter-aspect">Filter Aspek</label>
                                     <select id="filter-aspect" class="form-control w-25">
                                         <option value="">-- Pilih Aspek --</option>

@@ -32,6 +32,7 @@
                 url: url,
                 data: function(d) {
                     d.aspect = $('#filter-aspect').val();
+                    d.type_aspect = $('#filter-type_aspect').val();
                 },
                 error: function(xhr, error, code) {
                     swalError(xhr.statusText);
@@ -74,6 +75,9 @@
 
         });
         $('#filter-aspect').on('change', function() {
+            table.draw();
+        });
+        $('#filter-type_aspect').on('change', function() {
             table.draw();
         });
     }
