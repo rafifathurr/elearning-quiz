@@ -37,9 +37,7 @@
                                     <label for="filter-aspect">Filter Aspek</label>
                                     <select id="filter-aspect" class="form-control w-25">
                                         <option value="">-- Pilih Aspek --</option>
-                                        @foreach ($aspects as $aspect)
-                                            <option value="{{ $aspect->id }}">{{ $aspect->name }}</option>
-                                        @endforeach
+                                        <!-- Aspek akan diisi melalui JavaScript -->
                                     </select>
                                 </div>
 

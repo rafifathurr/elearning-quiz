@@ -117,4 +117,36 @@
             }
         });
     }
+
+    $('#filter-type_aspect').on('change', function() {
+        console.log('type aspect berubah');
+        const typeAspect = $(this).val();
+        const aspectDropdown = $('#filter-aspect');
+
+        // Kosongkan dropdown aspek
+        aspectDropdown.empty();
+        aspectDropdown.append('<option value="">-- Pilih Aspek --</option>');
+
+        if (typeAspect) {
+            // Panggil API untuk mendapatkan data aspek berdasarkan type_aspect
+            $.ajax({
+                url: '{{ url('master/aspect/get-aspect') }}',
+                type: 'GET',
+                data: {
+                    type_aspect: typeAspect
+                },
+                success: function(data) {
+                    // Tambahkan data ke dropdown aspek
+                    data.forEach(function(aspect) {
+                        aspectDropdown.append(
+                            `<option value="${aspect.id}">${aspect.name}</option>`
+                        );
+                    });
+                },
+                error: function() {
+                    console.error('Gagal memuat data aspek');
+                }
+            });
+        }
+    });
 </script>

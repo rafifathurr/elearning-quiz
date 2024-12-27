@@ -157,4 +157,16 @@ class AspectQuestionController extends Controller
                 ->withInput();
         }
     }
+
+    public function getAspectsByTypeAspect(Request $request)
+    {
+        $typeAspect = $request->input('type_aspect');
+
+        // Ambil aspek berdasarkan nilai type_aspect
+        $aspects = AspectQuestion::where('type_aspect', $typeAspect)
+            ->whereNull('deleted_at')
+            ->get(['id', 'name']);
+
+        return response()->json($aspects);
+    }
 }

@@ -140,6 +140,7 @@ Route::group(['middleware' => ['role:admin']], function () {
 
         Route::group(['controller' => AspectQuestionController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::get('get-aspect', 'getAspectsByTypeAspect')->name('getAspectsByTypeAspect');
         });
         Route::resource('aspect', AspectQuestionController::class)->parameters(['aspect' => 'id']);
 
