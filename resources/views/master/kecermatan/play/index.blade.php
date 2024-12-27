@@ -239,6 +239,22 @@
 
             function updateWaktu() {
                 if (durasi > 0) {
+
+                    if (durasi <= 1) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Berpindah ke kombinasi berikutnya',
+                            text: `Anda akan diarahkan ke kombinasi berikutnya.`,
+                            toast: false,
+                            position: 'center',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false,
+                            timer: 1000,
+                            timerProgressBar: true,
+                        });
+                    }
                     let seconds = durasi % 60;
                     $('#detik').html(seconds > 9 ? seconds : '0' + seconds);
 
@@ -303,19 +319,19 @@
                     return;
                 }
 
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Berpindah ke kombinasi berikutnya',
-                    text: `Anda akan diarahkan ke kombinasi berikutnya.`,
-                    toast: false,
-                    position: 'center',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    timer: 1000,
-                    timerProgressBar: true,
-                });
+                // Swal.fire({
+                //     icon: 'info',
+                //     title: 'Berpindah ke kombinasi berikutnya',
+                //     text: `Anda akan diarahkan ke kombinasi berikutnya.`,
+                //     toast: false,
+                //     position: 'center',
+                //     showConfirmButton: false,
+                //     allowOutsideClick: false,
+                //     allowEscapeKey: false,
+                //     allowEnterKey: false,
+                //     timer: 1000,
+                //     timerProgressBar: true,
+                // });
 
 
                 // Jika belum kombinasi terakhir, lanjut ke kombinasi berikutnya
