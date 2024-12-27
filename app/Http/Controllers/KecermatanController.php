@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz\Quiz;
 use App\Models\Result;
 use App\Models\ResultDetail;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -516,10 +517,16 @@ class KecermatanController extends Controller
     public function showResult($resultId)
     {
         try {
-            $result = Result::where('id', $resultId)
-                ->where('user_id', Auth::id())
-                ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
-                ->firstOrFail();
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $result = Result::where('id', $resultId)
+                    ->where('user_id', Auth::id())
+                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->firstOrFail();
+            } else {
+                $result = Result::where('id', $resultId)
+                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->firstOrFail();
+            }
 
             $questionsPerCombination = $result->details
                 ->groupBy('combination_name')

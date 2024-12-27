@@ -63,21 +63,10 @@
                                         </div>
                                     </div>
                                 @else
-                                    @foreach ($questionsPerCombination as $combination)
-                                        <ul>
-                                            <li>
-                                                Nama Kombinasi: {{ $combination['combination_name'] }}
-                                            </li>
-                                            <li>
-                                                Total Dijawab: {{ $combination['total_questions'] }}
-                                            </li>
-                                            <li>
-                                                Jawaban Benar: {{ $combination['correct_questions'] }}
-                                            </li>
-                                        </ul>
-                                    @endforeach
-                                    <div class="mt-4">
-                                        <canvas id="chartData" width="400" height="400"></canvas>
+                                    <div class="row mt-3">
+                                        <div class="col-md-10 mx-auto">
+                                            <canvas id="combinationChart"></canvas>
+                                        </div>
                                     </div>
                                 @endif
 
@@ -103,6 +92,7 @@
         <!-- /.content -->
     </div>
     @push('javascript-bottom')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             document.getElementById('mulaiKembali').addEventListener('click', function(e) {
                 e.preventDefault(); // Mencegah pengalihan default
@@ -114,37 +104,66 @@
                 window.location.href = this.href;
             });
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
         <script>
-            const ctx = document.getElementById(chartId).getContext('2d');
-            return new Chart(ctx, {
-                type: 'line',
+            // Ambil data dari PHP dan kirim ke JavaScript
+            const combinations = @json($questionsPerCombination->pluck('combination_name'));
+            const totalQuestions = @json($questionsPerCombination->pluck('total_questions'));
+            const correctQuestions = @json($questionsPerCombination->pluck('correct_questions'));
+
+            const formattedCombinations = combinations.map(combination =>
+                combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
+            );
+
+            const ctx = document.getElementById('combinationChart').getContext('2d');
+            const combinationChart = new Chart(ctx, {
+                type: 'line', // Tipe chart
                 data: {
-                    labels: [],
-                    datasets: [],
+                    labels: formattedCombinations, // Nama kombinasi untuk sumbu X
+                    datasets: [{
+                            label: 'Jumlah Jawaban',
+                            data: totalQuestions, // Data total pertanyaan
+                            borderColor: 'rgba(75, 192, 192, 1)', // Warna garis
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Warna latar belakang
+                            tension: 0.4, // Smooth line
+                        },
+                        {
+                            label: 'Jawaban Benar',
+                            data: correctQuestions, // Data jawaban benar
+                            borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Warna latar belakang
+                            tension: 0.4, // Smooth line
+                        },
+                    ],
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, // Responsive design
                     plugins: {
+                        legend: {
+                            position: 'top', // Posisi legenda
+                        },
                         title: {
                             display: true,
-                            text: 'Grafik Data Status Temuan Berdasarkan Tanggal'
-                        }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.4,
-                            borderWidth: 2,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                            text: 'Hasil Jawaban Per Kombinasi', // Judul Chart
                         },
-                        point: {
-                            radius: 3,
-
-                        }
-                    }
-                }
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Jumlah', // Label sumbu Y
+                            },
+                            beginAtZero: true, // Mulai dari 0
+                            ticks: {
+                                // Tampilkan hanya bilangan bulat
+                                callback: function(value) {
+                                    return Number.isInteger(value) ? value : null;
+                                },
+                                stepSize: 1, // Langkah antar nilai
+                            },
+                        },
+                    },
+                },
             });
         </script>
     @endpush
