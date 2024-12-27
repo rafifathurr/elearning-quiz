@@ -62,6 +62,23 @@
                                             @endif
                                         </div>
                                     </div>
+                                @else
+                                    @foreach ($questionsPerCombination as $combination)
+                                        <ul>
+                                            <li>
+                                                Nama Kombinasi: {{ $combination['combination_name'] }}
+                                            </li>
+                                            <li>
+                                                Total Dijawab: {{ $combination['total_questions'] }}
+                                            </li>
+                                            <li>
+                                                Jawaban Benar: {{ $combination['correct_questions'] }}
+                                            </li>
+                                        </ul>
+                                    @endforeach
+                                    <div class="mt-4">
+                                        <canvas id="chartData" width="400" height="400"></canvas>
+                                    </div>
                                 @endif
 
                                 <div class="row justify-content-center">
@@ -95,6 +112,39 @@
 
                 // Setelah menghapus, pindahkan halaman secara manual
                 window.location.href = this.href;
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById(chartId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Grafik Data Status Temuan Berdasarkan Tanggal'
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4,
+                            borderWidth: 2,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        },
+                        point: {
+                            radius: 3,
+
+                        }
+                    }
+                }
             });
         </script>
     @endpush

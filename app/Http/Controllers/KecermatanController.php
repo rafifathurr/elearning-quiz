@@ -434,6 +434,7 @@ class KecermatanController extends Controller
                 'value' => 'required',
                 'resultId' => 'required|integer',
                 'questionNumber' => 'required|integer',
+                'currentCombination' => 'required',
             ]);
 
             Log::info('Result ID: ' . $request->resultId);
@@ -469,6 +470,7 @@ class KecermatanController extends Controller
                 'result_id' => $validated['resultId'],
                 'answer' => $validated['value'],
                 'order' => $validated['questionNumber'],
+                'combination_name' => $validated['currentCombination'],
                 'score' => $score,
                 'display_time' => now(),
             ]);
@@ -519,7 +521,20 @@ class KecermatanController extends Controller
                 ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
                 ->firstOrFail();
 
-            return view('quiz.result', compact('result'));
+            $questionsPerCombination = $result->details
+                ->groupBy('combination_name')
+                ->map(function ($details) {
+                    $totalQuestions = $details->count();
+                    $correctQuestions = $details->where('score', 1)->count();
+
+                    return [
+                        'combination_name' => $details->first()->combination_name ?? 'Unknown Combination',
+                        'total_questions' => $totalQuestions,
+                        'correct_questions' => $correctQuestions,
+                    ];
+                });
+
+            return view('quiz.result', compact('result', 'questionsPerCombination'));
         } catch (\Exception $e) {
             Log::error("Error saat menampilkan hasil Test: " . $e->getMessage());
             return redirect('/')->with('error', 'Gagal menampilkan hasil Test.');
