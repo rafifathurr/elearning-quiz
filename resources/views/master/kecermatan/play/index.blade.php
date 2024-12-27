@@ -62,9 +62,6 @@
                 console.log('Current Question Number:', questionNumber);
                 console.log('Total Question:', totalQuestion);
 
-                let isLastQuestion = questionNumber == totalQuestion;
-                console.log('isLastQuestion:', isLastQuestion);
-
 
                 $.ajax({
                     url: '{{ url('kecermatan/answer') }}',
@@ -82,37 +79,6 @@
                         $('#answer_list .card').removeClass('bg-success').addClass('bg-primary');
                         $(element).removeClass('bg-primary').addClass('bg-success');
 
-
-                        console.log('Cek apakah ini pertanyaan terakhir...');
-
-                        // jika pertanyaan terakhir
-                        if (isLastQuestion) {
-                            console.log('Pertanyaan terakhir!');
-
-                            $.ajax({
-                                url: '{{ url('kecermatan/finish') }}',
-                                type: 'POST',
-                                cache: false,
-                                data: {
-                                    _token: token,
-                                    resultId: resultId,
-                                    q: $('#active_question').data('question-number') || 0,
-                                },
-                                success: function() {
-                                    const resultUrl =
-                                        `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
-                                        .replace('__RESULT_ID__', resultId);
-                                    window.location.href = resultUrl;
-                                },
-                                error: function(xhr) {
-                                    console.error("Error AJAX:", xhr);
-                                    swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
-                                },
-                            });
-                            return;
-
-                        }
-                        console.log('Bukan pertanyaan terakhir.');
 
                         // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
                         let questionNumber = $('#active_question').data('question-number');
@@ -336,6 +302,21 @@
                     });
                     return;
                 }
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Berpindah ke kombinasi berikutnya',
+                    text: `Anda akan diarahkan ke kombinasi berikutnya.`,
+                    toast: false,
+                    position: 'center',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    timer: 1000,
+                    timerProgressBar: true,
+                });
+
 
                 // Jika belum kombinasi terakhir, lanjut ke kombinasi berikutnya
                 nextCombinationUrl += (nextCombinationUrl.includes('?') ? '&' : '?') + 'durasi_kombinasi=' + encodeURIComponent(
