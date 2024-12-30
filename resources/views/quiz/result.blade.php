@@ -126,14 +126,12 @@
                                 data: totalQuestions, // Data total pertanyaan
                                 borderColor: 'rgba(75, 192, 192, 1)', // Warna garis
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)', // Warna latar belakang
-                                tension: 0.4, // Smooth line
                             },
                             {
                                 label: 'Jawaban Benar',
                                 data: correctQuestions, // Data jawaban benar
                                 borderColor: 'rgba(255, 99, 132, 1)', // Warna garis
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)', // Warna latar belakang
-                                tension: 0.4, // Smooth line
                             },
                         ],
                     },
