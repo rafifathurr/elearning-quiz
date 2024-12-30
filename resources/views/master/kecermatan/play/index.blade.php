@@ -35,6 +35,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-body" id="waktu">
+                        <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
+                            <span id="jam">--</span> : <span id="menit">--</span> : <span id="detik">--</span>
+                        </h2>
+                    </div>
+                </div>
                 <div id="question_box">
                     @include('master.kecermatan.play.question')
                 </div>

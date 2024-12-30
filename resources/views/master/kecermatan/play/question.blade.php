@@ -3,10 +3,9 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="p-2">
-                <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
+                <h2>
                     <input type="hidden" value="{{ $durasi_kombinasi[$active_question['nama_kombinasi'] ?? ''] ?? 0 }}"
                         id="durasi">
-                    <span id="jam">--</span> : <span id="menit">--</span> : <span id="detik">--</span>
                 </h2>
             </div>
             <div class="card-header d-flex justify-content-between">
