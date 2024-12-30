@@ -36,9 +36,11 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-body" id="waktu">
+                    <div class="card-body p-1" id="waktu">
+                        <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto px-3 py-2" id="current">
+                        </h2>
                         <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
-                            <span id="jam">--</span> : <span id="menit">--</span> : <span id="detik">--</span>
+                            <span id="detik">--</span>
                         </h2>
                     </div>
                 </div>
@@ -243,6 +245,13 @@
             let durasi = localStorage.getItem('waktuSisa') ? parseInt(localStorage.getItem('waktuSisa')) : parseInt($('#durasi')
                 .val());
 
+            let kombinasiSekarang = localStorage.getItem('kombinasi') ? localStorage.getItem('kombinasi') : $(
+                '#current_combination').val();
+
+            const displayCombination = kombinasiSekarang.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2');
+
+            $('#current').html(displayCombination);
+
             updateWaktu();
             let intervalWaktu = setInterval(updateWaktu, 1000);
 
@@ -357,7 +366,13 @@
                                         intervalWaktu = setInterval(updateWaktu, 1000);
                                     }
 
+                                    const displayNextCombination = nextCombination.replace(/([a-zA-Z]+)(\d+)/,
+                                        '$1 $2');
+                                    $('#current').html(displayNextCombination);
+
                                     localStorage.removeItem('waktuSisa');
+                                    localStorage.setItem('kombinasi', nextCombination);
+
                                 }
                             },
                             error: function(xhr) {

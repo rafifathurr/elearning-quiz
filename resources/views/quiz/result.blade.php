@@ -113,6 +113,11 @@
 
                 // Buat array untuk sumbu X dan data untuk grafik
                 const labels = formattedCombinations.map(num => 'Kecermatan' + num);
+
+                const displayCombination = labels.map(combination =>
+                    combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
+                );
+
                 const totalQuestions = labels.map(label => accuracyData[label]?.total_questions || 0);
                 const correctQuestions = labels.map(label => accuracyData[label]?.correct_questions || 0);
 
@@ -120,7 +125,7 @@
                 const combinationChart = new Chart(ctx, {
                     type: 'line', // Tipe chart
                     data: {
-                        labels: labels, // Nama kecermatan untuk sumbu X
+                        labels: displayCombination, // Nama kecermatan untuk sumbu X
                         datasets: [{
                                 label: 'Jumlah Jawaban',
                                 data: totalQuestions, // Data total pertanyaan
