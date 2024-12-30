@@ -78,11 +78,9 @@
 
                 <div class="collapse navbar-collapse order-3" id="navbarCollapse">
                     <!-- Left navbar links -->
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link font-weight-bold">Brata Cerdas</a>
-                        </li>
-                    </ul>
+                    <img src="{{ asset('img/brata.png') }}" alt="AdminLTE Logo" class="brand-image  "
+                        style="max-width: 3rem;">
+                    <span class="brand-text font-weight-bold text-secondary" style="opacity: .8">BRATA CERDAS</span>
                 </div>
 
                 <!-- Right navbar links -->
