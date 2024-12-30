@@ -65,7 +65,8 @@
                                 @else
                                     <div class="row mt-3">
                                         <div class="col-md-10 mx-auto">
-                                            <canvas id="combinationChart"></canvas>
+                                            <canvas id="combinationChart"
+                                                style="min-height: 250px;  max-width: 100%;"></canvas>
                                         </div>
                                     </div>
                                 @endif
@@ -142,6 +143,7 @@
                     },
                     options: {
                         responsive: true, // Responsive design
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 position: 'top', // Posisi legenda
