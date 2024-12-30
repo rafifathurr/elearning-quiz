@@ -108,19 +108,19 @@
         @if ($result->quiz->type_aspect == 'kecermatan')
             <script>
                 // Ambil data dari PHP dan kirim ke JavaScript
-                const combinations = @json($questionsPerCombination->pluck('combination_name'));
-                const totalQuestions = @json($questionsPerCombination->pluck('total_questions'));
-                const correctQuestions = @json($questionsPerCombination->pluck('correct_questions'));
+                const accuracyData = @json($accuracyData);
+                const formattedCombinations = @json($formattedCombinations);
 
-                const formattedCombinations = combinations.map(combination =>
-                    combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
-                );
+                // Buat array untuk sumbu X dan data untuk grafik
+                const labels = formattedCombinations.map(num => 'Kecermatan' + num);
+                const totalQuestions = labels.map(label => accuracyData[label]?.total_questions || 0);
+                const correctQuestions = labels.map(label => accuracyData[label]?.correct_questions || 0);
 
                 const ctx = document.getElementById('combinationChart').getContext('2d');
                 const combinationChart = new Chart(ctx, {
                     type: 'line', // Tipe chart
                     data: {
-                        labels: formattedCombinations, // Nama kombinasi untuk sumbu X
+                        labels: labels, // Nama kecermatan untuk sumbu X
                         datasets: [{
                                 label: 'Jumlah Jawaban',
                                 data: totalQuestions, // Data total pertanyaan
@@ -143,7 +143,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Hasil Jawaban Per Kombinasi', // Judul Chart
+                                text: 'Hasil Jawaban Per Kecermatan', // Judul Chart
                             },
                         },
                         scales: {

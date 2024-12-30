@@ -528,25 +528,46 @@ class KecermatanController extends Controller
                     ->firstOrFail();
             }
 
+            // Inisialisasi data Kecermatan 1-10 dengan nilai 0
+            $accuracyData = [];
+
             $questionsPerCombination = $result->details
                 ->groupBy('combination_name')
-                ->map(function ($details) {
+                ->map(function ($details) use (&$accuracyData) {
                     $totalQuestions = $details->count();
                     $correctQuestions = $details->where('score', 1)->count();
+                    $combinationName = $details->first()->combination_name ?? 'Unknown Combination';
+
+                    // Menyesuaikan key accuracyData dengan format 'Kecermatan1', 'Kecermatan2', dll.
+                    $index = (int) filter_var($combinationName, FILTER_SANITIZE_NUMBER_INT);
+                    if ($index >= 1 && $index <= 10) {
+                        $accuracyData['Kecermatan' . $index] = [
+                            'total_questions' => $totalQuestions,
+                            'correct_questions' => $correctQuestions
+                        ];
+                    }
 
                     return [
-                        'combination_name' => $details->first()->combination_name ?? 'Unknown Combination',
+                        'combination_name' => $combinationName,
                         'total_questions' => $totalQuestions,
                         'correct_questions' => $correctQuestions,
                     ];
                 });
 
-            return view('quiz.result', compact('result', 'questionsPerCombination'));
+
+            // Pastikan kecermatan 1-10 ada dalam data
+            $formattedCombinations = range(1, 10); // Kecermatan 1 sampai 10
+
+
+
+
+            return view('quiz.result', compact('result', 'accuracyData', 'formattedCombinations'));
         } catch (\Exception $e) {
             Log::error("Error saat menampilkan hasil Test: " . $e->getMessage());
             return redirect('/')->with('error', 'Gagal menampilkan hasil Test.');
         }
     }
+
 
 
     private function generateAnswerRandom(int $min, int $max, array $exception)
