@@ -80,7 +80,7 @@
                     <!-- Left navbar links -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a href="#" class="nav-link font-weight-bold">E - Learning Quiz</a>
+                            <a href="#" class="nav-link font-weight-bold">Brata Cerdas</a>
                         </li>
                     </ul>
                 </div>
@@ -235,7 +235,7 @@
                             <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
                                 <div class="card-header">
                                     <h4 class="card-title w-100">
-                                        1. Bagaimana cara membeli paket di Elerning-Quiz?
+                                        1. Bagaimana cara membeli paket di Brata Cerdas?
                                     </h4>
                                 </div>
                             </a>
@@ -250,7 +250,7 @@
                             <a class="d-block w-100" data-toggle="collapse" href="#collapseTwo">
                                 <div class="card-header">
                                     <h4 class="card-title w-100">
-                                        2. Materi apa saja yang tersedia dalam soal soal quiz?
+                                        2. Materi apa saja yang tersedia dalam soal soal Brata Cerdas?
                                     </h4>
                                 </div>
                             </a>
@@ -265,7 +265,7 @@
                             <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
                                 <div class="card-header">
                                     <h4 class="card-title w-100">
-                                        3. Apa kelebihan yang didapat dengan mengikuti try out quiz?
+                                        3. Apa kelebihan yang didapat dengan mengikuti try out Brata Cerdas?
                                     </h4>
                                 </div>
                             </a>
