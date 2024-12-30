@@ -230,7 +230,7 @@
 
                     <!-- FAQ -->
                     <div class="col-12" id="accordion">
-                        <h4>Pertanyaan Seputar Quiz</h4>
+                        <h4>Pertanyaan Seputar Brata Cerdas</h4>
                         <div class="card card-primary card-outline">
                             <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
                                 <div class="card-header">
