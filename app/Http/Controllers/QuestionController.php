@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
 
 class QuestionController extends Controller
@@ -226,7 +227,12 @@ class QuestionController extends Controller
                     $path_store = 'storage/question/images' .  $quiz_question->id;
 
                     if (!Storage::exists($path)) {
+                        // Buat directory
                         Storage::makeDirectory($path);
+                
+                        // Ubah izin folder menjadi 775 setelah membuat folder
+                        $folderPath = storage_path('app/' . $path);
+                        File::chmod($folderPath, 0775);  // Set izin folder menjadi 775
                     }
 
                     $file_name = $quiz_question->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('attachment')->getClientOriginalExtension();

@@ -15,7 +15,7 @@
             <!-- /.login-logo -->
             <div class="card card-outline card-primary">
                 <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Elearning - Quiz</label>
+                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Brata Cerdas</label>
                     <form action="{{ route('authenticate') }}" method="post">
                         @csrf
                         <div class="form-group">

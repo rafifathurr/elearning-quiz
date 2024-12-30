@@ -23,7 +23,7 @@
         <div class="register-box">
             <div class="card card-outline card-primary">
                 <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Register Account</label>
+                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Register Akun</label>
                     <form action="{{ route('account.store') }}" method="post">
                         @csrf
                         <div class="col-md-12">
