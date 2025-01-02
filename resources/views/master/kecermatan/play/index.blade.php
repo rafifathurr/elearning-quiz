@@ -134,7 +134,6 @@
                     },
                     error: function(xhr) {
                         console.error("Gagal menyimpan jawaban ke server:", xhr);
-                        swalError('Jawaban Anda disimpan sementara. Mohon periksa koneksi internet Anda.');
                     },
                 });
             }
