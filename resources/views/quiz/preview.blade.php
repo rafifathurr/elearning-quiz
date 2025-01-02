@@ -27,9 +27,15 @@
                                             {{ $no++ }}.
 
                                             {!! $question->question !!}
+                                            {!! $question->description !!}
                                             <ol style="list-style-type: lower-alpha;">
                                                 @foreach ($question->quizAnswer as $answer)
-                                                    <li>{{ $answer->answer }}</li>
+                                                    <li>{{ $answer->answer ?? '' }}
+                                                        @if (!is_null($answer->answer_image))
+                                                            <img src="{{ asset($answer->answer_image) }}"
+                                                                class="img-fluid mt-3" style="max-height: 10rem;">
+                                                        @endif
+                                                    </li>
                                                 @endforeach
                                             </ol>
                                         </li>
