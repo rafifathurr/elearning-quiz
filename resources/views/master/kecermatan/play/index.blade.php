@@ -67,9 +67,23 @@
                 let totalQuestion = $('#total_question').val();
                 let currentCombination = $('#current_combination').val();
 
-                console.log('Current Question Number:', questionNumber);
-                console.log('Total Question:', totalQuestion);
+                // Simpan jawaban sementara di localStorage
+                let tempAnswers = JSON.parse(localStorage.getItem('tempAnswers')) || {};
+                tempAnswers[questionNumber] = {
+                    answer: selectedAnswer,
+                    combination: currentCombination
+                };
+                localStorage.setItem('tempAnswers', JSON.stringify(tempAnswers));
 
+                console.log('Jawaban sementara disimpan:', tempAnswers);
+
+                // Tetap lanjutkan dengan permintaan ke server
+                sendAnswerToServer(element, selectedAnswer, questionNumber, currentCombination);
+            }
+
+            function sendAnswerToServer(element, selectedAnswer, questionNumber, currentCombination) {
+                let token = $('meta[name="csrf-token"]').attr('content');
+                let resultId = $('#result_id').val();
 
                 $.ajax({
                     url: '{{ url('kecermatan/answer') }}',
@@ -83,14 +97,20 @@
                         currentCombination: currentCombination,
                     },
                     success: function(data) {
-                        console.log("Jawaban berhasil disimpan:", data.value);
+                        console.log("Jawaban berhasil disimpan ke server:", data.message);
 
+                        // Jika berhasil, hapus jawaban dari localStorage
+                        let tempAnswers = JSON.parse(localStorage.getItem('tempAnswers')) || {};
+                        delete tempAnswers[questionNumber];
+                        localStorage.setItem('tempAnswers', JSON.stringify(tempAnswers));
+
+                        console.log('Jawaban sementara yang tersisa:', tempAnswers);
+
+                        // Highlight jawaban yang dipilih
                         $('#answer_list .card').removeClass('bg-success').addClass('bg-primary');
                         $(element).removeClass('bg-primary').addClass('bg-success');
 
-
-                        // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
-                        let questionNumber = $('#active_question').data('question-number');
+                        // Lanjutkan ke pertanyaan berikutnya
                         $.ajax({
                             url: $('#url-next').val(),
                             type: 'GET',
@@ -114,14 +134,13 @@
                                 }
                             },
                         });
-
                     },
                     error: function(xhr) {
-                        console.log("Error AJAX:", xhr);
-                        swalError('Gagal mengirim jawaban, silakan coba lagi.');
+                        console.error("Gagal menyimpan jawaban ke server:", xhr);
                     },
                 });
             }
+
 
 
             function timeExpired() {
