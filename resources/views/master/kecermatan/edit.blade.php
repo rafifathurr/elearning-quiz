@@ -73,6 +73,10 @@
                                                             <option value="huruf"
                                                                 {{ ctype_alpha($firstQuestion['correct_answer']) ? 'selected' : '' }}>
                                                                 Huruf</option>
+                                                            <option value="simbol"
+                                                                {{ !ctype_alpha($firstQuestion['correct_answer']) && !is_numeric($firstQuestion['correct_answer']) ? 'selected' : '' }}>
+                                                                Simbol
+                                                            </option>
 
                                                         </select>
                                                     </div>
@@ -137,6 +141,7 @@
                                                         <option value="">Pilih Tipe Pertanyaan</option>
                                                         <option value="angka">Angka</option>
                                                         <option value="huruf">Huruf</option>
+                                                        <option value="simbol">Simbol</option>
                                                     </select>
                                                 </div>
                                             </div>

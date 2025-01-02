@@ -25,7 +25,7 @@ class KecermatanController extends Controller
             'name' => 'required|string|max:255',
             'time_duration' => 'required|integer|min:1',
             'type_random_question' => 'required|array',
-            'type_random_question.*' => 'required|string|in:angka,huruf',
+            'type_random_question.*' => 'required|string|in:angka,huruf,simbol',
             'qty' => 'required|array',
             'qty.*' => 'required|integer|min:1',
             'durasi_kombinasi' => 'required|array',
@@ -46,7 +46,7 @@ class KecermatanController extends Controller
                     $unique_answers = range(1, 99);
                     shuffle($unique_answers);
                     $unique_answers = array_slice($unique_answers, 0, 5); // Ambil 5 angka unik
-                } else {
+                } elseif ($type === 'huruf') {
                     // Generate 5 unique letters
                     $unique_answers = [];
                     while (count($unique_answers) < 5) {
@@ -55,6 +55,12 @@ class KecermatanController extends Controller
                             $unique_answers[] = $letter; // Add unique letter
                         }
                     }
+                } elseif ($type === 'simbol') {
+                    $symbol_pool = ['±', '∞', '=', '≠', '~', '×', '÷', '!', '∝', '<', '≪', '>', '≫', '≤', '≥', '∓', '≅', '≈', '≡', '∀', '∁', '∂', '∅', '%', '∆', '∇', '∃', '∄', '∈', '∋', 'α', 'β', 'γ', 'δ', 'ε', 'ϑ', 'μ', 'π', 'φ', 'ω', 'ℵ', 'β', 'γ', 'δ', 'η', 'θ', 'π', 'ϖ', 'ϕ', 'χ', 'ψ'];
+                    shuffle($symbol_pool);
+                    $unique_answers = array_slice($symbol_pool, 0, 5);
+                } else {
+                    throw new Exception("Invalid question type");
                 }
 
 
@@ -135,7 +141,7 @@ class KecermatanController extends Controller
             'name' => 'required|string|max:255',
             'time_duration' => 'required|integer|min:1',
             'type_random_question' => 'required|array',
-            'type_random_question.*' => 'required|string|in:angka,huruf',
+            'type_random_question.*' => 'required|string|in:angka,huruf,simbol',
             'qty' => 'required|array',
             'qty.*' => 'required|integer|min:1',
             'durasi_kombinasi' => 'required|array',
@@ -160,7 +166,7 @@ class KecermatanController extends Controller
                     $unique_answers = range(1, 99);
                     shuffle($unique_answers);
                     $unique_answers = array_slice($unique_answers, 0, 5); // Ambil 5 angka unik
-                } else {
+                } elseif ($type === 'huruf') {
                     // Generate 5 unique letters
                     $unique_answers = [];
                     while (count($unique_answers) < 5) {
@@ -169,6 +175,12 @@ class KecermatanController extends Controller
                             $unique_answers[] = $letter; // Add unique letter
                         }
                     }
+                } elseif ($type === 'simbol') {
+                    $symbol_pool = ['±', '∞', '=', '≠', '~', '×', '÷', '!', '∝', '<', '≪', '>', '≫', '≤', '≥', '∓', '≅', '≈', '≡', '∀', '∁', '∂', '∅', '%', '∆', '∇', '∃', '∄', '∈', '∋', 'α', 'β', 'γ', 'δ', 'ε', 'ϑ', 'μ', 'π', 'φ', 'ω', 'ℵ', 'β', 'γ', 'δ', 'η', 'θ', 'π', 'ϖ', 'ϕ', 'χ', 'ψ'];
+                    shuffle($symbol_pool);
+                    $unique_answers = array_slice($symbol_pool, 0, 5);
+                } else {
+                    throw new Exception("Invalid question type");
                 }
 
 

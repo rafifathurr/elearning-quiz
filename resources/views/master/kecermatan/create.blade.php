@@ -63,6 +63,7 @@
                                                         <option value="">Pilih Tipe Pertanyaan</option>
                                                         <option value="angka">Angka</option>
                                                         <option value="huruf">Huruf</option>
+                                                        <option value="simbol">Simbol</option>
                                                     </select>
                                                     @error('type_random_question.*')
                                                         <div class="alert alert-danger mt-2">
@@ -137,6 +138,7 @@
                                                         <option value="">Pilih Tipe Pertanyaan</option>
                                                         <option value="angka">Angka</option>
                                                         <option value="huruf">Huruf</option>
+                                                        <option value="simbol">Simbol</option>
                                                     </select>
                                                 </div>
                                             </div>
