@@ -340,6 +340,7 @@ class QuizController extends Controller
                     $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
                         ->orWhere('aspect', '0');
                 })
+                ->whereNull('deleted_at')
                 ->inRandomOrder()
                 ->limit($aspect->total_question)
                 ->get();
