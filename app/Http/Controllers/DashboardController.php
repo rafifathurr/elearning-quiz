@@ -11,7 +11,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $data['tests'] = Package::whereNull('class')->orWhere('class', 0)->whereNull('deleted_at')->get();
+        $data['tests'] = Package::where(function ($query) {
+            $query->whereNull('class')
+                ->orWhere('class', 0);
+        })->whereNull('deleted_at')->get();
+
         $data['classes'] = Package::where('class', '>', 0)->whereNull('deleted_at')->get();
 
         return view('home', $data);
@@ -19,7 +23,10 @@ class DashboardController extends Controller
 
     public function landingPage()
     {
-        $data['tests'] = Package::whereNull('class')->orWhere('class', 0)->whereNull('deleted_at')->get();
+        $data['tests'] = Package::where(function ($query) {
+            $query->whereNull('class')
+                ->orWhere('class', 0);
+        })->whereNull('deleted_at')->get();
         $data['best_seller'] = Package::withCount(['orderPackage' => function ($query) {
             $query->whereHas('order', function ($subQuery) {
                 $subQuery->where('status', 100);
