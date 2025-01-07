@@ -247,7 +247,7 @@
             let kombinasiSekarang = localStorage.getItem('kombinasi') ? localStorage.getItem('kombinasi') : $(
                 '#current_combination').val();
 
-            const displayCombination = kombinasiSekarang.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2');
+            const displayCombination = kombinasiSekarang.replace(/([a-zA-Z]+)(\d+)/, 'Kolom $2');
 
             $('#current').html(displayCombination);
 
@@ -366,7 +366,7 @@
                                     }
 
                                     const displayNextCombination = nextCombination.replace(/([a-zA-Z]+)(\d+)/,
-                                        '$1 $2');
+                                        'Kolom $2');
                                     $('#current').html(displayNextCombination);
 
                                     localStorage.removeItem('waktuSisa');

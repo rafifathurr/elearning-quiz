@@ -116,7 +116,7 @@
                 const labels = formattedCombinations.map(num => 'Kecermatan' + num);
 
                 const displayCombination = labels.map(combination =>
-                    combination.replace(/([a-zA-Z]+)(\d+)/, 'Kombinasi $2')
+                    combination.replace(/([a-zA-Z]+)(\d+)/, 'Kolom $2')
                 );
 
                 const totalQuestions = labels.map(label => accuracyData[label]?.total_questions || 0);
