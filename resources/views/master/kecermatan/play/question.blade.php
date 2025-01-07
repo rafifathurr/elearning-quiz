@@ -26,7 +26,7 @@
                                         <h3 class="font-weight-bold">
                                             {{ chr(65 + $index) }} <!-- Convert index to A, B, C, etc. -->
                                         </h3>
-                                        <div class="card m-2 px-2 bg-primary text-white">
+                                        <div class="card m-2 px-2 bg-white text-dark border">
                                             <div class="card-body">
                                                 <h4 class="font-weight-bold text-center my-auto">
                                                     {{ $answer }}
@@ -43,7 +43,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 @foreach ($active_question['quiz_answer'] as $quiz_answer)
                                     <div class="p-2 text-center">
-                                        <div class="card m-2 px-2 bg-primary text-white">
+                                        <div class="card m-2 px-2 bg-white text-dark border">
                                             <div class="card-body">
                                                 <h4 class="font-weight-bold text-center my-auto">
                                                     {{ $quiz_answer['answer'] }}
@@ -64,7 +64,7 @@
                                     @endphp
                                     @foreach ($unique_answers as $index => $answer)
                                         <div class="p-2 text-center">
-                                            <div class="card my-2 mx-4 px-2 bg-primary text-white"
+                                            <div class="card my-2 mx-4 px-2 bg-white text-dark border"
                                                 style="cursor: pointer;" onclick="answerKecermatan(this)">
                                                 <input type="hidden" name="answer_list" value="{{ $answer }}">
                                                 <div class="card-body">

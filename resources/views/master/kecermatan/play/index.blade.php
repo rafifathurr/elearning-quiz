@@ -85,8 +85,8 @@
                     success: function(data) {
                         console.log("Jawaban berhasil disimpan:", data.value);
 
-                        $('#answer_list .card').removeClass('bg-success').addClass('bg-primary');
-                        $(element).removeClass('bg-primary').addClass('bg-success');
+                        $('#answer_list .card').removeClass('bg-secondary').addClass('bg-white');
+                        $(element).removeClass('bg-white').addClass('bg-secondary');
 
 
                         // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
@@ -268,7 +268,7 @@
                     localStorage.setItem('waktuSisa', durasi);
 
                     if (durasi === 1) {
-                        $('.card.bg-primary').addClass('disabled').css('pointer-events', 'none');
+                        $('.card.bg-white').addClass('disabled').css('pointer-events', 'none');
                     }
 
                     durasi--;
