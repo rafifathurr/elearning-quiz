@@ -123,7 +123,23 @@ class myTestController extends Controller
                             $btn_action .= '<a href="' . route('admin.quiz.result', ['resultId' => $review->id]) . '" class="btn btn-sm btn-primary">Review</a>';
                         }
                     } else {
-                        $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                        $onGoingTest = Result::where('user_id', Auth::user()->id)
+                            ->whereNull('finish_time')
+                            ->first();
+
+                        // Jika ada data tes lama tanpa finish_time, selesaikan secara otomatis
+                        if ($onGoingTest && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($onGoingTest->start_time)->copy()->addSeconds($onGoingTest->time_duration))) {
+                            $total_score = ResultDetail::where('result_id', $onGoingTest->id)->sum('score');
+                            $onGoingTest->update([
+                                'finish_time' => \Carbon\Carbon::now(),
+                                'total_score' => $total_score,
+                            ]);
+                            $onGoingTest = null; // Hapus status tes berjalan
+                        }
+
+                        if (!$onGoingTest) {
+                            $btn_action .= '<a href="' . route('admin.quiz.start', ['quiz' => encrypt($data->quiz->id), 'order_detail_id' => encrypt($data->id)]) . '" class="btn btn-sm btn-success">Mulai Test</a>';
+                        }
                     }
                 } else {
                     $review = Result::where('quiz_id', $data->quiz->id)
