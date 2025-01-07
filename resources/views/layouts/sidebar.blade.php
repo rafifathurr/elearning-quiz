@@ -135,6 +135,16 @@
                         </a>
                     </li>
                 @endhasrole
+                @hasrole('user')
+                    <li class="nav-item">
+                        <a href="{{ route('contact') }}" class="nav-link">
+                            <i class="nav-icon fas fa-phone-square"></i>
+                            <p>
+                                Contact Person
+                            </p>
+                        </a>
+                    </li>
+                @endhasrole
                 <li class="nav-item">
                     <a href="{{ route('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-power-off"></i>

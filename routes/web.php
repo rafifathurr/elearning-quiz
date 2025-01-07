@@ -64,6 +64,7 @@ Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
 Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [DashboardController::class, 'index'])->name('home');
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
 });
 
 

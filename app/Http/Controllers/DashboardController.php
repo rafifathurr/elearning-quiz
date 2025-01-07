@@ -42,4 +42,9 @@ class DashboardController extends Controller
 
         return view('landingPage', $data);
     }
+
+    public function contact()
+    {
+        return view('contact');
+    }
 }
