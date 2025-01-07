@@ -64,6 +64,36 @@
                                     </div>
                                 @else
                                     <div class="row mt-3">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nama Kolom</th>
+                                                        @foreach ($formattedCombinations as $combination)
+                                                            <th>Kolom {{ $combination }}</th>
+                                                        @endforeach
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Jumlah Jawaban</td>
+                                                        @foreach ($formattedCombinations as $combination)
+                                                            <td>{{ $accuracyData['Kecermatan' . $combination]['total_questions'] ?? 0 }}
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Jumlah Benar</td>
+                                                        @foreach ($formattedCombinations as $combination)
+                                                            <td>{{ $accuracyData['Kecermatan' . $combination]['correct_questions'] ?? 0 }}
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
                                         <div class="col-md-10 mx-auto">
                                             <canvas id="combinationChart"
                                                 style="min-height: 250px;  max-width: 100%;"></canvas>
