@@ -181,6 +181,15 @@
 
     }
 
+    $(document).on('click', '.btn-lanjutkan', function(e) {
+        e.preventDefault(); // Mencegah navigasi default sementara
+        localStorage.removeItem('remainingTime'); // Hapus data dari local storage
+
+        // Arahkan ke URL dari tombol "Lanjutkan"
+        const url = $(this).attr('href');
+        window.location.href = url;
+    });
+
     function addTest(id) {
         let token = $('meta[name="csrf-token"]').attr('content');
         console.log('Class ID:', id);

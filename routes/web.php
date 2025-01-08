@@ -17,6 +17,9 @@ use App\Http\Controllers\UserController;
 
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizQuestion;
+use App\Models\Result;
+use App\Models\ResultDetail;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +48,17 @@ Route::post('authenticate', [AuthController::class, 'authenticate'])->name('auth
 
 Route::get('/', function () {
     if (Auth::check()) {
+        if (User::find(Auth::user()->id)->hasRole('user')) {
+            $result = Result::where('user_id', Auth::id())
+                ->whereNull('finish_time')
+                ->first();
+            if ($result) {
+                Auth::logout();
+                return redirect()->route('landingPage');
+            } else {
+                return redirect()->route('home');
+            }
+        }
         return redirect()->route('home');
     }
     return redirect()->route('landingPage');

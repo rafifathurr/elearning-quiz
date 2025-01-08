@@ -617,6 +617,8 @@ class QuizController extends Controller
 
             // Persiapkan data untuk API atau tampilan
             $quizData = Quiz::find($result->quiz_id)->toArray();
+
+            $remainingTime = $request->has('remaining_time') ? decrypt($request->remaining_time) : null;
             $data = [
                 'quiz' => $quizData,
                 'result' => $result,
@@ -624,6 +626,7 @@ class QuizController extends Controller
                 'questionList' => $questionList,
                 'active_question' => $activeQuestion,
                 'total_question' => $questions->count(),
+                'remaining_time' => $remainingTime,
             ];
 
             if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {

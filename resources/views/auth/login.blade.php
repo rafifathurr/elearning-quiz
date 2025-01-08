@@ -61,7 +61,8 @@
                                 </div>
                             </div>
                             <div class="col-4">
-                                <button type="submit" class="btn btn-primary btn-block font-weight-bold">Log In</button>
+                                <button type="submit" id="login" class="btn btn-primary btn-block font-weight-bold">Log
+                                    In</button>
                             </div>
                         </div>
                         <div class="row justify-content-center mt-4">
@@ -77,4 +78,17 @@
         </div>
         <!-- /.login-box -->
     </body>
+    @push('javascript-bottom')
+        <script>
+            document.getElementById('login').addEventListener('click', function(e) {
+                e.preventDefault(); // Mencegah pengalihan default
+
+                // Hapus waktu dari localStorage ketika tombol "Login" diklik
+                localStorage.removeItem('remainingTime');
+
+                // Kirim form setelah menghapus remainingTime
+                this.closest('form').submit(); // Menyubmit form
+            });
+        </script>
+    @endpush
 @endsection

@@ -388,6 +388,7 @@ class KecermatanController extends Controller
             'durasi_kombinasi' => $durasiKombinasi[$currentCombination] ?? 0,
         ];
 
+        $remainingTime = $request->has('remaining_time') ? decrypt($request->remaining_time) : null;
         $data = [
             'quiz' => $result->quiz->toArray(),
             'result' => $result,
@@ -398,6 +399,7 @@ class KecermatanController extends Controller
             'durasi_kombinasi' => $durasiKombinasi,
             'soal_data' => $questionKecermatan,
             'currentCombination' => $currentCombination,
+            'remaining_time' => $remainingTime,
         ];
 
         if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {

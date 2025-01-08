@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Result;
+use App\Models\ResultDetail;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -40,9 +42,37 @@ class AuthController extends Controller
                 // Login pengguna secara manual
                 Auth::login($user);
 
-                // Redirect berdasarkan peran pengguna
-                if ($user->hasRole('admin')) {
-                    return redirect()->route('admin.quiz.index')->with(['success' => 'Login Berhasil']);
+                if ($user->hasRole('user')) {
+                    $result = Result::where('user_id', $user->id)
+                        ->whereNull('finish_time')
+                        ->first();
+
+                    $currentDateTime = \Carbon\Carbon::now();
+                    if ($result) {
+                        $startTime = \Carbon\Carbon::parse($result->start_time);
+                        $endTime = $startTime->copy()->addSeconds($result->time_duration);
+
+                        // Cek jika waktu belum habis dan quiz belum selesai
+                        if ($currentDateTime->lte($endTime)) {
+                            $remainingSeconds = $endTime->timestamp - $currentDateTime->timestamp;
+                            if ($result->quiz->type_aspect == 'kecermatan') {
+                                return redirect()->route('kecermatan.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
+                            } else {
+                                return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
+                            }
+                        } else {
+                            // Jika sudah selesai, update dan redirect ke halaman yang tepat
+                            $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
+                            $result->update([
+                                'finish_time' => $endTime,
+                                'total_score' => $total_score
+                            ]);
+                            return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+                        }
+                    } else {
+                        // Jika result tidak ditemukan, redirect ke halaman lain
+                        return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+                    }
                 } else {
                     return redirect()->route('home')->with(['success' => 'Login Berhasil']);
                 }

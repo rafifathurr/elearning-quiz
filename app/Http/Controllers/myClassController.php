@@ -179,10 +179,12 @@ class myClassController extends Controller
 
 
                             if ($currentDateTime->lte($endTime)) {
+                                // Hitung sisa durasi secara langsung
+                                $remainingSeconds = $endTime->timestamp - $currentDateTime->timestamp;
                                 if ($data->quiz->type_aspect == 'kecermatan') {
-                                    $btn_action .= '<a href="' . route('kecermatan.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                                    $btn_action .= '<a href="' . route('kecermatan.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]) . '" class="btn btn-sm btn-warning btn-lanjutkan">Lanjutkan</a>';
                                 } else {
-                                    $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id]) . '" class="btn btn-sm btn-warning">Lanjutkan</a>';
+                                    $btn_action .= '<a href="' . route('admin.quiz.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]) . '" class="btn btn-sm btn-warning btn-lanjutkan">Lanjutkan</a>';
                                 }
                             } else {
                                 // Update finish_time jika waktu habis

@@ -25,7 +25,10 @@
                                 </div>
                                 <div class="p-2">
                                     <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
-                                        <input type="hidden" value="{{ $quiz['time_duration'] }}" id="time">
+                                        <input type="hidden"
+                                            value="{{ isset($remaining_time) && !is_null($remaining_time) ? $remaining_time : $quiz['time_duration'] }}"
+                                            id="time">
+
                                         <span id="hour_time">--</span> : <span id="minute_time">--</span> : <span
                                             id="second_time">--</span>
                                     </h2>
