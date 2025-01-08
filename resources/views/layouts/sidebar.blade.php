@@ -1,4 +1,13 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
+
+    <?php
+    $result = App\Models\Result::where('user_id', Auth::id())->whereNull('finish_time')->first();
+    if (App\Models\User::find(Auth::user()->id)->hasRole('user') && $result) {
+        $display = 'd-none';
+    } else {
+        $display = 'd-block';
+    } ?>
+
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
         <img src="{{ asset('img/brata.png') }}" alt="AdminLTE Logo" class="brand-image " style="opacity: .8">
@@ -21,7 +30,7 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
-                <li class="nav-item">
+                <li class="nav-item {{ $display }}">
                     <a href="{{ route('home') }}" class="nav-link">
                         <i class="nav-icon fas fa-home"></i>
                         <p>
@@ -30,7 +39,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ $display }}">
                     <a href="{{ route('mytest.index') }}" class="nav-link">
                         <i class="nav-icon fas fa-book"></i>
                         <p>
@@ -44,7 +53,7 @@
                 </li>
 
                 @hasrole('user')
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('myclass.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
@@ -55,7 +64,7 @@
                 @endhasrole
 
                 @hasanyrole('admin|user')
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <?php
                         $orderIds = App\Models\Order::whereNull('deleted_at')
                             ->where('user_id', Auth::user()->id)
@@ -81,7 +90,7 @@
 
 
                 @hasrole('counselor')
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('class.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
@@ -92,7 +101,7 @@
                 @endhasrole
 
                 @hasrole('admin')
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('admin.quiz.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-file"></i>
                             <p>
@@ -100,7 +109,7 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.aspect.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-cubes"></i>
                             <p>
@@ -109,7 +118,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.question.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-clipboard-list"></i>
                             <p>
@@ -117,7 +126,7 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.package.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-gift"></i>
                             <p>
@@ -126,7 +135,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.user.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-user-cog"></i>
                             <p>
@@ -136,7 +145,7 @@
                     </li>
                 @endhasrole
                 @hasrole('user')
-                    <li class="nav-item">
+                    <li class="nav-item ">
                         <a href="{{ route('contact') }}" class="nav-link">
                             <i class="nav-icon fas fa-phone-square"></i>
                             <p>
@@ -145,7 +154,7 @@
                         </a>
                     </li>
                 @endhasrole
-                <li class="nav-item">
+                <li class="nav-item {{ $display }}">
                     <a href="{{ route('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-power-off"></i>
                         <p>
@@ -161,7 +170,7 @@
     <!-- /.sidebar -->
 </aside>
 
-{{-- <li class="nav-item">
+{{-- <li class="nav-item {{ $display }}">
     <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
         <i class="nav-icon fas fa-book"></i>
         <p>
@@ -169,7 +178,7 @@
         </p>
     </a>
 </li>
-<li class="nav-item">
+<li class="nav-item {{ $display }}">
     <a href="{{ route('quiz.historyQuiz') }}" class="nav-link">
         <i class="nav-icon fas fa-book"></i>
         <p>
@@ -178,7 +187,7 @@
     </a>
 </li> --}}
 
-{{-- <li class="nav-item">
+{{-- <li class="nav-item {{ $display }}">
     <a href="{{ route('master.payment.index') }}" class="nav-link">
         <i class="nav-icon fas fa-credit-card"></i>
         <p>
