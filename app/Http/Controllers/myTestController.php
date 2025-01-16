@@ -9,8 +9,10 @@ use App\Models\OrderPackage;
 use App\Models\Result;
 use App\Models\ResultDetail;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class myTestController extends Controller
@@ -154,6 +156,9 @@ class myTestController extends Controller
                         $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                     }
                 }
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete">Hapus</button>';
+                }
                 $btn_action .= '</div>';
                 return $btn_action;
             })
@@ -193,6 +198,47 @@ class myTestController extends Controller
         $questionsPerAspect = $questionsPerAspect->sortByDesc('percentage');
         return view('mytest.review', compact('review', 'questionsPerAspect'));
     }
+
+    function destroy(string $id)
+    {
+        try {
+            // Mulai transaksi
+            DB::beginTransaction();
+
+            // Cari data Result berdasarkan ID
+            $result = Result::where('order_detail_id', $id)->first();
+
+            if ($result) {
+                // Hapus data ResultDetail terkait
+                $detailDelete = ResultDetail::where('result_id', $result->id)->delete();
+
+                // Pastikan detail berhasil dihapus
+                if ($detailDelete !== false) {
+                    // Hapus data Result
+                    $resultDelete = $result->delete();
+
+                    // Pastikan Result berhasil dihapus
+                    if ($resultDelete) {
+                        DB::commit(); // Commit transaksi jika berhasil
+                        session()->flash('success', 'Riwayat test berhasil dihapus.');
+                    } else {
+                        DB::rollBack(); // Rollback jika gagal
+                        session()->flash('failed', 'Gagal menghapus data riwayat test.');
+                    }
+                } else {
+                    DB::rollBack(); // Rollback jika gagal menghapus detail
+                    session()->flash('failed', 'Gagal menghapus data riwayat test.');
+                }
+            } else {
+                session()->flash('failed', 'Data riwayat tidak ditemukan.');
+            }
+        } catch (Exception $e) {
+            // Rollback transaksi jika terjadi exception
+            DB::rollBack();
+            session()->flash('failed', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
 
     // function history(Request $request)
     // {

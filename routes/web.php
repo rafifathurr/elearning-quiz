@@ -137,6 +137,7 @@ Route::group(['middleware' => ['role:admin|user|counselor']], function () {
         Route::get('datatable-history', 'dataTableHistory')->name('dataTableHistory');
         Route::get('history', 'history')->name('history');
         Route::get('review/{id}', 'review')->name('review');
+        Route::delete('{id}', 'destroy')->name('destroy');
     });
 });
 

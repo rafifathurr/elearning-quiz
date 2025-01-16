@@ -128,6 +128,42 @@
 
     }
 
+    function destroyRecord(id) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        Swal.fire({
+            title: 'Apakah Anda Yakin Ingin Menghapus Data Ini?',
+            icon: 'question',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn btn-primary mr-2 mb-3',
+                cancelButton: 'btn btn-danger mb-3',
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalProcess();
+                $.ajax({
+                    url: '{{ url('mytest') }}/' + id,
+                    type: 'DELETE',
+                    cache: false,
+                    data: {
+                        _token: token
+                    },
+                    success: function(data) {
+                        location.reload();
+                    },
+                    error: function(xhr, error, code) {
+                        swalError(error);
+                    }
+                });
+            }
+        })
+    }
+
     $(document).on('click', '.btn-lanjutkan', function(e) {
         e.preventDefault(); // Mencegah navigasi default sementara
         localStorage.removeItem('remainingTime'); // Hapus data dari local storage
