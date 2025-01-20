@@ -55,16 +55,12 @@
             /* Icon color */
         }
 
-        @media (min-width: 768px) {
-            .best-seller {
-                height: 100%;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .best-seller {
-                height: auto;
-            }
+        .equal-height {
+            min-height: 350px;
+            /* Sesuaikan nilai sesuai kebutuhan */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
     </style>
 
@@ -138,11 +134,20 @@
 
                     @foreach ($best_seller as $class)
                         <div class="col-md-3 my-2">
-                            <div class="card best-seller">
+                            <div class="card h-100 equal-height">
                                 <div class="card-header bg-gradient-lightblue">
                                     <h5>{{ $class->name }}</h5>
                                 </div>
                                 <div class="card-body">
+
+                                    @if ($class->price == 0)
+                                        <h5 class="mb-3 text-success"><i class="fa fa-gift "></i>
+                                            Gratis</h5>
+                                    @else
+                                        <h5 class="mb-3"><i class="fa fa-tags text-danger"></i>
+                                            {{ 'Rp. ' . number_format($class->price, 0, ',', '.') }}</h5>
+                                    @endif
+
                                     @if (isset($class->class) && $class->class > 0)
                                         <h6 class="font-weight-bolder text-cyan "><i class="fas fa-chalkboard-teacher "></i>
                                             <span class="ml-1">
