@@ -99,19 +99,19 @@
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/photo1.jpg') }}" alt="First slide">
+                        src="{{ asset('dist/adminlte/img/photo1.png') }}" alt="First slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/photo2.jpg') }}" alt="Second slide">
+                        src="{{ asset('dist/adminlte/img/photo2.png') }}" alt="Second slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/photo3.jpg') }}" alt="Third slide">
+                        src="{{ asset('dist/adminlte/img/photo3.png') }}" alt="Third slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/photo4.jpg') }}" alt="Fourth slide">
+                        src="{{ asset('dist/adminlte/img/photo4.png') }}" alt="Fourth slide">
                 </div>
             </div>
             <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
