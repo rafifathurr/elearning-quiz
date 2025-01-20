@@ -128,10 +128,10 @@
             </a>
         </div>
         <div class="py-3 px-3">
+            <h3 class="text-center font-weight-bold my-3">Daftar Paket</h3>
             <div class="row mx-3 ">
                 {{-- Best Seller --}}
                 <div class="row mb-4">
-                    <h3 class="text-center font-weight-bold">Daftar Paket</h3>
                     @foreach ($best_seller as $class)
                         <div class="col-md-3 my-2">
                             <div class="card h-100 equal-height">
