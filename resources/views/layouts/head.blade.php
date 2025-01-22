@@ -16,7 +16,7 @@
 
     <title>Brata Cerdas</title>
 
-    <link rel="icon" href="{{ asset('img/brata.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('img/logobrata.png') }}" type="image/png">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
