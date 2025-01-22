@@ -55,12 +55,25 @@
             /* Icon color */
         }
 
+        .card {
+            transition: transform 0.3s ease;
+            /* Animasi untuk memperhalus perubahan ukuran */
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            /* Membesarkan ukuran card 5% */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            /* Menambahkan efek bayangan saat hover */
+        }
+
         .equal-height {
             min-height: 350px;
             /* Sesuaikan nilai sesuai kebutuhan */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
     </style>
 
@@ -149,16 +162,34 @@
                                     @endif
 
                                     @if (isset($class->class) && $class->class > 0)
-                                        <h6 class="font-weight-bolder text-cyan "><i class="fas fa-chalkboard-teacher "></i>
+                                        <p class="font-weight-bolder text-cyan "><i class="fas fa-chalkboard-teacher "></i>
                                             <span class="ml-1">
                                                 {{ $class->class }} Kali Pertemuan
                                             </span>
-                                        </h6>
+                                        </p>
+                                    @else
+                                        <p class="font-weight-bolder text-maroon "><i
+                                                class="fas fa-exclamation-circle "></i>
+                                            <span class="ml-1">
+                                                Hanya Test
+                                            </span>
+                                        </p>
                                     @endif
                                     <ul class="list-unstyled">
                                         @foreach ($class->packageTest as $package)
-                                            <li class="package-item font-weight-normal mb-1">
-                                                {{ $package->quiz->name . ' (' . $package->quiz->type_aspect . ')' }}
+                                            <?php
+                                            $colorMapping = [
+                                                'kecerdasan' => 'badge-info',
+                                                'kepribadian' => 'badge-secondary',
+                                                'kecermatan' => 'badge-warning',
+                                            ];
+                                            
+                                            $colorVar = $colorMapping[$package->quiz->type_aspect] ?? '';
+                                            ?>
+                                            <li class="package-item font-weight-normal my-1">
+                                                {{ $package->quiz->name }}
+                                                <span
+                                                    class="badge {{ $colorVar }}  font-weight-bolder ">{{ $package->quiz->type_aspect }}</span>
                                             </li>
                                         @endforeach
                                     </ul>
@@ -175,7 +206,8 @@
                 </div>
             </div>
         </div>
-        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
+            aria-label="Scroll to top">
             <i class="fas fa-chevron-up"></i>
         </a>
 
