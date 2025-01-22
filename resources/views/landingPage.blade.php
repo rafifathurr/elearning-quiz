@@ -75,6 +75,16 @@
             justify-content: space-between;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+
+        .custom-shape {
+            display: inline-block;
+            position: relative;
+            padding: 10px 20px;
+            font-weight: bold;
+            clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%)
+        }
+
+        /* Bentuk Belah Ketupat */
     </style>
 
     <body class="hold-transition layout-top-nav">
@@ -141,70 +151,80 @@
             </a>
         </div>
         <div class="py-3 px-3">
-            <h3 class="text-center font-weight-bold my-3">Daftar Paket</h3>
-            <div class="row mx-3 ">
-                {{-- Best Seller --}}
-                <div class="row mb-4">
-                    @foreach ($best_seller as $class)
-                        <div class="col-md-3 my-2">
-                            <div class="card h-100 equal-height">
-                                <div class="card-header bg-gradient-lightblue">
-                                    <h5>{{ $class->name }}</h5>
-                                </div>
-                                <div class="card-body">
+            @if ($best_seller->isNotEmpty())
+                <h3 class="text-center font-weight-bold my-3">
+                    Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                </h3>
+                <div class="row mx-3 ">
+                    {{-- Best Seller --}}
+                    <div class="row mb-4">
+                        @foreach ($best_seller as $class)
+                            <div class="col-md-3 my-2">
+                                <div class="card h-100 equal-height">
+                                    <div class="card-header bg-gradient-lightblue">
+                                        <h5>{{ $class->name }}</h5>
+                                    </div>
+                                    <div class="card-body">
 
-                                    @if ($class->price == 0)
-                                        <h5 class="mb-3 text-success"><i class="fa fa-gift "></i>
-                                            Gratis</h5>
-                                    @else
-                                        <h5 class="mb-3"><i class="fa fa-tags text-danger"></i>
-                                            {{ 'Rp. ' . number_format($class->price, 0, ',', '.') }}</h5>
-                                    @endif
+                                        @if ($class->price == 0)
+                                            <h5 class="mb-3 text-success"><i class="fa fa-gift "></i>
+                                                Gratis</h5>
+                                        @else
+                                            <h5 class="mb-3"><i class="fa fa-tags text-danger"></i>
+                                                {{ 'Rp. ' . number_format($class->price, 0, ',', '.') }}</h5>
+                                        @endif
 
-                                    @if (isset($class->class) && $class->class > 0)
-                                        <p class="font-weight-bolder text-cyan "><i class="fas fa-chalkboard-teacher "></i>
-                                            <span class="ml-1">
-                                                {{ $class->class }} Kali Pertemuan
-                                            </span>
-                                        </p>
-                                    @else
-                                        <p class="font-weight-bolder text-maroon "><i
-                                                class="fas fa-exclamation-circle "></i>
-                                            <span class="ml-1">
-                                                Hanya Test
-                                            </span>
-                                        </p>
-                                    @endif
-                                    <ul class="list-unstyled">
-                                        @foreach ($class->packageTest as $package)
-                                            <?php
-                                            $colorMapping = [
-                                                'kecerdasan' => 'badge-info',
-                                                'kepribadian' => 'badge-secondary',
-                                                'kecermatan' => 'badge-warning',
-                                            ];
-                                            
-                                            $colorVar = $colorMapping[$package->quiz->type_aspect] ?? '';
-                                            ?>
-                                            <li class="package-item font-weight-normal my-1">
-                                                {{ $package->quiz->name }}
-                                                <span
-                                                    class="badge {{ $colorVar }}  font-weight-bolder ">{{ $package->quiz->type_aspect }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <div class="card-footer bg-white">
-                                    <div class="d-flex justify-content-end">
-                                        <a href="{{ route('login') }}" class="btn btn-sm btn-primary "> <i
-                                                class="fas fa-shopping-cart"></i> Checkout</a>
+                                        @if (isset($class->class) && $class->class > 0)
+                                            <p class="font-weight-bolder text-cyan "><i
+                                                    class="fas fa-chalkboard-teacher "></i>
+                                                <span class="ml-1">
+                                                    {{ $class->class }} Kali Pertemuan
+                                                </span>
+                                            </p>
+                                        @else
+                                            <p class="font-weight-bolder text-maroon "><i
+                                                    class="fas fa-exclamation-circle "></i>
+                                                <span class="ml-1">
+                                                    Hanya Test
+                                                </span>
+                                            </p>
+                                        @endif
+                                        <ul class="list-unstyled">
+                                            @foreach ($class->packageTest as $package)
+                                                <?php
+                                                $colorMapping = [
+                                                    'kecerdasan' => 'badge-info',
+                                                    'kepribadian' => 'badge-secondary',
+                                                    'kecermatan' => 'badge-warning',
+                                                ];
+                                                
+                                                $colorVar = $colorMapping[$package->quiz->type_aspect] ?? '';
+                                                ?>
+                                                <li class="package-item font-weight-normal my-1">
+                                                    {{ $package->quiz->name }}
+                                                    <span
+                                                        class="badge {{ $colorVar }}  font-weight-bolder ">{{ $package->quiz->type_aspect }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="{{ route('login') }}" class="btn btn-sm btn-primary "> <i
+                                                    class="fas fa-shopping-cart"></i> Checkout</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @else
+                <h3 class="text-center font-weight-bold my-3">
+                    Belum Ada Paket
+                </h3>
+            @endif
+
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
             aria-label="Scroll to top">
