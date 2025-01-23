@@ -89,7 +89,13 @@
                                                 {{ $detail->order }}.
                                             </td>
                                             <td>
-                                                {{ $detail->resultQuestion->direction_question }}
+                                                {{ $detail->resultQuestion->direction_question }} @if (is_null($detail->answer))
+                                                    <span class="ml-2 text-danger font-weight-light">
+                                                        <i class="fas fa-times">
+                                                            Tidak Menjawab
+                                                        </i>
+                                                    </span>
+                                                @endif
                                             </td>
                                         </tr>
                                         <tr>
