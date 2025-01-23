@@ -10,8 +10,43 @@
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="font-weight-bold">Review Riwayat Test - {{ $review->quiz->name }}</h5>
-
                                 <div class="row mt-3">
+                                    <div class="col-md-5">
+                                        <table class="table table-sm table-bordered">
+                                            <tr>
+                                                <td class="text-right  bg-light">Waktu Mulai</td>
+                                                <td>{{ \Carbon\Carbon::parse($review->start_time)->translatedFormat('l,  d F Y, H:i') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right  bg-light">Waktu Selesai</td>
+                                                <td>{{ \Carbon\Carbon::parse($review->finish_time)->translatedFormat('l,  d F Y, H:i') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right  bg-light">Durasi Pengerjaan</td>
+                                                <td>
+                                                    @php
+                                                        $startTime = \Carbon\Carbon::parse($review->start_time);
+                                                        $finishTime = \Carbon\Carbon::parse($review->finish_time);
+                                                        $duration = $finishTime->diff($startTime); // Menghitung selisih waktu
+                                                    @endphp
+
+                                                    {{ $duration->h != 0 ? $duration->h . ' jam' : '' }}
+                                                    {{ $duration->i != 0 ? $duration->i . ' menit' : '' }}
+                                                    {{ $duration->s . ' detik' }}
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right  bg-light">Total Skor</td>
+                                                <td>{{ $review->total_score }}/{{ count($review->details) }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
                                     <div class="col-md-6">
                                         @foreach ($questionsPerAspect as $aspect)
                                             @if ($aspect['percentage'] >= 90)
@@ -48,10 +83,7 @@
                             </div>
                             <div class="card-body">
                                 @foreach ($review->details->sortBy('order') as $detail)
-                                    <p>{{ $detail->order }}.
-                                        {!! $detail->resultQuestion->question
-                                            ? $detail->resultQuestion->question
-                                            : $detail->resultQuestion->direction_question !!}
+                                    <p>{{ $detail->order }}. {{ $detail->resultQuestion->direction_question }}
                                         @if (is_null($detail->answer))
                                             <span class="ml-2 text-danger font-weight-light">
                                                 <i class="fas fa-times">
@@ -60,6 +92,7 @@
                                             </span>
                                         @endif
                                     </p>
+                                    <p class="m-3">{{ $detail->order }}. {!! $detail->resultQuestion->question ? $detail->resultQuestion->question : '' !!}</p>
                                     @if (!is_null($detail->resultQuestion->attachment))
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
                                             class="img img-fluid mb-4" style="max-height: 12rem;">
