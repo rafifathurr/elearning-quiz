@@ -1,13 +1,6 @@
 @extends('layouts.section')
 
 @section('content')
-    <style>
-        p.m-3 span {
-            display: block;
-            margin: inherit;
-            padding: inherit;
-        }
-    </style>
     <div class="py-4 px-3">
         <div class="content">
             <div class="container-fluid">
@@ -90,18 +83,21 @@
                             </div>
                             <div class="card-body">
                                 @foreach ($review->details->sortBy('order') as $detail)
-                                    <p>{{ $detail->order }}. {{ $detail->resultQuestion->direction_question }}
-                                        @if (is_null($detail->answer))
-                                            <span class="ml-2 text-danger font-weight-light">
-                                                <i class="fas fa-times">
-                                                    Tidak Menjawab
-                                                </i>
-                                            </span>
-                                        @endif
-                                    </p>
-                                    <p class="m-3">
-                                        <span>{!! $detail->resultQuestion->question !!}</span>
-                                    </p>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                {{ $detail->order }}.
+                                            </td>
+                                            <td>
+                                                {{ $detail->resultQuestion->direction_question }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>{!! $detail->resultQuestion->question ? $detail->resultQuestion->question : '' !!}</td>
+                                        </tr>
+                                    </table>
+
                                     @if (!is_null($detail->resultQuestion->attachment))
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
                                             class="img img-fluid mb-4" style="max-height: 12rem;">
