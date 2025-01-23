@@ -92,7 +92,7 @@
                                             </span>
                                         @endif
                                     </p>
-                                    <p class="m-3">{{ $detail->order }}. {!! $detail->resultQuestion->question ? $detail->resultQuestion->question : '' !!}</p>
+                                    <p class="m-3">{!! $detail->resultQuestion->question ? $detail->resultQuestion->question : '' !!}</p>
                                     @if (!is_null($detail->resultQuestion->attachment))
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
                                             class="img img-fluid mb-4" style="max-height: 12rem;">
