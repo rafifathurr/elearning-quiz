@@ -47,7 +47,7 @@
                                 </div>
 
                                 <div class="row mt-2">
-                                    <div class="col-md-6">
+                                    <div class="col">
                                         @foreach ($questionsPerAspect as $aspect)
                                             @if ($aspect['percentage'] >= 90)
                                                 <p class="text-success">{{ $review->user->name }} sudah
@@ -92,7 +92,9 @@
                                             </span>
                                         @endif
                                     </p>
-                                    <p class="m-3">{!! $detail->resultQuestion->question ? $detail->resultQuestion->question : '' !!}</p>
+                                    <p class="m-3">
+                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : '' }}
+                                    </p>
                                     @if (!is_null($detail->resultQuestion->attachment))
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
                                             class="img img-fluid mb-4" style="max-height: 12rem;">
