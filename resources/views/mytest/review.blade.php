@@ -1,6 +1,13 @@
 @extends('layouts.section')
 
 @section('content')
+    <style>
+        p.m-3 span {
+            display: block;
+            margin: inherit;
+            padding: inherit;
+        }
+    </style>
     <div class="py-4 px-3">
         <div class="content">
             <div class="container-fluid">
@@ -93,7 +100,7 @@
                                         @endif
                                     </p>
                                     <p class="m-3">
-                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : '' }}
+                                        <span>{!! $detail->resultQuestion->question !!}</span>
                                     </p>
                                     @if (!is_null($detail->resultQuestion->attachment))
                                         <img src="{{ asset($detail->resultQuestion->attachment) }}"
