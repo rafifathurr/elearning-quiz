@@ -42,7 +42,7 @@
                         <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto px-3 py-2" id="current">
                         </h2>
                         <h2 class="card-title mb-0 font-weight-bold my-auto ml-auto bg-dark px-3 py-2 rounded">
-                            <span id="detik">--</span>
+                            <span id="menit">--</span> <span id="batas">:</span> <span id="detik">--</span>
                         </h2>
                     </div>
                 </div>
@@ -262,7 +262,15 @@
                     $('#detik').html(seconds > 9 ? seconds : '0' + seconds);
 
                     let minutes = Math.floor((durasi % 3600) / 60);
-                    $('#menit').html(minutes > 9 ? minutes : '0' + minutes);
+
+                    if (durasi < 60) {
+                        $('#menit').hide();
+                        $('#batas').hide();
+                    } else {
+                        $('#batas').show();
+                        $('#menit').show();
+                        $('#menit').html(minutes > 9 ? minutes : '0' + minutes);
+                    }
 
                     let hours = Math.floor(durasi / 3600);
                     $('#jam').html(hours > 9 ? hours : '0' + hours);
