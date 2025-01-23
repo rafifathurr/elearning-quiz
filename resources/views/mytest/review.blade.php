@@ -49,7 +49,9 @@
                             <div class="card-body">
                                 @foreach ($review->details->sortBy('order') as $detail)
                                     <p>{{ $detail->order }}.
-                                        {{ $detail->resultQuestion->question ? $detail->resultQuestion->question : $detail->resultQuestion->direction_question }}
+                                        {!! $detail->resultQuestion->question
+                                            ? $detail->resultQuestion->question
+                                            : $detail->resultQuestion->direction_question !!}
                                         @if (is_null($detail->answer))
                                             <span class="ml-2 text-danger font-weight-light">
                                                 <i class="fas fa-times">
