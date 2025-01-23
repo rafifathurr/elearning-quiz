@@ -97,7 +97,7 @@
 
                 <div class="collapse navbar-collapse order-3" id="navbarCollapse">
                     <!-- Left navbar links -->
-                    <img src="{{ asset('img/logobrata.png') }}" alt="AdminLTE Logo" class="brand-image  "
+                    <img src="{{ asset('img/bclogo.png') }}" alt="AdminLTE Logo" class="brand-image  "
                         style="max-width: 3rem;">
                     <span class="brand-text font-weight-bold text-secondary" style="opacity: .8">BRATA CERDAS</span>
                 </div>

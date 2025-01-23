@@ -10,7 +10,7 @@
 
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
-        <img src="{{ asset('img/logobrata.png') }}" alt="AdminLTE Logo" class="brand-image " style="opacity: .8">
+        <img src="{{ asset('img/bclogo.png') }}" alt="AdminLTE Logo" class="brand-image " style="opacity: .8">
         <span class="brand-text font-weight-bold text-uppercase text-truncate">Brata Cerdas</span>
     </a>
 
