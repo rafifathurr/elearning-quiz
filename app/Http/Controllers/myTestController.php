@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\ClassAttendance;
+use App\Models\ClassPackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -39,6 +40,17 @@ class myTestController extends Controller
 
             $myTest = OrderDetail::whereIn('order_id', $orderIds)
                 ->whereIn('package_id', $orderPackageIds)
+                ->whereNull('deleted_at')
+                ->get();
+        } elseif (User::find(Auth::user()->id)->hasRole('counselor')) {
+            $classIds = ClassPackage::where('user_id', Auth::user()->id)->pluck('id');
+            $orderPackageIds = ClassAttendance::whereIn('class_id', $classIds)->pluck('order_package_id');
+            $packageIds = OrderPackage::whereIn('id', $orderPackageIds)->pluck('package_id');
+            $orderIds = OrderPackage::whereIn('id', $orderPackageIds)->pluck('order_id');
+            $orderDetailIds = Result::whereNotNull('finish_time')->pluck('order_detail_id');
+            $myTest = OrderDetail::whereIn('id', $orderDetailIds)
+                ->whereIn('order_id', $orderIds)
+                ->whereIn('package_id', $packageIds)
                 ->whereNull('deleted_at')
                 ->get();
         } else {
