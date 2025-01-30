@@ -39,18 +39,20 @@
                     </a>
                 </li>
 
-                <li class="nav-item {{ $display }}">
-                    <a href="{{ route('mytest.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-book"></i>
-                        <p>
-                            @hasrole('user')
-                                My Test
-                            @else
-                                Riwayat Test
-                            @endhasrole
-                        </p>
-                    </a>
-                </li>
+                @hasanyrole('admin|user|counselor')
+                    <li class="nav-item {{ $display }}">
+                        <a href="{{ route('mytest.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>
+                                @hasrole('user')
+                                    My Test
+                                    @elsehasanyrole('admin|counselor')
+                                    Riwayat Test
+                                @endhasrole
+                            </p>
+                        </a>
+                    </li>
+                @endhasanyrole
 
                 @hasrole('user')
                     <li class="nav-item {{ $display }}">
