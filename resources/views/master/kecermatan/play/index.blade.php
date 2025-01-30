@@ -63,20 +63,15 @@
 
             function answerKecermatan(element) {
                 let selectedAnswer = $(element).find('input[name="answer_list"]').val();
-                let resultId = $('#result_id').val(); // Ambil resultId dari input hidden
+                let resultId = $('#result_id').val();
                 let token = $('meta[name="csrf-token"]').attr('content');
                 let questionNumber = $('#active_question').data('question-number');
                 let totalQuestion = $('#total_question').val();
                 let currentCombination = $('#current_combination').val();
 
-                console.log('Current Question Number:', questionNumber);
-                console.log('Total Question:', totalQuestion);
-
-
                 $.ajax({
                     url: '{{ url('kecermatan/answer') }}',
                     type: 'POST',
-                    cache: false,
                     data: {
                         _token: token,
                         value: selectedAnswer,
@@ -85,45 +80,50 @@
                         currentCombination: currentCombination,
                     },
                     success: function(data) {
+                        // Status jawaban berhasil
                         console.log("Jawaban berhasil disimpan:", data.value);
 
+                        // Update tampilan dan mark kombinasi yang dipilih
                         $('#answer_list .card').removeClass('bg-secondary').addClass('bg-white');
                         $(element).removeClass('bg-white').addClass('bg-secondary');
 
-
                         // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
-                        let questionNumber = $('#active_question').data('question-number');
-                        $.ajax({
-                            url: $('#url-next').val(),
-                            type: 'GET',
-                            cache: false,
-                            success: function(data) {
-                                console.log(data);
-                                if (data) {
-                                    $('#question_box').html(data);
-                                } else {
-                                    swalError('Tidak ada pertanyaan berikutnya.');
-                                }
-                            },
-                            error: function(xhr) {
-                                console.log(xhr);
-                                if (xhr.status == 401) {
-                                    swalError('Sesi Anda telah habis.');
-                                    window.location.href =
-                                        '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
-                                } else if (xhr.status == 500) {
-                                    swalError('Terjadi kesalahan koneksi.');
-                                }
-                            },
-                        });
-
+                        goToNextQuestionOrCombination();
                     },
                     error: function(xhr) {
-                        console.log("Error AJAX:", xhr);
+                        console.error("Error AJAX:", xhr);
                         swalError('Gagal mengirim jawaban, silakan coba lagi.');
                     },
                 });
             }
+
+            function goToNextQuestionOrCombination() {
+                // Lakukan pengecekan apakah waktu sudah habis
+                if (time <= 0) {
+                    moveNextCombination();
+                } else {
+                    // Lanjutkan ke pertanyaan berikutnya
+                    $.ajax({
+                        url: $('#url-next').val(),
+                        type: 'GET',
+                        success: function(data) {
+                            if (data) {
+                                $('#question_box').html(data);
+                            } else {
+                                swalError('Tidak ada pertanyaan berikutnya.');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            if (xhr.status == 401) {
+                                swalError('Sesi Anda telah habis.');
+                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
+                            }
+                        }
+                    });
+                }
+            }
+
 
 
 
