@@ -45,7 +45,7 @@ class UserController extends Controller
 
                 $list_view = '<div align="center">';
                 foreach ($data->getRoleNames() as $role) {
-                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . ucwords($role) . '</span>';
+                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . ucwords(str_replace('-', ' ', $role)) . '</span>';
                 };
                 $list_view .= '</div>';
                 return $list_view;

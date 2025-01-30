@@ -143,7 +143,7 @@ Route::group(['middleware' => ['role:admin|user|counselor']], function () {
 
 
 
-Route::group(['middleware' => ['role:admin']], function () {
+Route::group(['middleware' => ['role:admin|package-manager|question-operator']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
     });

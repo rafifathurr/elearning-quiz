@@ -63,7 +63,7 @@
                     </li>
                 @endhasrole
 
-                @hasanyrole('admin|user')
+                @hasanyrole('admin|user|finance')
                     <li class="nav-item {{ $display }}">
                         <?php
                         $orderIds = App\Models\Order::whereNull('deleted_at')
@@ -76,7 +76,7 @@
                         <a href="{{ route('order.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
-                                @hasrole('admin')
+                                @hasrole('admin|finance')
                                     Daftar Order <span
                                         class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
                                 @else
@@ -100,49 +100,59 @@
                     </li>
                 @endhasrole
 
-                @hasrole('admin')
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('admin.quiz.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-file"></i>
-                            <p>
-                                Daftar Tes
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.aspect.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-cubes"></i>
-                            <p>
-                                Aspek Pertanyaan
-                            </p>
-                        </a>
-                    </li>
+                @hasanyrole('admin|package-manager|question-operator')
+                    @hasrole('admin')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('admin.quiz.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-file"></i>
+                                <p>
+                                    Daftar Tes
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.aspect.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-cubes"></i>
+                                <p>
+                                    Aspek Pertanyaan
+                                </p>
+                            </a>
+                        </li>
+                    @endhasrole
 
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.question.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-clipboard-list"></i>
-                            <p>
-                                Bank Soal
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.package.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-gift"></i>
-                            <p>
-                                Daftar Paket
-                            </p>
-                        </a>
-                    </li>
+                    @hasanyrole('admin|question-operator')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.question.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-clipboard-list"></i>
+                                <p>
+                                    Bank Soal
+                                </p>
+                            </a>
+                        </li>
+                    @endhasanyrole
 
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.user.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-user-cog"></i>
-                            <p>
-                                Daftar Pengguna
-                            </p>
-                        </a>
-                    </li>
+                    @hasanyrole('admin|package-manager')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.package.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-gift"></i>
+                                <p>
+                                    Daftar Paket
+                                </p>
+                            </a>
+                        </li>
+                    @endhasanyrole
+
+                    @hasrole('admin')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.user.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p>
+                                    Daftar Pengguna
+                                </p>
+                            </a>
+                        </li>
+                    @endhasrole
+
                 @endhasrole
                 @hasrole('user')
                     <li class="nav-item ">
