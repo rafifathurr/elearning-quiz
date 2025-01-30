@@ -65,12 +65,12 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-md-4 control-label text-left" for="roles">Role <span
-                                            class="text-danger">*</span></label>
+                                    <label for="roles" class="col-md-4 control-label text-left">Role
+                                        <span class="text-danger ml-1">*</span>
+                                    </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('roles') is-invalid @enderror" id="roles"
-                                            name="roles" required>
-                                            <option disabled hidden selected>Pilih Peran</option>
+                                        <select class="form-control @error('roles[]') is-invalid @enderror" name="roles[]"
+                                            id="roles" data-placeholder="Pilih Role" style="width: 100%;" required>
                                             @foreach ($roles as $role)
                                                 @if (!is_null(old('roles')) && old('roles') == $role->name)
                                                     <option value="{{ $role->name }}" selected>
@@ -82,13 +82,14 @@
                                                 @endif
                                             @endforeach
                                         </select>
-                                        @error('role')
+                                        @error('roles[]')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
                                 </div>
+
 
                                 <div class="form-group row">
                                     <label class="col-md-4 control-label text-left" for="phone">Phone
@@ -184,7 +185,11 @@
             $('#type_of_user').select2({
                 multiple: true,
             });
-            $('#roles').select2();
+            $('#roles').select2({
+                multiple: true,
+            });
+
+            $('#roles').val('').trigger('change');
             $('#id_payment_package').select2();
 
             $('#type_of_user').val('').trigger('change');

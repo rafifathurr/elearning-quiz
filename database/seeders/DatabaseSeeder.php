@@ -17,13 +17,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
-            UserSeeder::class,
-            TypeUserSeeder::class,
-            TypeQuizSeeder::class,
-            AspectQuestionSeeder::class,
-            PaymentPackageSeeder::class,
-            QuestionSeeder::class,
-            Question2Seeder::class,
+            // UserSeeder::class,
+            // TypeUserSeeder::class,
+            // TypeQuizSeeder::class,
+            // AspectQuestionSeeder::class,
+            // PaymentPackageSeeder::class,
+            // QuestionSeeder::class,
+            // Question2Seeder::class,
             //AllDataQuizSeeder::class
             // QuizSeeder::class,
             // Quiz2Seeder::class

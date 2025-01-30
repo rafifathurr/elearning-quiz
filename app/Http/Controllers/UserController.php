@@ -42,12 +42,13 @@ class UserController extends Controller
         $dataTable = DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('role', function ($data) {
-                /**
-                 * User Role Configuration
-                 */
-                $exploded_raw_role = explode('-', $data->getRoleNames()[0]);
-                $user_role = ucwords(implode(' ', $exploded_raw_role));
-                return $user_role;
+
+                $list_view = '<div align="center">';
+                foreach ($data->getRoleNames() as $role) {
+                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . ucwords($role) . '</span>';
+                };
+                $list_view .= '</div>';
+                return $list_view;
             })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
@@ -64,7 +65,7 @@ class UserController extends Controller
                 return $btn_action;
             })
             ->only(['name', 'username', 'email', 'role', 'action'])
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'role'])
             ->make(true);
 
         return $dataTable;
@@ -91,7 +92,8 @@ class UserController extends Controller
                     'username' => 'required',
                     'name' => 'required|string',
                     'email' => 'required|email',
-                    'roles' => 'required',
+                    'roles' => 'required|array',
+                    'roles.*' => 'string|exists:roles,name',
                     'phone' => 'required',
                     'id_payment_package' => 'nullable',
                     'password' => 'required',
@@ -130,7 +132,9 @@ class UserController extends Controller
 
 
                 if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
-                    $user_role = $add_user->assignRole($request->roles);
+                    foreach ($request->roles as $role) {
+                        $user_role = $add_user->assignRole($role);
+                    }
                 } else {
                     $add_user->update([
                         'otp' => $otp,
@@ -197,157 +201,57 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            /**
-             * Validation Request Body Variables
-             */
+            // Validasi Input
             $request->validate([
-                'username' => 'required',
+                'username' => 'required|string|unique:users,username,' . $id,
                 'name' => 'required|string',
-                'email' => 'required|email',
-                'roles' => 'required',
-                'phone' => 'required',
+                'email' => 'required|email|unique:users,email,' . $id,
+                'roles' => 'required|array',
+                'roles.*' => 'string|exists:roles,name',
+                'phone' => 'required|string',
+                'password' => 'nullable|string',
             ]);
 
-            /**
-             * Validation Unique Field Record
-             */
-            $username_check = User::whereNull('deleted_at')
-                ->where('username', $request->username)
-                ->where('id', '!=', $id)
-                ->first();
-            $email_check = User::whereNull('deleted_at')
-                ->where('email', $request->email)
-                ->where('id', '!=', $id)
-                ->first();
 
-            /**
-             * Validation Unique Field Record
-             */
-            if (is_null($username_check) && is_null($email_check)) {
-                /**
-                 * Get User Record from id
-                 */
-                $user = User::find($id);
+            $user = User::findOrFail($id);
 
-                /**
-                 * Validation User id
-                 */
-                if (!is_null($user)) {
-                    /**
-                     * Validation Password Request
-                     */
 
-                    if (isset($request->password)) {
+            DB::beginTransaction();
 
-                        if ($request->password != $request->re_password) {
-                            return redirect()
-                                ->back()
-                                ->with(['failed' => 'Password Tidak Sama'])
-                                ->withInput();
-                        }
+            // Update Data User
+            $updateData = [
+                'username' => $request->username,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+            ];
 
-                        /**
-                         * Begin Transaction
-                         */
-                        DB::beginTransaction();
-
-                        /**
-                         * Update User Record
-                         */
-                        $user_update = User::where('id', $id)->update([
-                            'username' => $request->username,
-                            'name' => $request->name,
-                            'email' => $request->email,
-                            'phone' => $request->phone,
-                            'password' => bcrypt($request->password)
-                        ]);
-                    } else {
-                        /**
-                         * Begin Transaction
-                         */
-                        DB::beginTransaction();
-
-                        /**
-                         * Update User Record
-                         */
-                        $user_update = User::where('id', $id)->update([
-                            'username' => $request->username,
-                            'name' => $request->name,
-                            'email' => $request->email,
-                            'phone' => $request->phone,
-                        ]);
-                    }
-
-                    /**
-                     * Validation Update Role Equals Default
-                     */
-                    if ($user->getRoleNames()[0] != $request->roles) {
-                        /**
-                         * Assign Role of User Based on Requested
-                         */
-                        $model_has_role_delete = $user->removeRole($user->getRoleNames()[0]);
-
-                        /**
-                         * Assign Role of User Based on Requested
-                         */
-                        $model_has_role_update = $user->assignRole($request->roles);
-
-                        /**
-                         * Validation Update User Record and Update Assign Role User
-                         */
-                        if ($user_update && $model_has_role_delete && $model_has_role_update) {
-                            DB::commit();
-                            return redirect()
-                                ->route('master.user.index')
-                                ->with(['success' => 'Berhasil Update Data User']);
-                        } else {
-                            /**
-                             * Failed Store Record
-                             */
-                            DB::rollBack();
-                            return redirect()
-                                ->back()
-                                ->with(['failed' => 'Gagal Update Data User'])
-                                ->withInput();
-                        }
-                    } else {
-                        /**
-                         * Validation Update User Record
-                         */
-                        if ($user_update) {
-                            DB::commit();
-
-                            return redirect()
-                                ->route('master.user.index')
-                                ->with(['success' => 'Berhasil Update Data User']);
-                        } else {
-                            /**
-                             * Failed Store Record
-                             */
-                            DB::rollBack();
-                            return redirect()
-                                ->back()
-                                ->with(['failed' => 'Gagal Update Data User'])
-                                ->withInput();
-                        }
-                    }
-                } else {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => 'Invalid Request!']);
-                }
-            } else {
-                return redirect()
-                    ->back()
-                    ->with(['failed' => 'Email atau Username Sudah Tersedia'])
-                    ->withInput();
+            // Jika password diberikan, tambahkan ke updateData
+            if ($request->filled('password')) {
+                $updateData['password'] = bcrypt($request->password);
             }
+
+            $user->update($updateData);
+
+
+            $user->syncRoles($request->roles);
+
+
+            DB::commit();
+
+            return redirect()
+                ->route('master.user.index')
+                ->with(['success' => 'Berhasil Update Data User']);
         } catch (Exception $e) {
+
+            DB::rollBack();
             return redirect()
                 ->back()
-                ->with(['failed' => $e->getMessage()]);
+                ->with(['failed' => 'Gagal Update Data User: ' . $e->getMessage()])
+                ->withInput();
         }
     }
+
 
     public function show(string $id)
     {

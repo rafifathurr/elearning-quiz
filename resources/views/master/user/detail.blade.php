@@ -40,29 +40,16 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label" for="email">Peran </label>
+                                <label class="col-sm-3 col-form-label" for="role">Role Pengguna </label>
                                 <div class="col-sm-9 col-form-label">
-                                    {{ $user->roles[0]->name }}
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label" for="email">Tipe Pengguna </label>
-                                <div class="col-sm-9 col-form-label">
-                                    @foreach ($user->userTypeAccess as $typeAccess)
+                                    @foreach ($user->roles as $role)
                                         <span class="badge badge-primary mr-2 py-2"
-                                            style="font-size: 0.8rem;">{{ $typeAccess->typeUser->name }}</span>
+                                            style="font-size: 0.8rem;">{{ $role->name }}</span>
                                     @endforeach
                                 </div>
                             </div>
-
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label" for="email">Tipe Pengguna </label>
-                                <div class="col-sm-9 col-form-label">
-                                    @foreach ($user->userPayment as $payment)
-                                        <span>{{ $payment->paymentPackage->name }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
+                            <a href="{{ route('master.user.index') }}" class="btn btn-sm btn-primary"><i
+                                    class="fas fa-arrow-left mr-2"></i>Kembali</a>
                         </div>
                     </div>
                 </div>

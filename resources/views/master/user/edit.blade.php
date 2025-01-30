@@ -59,26 +59,24 @@
                                     @enderror
                                 </div>
 
+
                                 <div class="form-group">
-                                    <label for="roles">Role <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('roles') is-invalid @enderror" id="roles"
-                                        name="roles" required>
-                                        <option disabled hidden selected>Pilih Peran</option>
+                                    <label for="roles">Pilih Role
+                                        <span class="text-danger ml-1">*</span>
+                                    </label>
+
+                                    <input type="hidden" id="value_role" value="{{ json_encode($user->getRoleNames()) }}">
+
+                                    <select class="form-control @error('roles[]') is-invalid @enderror" name="roles[]"
+                                        id="roles" multiple="multiple" data-placeholder="Pilih Role"
+                                        style="width: 100%;" required>
                                         @foreach ($roles as $role)
-                                            @if (old('roles', $user->getRoleNames()[0]) == $role->name)
-                                                <option value="{{ $role->name }}" selected>{{ $role->name }}
-                                                </option>
-                                            @else
-                                                <option value="{{ $role->name }}">{{ $role->name }}</option>
-                                            @endif
+                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('role')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
                                 </div>
+
+
 
                                 <div class="form-group">
                                     <label for="phone">Phone <span class="text-danger">*</span></label>
@@ -133,7 +131,12 @@
     </div>
     @push('javascript-bottom')
         <script>
-            $('#roles').select2();
+            $('#roles').select2({
+                multiple: true,
+            });
+
+            let selectedRoles = JSON.parse($('#value_role').val());
+            $('#roles').val(selectedRoles).trigger('change');
         </script>
         @include('js.master.user.script')
     @endpush

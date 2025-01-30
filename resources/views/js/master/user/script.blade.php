@@ -102,4 +102,20 @@
             }
         })
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const password = document.getElementById('password');
+        const re_password = document.getElementById('re_password');
+
+        function checkRePassword(event) {
+            var input = event.target;
+
+            if (input.id === 're_password' && input.value !== password.value) {
+                input.setCustomValidity('Password Tidak Sama.');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+        re_password.addEventListener('input', checkRePassword);
+    });
 </script>

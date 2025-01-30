@@ -105,7 +105,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="password" name="password"
+                                    <input type="password" name="password" id="password"
                                         class="form-control @error('password') is-invalid @enderror" placeholder="Password">
                                     <div class="input-group-append">
                                         <div class="input-group-text">
@@ -123,7 +123,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="password" name="re_password"
+                                    <input type="password" name="re_password" id="re_password"
                                         class="form-control @error('re_password') is-invalid @enderror"
                                         placeholder="Re-Password">
                                     <div class="input-group-append">
@@ -167,6 +167,22 @@
             });
             $('#type_of_user').val('').trigger('change');
             $('#id_payment_package').val('').trigger('change');
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const password = document.getElementById('password');
+                const re_password = document.getElementById('re_password');
+
+                function checkRePassword(event) {
+                    var input = event.target;
+
+                    if (input.id === 're_password' && input.value !== password.value) {
+                        input.setCustomValidity('Password Tidak Sama.');
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                }
+                re_password.addEventListener('input', checkRePassword);
+            });
         </script>
     @endpush
 @endsection
