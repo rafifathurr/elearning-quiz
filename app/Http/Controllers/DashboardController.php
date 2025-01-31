@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrderPackage;
 use App\Models\Package;
 use App\Models\Result;
+use App\Models\TypePackage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,14 +41,7 @@ class DashboardController extends Controller
             return redirect()->route('home');
         }
 
-        $data['best_seller'] = Package::withCount(['orderPackage' => function ($query) {
-            $query->whereHas('order', function ($subQuery) {
-                $subQuery->where('status', 100);
-            });
-        }])
-            ->whereNull('deleted_at')
-            ->orderBy('order_package_count', 'DESC') ///order_package_count = dari nama relasi orderPackage ditambah count dari withCount
-            ->get();
+        $data['type_package'] = TypePackage::whereNull('deleted_at')->get();
 
         return view('landingPage', $data);
     }

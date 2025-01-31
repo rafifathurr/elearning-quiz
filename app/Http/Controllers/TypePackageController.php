@@ -34,8 +34,8 @@ class TypePackageController extends Controller
                 $btn_action .= '<div>';
                 return $btn_action;
             })
-            ->only(['name', 'action'])
-            ->rawColumns(['action'])
+            ->only(['name', 'description', 'action'])
+            ->rawColumns(['description', 'action'])
             ->make(true);
 
         return $dataTable;
@@ -57,8 +57,14 @@ class TypePackageController extends Controller
         try {
             DB::beginTransaction();
 
+            $request->validate([
+                'name' => 'required',
+                'description' => 'nullable'
+            ]);
+
             $add_type_package = TypePackage::lockForUpdate()->create([
                 'name' => $request->name,
+                'description' => $request->description,
             ]);
 
             if ($add_type_package) {
@@ -100,11 +106,13 @@ class TypePackageController extends Controller
             $type_package = TypePackage::Find($id);
             if (!is_null($type_package)) {
                 $request->validate([
-                    'name' => 'required'
+                    'name' => 'required',
+                    'description' => 'nullable'
                 ]);
 
                 $update_type_package = TypePackage::where('id', $id)->update([
-                    'name' => $request->name
+                    'name' => $request->name,
+                    'description' => $request->description,
                 ]);
 
                 if ($update_type_package) {

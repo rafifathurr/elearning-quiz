@@ -12,6 +12,6 @@ class TypePackage extends Model
 
     public function package()
     {
-        return $this->hasMany(Package::class, 'id_type_package', 'id');
+        return $this->hasMany(Package::class, 'id_type_package', 'id')->whereNull('deleted_at');
     }
 }

@@ -25,9 +25,11 @@ class PackageController extends Controller
 
         $dataTable = DataTables::of($categories)
             ->addIndexColumn()
+            ->addColumn('id', function ($data) {
+                return $data->id;
+            })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-                // $btn_action .= '<a href="' . route('master.package.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
                 $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
                 $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
 
@@ -46,6 +48,18 @@ class PackageController extends Controller
             ->addColumn('type_package', function ($data) {
                 return $data->typePackage ? $data->typePackage->name : '-';
             })
+            ->addColumn('status', function ($data) {
+                // Cek apakah status aktif (1) atau tidak (0)
+                $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
+
+                $toggle_status = '<div class="custom-control custom-switch">';
+                $toggle_status .= '<input type="checkbox" class="custom-control-input" id="status' . $data->id . '" ' . $checked . '>';
+                $toggle_status .= '<label class="custom-control-label" for="status' . $data->id . '">' . ($data->status == 1 ? 'Aktif' : 'Tidak Aktif') . '</label>';
+                $toggle_status .= '</div>';
+
+                return $toggle_status;
+            })
+
             ->addColumn('quiz', function ($data) {
                 $list_view = '<div align="center">';
                 foreach ($data->packageTest as $package) {
@@ -56,12 +70,22 @@ class PackageController extends Controller
             })
 
 
-            ->only(['name', 'class', 'price', 'quiz', 'type_package', 'action'])
-            ->rawColumns(['action', 'price', 'quiz'])
+            ->only(['id', 'name', 'class', 'price', 'quiz', 'type_package', 'status', 'action'])
+            ->rawColumns(['status', 'action', 'price', 'quiz'])
             ->make(true);
 
         return $dataTable;
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $package = Package::findOrFail($id);
+        $package->status = $request->status;
+        $package->save();
+
+        return response()->json(['success' => true, 'status' => $package->status ? 'Aktif' : 'Tidak Aktif']);
+    }
+
 
     public function create()
     {

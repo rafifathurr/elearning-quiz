@@ -186,6 +186,7 @@ Route::group(['middleware' => ['role:admin|package-manager']], function () {
 
         Route::group(['controller' => PackageController::class, 'prefix' => 'package', 'as' => 'package.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::post('update-status/{id}', 'updateStatus')->name('updateStatus');
         });
         Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
 

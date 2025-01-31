@@ -44,6 +44,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'description',
+                    defaultContent: '-'
+                },
+                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',

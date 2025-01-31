@@ -35,6 +35,7 @@
                                                 <th>Pertemuan</th>
                                                 <th>Harga</th>
                                                 <th>Daftar Test</th>
+                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

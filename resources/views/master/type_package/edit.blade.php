@@ -37,6 +37,19 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group row">
+                                    <label for="description" class="col-md-4 control-label text-left">Deskripsi
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <textarea placeholder="Deskripsi" rows="4" name="description" id="description" class="form-control ">{{ old('description', $type_package->description) }}</textarea>
+                                        @error('description')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
 
                                 <div class="pt-3 d-flex justify-content-end">
                                     <a href="{{ route('master.typePackage.index') }}" class="btn btn-danger mr-2"> Back</a>

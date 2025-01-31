@@ -55,6 +55,14 @@
             /* Icon color */
         }
 
+        .custom-shape {
+            display: inline-block;
+            position: relative;
+            padding: 10px 20px;
+            font-weight: bold;
+            clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%)
+        }
+
         .card {
             transition: transform 0.3s ease;
             /* Animasi untuk memperhalus perubahan ukuran */
@@ -67,27 +75,11 @@
             /* Menambahkan efek bayangan saat hover */
         }
 
-        .equal-height {
-            min-height: 350px;
-            /* Sesuaikan nilai sesuai kebutuhan */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .custom-shape {
-            display: inline-block;
-            position: relative;
-            padding: 10px 20px;
-            font-weight: bold;
-            clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%)
-        }
-
         /* Bentuk Belah Ketupat */
     </style>
 
     <body class="hold-transition layout-top-nav">
+        {{-- Navbar --}}
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
             <div class="container">
                 <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -111,6 +103,7 @@
                 </ul>
             </div>
         </nav>
+
         {{-- Carousel --}}
         <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
             <ol class="carousel-indicators">
@@ -150,74 +143,41 @@
                 <span class="sr-only">Next</span>
             </a>
         </div>
+
         <div class="py-3 px-3">
-            @if ($best_seller->isNotEmpty())
+            @if ($type_package->isNotEmpty())
                 <h3 class="text-center font-weight-bold my-3">
                     Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
                 </h3>
-                <div class="row mx-3 ">
-                    {{-- Best Seller --}}
-                    <div class="row mb-4">
-                        @foreach ($best_seller as $class)
-                            <div class="col-md-3 my-2">
-                                <div class="card h-100 equal-height">
-                                    <div class="card-header bg-gradient-lightblue">
-                                        <h5>{{ $class->name }}</h5>
-                                    </div>
-                                    <div class="card-body">
+                <div class="row mx-3 justify-content-center">
+                    @foreach ($type_package as $type)
+                        <div class="col-md-5 my-3">
+                            <div class="card h-100">
+                                <div class="card-header bg-gradient-lightblue">
+                                    <h5 class="font-weight-bold">{{ $type->name }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-center">{{ $type->description }}</p>
 
-                                        @if ($class->price == 0)
-                                            <h5 class="mb-3 text-success"><i class="fa fa-gift "></i>
-                                                Gratis</h5>
-                                        @else
-                                            <h5 class="mb-3"><i class="fa fa-tags text-danger"></i>
-                                                {{ 'Rp. ' . number_format($class->price, 0, ',', '.') }}</h5>
-                                        @endif
-
-                                        @if (isset($class->class) && $class->class > 0)
-                                            <p class="font-weight-bolder text-cyan "><i
-                                                    class="fas fa-chalkboard-teacher "></i>
-                                                <span class="ml-1">
-                                                    {{ $class->class }} Kali Pertemuan
-                                                </span>
-                                            </p>
-                                        @else
-                                            <p class="font-weight-bolder text-maroon "><i
-                                                    class="fas fa-exclamation-circle "></i>
-                                                <span class="ml-1">
-                                                    Hanya Test
-                                                </span>
-                                            </p>
-                                        @endif
-                                        <ul class="list-unstyled">
-                                            @foreach ($class->packageTest as $package)
-                                                <?php
-                                                $colorMapping = [
-                                                    'kecerdasan' => 'badge-info',
-                                                    'kepribadian' => 'badge-secondary',
-                                                    'kecermatan' => 'badge-warning',
-                                                ];
-                                                
-                                                $colorVar = $colorMapping[$package->quiz->type_aspect] ?? '';
-                                                ?>
-                                                <li class="package-item font-weight-normal my-1">
-                                                    {{ $package->quiz->name }}
-                                                    <span
-                                                        class="badge {{ $colorVar }}  font-weight-bolder ">{{ $package->quiz->type_aspect }}</span>
+                                    <div class="border rounded-lg p-2 mx-2">
+                                        <h4 class="text-center font-weight-bold text-blue mb-2">Daftar Paket</h4>
+                                        <ul class="text-center list-unstyled p-2 m-0">
+                                        @foreach ($type->package as $package)
+                                                <li class="my-3">
+                                                    <a href="{{ route('login') }}"
+                                                        class="btn btn-primary w-full d-block font-weight-bold p-2 rounded-pill"
+                                                        style="font-size: 1.2rem;">{{ $package->name }}</a>
                                                 </li>
                                             @endforeach
                                         </ul>
                                     </div>
-                                    <div class="card-footer bg-white">
-                                        <div class="d-flex justify-content-end">
-                                            <a href="{{ route('login') }}" class="btn btn-sm btn-primary "> <i
-                                                    class="fas fa-shopping-cart"></i> Checkout</a>
-                                        </div>
-                                    </div>
                                 </div>
+
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
+
+
                 </div>
             @else
                 <h3 class="text-center font-weight-bold my-3">
@@ -226,13 +186,13 @@
             @endif
 
         </div>
-        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
-            aria-label="Scroll to top">
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
             <i class="fas fa-chevron-up"></i>
         </a>
 
 
         @push('javascript-bottom')
+            @include('js.order.script')
             <script>
                 $(document).ready(function() {
                     $('#table-test').DataTable({
