@@ -47,25 +47,7 @@ Route::get('login', function () {
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
 
 
-Route::get('/', function () {
-    if (Auth::check()) {
-        if (User::find(Auth::user()->id)->hasRole('user')) {
-            $result = Result::where('user_id', Auth::id())
-                ->whereNull('finish_time')
-                ->first();
-            if ($result) {
-                Auth::logout();
-                return redirect()->route('landingPage');
-            } else {
-                return redirect()->route('home');
-            }
-        }
-        return redirect()->route('home');
-    }
-    return redirect()->route('landingPage');
-});
-
-Route::get('landing-page', [DashboardController::class, 'landingPage'])->name('landingPage');
+Route::get('/', [DashboardController::class, 'landingPage'])->name('landingPage');
 
 Route::get('otp-verify', [AuthController::class, 'showVerifyForm'])->name('otp.verify');
 Route::post('otp-verify', [AuthController::class, 'verifyOtp'])->name('otp.verify.post');
