@@ -13,6 +13,7 @@ use App\Http\Controllers\myClassController;
 use App\Http\Controllers\myTestController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\TypePackageController;
 use App\Http\Controllers\UserController;
 
 use App\Models\Quiz\Quiz;
@@ -81,7 +82,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
 });
 
-
+//Admin | User
 Route::group(['middleware' => ['role:admin|user']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::group(['controller' => \App\Http\Controllers\Admin\Quiz\QuizController::class, 'prefix' => 'quiz', 'as' => 'quiz.'], function () {
@@ -106,8 +107,6 @@ Route::group(['middleware' => ['role:admin|user']], function () {
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('datatable2', 'dataTable2')->name('dataTable2');
-        Route::get('index', 'index')->name('index');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');
@@ -130,6 +129,23 @@ Route::group(['middleware' => ['role:admin|user']], function () {
     });
 });
 
+//Admin | User | Finance
+Route::group(['middleware' => ['role:admin|user|finance']], function () {
+    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('index', 'index')->name('index');
+    });
+});
+
+// Admin | Finance
+Route::group(['middleware' => ['role:admin|finance']], function () {
+    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('datatable2', 'dataTable2')->name('dataTable2');
+        Route::post('approve/{id}', 'approve')->name('approve');
+        Route::post('reject/{id}', 'reject')->name('reject');
+    });
+});
+
+//Admin | User | Konselor
 Route::group(['middleware' => ['role:admin|user|counselor']], function () {
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
@@ -141,58 +157,7 @@ Route::group(['middleware' => ['role:admin|user|counselor']], function () {
     });
 });
 
-
-
-Route::group(['middleware' => ['role:admin|package-manager|question-operator']], function () {
-    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
-        Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
-    });
-
-    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
-        Route::group(['controller' => UserController::class, 'prefix' => 'user', 'as' => 'user.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-        });
-        Route::resource('user', UserController::class)->parameters(['user' => 'id']);
-
-        Route::group(['controller' => AspectQuestionController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-            Route::get('get-aspect', 'getAspectsByTypeAspect')->name('getAspectsByTypeAspect');
-        });
-        Route::resource('aspect', AspectQuestionController::class)->parameters(['aspect' => 'id']);
-
-        Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-        });
-        Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
-
-        //question
-        Route::group(['controller' => QuestionController::class, 'prefix' => 'question', 'as' => 'question.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-            Route::get('append', 'append')->name('append');
-        });
-        Route::resource('question', QuestionController::class)->parameters(['question' => 'id']);
-
-
-        Route::group(['controller' => PackageController::class, 'prefix' => 'package', 'as' => 'package.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-        });
-        Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
-
-
-        Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
-            Route::get('create', 'create')->name('create');
-            Route::post('store', 'store')->name('store');
-            Route::get('edit/{quiz}', 'edit')->name('edit');
-            Route::patch('update/{quiz}', 'update')->name('update');
-        });
-    });
-
-    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
-        Route::post('approve/{id}', 'approve')->name('approve');
-        Route::post('reject/{id}', 'reject')->name('reject');
-    });
-});
-
+// Konselor
 Route::group(['middleware' => ['role:counselor']], function () {
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
@@ -203,4 +168,65 @@ Route::group(['middleware' => ['role:counselor']], function () {
         Route::delete('remove-member/{index}', 'removeMember')->name('removeMember');
     });
     Route::resource('class', myClassAdminController::class)->parameters(['class' => 'id']);
+});
+
+// Hanya Admin
+Route::group(['middleware' => ['role:admin']], function () {
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
+    });
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        Route::group(['controller' => UserController::class, 'prefix' => 'user', 'as' => 'user.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('user', UserController::class)->parameters(['user' => 'id']);
+
+        Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
+
+
+        Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
+            Route::get('create', 'create')->name('create');
+            Route::post('store', 'store')->name('store');
+            Route::get('edit/{quiz}', 'edit')->name('edit');
+            Route::patch('update/{quiz}', 'update')->name('update');
+        });
+    });
+});
+
+// Admin | Package Manager
+Route::group(['middleware' => ['role:admin|package-manager']], function () {
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+
+        Route::group(['controller' => PackageController::class, 'prefix' => 'package', 'as' => 'package.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('package', PackageController::class)->parameters(['package' => 'id']);
+
+        Route::group(['controller' => TypePackageController::class, 'prefix' => 'typePackage', 'as' => 'typePackage.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('typePackage', TypePackageController::class)->parameters(['typePackage' => 'id']);
+    });
+});
+
+// Admin | Question Operator
+Route::group(['middleware' => ['role:admin|question-operator']], function () {
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        Route::group(['controller' => QuestionController::class, 'prefix' => 'question', 'as' => 'question.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::get('append', 'append')->name('append');
+        });
+        Route::resource('question', QuestionController::class)->parameters(['question' => 'id']);
+
+        Route::group(['controller' => AspectQuestionController::class, 'prefix' => 'aspect', 'as' => 'aspect.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::get('get-aspect', 'getAspectsByTypeAspect')->name('getAspectsByTypeAspect');
+        });
+        Route::resource('aspect', AspectQuestionController::class)->parameters(['aspect' => 'id']);
+    });
 });
