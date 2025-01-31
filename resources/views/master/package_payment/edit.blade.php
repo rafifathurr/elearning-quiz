@@ -36,6 +36,33 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label text-left" for="id_type_package">Tipe Paket <span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select class="form-control @error('id_type_package') is-invalid @enderror"
+                                            id="id_type_package" name="id_type_package" required>
+                                            <option disabled hidden selected>Pilih Tipe Paket</option>
+                                            @foreach ($types as $type)
+                                                @if (old('roles', $package->id_type_package) == $type->id)
+                                                    <option value="{{ $type->id }}" selected>
+                                                        {{ $type->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $type->id }}">{{ $type->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        @error('id_type_package')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="form-group row">
                                     <label for="class" class="col-md-4 control-label text-left">Jumlah Pertemuan
                                     </label>
@@ -100,6 +127,7 @@
             $('#quiz_id').select2({
                 multiple: true,
             });
+            $('#id_type_package').select2();
 
             $('#quiz_id').val('').trigger('change');
             $('#quiz_id').val(JSON.parse($('#value_quiz').val())).trigger('change');

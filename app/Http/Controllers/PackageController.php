@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Package;
 use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
-
+use App\Models\TypePackage;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +43,9 @@ class PackageController extends Controller
                 $price .= '<div>';
                 return $price;
             })
+            ->addColumn('type_package', function ($data) {
+                return $data->typePackage ? $data->typePackage->name : '-';
+            })
             ->addColumn('quiz', function ($data) {
                 $list_view = '<div align="center">';
                 foreach ($data->packageTest as $package) {
@@ -53,7 +56,7 @@ class PackageController extends Controller
             })
 
 
-            ->only(['name', 'class', 'price', 'quiz', 'action'])
+            ->only(['name', 'class', 'price', 'quiz', 'type_package', 'action'])
             ->rawColumns(['action', 'price', 'quiz'])
             ->make(true);
 
@@ -63,7 +66,8 @@ class PackageController extends Controller
     public function create()
     {
         $quizes = Quiz::whereNull('deleted_at')->get();
-        return view('master.package_payment.create', compact('quizes'));
+        $types = TypePackage::whereNull('deleted_at')->get();
+        return view('master.package_payment.create', compact('quizes', 'types'));
     }
 
     public function store(Request $request)
@@ -74,13 +78,15 @@ class PackageController extends Controller
                 'name' => 'required',
                 'price' => 'required',
                 'class' => 'nullable',
-                'quiz_id' => 'required'
+                'quiz_id' => 'required',
+                'id_type_package' => 'required'
             ]);
 
             $add_package = Package::lockForUpdate()->create([
                 'name' => $request->name,
                 'price' => $request->price,
-                'class' => $request->class
+                'class' => $request->class,
+                'id_type_package' => $request->id_type_package
             ]);
             $packages_test = [];
             foreach ($request->quiz_id as $quiz) {
@@ -114,6 +120,7 @@ class PackageController extends Controller
         try {
             $data['package'] = Package::find($id);
             $data['quizes'] = Quiz::whereNull('deleted_at')->get();
+            $data['types'] = TypePackage::whereNull('deleted_at')->get();
             return view('master.package_payment.edit', $data);
         } catch (Exception $e) {
             return redirect()
@@ -134,7 +141,8 @@ class PackageController extends Controller
                     'name' => 'required',
                     'price' => 'required',
                     'class' => 'nullable',
-                    'quiz_id' => 'required'
+                    'quiz_id' => 'required',
+                    'id_type_package' => 'required'
                 ]);
                 DB::beginTransaction();
 
@@ -142,7 +150,8 @@ class PackageController extends Controller
                     ->update([
                         'name' => $request->name,
                         'price' => $request->price,
-                        'class' => $request->class
+                        'class' => $request->class,
+                        'id_type_package' => $request->id_type_package
                     ]);
                 $deleted_package_test = PackageTest::where('package_id', $package->id)->delete();
                 if ($package_update && $deleted_package_test) {

@@ -18,4 +18,9 @@ class Package extends Model
     {
         return $this->hasMany(OrderPackage::class, 'package_id', 'id');
     }
+
+    public function typePackage()
+    {
+        return $this->belongsTo(typePackage::class, 'id_type_package');
+    }
 }

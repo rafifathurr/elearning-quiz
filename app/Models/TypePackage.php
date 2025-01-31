@@ -9,4 +9,9 @@ class TypePackage extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function package()
+    {
+        return $this->hasMany(Package::class, 'id_type_package', 'id');
+    }
 }

@@ -44,6 +44,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'type_package',
+                    defaultContent: '-'
+                },
+                {
                     data: 'class',
                     defaultContent: '-'
                 },
