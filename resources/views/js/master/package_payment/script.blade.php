@@ -57,6 +57,7 @@
                 },
                 {
                     data: 'quiz',
+                    width: '25%',
                     defaultContent: '-'
                 },
                 {
@@ -65,8 +66,8 @@
                 },
                 {
                     data: 'action',
-                    width: '20%',
                     defaultContent: '-',
+                    width: '10%',
                     orderable: false,
                     searchable: false
                 },
