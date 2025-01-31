@@ -381,6 +381,9 @@ class QuestionController extends Controller
 
                     if (!Storage::exists($path)) {
                         Storage::makeDirectory($path);
+                        // Ubah izin folder menjadi 775 setelah membuat folder
+                        $folderPath = storage_path('app/' . $path);
+                        File::chmod($folderPath, 0775);  // Set izin folder menjadi 775
                     }
 
                     $file_name = $question->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('attachment')->getClientOriginalExtension();
@@ -432,6 +435,10 @@ class QuestionController extends Controller
 
                         if (!Storage::exists($path)) {
                             Storage::makeDirectory($path);
+
+                            // Ubah izin folder menjadi 775 setelah membuat folder
+                            $folderPath = storage_path('app/' . $path);
+                            File::chmod($folderPath, 0775);  // Set izin folder menjadi 775
                         }
 
                         $file_name = $quiz_answer->id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' .  $quiz_answer_request['answer_image']->getClientOriginalExtension();
