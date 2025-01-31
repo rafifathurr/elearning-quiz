@@ -112,6 +112,9 @@
                                 </p>
                             </a>
                         </li>
+                    @endhasrole
+
+                    @hasanyrole('admin|question-operator')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.aspect.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-cubes"></i>
@@ -120,9 +123,6 @@
                                 </p>
                             </a>
                         </li>
-                    @endhasrole
-
-                    @hasanyrole('admin|question-operator')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.question.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-clipboard-list"></i>
@@ -134,6 +134,14 @@
                     @endhasanyrole
 
                     @hasanyrole('admin|package-manager')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.typePackage.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-cube"></i>
+                                <p>
+                                    Tipe Paket
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.package.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-gift"></i>
