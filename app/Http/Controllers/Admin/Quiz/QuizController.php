@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Quiz;
 
 use App\Http\Controllers\Controller;
+use App\Mail\FinishMail;
 use App\Models\AspectQuestion;
 use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Mail;
 
 class QuizController extends Controller
 {
@@ -790,6 +792,15 @@ class QuizController extends Controller
                 'finish_time' => now(),
             ]);
 
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $data = [
+                    'result' => $resultData,
+                    'name' => Auth::user()->name,
+                ];
+                Log::info('Email dimasukkan ke antrian');
+                Mail::to(Auth::user()->email)->queue(new FinishMail($data));
+                Log::info('Email berhasil dikirim ke antrian');
+            };
             return view('quiz.result', compact('result'));
         } catch (Exception $e) {
             Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
