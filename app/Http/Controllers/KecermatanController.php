@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FinishMail;
 use App\Models\Quiz\Quiz;
 use App\Models\Result;
 use App\Models\ResultDetail;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KecermatanController extends Controller
 {
@@ -521,6 +523,68 @@ class KecermatanController extends Controller
                 'total_score' => $totalScore,
                 'finish_time' => now(),
             ]);
+            // if (User::find(Auth::user()->id)->hasRole('user')) {
+            //     $data = [
+            //         'result' => $resultData,
+            //         'name' => Auth::user()->name,
+            //     ];
+            //     $correctAnswers = $resultData->details->where('score', 1)->count();
+            //     $totalQuestions = $resultData->details->count();
+            //     $wrongAnswers = $totalQuestions - $correctAnswers;
+
+            //     // Kecepatan
+            //     $speed = '';
+            //     if ($correctAnswers > 300) {
+            //         $speed = 'B'; // Baik
+            //     } elseif ($correctAnswers >= 280 && $correctAnswers < 300) {
+            //         $speed = 'CB'; // Cukup Baik
+            //     } elseif ($correctAnswers >= 260 && $correctAnswers < 280) {
+            //         $speed = 'C'; // Cukup
+            //     } elseif ($correctAnswers >= 240 && $correctAnswers < 260) {
+            //         $speed = 'K'; // Kurang
+            //     } elseif ($correctAnswers >= 0 && $correctAnswers < 240) {
+            //         $speed = 'KS'; // Kurang Sekali
+            //     }
+
+            //     // Ketelitian
+            //     $accuracy = ($wrongAnswers / $totalQuestions) * 100;
+            //     $accuracyLabel = '';
+            //     if ($accuracy < 4) {
+            //         $accuracyLabel = 'B'; // Baik
+            //     } elseif ($accuracy >= 4.1 && $accuracy < 6) {
+            //         $accuracyLabel = 'CB'; // Cukup Baik
+            //     } elseif ($accuracy >= 6.1 && $accuracy < 8) {
+            //         $accuracyLabel = 'C'; // Cukup
+            //     } elseif ($accuracy >= 8.1 && $accuracy < 10) {
+            //         $accuracyLabel = 'K'; // Kurang
+            //     } elseif ($accuracy >= 10.1) {
+            //         $accuracyLabel = 'KS'; // Kurang Sekali
+            //     }
+
+            //     Log::info('Generate PDF');
+            //     Log::info('Speed: ' . $speed);
+            //     Log::info('Accuracy Label: ' . $accuracyLabel);
+
+            //     // Pemanggilan PDF yang benar
+            //     // Generate PDF dari hasil
+            //     $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'speed', 'accuracyLabel'));
+
+            //     // Simpan PDF ke file sementara
+            //     $pdfPath = storage_path('app/public/result_pdf.pdf');
+            //     $pdf->save($pdfPath);
+
+            //     // Pastikan file PDF ada
+            //     if (!file_exists($pdfPath)) {
+            //         Log::error('PDF tidak ditemukan di path: ' . $pdfPath);
+            //     } else {
+            //         Log::info('PDF berhasil dibuat: ' . $pdfPath);
+
+            //         // Kirim email dengan lampiran PDF
+            //         Log::info('Email dimasukkan ke antrian');
+            //         Mail::to(Auth::user()->email)->queue(new FinishMail($data, $pdfPath));
+            //         Log::info('Email berhasil dikirim ke antrian');
+            //     }
+            // }
 
             return view('quiz.result', compact('result'));
         } catch (Exception $e) {

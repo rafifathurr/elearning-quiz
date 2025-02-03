@@ -70,93 +70,131 @@
         <div class="main">
             <h1>{{ $resultData->quiz->name }}</h1>
 
-            <table>
-                <tr>
-                    <td style="background-color: #d9d9d9">Waktu Mulai</td>
-                    <td>
-                        {{ \Carbon\Carbon::parse($resultData->start_time)->translatedFormat('l,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    d F Y, H:i') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="background-color: #d9d9d9">Waktu Selesai</td>
-                    <td>
-                        {{ \Carbon\Carbon::parse($resultData->finish_time)->translatedFormat('l,
-                                                                                                                                                                                                                                                                                                                                  d F Y, H:i') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="background-color: #d9d9d9">
-                        Durasi Pengerjaan
-                    </td>
-                    <td>
-                        @php
-                            $startTime = \Carbon\Carbon::parse($resultData->start_time);
-                            $finishTime = \Carbon\Carbon::parse($resultData->finish_time);
-                            $duration = $finishTime->diff($startTime);
-                        @endphp
-                        {{ $duration->h != 0 ? $duration->h . ' jam' : '' }}
-                        {{ $duration->i != 0 ? $duration->i . ' menit' : '' }}
-                        {{ $duration->s . ' detik' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="background-color: #d9d9d9">Total Skor</td>
-                    <td>
-                        {{ $resultData->total_score }}/{{ count($resultData->details) }}
-                    </td>
-                </tr>
-            </table>
-            <table>
-                <thead style="background-color: #d9d9d9; margin-top: 30px">
+            @if ($resultData->quiz->type_aspect != 'kecermatan')
+                <table>
                     <tr>
-                        <th>Nama Aspek</th>
-                        <th>Persentase</th>
+                        <td style="background-color: #d9d9d9">Waktu Mulai</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($resultData->start_time)->translatedFormat('l, d F Y, H:i') }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($questionsPerAspect as $aspect)
+                    <tr>
+                        <td style="background-color: #d9d9d9">Waktu Selesai</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($resultData->finish_time)->translatedFormat('l, d F Y, H:i') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">
+                            Durasi Pengerjaan
+                        </td>
+                        <td>
+                            @php
+                                $startTime = \Carbon\Carbon::parse($resultData->start_time);
+                                $finishTime = \Carbon\Carbon::parse($resultData->finish_time);
+                                $duration = $finishTime->diff($startTime);
+                            @endphp
+                            {{ $duration->h != 0 ? $duration->h . ' jam' : '' }}
+                            {{ $duration->i != 0 ? $duration->i . ' menit' : '' }}
+                            {{ $duration->s . ' detik' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Total Skor</td>
+                        <td>
+                            {{ $resultData->total_score }}/{{ count($resultData->details) }}
+                        </td>
+                    </tr>
+                </table>
+                <table style=" margin-top: 30px;">
+                    <thead style="background-color: #d9d9d9;">
                         <tr>
-                            <td>{{ $aspect['aspect_name'] }}</td>
-                            <td>{{ $aspect['percentage'] }}%</td>
+                            <td>Nama Aspek</td>
+                            <td>Persentase</td>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <h4>Kesimpulan:</h4>
-            @foreach ($questionsPerAspect as $aspect)
-                @if ($aspect['percentage'] >= 90)
-                    <p style="color: green">
-                        Anda sudah <strong>baik</strong> dalam
-                        aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
-                    </p>
-                @elseif ($aspect['percentage'] < 90 && $aspect['percentage'] >= 80)
-                    <p style="color: green">
-                        {{ $resultData->user->name }} <strong>cukup baik</strong> dalam
-                        aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
-                    </p>
-                @elseif ($aspect['percentage'] < 80 && $aspect['percentage'] >= 70)
-                    <p style="color: green">
-                        {{ $resultData->user->name }} <strong>cukup</strong>
-                        dalam aspek
-                        <strong>{{ $aspect['aspect_name'] }}</strong>.
-                    </p>
-                @elseif ($aspect['percentage'] < 70 && $aspect['percentage'] >= 50)
-                    <p style="color: orange">
-                        {{ $resultData->user->name }} masih
-                        <strong>kurang</strong> dalam aspek
-                        <strong>{{ $aspect['aspect_name'] }}</strong>.
-                    </p>
-                @elseif ($aspect['percentage'] < 50)
-                    <p style="color: red">
-                        {{ $resultData->user->name }} masih
-                        <strong>kurang sekali</strong> dalam aspek
-                        <strong>{{ $aspect['aspect_name'] }}</strong>.
-                    </p>
-                @endif
-            @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach ($questionsPerAspect as $aspect)
+                            <tr>
+                                <td>{{ $aspect['aspect_name'] }}</td>
+                                <td>{{ $aspect['percentage'] }}%</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <h4>Kesimpulan:</h4>
+                @foreach ($questionsPerAspect as $aspect)
+                    @if ($aspect['percentage'] >= 90)
+                        <p style="color: green">
+                            Anda sudah <strong>baik</strong> dalam
+                            aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
+                        </p>
+                    @elseif ($aspect['percentage'] < 90 && $aspect['percentage'] >= 80)
+                        <p style="color: green">
+                            Anda <strong>cukup baik</strong> dalam
+                            aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
+                        </p>
+                    @elseif ($aspect['percentage'] < 80 && $aspect['percentage'] >= 70)
+                        <p style="color: green">
+                            Anda <strong>cukup</strong>
+                            dalam aspek
+                            <strong>{{ $aspect['aspect_name'] }}</strong>.
+                        </p>
+                    @elseif ($aspect['percentage'] < 70 && $aspect['percentage'] >= 50)
+                        <p style="color: orange">
+                            Anda masih
+                            <strong>kurang</strong> dalam aspek
+                            <strong>{{ $aspect['aspect_name'] }}</strong>.
+                        </p>
+                    @elseif ($aspect['percentage'] < 50)
+                        <p style="color: red">
+                            Anda masih
+                            <strong>kurang sekali</strong> dalam aspek
+                            <strong>{{ $aspect['aspect_name'] }}</strong>.
+                        </p>
+                    @endif
+                @endforeach
+            @else
+                <table>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Waktu Mulai</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($resultData->start_time)->translatedFormat('l, d F Y, H:i') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Waktu Selesai</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($resultData->finish_time)->translatedFormat('l, d F Y, H:i') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Durasi Pengerjaan</td>
+                        <td>
+                            @php
+                                $startTime = \Carbon\Carbon::parse($resultData->start_time);
+                                $finishTime = \Carbon\Carbon::parse($resultData->finish_time);
+                                $duration = $finishTime->diff($startTime);
+                            @endphp
+                            {{ $duration->h != 0 ? $duration->h . ' jam' : '' }}
+                            {{ $duration->i != 0 ? $duration->i . ' menit' : '' }}
+                            {{ $duration->s . ' detik' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Kecepatan</td>
+                        <td>{{ $speed }}</td> <!-- Menampilkan Kecepatan -->
+                    </tr>
+                    <tr>
+                        <td style="background-color: #d9d9d9">Ketelitian</td>
+                        <td>{{ $accuracyLabel }}</td> <!-- Menampilkan Ketelitian -->
+                    </tr>
+                </table>
+
+            @endif
         </div>
     </div>
+
 </body>
 
 </html>
