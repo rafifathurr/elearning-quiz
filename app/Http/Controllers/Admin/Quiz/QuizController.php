@@ -792,15 +792,52 @@ class QuizController extends Controller
                 'finish_time' => now(),
             ]);
 
-            if (User::find(Auth::user()->id)->hasRole('user')) {
-                $data = [
-                    'result' => $resultData,
-                    'name' => Auth::user()->name,
-                ];
-                Log::info('Email dimasukkan ke antrian');
-                Mail::to(Auth::user()->email)->queue(new FinishMail($data));
-                Log::info('Email berhasil dikirim ke antrian');
-            };
+            // if (User::find(Auth::user()->id)->hasRole('user')) {
+            //     $data = [
+            //         'result' => $resultData,
+            //         'name' => Auth::user()->name,
+            //     ];
+            //     // Generate PDF dari hasil
+            //     $questionsPerAspect = $resultData->details
+            //         ->groupBy('aspect_id')
+            //         ->map(function ($details, $aspectId) {
+            //             $totalQuestions = $details->count();
+            //             $correctQuestions = $details->where('score', 1)->count();
+            //             $percentage = $totalQuestions > 0
+            //                 ? ($correctQuestions / $totalQuestions) * 100
+            //                 : 0;
+
+            //             return [
+            //                 'aspect_name' => $details->first()->aspect->name ?? 'Unknown Aspect',
+            //                 'total_questions' => $totalQuestions,
+            //                 'correct_questions' => $correctQuestions,
+            //                 'percentage' => round($percentage, 2),
+            //             ];
+            //         });
+
+            //     $questionsPerAspect = $questionsPerAspect->sortByDesc('percentage');
+
+            //     Log::info('Generate PDF');
+            //     // Pemanggilan PDF yang benar
+            //     // Generate PDF dari hasil
+            //     $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'questionsPerAspect'));
+
+            //     // Simpan PDF ke file sementara
+            //     $pdfPath = storage_path('app/public/result_pdf.pdf');
+            //     $pdf->save($pdfPath);
+
+            //     // Pastikan file PDF ada
+            //     if (!file_exists($pdfPath)) {
+            //         Log::error('PDF tidak ditemukan di path: ' . $pdfPath);
+            //     } else {
+            //         Log::info('PDF berhasil dibuat: ' . $pdfPath);
+
+            //         // Kirim email dengan lampiran PDF
+            //         Log::info('Email dimasukkan ke antrian');
+            //         Mail::to(Auth::user()->email)->queue(new FinishMail($data, $pdfPath));
+            //         Log::info('Email berhasil dikirim ke antrian');
+            //     }
+            // };
             return view('quiz.result', compact('result'));
         } catch (Exception $e) {
             Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error

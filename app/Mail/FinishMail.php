@@ -8,18 +8,21 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class FinishMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $data;
+    public $pdfPath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($data)
+    public function __construct($data, $pdfPath)
     {
         $this->data = $data;
+        $this->pdfPath = $pdfPath;
     }
 
     /**
@@ -27,9 +30,14 @@ class FinishMail extends Mailable
      */
     public function build()
     {
+        Log::info('Menyusun email');
         return $this->subject('Hasil Test')
             ->view('auth.mail.finish')
-            ->with(['data' => $this->data]);
+            ->with(['data' => $this->data])
+            ->attach($this->pdfPath, [
+                'as' => 'result_pdf.pdf',
+                'mime' => 'application/pdf',
+            ]);
     }
 
     /**
