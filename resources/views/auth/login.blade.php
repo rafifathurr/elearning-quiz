@@ -22,7 +22,7 @@
                             <div class="input-group">
                                 <input type="text" name="username"
                                     class="form-control @error('username') is-invalid @enderror"
-                                    placeholder="Email or Username">
+                                    placeholder="Email Atau Username">
                                 <div class="input-group-append">
                                     <div class="input-group-text">
                                         <span class="fas fa-envelope"></span>
@@ -51,26 +51,24 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row pt-3">
-                            <div class="col-8">
-                                <div class="icheck-primary">
-                                    <input type="checkbox" id="remember" name="remember">
-                                    <label for="remember" class="font-weight-normal">
-                                        Remember Me
-                                    </label>
-                                </div>
-                            </div>
+                        <div class="row pt-3 d-flex justify-content-end">
                             <div class="col-4">
                                 <button type="submit" id="login" class="btn btn-primary btn-block font-weight-bold">Log
                                     In</button>
                             </div>
                         </div>
-                        <div class="row justify-content-center mt-4">
-                            <div class="col-12 text-center">
-                                Tidak Punya Akun ? <a href="{{ route('account.create') }}" class="">Daftar Akun</a>
-                            </div>
-                        </div>
                     </form>
+                    <div class="social-auth-links text-center mb-3">
+                        <p>- Atau -</p>
+                        <a href="{{ url('/auth/google') }}" class="btn btn-block btn-primary">
+                            <i class="fab fa-google mr-2"></i> Login Menggunakan Google
+                        </a>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-12 text-center">
+                            Tidak Punya Akun ? <a href="{{ route('account.create') }}" class="">Daftar Akun</a>
+                        </div>
+                    </div>
                 </div>
                 <!-- /.card-body -->
             </div>

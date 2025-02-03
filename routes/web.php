@@ -23,6 +23,8 @@ use App\Models\ResultDetail;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +37,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Google Login
+Route::get('/auth/google', [AuthController::class, 'redirect']);
+Route::get('/auth/google/callback', [AuthController::class, 'callback']);
+
+
+Route::group(['prefix' => 'auth', 'as' => 'auth.'], function () {
+    Route::get('register', [AuthController::class, 'create'])->name('create');
+    Route::post('store', [AuthController::class, 'storeDataGoogle'])->name('storeDataGoogle');
+});
 
 
 Route::get('login', function () {

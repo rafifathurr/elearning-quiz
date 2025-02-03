@@ -115,7 +115,8 @@ class UserController extends Controller
                 ->where('username', $request->username)
                 ->first();
 
-            $email_check = User::where('email', $request->email)
+            $email_check = User::whereNull('deleted_at')
+                ->where('email', $request->email)
                 ->first();
 
             if (is_null($username_check) && is_null($email_check)) {

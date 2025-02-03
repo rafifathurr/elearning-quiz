@@ -9,9 +9,67 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function redirect()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    // Callback dari Google
+    public function callback()
+    {
+        $googleUser = Socialite::driver('google')->user();
+
+        // Cek apakah user sudah ada di database
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if ($user) {
+            // Jika user sudah ada, langsung login
+            Auth::login($user);
+            return redirect('/home')->with('success', 'Login berhasil!');
+        } else {
+            // Jika belum terdaftar, arahkan ke halaman register
+            return redirect()->route('auth.create')->with([
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
+            ]);
+        }
+    }
+
+    public function create()
+    {
+        return view('auth.registerGoogle');
+    }
+    public function storeDataGoogle(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|unique:users,username',
+            'phone' => 'required|digits:13',
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'google_id' => 'required',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'password' => bcrypt(Str::random(16)),
+            'google_id' => $request->google_id,
+        ]);
+
+        $user->assignRole('user');
+
+        Auth::login($user);
+        return redirect('/home')->with('success', 'Registrasi berhasil!');
+    }
+
     public function login()
     {
         return view('auth.login');

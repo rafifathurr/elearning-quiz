@@ -21,6 +21,8 @@ class DashboardController extends Controller
 
         $data['classes'] = Package::where('class', '>', 0)->whereNull('deleted_at')->where('status', 1)->get();
 
+        $data['type_package'] = TypePackage::whereNull('deleted_at')->get();
+
         return view('home', $data);
     }
 
