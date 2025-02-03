@@ -75,14 +75,14 @@
                     <td style="background-color: #d9d9d9">Waktu Mulai</td>
                     <td>
                         {{ \Carbon\Carbon::parse($resultData->start_time)->translatedFormat('l,
-                                                                                                                                                                                                                                                                                                                                                                            d F Y, H:i') }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    d F Y, H:i') }}
                     </td>
                 </tr>
                 <tr>
                     <td style="background-color: #d9d9d9">Waktu Selesai</td>
                     <td>
                         {{ \Carbon\Carbon::parse($resultData->finish_time)->translatedFormat('l,
-                                                                                                                                                                                                                                                          d F Y, H:i') }}
+                                                                                                                                                                                                                                                                                                                                  d F Y, H:i') }}
                     </td>
                 </tr>
                 <tr>
@@ -126,17 +126,17 @@
             <h4>Kesimpulan:</h4>
             @foreach ($questionsPerAspect as $aspect)
                 @if ($aspect['percentage'] >= 90)
-                    <p class="text-success">
-                        {{ $resultData->user->name }} sudah <strong>baik</strong> dalam
+                    <p style="color: green">
+                        Anda sudah <strong>baik</strong> dalam
                         aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
                     </p>
                 @elseif ($aspect['percentage'] < 90 && $aspect['percentage'] >= 80)
-                    <p class="text-success">
+                    <p style="color: green">
                         {{ $resultData->user->name }} <strong>cukup baik</strong> dalam
                         aspek <strong>{{ $aspect['aspect_name'] }}</strong>.
                     </p>
                 @elseif ($aspect['percentage'] < 80 && $aspect['percentage'] >= 70)
-                    <p class="text-success">
+                    <p style="color: green">
                         {{ $resultData->user->name }} <strong>cukup</strong>
                         dalam aspek
                         <strong>{{ $aspect['aspect_name'] }}</strong>.
@@ -148,7 +148,7 @@
                         <strong>{{ $aspect['aspect_name'] }}</strong>.
                     </p>
                 @elseif ($aspect['percentage'] < 50)
-                    <p class="text-danger">
+                    <p style="color: red">
                         {{ $resultData->user->name }} masih
                         <strong>kurang sekali</strong> dalam aspek
                         <strong>{{ $aspect['aspect_name'] }}</strong>.
