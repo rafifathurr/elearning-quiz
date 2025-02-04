@@ -7,6 +7,7 @@ use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DateClassController;
 use App\Http\Controllers\KecermatanController;
 use App\Http\Controllers\myClassAdminController;
 use App\Http\Controllers\myClassController;
@@ -150,6 +151,17 @@ Route::group(['middleware' => ['role:admin|user|counselor']], function () {
     });
 });
 
+// Admin | Konselor
+Route::group(['middleware' => ['role:admin|counselor']], function () {
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+
+        Route::group(['controller' => DateClassController::class, 'prefix' => 'dateclass', 'as' => 'dateclass.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('dateclass', DateClassController::class)->parameters(['dateclass' => 'id']);
+    });
+});
+
 // Konselor
 Route::group(['middleware' => ['role:counselor']], function () {
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
@@ -163,6 +175,7 @@ Route::group(['middleware' => ['role:counselor']], function () {
     Route::resource('class', myClassAdminController::class)->parameters(['class' => 'id']);
 });
 
+
 // Hanya Admin
 Route::group(['middleware' => ['role:admin']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
@@ -174,6 +187,11 @@ Route::group(['middleware' => ['role:admin']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('user', UserController::class)->parameters(['user' => 'id']);
+
+        Route::group(['controller' => DateClassController::class, 'prefix' => 'dateclass', 'as' => 'dateclass.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+        });
+        Route::resource('dateclass', DateClassController::class)->parameters(['dateclass' => 'id']);
 
         Route::group(['controller' => PaymentPackageController::class, 'prefix' => 'payment', 'as' => 'payment.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');

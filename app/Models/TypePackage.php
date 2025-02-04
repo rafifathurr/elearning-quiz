@@ -19,4 +19,8 @@ class TypePackage extends Model
     {
         return $this->hasMany(TypePackage::class, 'id_parent')->whereNull('deleted_at');
     }
+    public function parent()
+    {
+        return $this->belongsTo(TypePackage::class, 'id_parent')->whereNull('deleted_at');
+    }
 }

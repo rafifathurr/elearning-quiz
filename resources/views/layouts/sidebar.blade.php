@@ -102,6 +102,17 @@
                     </li>
                 @endhasrole
 
+                @hasanyrole('admin|counselor')
+                    {{-- <li class="nav-item {{ $display }}">
+                        <a href="{{ route('master.dateclass.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p>
+                                Jadwal Kelas
+                            </p>
+                        </a>
+                    </li> --}}
+                @endhasanyrole
+
                 @hasanyrole('admin|package-manager|question-operator')
                     @hasrole('admin')
                         <li class="nav-item {{ $display }}">

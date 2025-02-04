@@ -23,7 +23,7 @@
 
     function dataTable() {
         const url = $('#url_dt').val();
-        $('#dt-type-package').DataTable({
+        $('#dt-dateclass').DataTable({
             responsive: true,
             autoWidth: false,
             processing: true,
@@ -40,15 +40,11 @@
                     searchable: false
                 },
                 {
+                    data: 'date_code',
+                    defaultContent: '-'
+                },
+                {
                     data: 'name',
-                    defaultContent: '-'
-                },
-                {
-                    data: 'parent',
-                    defaultContent: '-'
-                },
-                {
-                    data: 'description',
                     defaultContent: '-'
                 },
                 {
@@ -61,6 +57,7 @@
             ]
 
         });
+
     }
 
     function destroyRecord(id) {
@@ -82,7 +79,7 @@
             if (result.isConfirmed) {
                 swalProcess();
                 $.ajax({
-                    url: '{{ url('master/typePackage') }}/' + id,
+                    url: '{{ url('master/dateclass') }}/' + id,
                     type: 'DELETE',
                     cache: false,
                     data: {

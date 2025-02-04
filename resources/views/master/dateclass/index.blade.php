@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Kategori Paket</h1>
+                        <h1 class="m-0">Jadwal Kelas</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -20,19 +20,18 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <a href="{{ route('master.typePackage.create') }}" class="btn btn-primary btn-sm">
+                                <a href="{{ route('master.dateclass.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus mr-1"></i>
-                                    Tambah Kategori Paket
+                                    Tambah Jadwal Kelas
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-type-package">
+                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-dateclass">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Kategori</th>
-                                                <th>Kategori Induk</th>
-                                                <th>Deskripsi</th>
+                                                <th>Code</th>
+                                                <th>TJadwal</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -49,7 +48,7 @@
 
     </div>
     @push('javascript-bottom')
-        @include('js.master.type_package.script')
+        @include('js.master.dateclass.script')
         <script>
             dataTable();
         </script>
