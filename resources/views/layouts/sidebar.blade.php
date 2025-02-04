@@ -138,7 +138,7 @@
                             <a href="{{ route('master.typePackage.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
-                                    Tipe Paket
+                                    Kategori Paket
                                 </p>
                             </a>
                         </li>

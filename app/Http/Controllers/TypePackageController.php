@@ -69,10 +69,10 @@ class TypePackageController extends Controller
 
             if ($add_type_package) {
                 DB::commit();
-                return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Menambahkan Tipe Paket']);
+                return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Menambahkan Kategori Paket']);
             } else {
                 DB::rollBack();
-                return redirect()->back()->with(['failed' => 'Gagal Menambahkan Tipe Paket']);
+                return redirect()->back()->with(['failed' => 'Gagal Menambahkan Kategori Paket']);
             }
         } catch (Exception $e) {
             DB::rollBack();
@@ -117,10 +117,10 @@ class TypePackageController extends Controller
 
                 if ($update_type_package) {
                     DB::commit();
-                    return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Mengubah Tipe Paket']);
+                    return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Mengubah Kategori Paket']);
                 } else {
                     DB::rollBack();
-                    return redirect()->back()->with(['failed' => 'Gagal Mengubah Tipe Paket']);
+                    return redirect()->back()->with(['failed' => 'Gagal Mengubah Kategori Paket']);
                 }
             }
         } catch (Exception $e) {
@@ -146,10 +146,10 @@ class TypePackageController extends Controller
                 ]);
                 if ($deleted_type_package) {
                     DB::commit();
-                    session()->flash('success', 'Berhasil Menghapus Data Tipe Paket');
+                    session()->flash('success', 'Berhasil Menghapus Data Kategori Paket');
                 } else {
                     DB::rollBack();
-                    session()->flash('failed', 'Gagal Menghapus Data Tipe Paket');
+                    session()->flash('failed', 'Gagal Menghapus Data Kategori Paket');
                 }
             }
         } catch (Exception $e) {
