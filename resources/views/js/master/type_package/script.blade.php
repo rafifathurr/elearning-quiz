@@ -44,6 +44,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'children',
+                    defaultContent: '-'
+                },
+                {
                     data: 'description',
                     defaultContent: '-'
                 },

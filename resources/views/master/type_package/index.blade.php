@@ -30,7 +30,8 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Nama</th>
+                                                <th>Kategori Induk</th>
+                                                <th>Daftar Kategori</th>
                                                 <th>Deskripsi</th>
                                                 <th>Action</th>
                                             </tr>
