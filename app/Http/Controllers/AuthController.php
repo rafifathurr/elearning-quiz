@@ -29,8 +29,44 @@ class AuthController extends Controller
 
         if ($user) {
             // Jika user sudah ada, langsung login
+            $user->update([
+                'deleted_at' => null
+            ]);
             Auth::login($user);
-            return redirect('/home')->with('success', 'Login berhasil!');
+            if ($user->hasRole('user')) {
+                $result = Result::where('user_id', $user->id)
+                    ->whereNull('finish_time')
+                    ->first();
+
+                $currentDateTime = \Carbon\Carbon::now();
+                if ($result) {
+                    $startTime = \Carbon\Carbon::parse($result->start_time);
+                    $endTime = $startTime->copy()->addSeconds($result->time_duration);
+
+                    // Cek jika waktu belum habis dan quiz belum selesai
+                    if ($currentDateTime->lte($endTime)) {
+                        $remainingSeconds = $endTime->timestamp - $currentDateTime->timestamp;
+                        if ($result->quiz->type_aspect == 'kecermatan') {
+                            return redirect()->route('kecermatan.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
+                        } else {
+                            return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
+                        }
+                    } else {
+                        // Jika sudah selesai, update dan redirect ke halaman yang tepat
+                        $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
+                        $result->update([
+                            'finish_time' => $endTime,
+                            'total_score' => $total_score
+                        ]);
+                        return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+                    }
+                } else {
+                    // Jika result tidak ditemukan, redirect ke halaman lain
+                    return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+                }
+            } else {
+                return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+            }
         } else {
             // Jika belum terdaftar, arahkan ke halaman register
             return redirect()->route('auth.create')->with([
@@ -43,8 +79,13 @@ class AuthController extends Controller
 
     public function create()
     {
-        return view('auth.registerGoogle');
+        return view('auth.registerGoogle')->with([
+            'name' => session('name'),
+            'email' => session('email'),
+            'google_id' => session('google_id'),
+        ]);
     }
+
     public function storeDataGoogle(Request $request)
     {
         $request->validate([
@@ -55,49 +96,25 @@ class AuthController extends Controller
             'google_id' => 'required',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => bcrypt(Str::random(16)),
-            'google_id' => $request->google_id,
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'password' => bcrypt(Str::random(16)),
+                'google_id' => $request->google_id,
+            ]);
 
-        $user->assignRole('user');
+            $user->assignRole('user');
 
-        Auth::login($user);
-        $result = Result::where('user_id', $user->id)
-            ->whereNull('finish_time')
-            ->first();
-
-        $currentDateTime = \Carbon\Carbon::now();
-        if ($result) {
-            $startTime = \Carbon\Carbon::parse($result->start_time);
-            $endTime = $startTime->copy()->addSeconds($result->time_duration);
-
-            // Cek jika waktu belum habis dan quiz belum selesai
-            if ($currentDateTime->lte($endTime)) {
-                $remainingSeconds = $endTime->timestamp - $currentDateTime->timestamp;
-                if ($result->quiz->type_aspect == 'kecermatan') {
-                    return redirect()->route('kecermatan.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
-                } else {
-                    return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id, 'remaining_time' => encrypt($remainingSeconds)]);
-                }
-            } else {
-                // Jika sudah selesai, update dan redirect ke halaman yang tepat
-                $total_score = ResultDetail::where('result_id', $result->id)->sum('score');
-                $result->update([
-                    'finish_time' => $endTime,
-                    'total_score' => $total_score
-                ]);
-                return redirect()->route('home')->with(['success' => 'Login Berhasil']);
-            }
-        } else {
-            // Jika result tidak ditemukan, redirect ke halaman lain
-            return redirect()->route('home')->with(['success' => 'Login Berhasil']);
+            Auth::login($user);
+            return redirect('/home')->with('success', 'Registrasi berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Terjadi kesalahan. Silakan coba lagi.']);
         }
     }
+
 
     public function login()
     {

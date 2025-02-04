@@ -26,9 +26,10 @@
                     <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Register Akun</label>
                     <form action="{{ route('auth.storeDataGoogle') }}" method="post">
                         @csrf
-                        <input type="hidden" name="name" value="{{ session('name') }}">
-                        <input type="hidden" name="email" value="{{ session('email') }}">
-                        <input type="hidden" name="google_id" value="{{ session('google_id') }}">
+                        <input type="hidden" name="name" value="{{ old('name', session('name')) }}">
+                        <input type="hidden" name="email" value="{{ old('email', session('email')) }}">
+                        <input type="hidden" name="google_id" value="{{ old('google_id', session('google_id')) }}">
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="input-group">
