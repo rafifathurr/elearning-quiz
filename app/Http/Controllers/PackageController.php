@@ -98,29 +98,38 @@ class PackageController extends Controller
     {
         try {
             DB::beginTransaction();
+
             $request->validate([
                 'name' => 'required',
                 'price' => 'required',
                 'class' => 'nullable',
-                'quiz_id' => 'required',
                 'id_type_package' => 'required'
             ]);
 
+            // Menambahkan package
             $add_package = Package::lockForUpdate()->create([
                 'name' => $request->name,
                 'price' => $request->price,
                 'class' => $request->class,
                 'id_type_package' => $request->id_type_package
             ]);
-            $packages_test = [];
-            foreach ($request->quiz_id as $quiz) {
-                $packages_test[] = [
-                    'package_id' => $add_package->id,
-                    'quiz_id' => $quiz
-                ];
-            }
-            $add_package_test = PackageTest::insert($packages_test);
 
+            // Cek apakah ada quiz yang dipilih
+            if ($request->has('quiz_id') && !empty($request->quiz_id)) {
+                $packages_test = [];
+                foreach ($request->quiz_id as $quiz) {
+                    $packages_test[] = [
+                        'package_id' => $add_package->id,
+                        'quiz_id' => $quiz
+                    ];
+                }
+                // Insert hanya jika ada quiz_id yang dipilih
+                $add_package_test = PackageTest::insert($packages_test);
+            } else {
+                $add_package_test = true; // Set true jika tidak ada quiz
+            }
+
+            // Jika insert berhasil
             if ($add_package && $add_package_test) {
                 DB::commit();
                 return redirect()->route('master.package.index')->with(['success' => 'Berhasil Menambahkan Paket Test']);
@@ -132,12 +141,14 @@ class PackageController extends Controller
                     ->withInput();
             }
         } catch (Exception $e) {
+            DB::rollBack();
             return redirect()
                 ->back()
-                ->with(['failed', $e->getMessage()])
+                ->with(['failed' => $e->getMessage()])
                 ->withInput();
         }
     }
+
 
     public function edit(string $id)
     {
@@ -165,11 +176,12 @@ class PackageController extends Controller
                     'name' => 'required',
                     'price' => 'required',
                     'class' => 'nullable',
-                    'quiz_id' => 'required',
+                    'quiz_id' => 'nullable',
                     'id_type_package' => 'required'
                 ]);
                 DB::beginTransaction();
 
+                // Update package
                 $package_update = Package::where('id', $id)
                     ->update([
                         'name' => $request->name,
@@ -177,18 +189,28 @@ class PackageController extends Controller
                         'class' => $request->class,
                         'id_type_package' => $request->id_type_package
                     ]);
-                $deleted_package_test = PackageTest::where('package_id', $package->id)->delete();
-                if ($package_update && $deleted_package_test) {
-                    $packages_test = [];
-                    foreach ($request->quiz_id as $quiz) {
-                        $packages_test[] = [
-                            'package_id' => $package->id,
-                            'quiz_id' => $quiz
-                        ];
-                    }
-                    $add_package_test = PackageTest::insert($packages_test);
-                    if ($add_package_test) {
 
+                // Hapus package_test lama
+                $deleted_package_test = PackageTest::where('package_id', $package->id)->delete();
+
+                if ($package_update) {
+                    // Cek apakah ada quiz_id yang dipilih
+                    if ($request->has('quiz_id') && !empty($request->quiz_id)) {
+                        $packages_test = [];
+                        foreach ($request->quiz_id as $quiz) {
+                            $packages_test[] = [
+                                'package_id' => $package->id,
+                                'quiz_id' => $quiz
+                            ];
+                        }
+                        // Insert ke PackageTest jika ada quiz_id
+                        $add_package_test = PackageTest::insert($packages_test);
+                    } else {
+                        // Jika tidak ada quiz_id, set add_package_test = true
+                        $add_package_test = true;
+                    }
+
+                    if ($add_package_test) {
                         DB::commit();
                         return redirect()
                             ->route('master.package.index')
@@ -209,12 +231,14 @@ class PackageController extends Controller
                 }
             }
         } catch (Exception $e) {
+            DB::rollBack();
             return redirect()
                 ->back()
-                ->with(['failed', $e->getMessage()])
+                ->with(['failed' => $e->getMessage()])
                 ->withInput();
         }
     }
+
 
     public function destroy(string $id)
     {

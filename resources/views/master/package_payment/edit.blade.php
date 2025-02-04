@@ -94,14 +94,13 @@
 
                                 <div class="form-group row">
                                     <label for="quiz_id" class="col-md-4 control-label text-left">Pilih Test
-                                        <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
                                         <input type="hidden" id="value_quiz"
                                             value="{{ json_encode($package->packageTest->pluck('quiz_id')->toArray()) }}">
                                         <select class="form-control @error('quiz_id[]') is-invalid @enderror"
                                             name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Jenis Test"
-                                            style="width: 100%;" required>
+                                            style="width: 100%;">
                                             @foreach ($quizes as $quiz)
                                                 <option value="{{ $quiz->id }}" selected>
                                                     {{ $quiz->name }}</option>
