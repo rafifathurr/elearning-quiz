@@ -63,6 +63,7 @@
                                                 <h4 class="text-center font-weight-bold text-primary">
                                                     {{ $child->name }}
                                                 </h4>
+                                                <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
                                                 @include('master.package_payment.package_list', [
                                                     'packages' => $child->package,
                                                 ])
