@@ -37,28 +37,18 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-md-4 control-label text-left" for="id_type_package">Tipe Paket <span
-                                            class="text-danger">*</span></label>
+                                    <label class="col-md-4 control-label text-left" for="id_type_package">
+                                        Tipe Paket <span class="text-danger">*</span>
+                                    </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('id_type_package') is-invalid @enderror"
-                                            id="id_type_package" name="id_type_package" required>
-                                            <option disabled hidden selected>Pilih Tipe Paket</option>
+                                        <ul style="list-style-type: none; padding-left: 0;">
                                             @foreach ($types as $type)
-                                                @if (!is_null(old('id_type_package')) && old('id_type_package') == $type->id)
-                                                    <option value="{{ $type->id }}" selected>
-                                                        {{ $type->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $type->id }}">{{ $type->name }}
-                                                    </option>
-                                                @endif
+                                                @include('master.package_payment.type_node', [
+                                                    'type' => $type,
+                                                    'level' => 0,
+                                                ])
                                             @endforeach
-                                        </select>
-                                        @error('id_type_package')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
+                                        </ul>
                                     </div>
                                 </div>
 

@@ -37,89 +37,78 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label text-left" for="id_type_package">Tipe Paket <span
-                                            class="text-danger">*</span></label>
+                                <<div class="form-group row">
+                                    <label class="col-md-4 control-label text-left" for="id_type_package">
+                                        Tipe Paket <span class="text-danger">*</span>
+                                    </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('id_type_package') is-invalid @enderror"
-                                            id="id_type_package" name="id_type_package" required>
-                                            <option disabled hidden selected>Pilih Tipe Paket</option>
+                                        <ul style="list-style-type: none; padding-left: 0;">
                                             @foreach ($types as $type)
-                                                @if (old('id_type_package', $package->id_type_package) == $type->id)
-                                                    <option value="{{ $type->id }}" selected>
-                                                        {{ $type->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $type->id }}">{{ $type->name }}
-                                                    </option>
-                                                @endif
+                                                @include('master.package_payment.type_node', [
+                                                    'type' => $type,
+                                                    'level' => 0,
+                                                    'selectedType' => $package->id_type_package, // Kirim data yang terpilih
+                                                ])
                                             @endforeach
-                                        </select>
-                                        @error('id_type_package')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
+                                        </ul>
                                     </div>
-                                </div>
+                            </div>
 
-                                <div class="form-group row">
-                                    <label for="class" class="col-md-4 control-label text-left">Jumlah Pertemuan
-                                    </label>
-                                    <div class="col-md-8 col-sm-12">
-                                        <input class="form-control @error('class') is-invalid @enderror" type="number"
-                                            name="class" id="class" value="{{ old('class', $package->class) }}">
-                                        @error('class')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="price" class="col-md-4 control-label text-left">Harga Paket
-                                        <span class="text-danger ml-1">*</span>
-                                    </label>
-                                    <div class="col-md-8 col-sm-12">
-                                        <input class="form-control @error('price') is-invalid @enderror" type="text"
-                                            name="price" id="price" value="{{ old('price', $package->price) }}"
-                                            required>
-                                        @error('price')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label for="quiz_id" class="col-md-4 control-label text-left">Pilih Test
-                                    </label>
-                                    <div class="col-md-8 col-sm-12">
-                                        <input type="hidden" id="value_quiz"
-                                            value="{{ json_encode($package->packageTest->pluck('quiz_id')->toArray()) }}">
-                                        <select class="form-control @error('quiz_id[]') is-invalid @enderror"
-                                            name="quiz_id[]" id="quiz_id" data-placeholder="Pilih Jenis Test"
-                                            style="width: 100%;">
-                                            @foreach ($quizes as $quiz)
-                                                <option value="{{ $quiz->id }}" selected>
-                                                    {{ $quiz->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="pt-3 d-flex">
-                                    <a href="{{ route('master.package.index') }}" class="btn btn-danger mr-2"> Back</a>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                            <div class="form-group row">
+                                <label for="class" class="col-md-4 control-label text-left">Jumlah Pertemuan
+                                </label>
+                                <div class="col-md-8 col-sm-12">
+                                    <input class="form-control @error('class') is-invalid @enderror" type="number"
+                                        name="class" id="class" value="{{ old('class', $package->class) }}">
+                                    @error('class')
+                                        <div class="alert alert-danger mt-2">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
-                            <!-- /.card-body -->
-                        </form>
+                            <div class="form-group row">
+                                <label for="price" class="col-md-4 control-label text-left">Harga Paket
+                                    <span class="text-danger ml-1">*</span>
+                                </label>
+                                <div class="col-md-8 col-sm-12">
+                                    <input class="form-control @error('price') is-invalid @enderror" type="text"
+                                        name="price" id="price" value="{{ old('price', $package->price) }}" required>
+                                    @error('price')
+                                        <div class="alert alert-danger mt-2">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="quiz_id" class="col-md-4 control-label text-left">Pilih Test
+                                </label>
+                                <div class="col-md-8 col-sm-12">
+                                    <input type="hidden" id="value_quiz"
+                                        value="{{ json_encode($package->packageTest->pluck('quiz_id')->toArray()) }}">
+                                    <select class="form-control @error('quiz_id[]') is-invalid @enderror" name="quiz_id[]"
+                                        id="quiz_id" data-placeholder="Pilih Jenis Test" style="width: 100%;">
+                                        @foreach ($quizes as $quiz)
+                                            <option value="{{ $quiz->id }}" selected>
+                                                {{ $quiz->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 d-flex">
+                                <a href="{{ route('master.package.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
                     </div>
+                    <!-- /.card-body -->
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     @push('javascript-bottom')
         <script>

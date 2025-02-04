@@ -90,9 +90,10 @@ class PackageController extends Controller
     public function create()
     {
         $quizes = Quiz::whereNull('deleted_at')->get();
-        $types = TypePackage::whereNull('deleted_at')->get();
+        $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
         return view('master.package_payment.create', compact('quizes', 'types'));
     }
+
 
     public function store(Request $request)
     {
@@ -153,17 +154,16 @@ class PackageController extends Controller
     public function edit(string $id)
     {
         try {
-            $data['package'] = Package::find($id);
-            $data['quizes'] = Quiz::whereNull('deleted_at')->get();
-            $data['types'] = TypePackage::whereNull('deleted_at')->get();
-            return view('master.package_payment.edit', $data);
+            $package = Package::findOrFail($id);
+            $quizes = Quiz::whereNull('deleted_at')->get();
+            $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+
+            return view('master.package_payment.edit', compact('package', 'quizes', 'types'));
         } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with(['failed', $e->getMessage()])
-                ->withInput();;
+            return redirect()->back()->with(['failed' => $e->getMessage()])->withInput();
         }
     }
+
 
     public function update(Request $request, string $id)
     {
