@@ -159,18 +159,56 @@
                                 <div class="card-body">
                                     <p class="text-center">{{ $type->description }}</p>
 
-                                    <div class="border rounded-lg p-2 mx-2">
-                                        <h4 class="text-center font-weight-bold text-blue mb-2">Daftar Paket</h4>
-                                        <ul class="text-center list-unstyled p-2 m-0">
-                                        @foreach ($type->package as $package)
-                                                <li class="my-3">
-                                                    <a href="{{ route('login') }}"
-                                                        class="btn btn-primary w-full d-block font-weight-bold p-2 rounded-pill"
-                                                        style="font-size: 1.2rem;">{{ $package->name }}</a>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
+                                    @forelse ($type->children as $child)
+                                        <div class="border rounded-lg p-2 mx-2 my-3">
+                                            <h4 class="text-center font-weight-bold text-blue ">
+                                                {{ $child->name }}
+                                            </h4>
+                                            <ul class=" text-center list-unstyled p-2 m-0">
+                                                @forelse ($child->package as $package)
+                                                    <li class="mb-3">
+                                                        <button
+                                                            onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
+                                                            class="btn btn-primary w-100 rounded-lg"
+                                                            style="font-size: 1.2rem;">
+                                                            {{ $package->name }}
+                                                            <span class="bg-white p-1 font-weight-bold rounded"
+                                                                style="font-size: 1rem">
+                                                                {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
+                                                            </span>
+
+                                                        </button>
+                                                    </li>
+                                                @empty
+                                                    <p class="font-weight-bolder text-danger">-- Belum Ada Paket --</p>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+                                    @empty
+                                        <div class="border rounded-lg p-2 mx-2">
+                                            <h4 class="text-center font-weight-bold text-blue mb-2">{{ $type->name }}
+                                            </h4>
+                                            <ul class="text-center list-unstyled p-2 m-0">
+                                                @forelse ($type->package as $package)
+                                                    <li class="my-3">
+                                                        <button
+                                                            onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
+                                                            class="btn btn-primary w-100 rounded-lg"
+                                                            style="font-size: 1.2rem;">
+                                                            {{ $package->name }}
+                                                            <span class="bg-white p-1 font-weight-bold rounded"
+                                                                style="font-size: 1rem">
+                                                                {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
+                                                            </span>
+
+                                                        </button>
+                                                    </li>
+                                                @empty
+                                                    <p class="font-weight-bolder text-danger">-- Belum Ada Paket --</p>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+                                    @endforelse
                                 </div>
 
                             </div>
@@ -186,7 +224,8 @@
             @endif
 
         </div>
-        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
+            aria-label="Scroll to top">
             <i class="fas fa-chevron-up"></i>
         </a>
 
