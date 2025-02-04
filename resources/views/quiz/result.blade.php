@@ -105,7 +105,7 @@
                                     <div class="col-md-6 text-center">
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
-                                                <a href="{{ url('/') }}" class="btn btn-lg btn-danger">
+                                                <a href="{{ route('home') }}" class="btn btn-lg btn-danger">
                                                     <i class="fas fa-home mr-2"></i>Halaman Utama
                                                 </a>
                                             </div>

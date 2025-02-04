@@ -92,14 +92,37 @@
                     <img src="{{ asset('img/bclogo.png') }}" alt="AdminLTE Logo" class="brand-image  "
                         style="max-width: 3rem;">
                     <span class="brand-text font-weight-bold text-secondary" style="opacity: .8">BRATA CERDAS</span>
+
                 </div>
 
                 <!-- Right navbar links -->
                 <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                     <li class="nav-item">
-                        <a href="{{ route('login') }}" class="nav-link font-weight-bold">Login <i
-                                class="fa fa-sign-in-alt"></i></a>
+                        <a href="{{ route('home') }}" class="nav-link font-weight-bold">
+                            <i class="fa fa-home mr-2"></i>Home </a>
                     </li>
+                    @if (Auth::check())
+                        <li class="nav-item dropdown">
+                            <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
+                                <i class="far fa-user mr-2"></i>
+                                {{ Auth::user()->name }}
+
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                                <a href="{{ route('logout') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+
+                                </a>
+
+                            </div>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a href="{{ route('login') }}" class="nav-link font-weight-bold">Login <i
+                                    class="fa fa-sign-in-alt"></i></a>
+                        </li>
+                    @endif
+
                 </ul>
             </div>
         </nav>

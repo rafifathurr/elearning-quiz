@@ -137,12 +137,9 @@ class DashboardController extends Controller
                     ->first();
                 if ($resultData) {
                     Auth::logout();
-                    return redirect()->route('landingPage');
-                } else {
-                    return redirect()->route('home');
+                    return redirect()->route('login');
                 }
             }
-            return redirect()->route('home');
         }
 
         $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();;
