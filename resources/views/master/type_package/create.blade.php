@@ -37,8 +37,7 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-md-4 control-label text-left" for="id_parent">Kategori Utama
-                                    </label>
+                                    <label class="col-md-4 control-label text-left" for="id_parent">Kategori Utama</label>
                                     <div class="col-md-8 col-sm-12">
                                         <div style="overflow: auto; max-height: 300px;">
                                             <ul style="list-style-type: none; padding-left: 0;">
@@ -46,12 +45,14 @@
                                                     @include('master.type_package.type_node', [
                                                         'type' => $type,
                                                         'level' => 0,
+                                                        'selectedType' => $selectedType ?? null, // Tambahkan ini
                                                     ])
                                                 @endforeach
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <div class="form-group row">
                                     <label for="description" class="col-md-4 control-label text-left">Deskripsi
