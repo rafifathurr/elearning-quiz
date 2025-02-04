@@ -97,11 +97,12 @@
 
                 <!-- Right navbar links -->
                 <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
-                    <li class="nav-item">
-                        <a href="{{ route('home') }}" class="nav-link font-weight-bold">
-                            <i class="fa fa-home mr-2"></i>Home </a>
-                    </li>
+
                     @if (Auth::check())
+                        <li class="nav-item">
+                            <a href="{{ route('home') }}" class="nav-link font-weight-bold">
+                                <i class="fa fa-home mr-2"></i>Home </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
                                 <i class="far fa-user mr-2"></i>
@@ -174,66 +175,31 @@
                 </h3>
                 <div class="row mx-3 justify-content-center">
                     @foreach ($type_package as $type)
-                        <div class="col-md-5 my-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-gradient-lightblue">
-                                    <h5 class="font-weight-bold">{{ $type->name }}</h5>
+                        <div class="col-md-5 col-sm-6 col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-gradient-lightblue text-center">
+                                    <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-center">{{ $type->description }}</p>
+                                    <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
 
-                                    @forelse ($type->children as $child)
-                                        <div class="border rounded-lg p-2 mx-2 my-3">
-                                            <h4 class="text-center font-weight-bold text-blue ">
+                                    {{-- Paket dari parent --}}
+                                    @include('master.package_payment.package_list', [
+                                        'packages' => $type->package,
+                                    ])
+
+                                    {{-- Paket dari children --}}
+                                    @foreach ($type->children as $child)
+                                        <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
+                                            <h4 class="text-center font-weight-bold text-primary">
                                                 {{ $child->name }}
                                             </h4>
-                                            <ul class=" text-center list-unstyled p-2 m-0">
-                                                @forelse ($child->package as $package)
-                                                    <li class="mb-3">
-                                                        <button
-                                                            onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
-                                                            class="btn btn-primary w-100 rounded-lg"
-                                                            style="font-size: 1.2rem;">
-                                                            {{ $package->name }}
-                                                            <span class="bg-white p-1 font-weight-bold rounded"
-                                                                style="font-size: 1rem">
-                                                                {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
-                                                            </span>
-
-                                                        </button>
-                                                    </li>
-                                                @empty
-                                                    <p class="font-weight-bolder text-danger">-- Belum Ada Paket --</p>
-                                                @endforelse
-                                            </ul>
+                                            @include('master.package_payment.package_list', [
+                                                'packages' => $child->package,
+                                            ])
                                         </div>
-                                    @empty
-                                        <div class="border rounded-lg p-2 mx-2">
-                                            <h4 class="text-center font-weight-bold text-blue mb-2">{{ $type->name }}
-                                            </h4>
-                                            <ul class="text-center list-unstyled p-2 m-0">
-                                                @forelse ($type->package as $package)
-                                                    <li class="my-3">
-                                                        <button
-                                                            onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
-                                                            class="btn btn-primary w-100 rounded-lg"
-                                                            style="font-size: 1.2rem;">
-                                                            {{ $package->name }}
-                                                            <span class="bg-white p-1 font-weight-bold rounded"
-                                                                style="font-size: 1rem">
-                                                                {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
-                                                            </span>
-
-                                                        </button>
-                                                    </li>
-                                                @empty
-                                                    <p class="font-weight-bolder text-danger">-- Belum Ada Paket --</p>
-                                                @endforelse
-                                            </ul>
-                                        </div>
-                                    @endforelse
+                                    @endforeach
                                 </div>
-
                             </div>
                         </div>
                     @endforeach

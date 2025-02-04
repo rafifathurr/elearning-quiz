@@ -12,7 +12,7 @@ class TypePackage extends Model
 
     public function package()
     {
-        return $this->hasMany(Package::class, 'id_type_package', 'id')->whereNull('deleted_at')->where('status', 1);
+        return $this->hasMany(Package::class, 'id_type_package', 'id')->whereNull('deleted_at')->where('status', 1)->orderBy('price', 'DESC');
     }
 
     public function children()

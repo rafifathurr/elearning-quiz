@@ -142,7 +142,7 @@ class DashboardController extends Controller
             }
         }
 
-        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();;
+        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
 
         return view('landingPage', $data);
     }
