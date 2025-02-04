@@ -21,7 +21,7 @@
                             <div class="card-body">
 
                                 <div class="form-group row">
-                                    <label for="name" class="col-md-4 control-label text-left">Kategori Paket
+                                    <label for="name" class="col-md-4 control-label text-left">Nama Kategori Paket
                                         <span class="text-danger ml-1">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
@@ -29,6 +29,32 @@
                                             name="name" id="name" value="{{ old('name') }}"
                                             placeholder="Kategori Paket" required>
                                         @error('name')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label text-left" for="id_parent">Kategori Utama
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select class="form-control @error('id_parent') is-invalid @enderror" id="id_parent"
+                                            name="id_parent">
+                                            <option value="0" hidden selected>Pilih Kategori Utama</option>
+                                            @foreach ($types as $type)
+                                                @if (!is_null(old('id_parent')) && old('id_parent') == $type->id)
+                                                    <option value="{{ $type->id }}" selected>
+                                                        {{ $type->name }}
+                                                    </option>
+                                                @else
+                                                    <option value="{{ $type->id }}">{{ $type->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        @error('id_parent')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
@@ -64,5 +90,8 @@
     </div>
     @push('javascript-bottom')
         @include('js.master.type_package.script')
+        <script>
+            $('#id_parent').select2();
+        </script>
     @endpush
 @endsection

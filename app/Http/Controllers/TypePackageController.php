@@ -46,7 +46,8 @@ class TypePackageController extends Controller
      */
     public function create()
     {
-        return view('master.type_package.create');
+        $types = TypePackage::whereNull('deleted_at')->get();
+        return view('master.type_package.create', compact('types'));
     }
 
     /**
@@ -65,6 +66,7 @@ class TypePackageController extends Controller
             $add_type_package = TypePackage::lockForUpdate()->create([
                 'name' => $request->name,
                 'description' => $request->description,
+                'id_parent' => isset($request->id_parent) ? $request->id_parent : 0,
             ]);
 
             if ($add_type_package) {
@@ -94,7 +96,8 @@ class TypePackageController extends Controller
     public function edit(String $id)
     {
         $type_package = TypePackage::find($id);
-        return view('master.type_package.edit', compact('type_package'));
+        $types = TypePackage::whereNull('deleted_at')->get();
+        return view('master.type_package.edit', compact('type_package', 'types'));
     }
 
     /**

@@ -45,7 +45,7 @@
                                             id="id_type_package" name="id_type_package" required>
                                             <option disabled hidden selected>Pilih Tipe Paket</option>
                                             @foreach ($types as $type)
-                                                @if (old('roles', $package->id_type_package) == $type->id)
+                                                @if (old('id_type_package', $package->id_type_package) == $type->id)
                                                     <option value="{{ $type->id }}" selected>
                                                         {{ $type->name }}
                                                     </option>
