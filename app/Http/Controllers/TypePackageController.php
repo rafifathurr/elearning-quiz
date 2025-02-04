@@ -46,7 +46,7 @@ class TypePackageController extends Controller
      */
     public function create()
     {
-        $types = TypePackage::whereNull('deleted_at')->get();
+        $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
         return view('master.type_package.create', compact('types'));
     }
 
@@ -96,7 +96,7 @@ class TypePackageController extends Controller
     public function edit(String $id)
     {
         $type_package = TypePackage::find($id);
-        $types = TypePackage::whereNull('deleted_at')->get();
+        $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
         return view('master.type_package.edit', compact('type_package', 'types'));
     }
 
@@ -116,6 +116,7 @@ class TypePackageController extends Controller
                 $update_type_package = TypePackage::where('id', $id)->update([
                     'name' => $request->name,
                     'description' => $request->description,
+                    'id_parent' => isset($request->id_parent) ? $request->id_parent : 0,
                 ]);
 
                 if ($update_type_package) {

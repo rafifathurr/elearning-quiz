@@ -40,25 +40,16 @@
                                     <label class="col-md-4 control-label text-left" for="id_parent">Kategori Utama
                                     </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('id_parent') is-invalid @enderror" id="id_parent"
-                                            name="id_parent">
-                                            <option value="0" hidden selected>Pilih Kategori Utama</option>
-                                            @foreach ($types as $type)
-                                                @if (!is_null(old('id_parent')) && old('id_parent') == $type->id)
-                                                    <option value="{{ $type->id }}" selected>
-                                                        {{ $type->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $type->id }}">{{ $type->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        @error('id_parent')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
+                                        <div style="overflow: auto; height: 300px;">
+                                            <ul style="list-style-type: none; padding-left: 0;">
+                                                @foreach ($types as $type)
+                                                    @include('master.type_package.type_node', [
+                                                        'type' => $type,
+                                                        'level' => 0,
+                                                    ])
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 

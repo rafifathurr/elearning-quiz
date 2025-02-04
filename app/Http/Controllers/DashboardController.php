@@ -122,14 +122,8 @@ class DashboardController extends Controller
             };
         }
 
-        $data['tests'] = Package::where(function ($query) {
-            $query->whereNull('class')
-                ->orWhere('class', 0);
-        })->whereNull('deleted_at')->where('status', 1)->get();
 
-        $data['classes'] = Package::where('class', '>', 0)->whereNull('deleted_at')->where('status', 1)->get();
-
-        $data['type_package'] = TypePackage::whereNull('deleted_at')->get();
+        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();;
 
         return view('home', $data);
     }

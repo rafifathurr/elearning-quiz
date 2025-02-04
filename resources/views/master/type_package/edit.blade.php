@@ -41,25 +41,17 @@
                                     <label class="col-md-4 control-label text-left" for="id_parent">Kategori Utama
                                         <span class="text-danger">*</span></label>
                                     <div class="col-md-8 col-sm-12">
-                                        <select class="form-control @error('id_parent') is-invalid @enderror" id="id_parent"
-                                            name="id_parent" required>
-                                            <option value="0" disabled hidden selected>Pilih Kategori Utama</option>
-                                            @foreach ($types as $type)
-                                                @if (old('id_parent', $type_package->id_parent) == $type->id)
-                                                    <option value="{{ $type->id }}" selected>
-                                                        {{ $type->name }}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $type->id }}">{{ $type->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        @error('id_parent')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
+                                        <div style="overflow: auto; height: 300px;">
+                                            <ul style="list-style-type: none; padding-left: 0;">
+                                                @foreach ($types as $type)
+                                                    @include('master.type_package.type_node', [
+                                                        'type' => $type,
+                                                        'level' => 0,
+                                                        'selectedType' => $type_package->id_parent, // Kirim data yang terpilih
+                                                    ])
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 

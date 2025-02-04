@@ -41,14 +41,16 @@
                                         Tipe Paket <span class="text-danger">*</span>
                                     </label>
                                     <div class="col-md-8 col-sm-12">
-                                        <ul style="list-style-type: none; padding-left: 0;">
-                                            @foreach ($types as $type)
-                                                @include('master.package_payment.type_node', [
-                                                    'type' => $type,
-                                                    'level' => 0,
-                                                ])
-                                            @endforeach
-                                        </ul>
+                                        <div style="overflow: auto; height: 300px;">
+                                            <ul style="list-style-type: none; padding-left: 0;">
+                                                @foreach ($types as $type)
+                                                    @include('master.package_payment.type_node', [
+                                                        'type' => $type,
+                                                        'level' => 0,
+                                                    ])
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
