@@ -59,6 +59,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'date',
+                    defaultContent: '-'
+                },
+                {
                     data: 'price',
                     defaultContent: '-'
                 },
@@ -123,44 +127,92 @@
 
 
     function checkOut(id, name) {
-        console.log('Checkout ID:', id); // Debugging
         let token = $('meta[name="csrf-token"]').attr('content');
 
-        Swal.fire({
-            title: `Apakah Anda Yakin Checkout Paket: ${name}`,
-            icon: 'question',
-            showCancelButton: true,
-            allowOutsideClick: false,
-            customClass: {
-                confirmButton: 'btn btn-primary mr-2 mb-3',
-                cancelButton: 'btn btn-danger mb-3',
-            },
-            buttonsStyling: false,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel',
-        }).then(result => {
-            if (result.isConfirmed) {
-                console.log('Metode Pembayaran:', result.value); // Debugging
-                swalProcess();
-                $.ajax({
-                    url: '{{ url('order/checkout') }}/' + id,
-                    type: 'POST',
-                    cache: false,
-                    data: {
-                        _token: token,
+        // Ambil jadwal kelas terkait paket
+        $.ajax({
+            url: '{{ url('order/get-schedule') }}/' + id,
+            type: 'GET',
+            success: function(response) {
+                let scheduleOptions = '';
+
+                if (response.schedules.length > 0) {
+                    scheduleOptions =
+                        '<select class="form-control mb-3" id="selected_schedule" required>';
+                    scheduleOptions += '<option value="" disabled selected>Pilih Jadwal Kelas</option>';
+
+                    response.schedules.forEach(schedule => {
+                        scheduleOptions +=
+                            `<option value="${schedule.id}">${schedule.name}</option>`;
+                    });
+
+                    scheduleOptions += '</select>';
+                }
+
+                Swal.fire({
+                    title: `Checkout Paket: ${name}`,
+                    html: scheduleOptions, // Tampilkan select jadwal jika ada
+                    icon: 'question',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-2 mb-3',
+                        cancelButton: 'btn btn-danger mb-3',
                     },
-                    success: function(data) {
-                        console.log('Success Response:', data); // Debugging
-                        location.reload();
+                    buttonsStyling: false,
+                    confirmButtonText: 'Checkout',
+                    cancelButtonText: 'Batal',
+                    didOpen: () => {
+                        // Pastikan dropdown sudah ter-render
+                        console.log('Dropdown Loaded:', $('#selected_schedule').length);
                     },
-                    error: function(xhr, error, code) {
-                        console.log('Error:', xhr, error, code); // Debugging
-                        swalError(error);
+                    preConfirm: () => {
+                        const selectedSchedule = $('#selected_schedule').val();
+                        console.log('Selected Schedule:',
+                            selectedSchedule); // Debugging tambahan
+                        if (response.schedules.length > 0 && !selectedSchedule) {
+                            Swal.showValidationMessage('Pilih jadwal terlebih dahulu!');
+                            return false;
+                        }
+                        return selectedSchedule ? parseInt(selectedSchedule) : null;
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        console.log('Schedule ID sebelum parse:', result.value);
+                        console.log('Schedule ID setelah parse:', (result.value !== undefined &&
+                                result.value !== null && result.value !== '0') ?
+                            parseInt(result.value) :
+                            null);
+
+                        $.ajax({
+                            url: '{{ url('order/checkout') }}/' + id,
+                            type: 'POST',
+                            data: {
+                                _token: token,
+                                schedule_id: (result.value !== undefined && result.value !==
+                                        null && result.value !== '0') ?
+                                    parseInt(result.value) : null
+
+
+                            },
+                            success: function(data) {
+                                console.log('Success Response:', data);
+                                location.reload();
+                            },
+                            error: function(xhr, error, code) {
+                                console.log('Error:', xhr, error, code);
+                                swalError(error);
+                            }
+                        });
                     }
                 });
+            },
+            error: function() {
+                Swal.fire('Gagal', 'Tidak dapat memuat jadwal.', 'error');
             }
         });
     }
+
 
     function cancelOrder(id) {
         console.log('Paket ID:', id);

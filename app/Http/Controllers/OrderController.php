@@ -61,6 +61,10 @@ class OrderController extends Controller
                 return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
             })
 
+            ->addColumn('date', function ($data) {
+                return $data->dateClass ? $data->dateClass->name : '-';
+            })
+
             ->addColumn('action', function ($data) {
                 return '<div align="center">
                             <button class="btn btn-sm btn-danger ml-2" onclick="cancelOrder(' . $data->id . ')" title="Hapus">Hapus</button>
@@ -110,13 +114,38 @@ class OrderController extends Controller
             ->make(true);
     }
 
-    public function checkout(string $id)
+    public function getSchedule($id)
+    {
+        $package = Package::with('packageDate.dateClass')->find($id);
+
+        $schedules = [];
+        if ($package && $package->packageDate->isNotEmpty()) {
+            foreach ($package->packageDate as $packageDate) {
+                $schedules[] = [
+                    'id' => $packageDate->dateClass->id,
+                    'name' => $packageDate->dateClass->name
+                ];
+            }
+        }
+
+        return response()->json(['schedules' => $schedules]);
+    }
+
+
+    public function checkout(Request $request, string $id)
     {
         DB::beginTransaction();
         try {
 
             $user_id = Auth::user()->id;
             $package  = Package::find($id);
+            $schedule_id = $request->input('schedule_id');
+            $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
+
+            Log::info('schedule id: ' . $schedule_id);
+
+
+
 
             $orderPackageId = OrderPackage::whereHas('order', function ($query) use ($user_id) {
                 $query->where('user_id', $user_id)
@@ -163,6 +192,7 @@ class OrderController extends Controller
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
+                    'date_class_id' => $schedule_id
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -174,6 +204,7 @@ class OrderController extends Controller
                     'order_id' => $new_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
+                    'date_class_id' => $schedule_id
                 ]);
             }
 
@@ -353,6 +384,69 @@ class OrderController extends Controller
         }
     }
 
+    // Ada select untuk jadwal kelas
+    // public function dataTable()
+    // {
+    //     $order_ids = Order::whereNull('deleted_at')
+    //         ->where('user_id', Auth::user()->id)
+    //         ->where('status', 1)
+    //         ->pluck('id');
+
+    //     $order_package = OrderPackage::whereNull('deleted_at')
+    //         ->whereIn('order_id', $order_ids)
+    //         ->get();
+
+    //     $totalPrice = $order_package->sum(function ($data) {
+    //         return $data->package->price;
+    //     });
+
+    //     $order_id = null;
+    //     if ($order_package->isNotEmpty()) {
+    //         $order_id = $order_package->first()->order_id;
+    //     }
+
+    //     return DataTables::of($order_package)
+    //         ->addIndexColumn()
+    //         ->addColumn('name', function ($data) {
+    //             return $data->package->name;
+    //         })
+    //         ->addColumn('class', function ($data) {
+    //             return (!is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-');
+    //         })
+    //         ->addColumn('price', function ($data) {
+    //             return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
+    //         })
+
+    //         ->addColumn('date', function ($data) {
+    //             if ($data->package->packageDate->isNotEmpty()) {
+    //                 $select = '<select class="form-control" name="date_class_id_' . $data->id . '" required>';
+    //                 $select .= '<option disabled hidden selected>Pilih Jadwal</option>';
+
+    //                 foreach ($data->package->packageDate as $packageDate) {
+    //                     $select .= '<option value="' . $packageDate->dateClass->id . '">' . $packageDate->dateClass->name . '</option>';
+    //                 }
+
+    //                 $select .= '</select>';
+    //                 return $select;
+    //             } else {
+    //                 // Jika tidak ada packageDate, tampilkan tanda "-"
+    //                 return '-';
+    //             }
+    //         })
+
+    //         ->addColumn('action', function ($data) {
+    //             return '<div align="center">
+    //                         <button class="btn btn-sm btn-danger ml-2" onclick="cancelOrder(' . $data->id . ')" title="Hapus">Hapus</button>
+    //                     </div>';
+    //         })
+    //         ->addColumn('order_id', function () use ($order_id) {
+    //             return $order_id ? $order_id : '-';
+    //         })
+
+    //         ->with('totalPrice', 'Rp. ' . number_format($totalPrice, 0, ',', '.'))
+    //         ->rawColumns(['price', 'date', 'action'])
+    //         ->make(true);
+    // }
 
 
 

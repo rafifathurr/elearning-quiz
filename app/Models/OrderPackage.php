@@ -16,6 +16,11 @@ class OrderPackage extends Model
         return $this->belongsTo(Package::class, 'package_id');
     }
 
+    public function dateClass()
+    {
+        return $this->belongsTo(DateClass::class, 'date_class_id');
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id', 'id');

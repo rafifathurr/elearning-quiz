@@ -27,13 +27,14 @@
                                                     <th>No</th>
                                                     <th>Nama Paket</th>
                                                     <th>Kelas</th>
+                                                    <th>Jadwal Kelas</th>
                                                     <th>Harga Paket</th>
                                                     <th class="text-center">Action</th>
                                                 </tr>
                                             </thead>
                                             <tfoot class="bg-gray-light">
                                                 <tr>
-                                                    <th colspan="3" class="text-right">Total:</th>
+                                                    <th colspan="4" class="text-right">Total:</th>
                                                     <th class="text-left"id="totalPrice"></th>
                                                     <th class="text-center">
                                                         <button class="btn btn-sm btn-success" id="payButton"
