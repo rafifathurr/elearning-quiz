@@ -1,20 +1,6 @@
 @extends('layouts.main')
 @section('section')
     <style>
-        /* Menimpa gaya tercoret bawaan */
-        .todo-list>li.done .text {
-            text-decoration: none;
-            /* Hilangkan teks tercoret */
-            color: black;
-            /* Warna hijau */
-            font-weight: bold;
-        }
-
-        /* Menambahkan efek visual pada elemen */
-        .todo-list>li.done {
-            background-color: lightgreen
-        }
-
         .back-to-top {
             position: fixed;
             bottom: 50px;
@@ -29,31 +15,6 @@
             /* Tampilkan tombol saat ada scroll */
         }
 
-        .list-unstyled {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .list-unstyled .package-item {
-            position: relative;
-            padding-left: 30px;
-            /* Space for the icon */
-        }
-
-        .list-unstyled .package-item::before {
-            content: "\f00c";
-            /* FontAwesome checkmark icon */
-            font-family: "Font Awesome 5 Free";
-            /* Font Awesome family */
-            font-weight: 900;
-            /* Required for solid icons */
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            color: green;
-            /* Icon color */
-        }
 
         .custom-shape {
             display: inline-block;
@@ -63,162 +24,317 @@
             clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%)
         }
 
-        .card {
+        .package .card {
             transition: transform 0.3s ease;
             /* Animasi untuk memperhalus perubahan ukuran */
         }
 
-        .card:hover {
+        .package .card:hover {
             transform: scale(1.05);
             /* Membesarkan ukuran card 5% */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             /* Menambahkan efek bayangan saat hover */
         }
 
+        .tagline .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        /* Navbar Default */
+        #navbar {
+            transition: all 0.4s ease;
+            background-color: transparent;
+            /* Transparan saat di posisi atas */
+            z-index: 1000;
+            position: relative;
+            /* Tidak sticky secara default */
+        }
+
+        /* Efek Blur dan Sticky saat Scroll */
+        #navbar.scrolled {
+            position: fixed;
+            /* Sticky hanya saat di-scroll */
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Semi transparan */
+            backdrop-filter: blur(10px);
+            /* Efek blur */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* Bayangan halus */
+            animation: slideDown 0.3s ease;
+            /* Animasi muncul dari atas */
+        }
+
+        /* Animasi Navbar Muncul */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Hover Efek */
+        .nav-link {
+            transition: color 0.3s ease, transform 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #007bff !important;
+            transform: translateY(-2px);
+        }
+
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .nav-mobile-adjust {
+                margin-left: 1.5rem !important;
+                /* Sama dengan ml-4 di Bootstrap */
+                margin-right: 0 !important;
+                /* Hilangkan margin kanan jika perlu */
+            }
+        }
+
+
+
         /* Bentuk Belah Ketupat */
     </style>
 
     <body class="hold-transition layout-top-nav">
         {{-- Navbar --}}
-        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
+        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white" id="navbar">
             <div class="container">
-                <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                     aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-                    <!-- Left navbar links -->
-                    <img src="{{ asset('img/bclogo.png') }}" alt="AdminLTE Logo" class="brand-image  "
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <img src="{{ asset('img/bclogo.png') }}" alt="Brata Cerdas Logo" class="brand-image"
                         style="max-width: 3rem;">
-                    <span class="brand-text font-weight-bold text-secondary" style="opacity: .8">BRATA CERDAS</span>
+                    <span class="brand-text font-weight-bold text-secondary ml-2" style="opacity: .9;">BRATA CERDAS</span>
 
+                    <ul class="navbar-nav ml-4">
+                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#contact">Kontak</a></li>
+                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#package">Paket</a></li>
+                    </ul>
+                    <ul class="navbar-nav ml-auto nav-mobile-adjust">
+                        @if (Auth::check())
+                            <li class="nav-item"><a href="{{ route('home') }}"
+                                    class="nav-link font-weight-bold">Dashboard</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
+                                    <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a href="{{ route('logout') }}" class="dropdown-item"><i
+                                            class="fas fa-sign-out-alt mr-2"></i> Logout</a>
+                                </div>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a href="{{ route('login') }}" class="nav-link font-weight-bold">
+                                    <i class="fa fa-sign-in-alt mr-1"></i> Login
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
                 </div>
 
-                <!-- Right navbar links -->
-                <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
 
-                    @if (Auth::check())
-                        <li class="nav-item">
-                            <a href="{{ route('home') }}" class="nav-link font-weight-bold">
-                                <i class="fa fa-home mr-2"></i>Home </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
-                                <i class="far fa-user mr-2"></i>
-                                {{ Auth::user()->name }}
-
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                <a href="{{ route('logout') }}" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-
-                                </a>
-
-                            </div>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a href="{{ route('login') }}" class="nav-link font-weight-bold">Login <i
-                                    class="fa fa-sign-in-alt"></i></a>
-                        </li>
-                    @endif
-
-                </ul>
             </div>
         </nav>
 
-        {{-- Carousel --}}
-        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-            <ol class="carousel-indicators">
-                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-                <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
-                <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
-            </ol>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}" alt="First slide">
-                </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban1.png') }}" alt="Second slide">
-                </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban2.png') }}" alt="Third slide">
-                </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban3.png') }}" alt="Fourth slide">
-                </div>
-                <div class="carousel-item">
-                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban4.png') }}" alt="Fifth slide">
-                </div>
-            </div>
-            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                <span class="carousel-control-custom-icon" aria-hidden="true">
-                    <i class="fas fa-chevron-left"></i>
-                </span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                <span class="carousel-control-custom-icon" aria-hidden="true">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-                <span class="sr-only">Next</span>
-            </a>
+
+
+
+        {{-- Banner --}}
+        <div class="home" id="home">
+            <img class="d-block w-100 " style="max-height: 650px" src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}">
         </div>
 
-        <div class="py-3 px-3">
-            @if ($type_package->isNotEmpty())
+
+        {{-- Kenapa Harus Brata Cerdas --}}
+        <div class="tagline">
+            <div class="p-3 ">
                 <h3 class="text-center font-weight-bold my-3">
-                    Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                    Kenapa Harus Bratacerdas <span style="font-size: 2.4rem" class="text-blue"><i
+                            class="fas fa-question"></i></span>
                 </h3>
-                <div class="row mx-3 justify-content-center">
-                    @foreach ($type_package as $type)
-                        <div class="col-md-5 col-sm-6 col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-gradient-lightblue text-center">
-                                    <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
-
-                                    {{-- Paket dari parent --}}
-                                    @include('master.package_payment.package_list', [
-                                        'packages' => $type->package,
-                                    ])
-
-                                    {{-- Paket dari children --}}
-                                    @foreach ($type->children as $child)
-                                        <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
-                                            <h4 class="text-center font-weight-bold text-primary">
-                                                {{ $child->name }}
-                                            </h4>
-                                            <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
-                                            @include('master.package_payment.package_list', [
-                                                'packages' => $child->package,
-                                            ])
-                                        </div>
-                                    @endforeach
-                                </div>
+                <div class="row  px-4">
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center ">
+                                <img src="{{ asset('img/aset1.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Bimbingan Lengkap</h4>
+                                <p class="text-muted">Tersedia kelas dan bimbingan konsultasi secara online dan offline
+                                    dengan Try Out berkala
+                                </p>
                             </div>
                         </div>
-                    @endforeach
-
-
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center">
+                                <img src="{{ asset('img/aset5.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Try Out Mandiri</h4>
+                                <p class="text-muted">Tersedia paket Try Out mandiri yang dapat dilakukan dimanapun dan
+                                    kapanpun</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center">
+                                <img src="{{ asset('img/aset3.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Pengajar Kompeten</h4>
+                                <p class="text-muted">Dibimbing oleh tenaga pengajar yang kompeten di bidangnya</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center">
+                                <img src="{{ asset('img/aset2.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Sistem Digital</h4>
+                                <p class="text-muted">Menggunakan sistem digital selama periode bimbingan</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center">
+                                <img src="{{ asset('img/aset6.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Materi Terupdate</h4>
+                                <p class="text-muted">Pembaharuan materi secara berkala</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <div class="card h-100 border border-primary">
+                            <div class="card-body text-center">
+                                <img src="{{ asset('img/aset4.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Suasana Nyaman</h4>
+                                <p class="text-muted">Suasana kelas bimbingan yang nyaman karena ada snack dan minuman</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @else
-                <h3 class="text-center font-weight-bold my-3">
-                    Belum Ada Paket
-                </h3>
-            @endif
-
+            </div>
         </div>
+
+        {{-- Daftar Paket --}}
+        <div class="package pt-4" id="package">
+            <div class="py-3 px-3">
+                @if ($type_package->isNotEmpty())
+                    <h3 class="text-center font-weight-bold my-3">
+                        Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                    </h3>
+                    <div class="row mx-3 justify-content-center">
+                        @foreach ($type_package as $type)
+                            <div class="col-md-5 col-sm-6 col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-header bg-gradient-lightblue text-center">
+                                        <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+
+                                        {{-- Paket dari parent --}}
+                                        @include('master.package_payment.package_list', [
+                                            'packages' => $type->package,
+                                        ])
+
+                                        {{-- Paket dari children --}}
+                                        @foreach ($type->children as $child)
+                                            <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
+                                                <h4 class="text-center font-weight-bold text-primary">
+                                                    {{ $child->name }}
+                                                </h4>
+                                                <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
+                                                @include('master.package_payment.package_list', [
+                                                    'packages' => $child->package,
+                                                ])
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+
+                    </div>
+                @else
+                    <h3 class="text-center font-weight-bold my-3">
+                        Belum Ada Paket
+                    </h3>
+                @endif
+
+            </div>
+        </div>
+
+        {{-- Contact Us --}}
+        <div class="contact-us p-4 justify-content-center" id="contact">
+            <div class="row justify-content-center align-items-center">
+                <!-- Kolom Gambar -->
+                <div class="col-md-5 text-center mt-4 mt-md-0">
+                    <img src="{{ asset('img/contactbrata.jpg') }}" alt="Kontak Kami" class="img-fluid "
+                        style="max-height: 400px; object-fit: cover;">
+                </div>
+
+                <!-- Kolom Nomor WhatsApp -->
+                <div class="col-md-5 bg-light p-4 rounded shadow-sm">
+                    <h3 class="font-weight-bold mb-3">
+                        <i class="fas fa-address-book mr-2 text-primary"></i>Kontak Kita
+                    </h3>
+
+                    <p class="text-muted">Hubungi kami kapan saja melalui WhatsApp untuk informasi lebih lanjut.</p>
+
+                    <!-- Kontak WhatsApp 1 -->
+                    <p class="mb-3">
+                        <a href="https://wa.me/6285860571111" target="_blank"
+                            class="d-flex align-items-center text-success text-decoration-none">
+                            <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
+                            <span class="h5 font-weight-bold">+62 858 6057 1111</span>
+                        </a>
+                    </p>
+
+                    <!-- Kontak WhatsApp 2 -->
+                    <p>
+                        <a href="https://wa.me/6281315001480" target="_blank"
+                            class="d-flex align-items-center text-success text-decoration-none">
+                            <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
+                            <span class="h5 font-weight-bold">+62 813 1500 1480</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Tambahan -->
+        <style>
+            .hover-scale:hover {
+                transform: scale(1.2);
+                transition: transform 0.3s ease-in-out;
+            }
+        </style>
+
+
+
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button"
             aria-label="Scroll to top">
             <i class="fas fa-chevron-up"></i>
@@ -228,18 +344,6 @@
         @push('javascript-bottom')
             @include('js.order.script')
             <script>
-                $(document).ready(function() {
-                    $('#table-test').DataTable({
-                        language: {
-                            lengthMenu: "" //ngilangin sort diatas
-                        },
-                        columnDefs: [{
-                            orderable: false,
-                            targets: [1, 3, 4]
-                        }],
-                        pageLength: 4
-                    });
-                });
                 document.addEventListener('DOMContentLoaded', function() {
                     const backToTopButton = document.querySelector('.back-to-top');
 
@@ -261,7 +365,29 @@
                         }
                     });
 
+                    const navbar = document.getElementById("navbar");
+                    let lastScrollY = window.scrollY; // Menyimpan posisi scroll terakhir
 
+                    window.addEventListener("scroll", function() {
+                        const currentScroll = window.scrollY;
+
+                        if (currentScroll > 50) {
+                            navbar.classList.add("scrolled"); // Tambahkan efek sticky saat scroll
+                            navbar.classList.remove("hide"); // Pastikan navbar terlihat saat scroll ke bawah
+                        } else {
+                            navbar.classList.remove("scrolled");
+                            navbar.classList.remove("hide"); // Tampilkan navbar kembali saat di posisi atas
+                        }
+
+                        // Deteksi arah scroll untuk menyembunyikan atau menampilkan navbar
+                        if (currentScroll > lastScrollY && currentScroll > 100) {
+                            navbar.classList.add("hide"); // Sembunyikan saat scroll ke bawah
+                        } else {
+                            navbar.classList.remove("hide"); // Tampilkan saat scroll ke atas
+                        }
+
+                        lastScrollY = currentScroll; // Update posisi scroll terakhir
+                    });
                 });
             </script>
         @endpush
