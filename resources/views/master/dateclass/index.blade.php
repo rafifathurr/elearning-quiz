@@ -31,7 +31,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Code</th>
-                                                <th>TJadwal</th>
+                                                <th>Jadwal</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
