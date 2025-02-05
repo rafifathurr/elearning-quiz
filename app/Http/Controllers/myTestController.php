@@ -41,6 +41,7 @@ class myTestController extends Controller
             $myTest = OrderDetail::whereIn('order_id', $orderIds)
                 ->whereIn('package_id', $orderPackageIds)
                 ->whereNull('deleted_at')
+                ->whereNotNull('quiz_id')
                 ->get();
         } elseif (User::find(Auth::user()->id)->hasRole('counselor')) {
             $classIds = ClassPackage::where('user_id', Auth::user()->id)->pluck('id');

@@ -52,6 +52,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'date_class',
+                    defaultContent: '-'
+                },
+                {
                     data: 'price',
                     defaultContent: '-'
                 },

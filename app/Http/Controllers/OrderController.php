@@ -230,17 +230,23 @@ class OrderController extends Controller
                 if ($approve_order) {
                     $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
                     $order_detail = [];
+
                     foreach ($order_package as $item) {
-                        if ($item->package && $item->package->packageTest) {
-                            foreach ($item->package->packageTest as $packageTest) {
-                                $quiz = $packageTest->quiz;
-                                if ($quiz) {
+                        if ($item->package) {
+                            if ($item->package->packageTest->isNotEmpty()) {
+                                foreach ($item->package->packageTest as $packageTest) {
                                     $order_detail[] = [
                                         'order_id' => $id,
                                         'package_id' => $item->package_id,
-                                        'quiz_id' => $quiz->id
+                                        'quiz_id' => $packageTest->quiz->id ?? null
                                     ];
                                 }
+                            } else {
+                                $order_detail[] = [
+                                    'order_id' => $id,
+                                    'package_id' => $item->package_id,
+                                    'quiz_id' => null
+                                ];
                             }
                         }
                     }

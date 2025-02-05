@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DateClass;
 use App\Models\Package;
+use App\Models\PackageDate;
 use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
 use App\Models\TypePackage;
@@ -69,9 +71,18 @@ class PackageController extends Controller
                 return $list_view;
             })
 
+            ->addColumn('date_class', function ($data) {
+                $list_view = '<div align="center">';
+                foreach ($data->packageDate as $package) {
+                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . $package->dateClass->name . '</span>';
+                };
+                $list_view .= '</div>';
+                return $list_view;
+            })
 
-            ->only(['id', 'name', 'class', 'price', 'quiz', 'type_package', 'status', 'action'])
-            ->rawColumns(['status', 'action', 'price', 'quiz'])
+
+            ->only(['id', 'name', 'class', 'price', 'quiz', 'date_class', 'type_package', 'status', 'action'])
+            ->rawColumns(['status', 'action', 'price', 'quiz', 'date_class'])
             ->make(true);
 
         return $dataTable;
@@ -90,8 +101,9 @@ class PackageController extends Controller
     public function create()
     {
         $quizes = Quiz::whereNull('deleted_at')->get();
+        $dates = DateClass::whereNull('deleted_at')->get();
         $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
-        return view('master.package_payment.create', compact('quizes', 'types'));
+        return view('master.package_payment.create', compact('quizes', 'types', 'dates'));
     }
 
 
@@ -130,8 +142,23 @@ class PackageController extends Controller
                 $add_package_test = true; // Set true jika tidak ada quiz
             }
 
+            // Cek apakah ada Jadwal yang dipilih
+            if ($request->has('date_class_id') && !empty($request->date_class_id)) {
+                $package_date = [];
+                foreach ($request->date_class_id as $date) {
+                    $package_date[] = [
+                        'package_id' => $add_package->id,
+                        'date_class_id' => $date
+                    ];
+                }
+                // Insert hanya jika ada date_class_id yang dipilih
+                $add_package_date = PackageDate::insert($package_date);
+            } else {
+                $add_package_date = true; // Set true jika tidak ada quiz
+            }
+
             // Jika insert berhasil
-            if ($add_package && $add_package_test) {
+            if ($add_package && $add_package_test && $add_package_date) {
                 DB::commit();
                 return redirect()->route('master.package.index')->with(['success' => 'Berhasil Menambahkan Paket Test']);
             } else {
@@ -156,9 +183,10 @@ class PackageController extends Controller
         try {
             $package = Package::findOrFail($id);
             $quizes = Quiz::whereNull('deleted_at')->get();
+            $dates = DateClass::whereNull('deleted_at')->get();
             $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
 
-            return view('master.package_payment.edit', compact('package', 'quizes', 'types'));
+            return view('master.package_payment.edit', compact('package', 'quizes', 'types', 'dates'));
         } catch (Exception $e) {
             return redirect()->back()->with(['failed' => $e->getMessage()])->withInput();
         }
@@ -193,6 +221,8 @@ class PackageController extends Controller
                 // Hapus package_test lama
                 $deleted_package_test = PackageTest::where('package_id', $package->id)->delete();
 
+                $deleted_package_date = PackageDate::where('package_id', $package->id)->delete();
+
                 if ($package_update) {
                     // Cek apakah ada quiz_id yang dipilih
                     if ($request->has('quiz_id') && !empty($request->quiz_id)) {
@@ -210,7 +240,23 @@ class PackageController extends Controller
                         $add_package_test = true;
                     }
 
-                    if ($add_package_test) {
+                    // Cek apakah ada date_class_id yang dipilih
+                    if ($request->has('date_class_id') && !empty($request->date_class_id)) {
+                        $packages_date = [];
+                        foreach ($request->date_class_id as $date) {
+                            $packages_date[] = [
+                                'package_id' => $package->id,
+                                'date_class_id' => $date
+                            ];
+                        }
+                        // Insert ke PackageDate jika ada date_class_id
+                        $add_package_date = PackageDate::insert($packages_date);
+                    } else {
+                        // Jika tidak ada date_class_id, set add_package_date = true
+                        $add_package_date = true;
+                    }
+
+                    if ($add_package_test && $add_package_date) {
                         DB::commit();
                         return redirect()
                             ->route('master.package.index')

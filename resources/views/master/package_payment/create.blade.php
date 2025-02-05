@@ -68,6 +68,27 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="form-group row">
+                                    <label for="date_class_id" class="col-md-4 control-label text-left">Pilih Jadwal Kelas
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <select class="form-control @error('date_class_id[]') is-invalid @enderror"
+                                            name="date_class_id[]" id="date_class_id" data-placeholder="Pilih Jadwal Kelas"
+                                            style="width: 100%;">
+                                            @foreach ($dates as $date)
+                                                <option value="{{ $date->id }}">
+                                                    {{ $date->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('date_class_id[]')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="form-group row">
                                     <label for="price" class="col-md-4 control-label text-left">Harga Paket
                                         <span class="text-danger ml-1">*</span>
@@ -121,9 +142,13 @@
             $('#quiz_id').select2({
                 multiple: true,
             });
+            $('#date_class_id').select2({
+                multiple: true,
+            });
             $('#id_type_package').select2();
 
             $('#quiz_id').val('').trigger('change');
+            $('#date_class_id').val('').trigger('change');
         </script>
         @include('js.master.package_payment.script')
     @endpush
