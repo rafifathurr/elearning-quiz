@@ -135,23 +135,28 @@
                 <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
                 <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                 <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
             </ol>
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban1.png') }}" alt="First slide">
+                        src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}" alt="First slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban2.png') }}" alt="Second slide">
+                        src="{{ asset('dist/adminlte/img/ban1.png') }}" alt="Second slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban3.png') }}" alt="Third slide">
+                        src="{{ asset('dist/adminlte/img/ban2.png') }}" alt="Third slide">
                 </div>
                 <div class="carousel-item">
                     <img class="d-block w-100 img-carousel" style="max-height: 650px"
-                        src="{{ asset('dist/adminlte/img/ban4.png') }}" alt="Fourth slide">
+                        src="{{ asset('dist/adminlte/img/ban3.png') }}" alt="Fourth slide">
+                </div>
+                <div class="carousel-item">
+                    <img class="d-block w-100 img-carousel" style="max-height: 650px"
+                        src="{{ asset('dist/adminlte/img/ban4.png') }}" alt="Fifth slide">
                 </div>
             </div>
             <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
