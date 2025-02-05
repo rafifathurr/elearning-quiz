@@ -177,7 +177,7 @@
                 </h3>
                 <div class="row  px-4">
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded-lg border border-primary">
                             <div class="card-body text-center ">
                                 <img src="{{ asset('img/aset1.png') }}" class="img-fluid" style="max-height: 300px">
                                 <h4 class="font-weight-bold text-blue">Bimbingan Lengkap</h4>
@@ -188,7 +188,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded-lg border border-primary">
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/aset5.png') }}" class="img-fluid" style="max-height: 300px">
                                 <h4 class="font-weight-bold text-blue">Try Out Mandiri</h4>
@@ -198,7 +198,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded-lg border border-primary">
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/aset3.png') }}" class="img-fluid" style="max-height: 300px">
                                 <h4 class="font-weight-bold text-blue">Pengajar Kompeten</h4>
@@ -207,7 +207,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded-lg border border-primary">
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/aset2.png') }}" class="img-fluid" style="max-height: 300px">
                                 <h4 class="font-weight-bold text-blue">Sistem Digital</h4>
@@ -216,7 +216,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded-lg border border-primary">
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/aset6.png') }}" class="img-fluid" style="max-height: 300px">
                                 <h4 class="font-weight-bold text-blue">Materi Terupdate</h4>
@@ -225,11 +225,12 @@
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 border border-primary">
+                        <div class="card h-100 rounded border border-primary">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/aset4.png') }}" class="img-fluid" style="max-height: 300px">
-                                <h4 class="font-weight-bold text-blue">Suasana Nyaman</h4>
-                                <p class="text-muted">Suasana kelas bimbingan yang nyaman karena ada snack dan minuman</p>
+                                <img src="{{ asset('img/aset7.png') }}" class="img-fluid" style="max-height: 300px">
+                                <h4 class="font-weight-bold text-blue">Kelas Representatif
+                                </h4>
+                                <p class="text-muted">Ruangan kelas yang nyaman dan representatif untuk pembelajaran</p>
                             </div>
                         </div>
                     </div>
@@ -247,7 +248,7 @@
                     <div class="row mx-3 justify-content-center">
                         @foreach ($type_package as $type)
                             <div class="col-md-5 col-sm-6 col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
-                                <div class="card h-100 shadow-sm border-0">
+                                <div class="card h-100 rounded-lg shadow-sm border-0">
                                     <div class="card-header bg-gradient-lightblue text-center">
                                         <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
                                     </div>
