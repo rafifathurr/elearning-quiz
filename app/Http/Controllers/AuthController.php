@@ -90,7 +90,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required|unique:users,username',
-            'phone' => 'required|digits:13',
+            'phone' => 'required',
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'google_id' => 'required',
@@ -98,7 +98,7 @@ class AuthController extends Controller
 
         try {
             $user = User::create([
-                'name' => $request->name,
+                'name' => strtoupper($request->name),
                 'username' => $request->username,
                 'phone' => $request->phone,
                 'email' => $request->email,
