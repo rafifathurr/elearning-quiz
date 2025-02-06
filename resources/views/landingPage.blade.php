@@ -24,6 +24,16 @@
             clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%)
         }
 
+        .header-shape {
+            display: inline-block;
+            position: relative;
+            padding: 12px 40px;
+            font-weight: bold;
+            clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
+        }
+
+
+
         .package .card {
             transition: transform 0.3s ease;
             /* Animasi untuk memperhalus perubahan ukuran */
@@ -179,8 +189,9 @@
         <div class="tagline">
             <div class="p-3 ">
                 <h3 class="text-center font-weight-bold my-3">
-                    Kenapa Harus Brata Cerdas <span style="font-size: 2.4rem" class="text-blue"><i
-                            class="fas fa-question"></i></span>
+                    <span class="header-shape bg-gradient-lightblue"> Kenapa Harus Brata Cerdas
+                    </span>
+                    <span style="font-size: 2.4rem" class="text-blue"><i class="fas fa-question"></i></span>
                 </h3>
                 <div class="row  px-4">
                     <div class="col-md-4 my-3">
@@ -211,7 +222,7 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why13.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Pengajar Kompeten</h4>
-                                <p style="color: #E3F2FD">Brata Cerdas bekerja sama dengan tenaga pengajar yang kompeten bi
+                                <p style="color: #E3F2FD">Brata Cerdas bekerja sama dengan tenaga pengajar yang kompeten di
                                     bidangnya
                                 </p>
                             </div>
@@ -317,10 +328,10 @@
                 <!-- Kolom Nomor WhatsApp -->
                 <div class="col-md-5  p-4 ">
                     <h3 class="font-weight-bold mb-3">
-                        <i class="fas fa-address-book mr-2 text-primary"></i>Kontak Kita
+                        <i class="fas fa-address-book mr-2 text-primary"></i>Kontak Brata Cerdas
                     </h3>
 
-                    <p>Hubungi kami kapan saja melalui WhatsApp untuk informasi lebih
+                    <p>Hubungi Brata Cerdas kapan saja melalui WhatsApp untuk informasi bimbingan dan konsultasi lebih
                         lanjut.</p>
 
                     <!-- Kontak WhatsApp 1 -->

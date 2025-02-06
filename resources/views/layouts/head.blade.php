@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Brata Cerdas</title>
+    <title>Brata Cerdas - Bimbingan dan Konsutasi Ujian Penerimaan</title>
 
     <link rel="icon" href="{{ asset('img/bclogo.png') }}" type="image/png">
 

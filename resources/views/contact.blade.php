@@ -7,7 +7,8 @@
                     <div class="card mt-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <h3 class="font-weight-bold"><i class="fas fa-address-book mr-2 text-primary"></i>Kontak Kita
+                                <h3 class="font-weight-bold"><i class="fas fa-address-book mr-2 text-primary"></i>Kontak Brata
+                                    Cerdas
                                 </h3>
                                 <?php
                                 $result = App\Models\Result::where('user_id', Auth::id())->whereNull('finish_time')->first();
@@ -41,13 +42,19 @@
                                 <div class="col-md-6 p-3 ">
                                     <h3 class="font-weight-bolder">Nomor WhatsApp</h3>
                                     <hr>
-                                    <p>
-                                        <i class="fab fa-whatsapp mr-2 text-success"></i>
-                                        <span class="text-lg">+62 858 6057 1111</span>
+                                    <p class="mb-3">
+                                        <a href="https://wa.me/6285860571111" target="_blank"
+                                            class="d-flex align-items-center text-success text-decoration-none">
+                                            <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
+                                            <span class="h5 font-weight-bold">+62 858 6057 1111</span>
+                                        </a>
                                     </p>
                                     <p>
-                                        <i class="fab fa-whatsapp mr-2 text-success"></i>
-                                        <span class="text-lg">+62 813 1500 1480</span>
+                                        <a href="https://wa.me/6281315001480" target="_blank"
+                                            class="d-flex align-items-center text-success text-decoration-none">
+                                            <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
+                                            <span class="h5 font-weight-bold">+62 813 1500 1480</span>
+                                        </a>
                                     </p>
                                 </div>
                             </div>
