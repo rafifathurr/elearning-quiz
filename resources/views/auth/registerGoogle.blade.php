@@ -53,7 +53,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="text" name="phone"
+                                    <input type="text" name="phone" id="phone"
                                         class="form-control @error('phone') is-invalid @enderror"
                                         placeholder="Nomor Handphone" value="{{ old('phone') }}">
                                     <div class="input-group-append">
@@ -79,4 +79,23 @@
             </div>
         </div>
     </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var phone = document.getElementById('phone');
+
+            function validateInput(event) {
+                var input = event.target;
+                // Menghapus karakter non-angka
+                input.value = input.value.replace(/\D/g, '');
+
+                if (input.id === 'phone' && input.value.length < 10 || input.value.length > 13) {
+                    input.setCustomValidity('Nomor HP terdiri dari 10 sampai 13 angka.');
+                } else {
+                    input.setCustomValidity('');
+                }
+            }
+            phone.addEventListener('input', validateInput);
+        });
+    </script>
 @endsection
