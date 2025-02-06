@@ -47,9 +47,10 @@
                             <div class="d-flex pt-3 ">
 
                                 @hasrole('user')
-                                    <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">Edit</a>
+                                    <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">Ubah
+                                        Password</a>
                                 @else
-                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Back</a>
+                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Kembali</a>
                                 @endhasrole
                             </div>
                         </div>

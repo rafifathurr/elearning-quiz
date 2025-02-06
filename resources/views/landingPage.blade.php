@@ -307,7 +307,7 @@
                 </div>
 
                 <!-- Kolom Nomor WhatsApp -->
-                <div class="col-md-5 bg-light p-4 rounded shadow-sm">
+                <div class="col-md-5  p-4 ">
                     <h3 class="font-weight-bold mb-3">
                         <i class="fas fa-address-book mr-2 text-primary"></i>Kontak Kita
                     </h3>
