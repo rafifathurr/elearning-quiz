@@ -1,19 +1,15 @@
 @extends('layouts.section')
 @section('content')
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Detail Pengguna #{{ $user->id }}</h1>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12">
-                    <div class="card ">
+                <div class="col-12 mt-4">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="card-title font-weight-bold">Detail User - {{ $user->name }}</h3>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label" for="username">Username </label>
@@ -48,8 +44,12 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <a href="{{ route('master.user.index') }}" class="btn btn-sm btn-primary"><i
-                                    class="fas fa-arrow-left mr-2"></i>Kembali</a>
+                            <div class="d-flex pt-3 ">
+                                <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Back</a>
+                                @hasrole('user')
+                                    <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">Edit</a>
+                                @endhasrole
+                            </div>
                         </div>
                     </div>
                 </div>

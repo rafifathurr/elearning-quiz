@@ -178,20 +178,29 @@ class UserController extends Controller
         }
     }
 
-    public function edit(String $id)
+    public function edit(String $id = null)
     {
         try {
+            if (!is_null($id)) {
+                $user  = User::find($id);
 
-            $user  = User::find($id);
+                if (!is_null($user)) {
+                    $roles = Role::all();
+                    $role_disabled = $id == Auth::user()->id ? 'disabled' : '';
+                    $type_user = TypeUser::whereNull('deleted_at')->get();
+                    $disabled = '';
 
-            if (!is_null($user)) {
+                    return view('master.user.edit', compact('user', 'roles', 'role_disabled', 'type_user', 'disabled'));
+                };
+            } else {
+                $user = User::find(Auth::user()->id);
                 $roles = Role::all();
                 $role_disabled = $id == Auth::user()->id ? 'disabled' : '';
                 $type_user = TypeUser::whereNull('deleted_at')->get();
                 $disabled = '';
 
                 return view('master.user.edit', compact('user', 'roles', 'role_disabled', 'type_user', 'disabled'));
-            };
+            }
         } catch (Exception $e) {
             return redirect()
                 ->back()
@@ -202,47 +211,60 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            // Validasi Input
-            $request->validate([
-                'username' => 'required|string|unique:users,username,' . $id,
-                'name' => 'required|string',
-                'email' => 'required|email|unique:users,email,' . $id,
-                'roles' => 'required|array',
-                'roles.*' => 'string|exists:roles,name',
-                'phone' => 'required|string',
-                'password' => 'nullable|string',
-            ]);
+            if (User::find(auth()->user()->id)->hasRole('admin')) {
+                // Validasi Input
+                $request->validate([
+                    'username' => 'required|string|unique:users,username,' . $id,
+                    'name' => 'required|string',
+                    'email' => 'required|email|unique:users,email,' . $id,
+                    'roles' => 'required|array',
+                    'roles.*' => 'string|exists:roles,name',
+                    'phone' => 'required|string',
+                    'password' => 'nullable|string',
+                ]);
 
 
-            $user = User::findOrFail($id);
+                $user = User::findOrFail($id);
 
 
-            DB::beginTransaction();
+                DB::beginTransaction();
 
-            // Update Data User
-            $updateData = [
-                'username' => $request->username,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-            ];
+                // Update Data User
+                $updateData = [
+                    'username' => $request->username,
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                ];
 
-            // Jika password diberikan, tambahkan ke updateData
-            if ($request->filled('password')) {
-                $updateData['password'] = bcrypt($request->password);
+                // Jika password diberikan, tambahkan ke updateData
+                if ($request->filled('password')) {
+                    $updateData['password'] = bcrypt($request->password);
+                }
+
+                $user->update($updateData);
+
+
+                $user->syncRoles($request->roles);
+
+
+                DB::commit();
+
+                return redirect()
+                    ->route('master.user.index')
+                    ->with(['success' => 'Berhasil Update Data User']);
+            } else {
+                $user = User::findOrFail($id);
+                if ($request->filled('password')) {
+                    $updateData['password'] = bcrypt($request->password);
+                }
+                $user->update($updateData);
+                DB::commit();
+
+                return redirect()
+                    ->route('my-account.show')
+                    ->with(['success' => 'Berhasil Ubah Password']);
             }
-
-            $user->update($updateData);
-
-
-            $user->syncRoles($request->roles);
-
-
-            DB::commit();
-
-            return redirect()
-                ->route('master.user.index')
-                ->with(['success' => 'Berhasil Update Data User']);
         } catch (Exception $e) {
 
             DB::rollBack();
@@ -254,15 +276,19 @@ class UserController extends Controller
     }
 
 
-    public function show(string $id)
+    public function show(string $id = null)
     {
         try {
-
-            $user = User::find($id);
-            if (!is_null($user)) {
-
-                $type_user = TypeUser::whereNull('deleted_at')->get();
-                return view('master.user.detail', compact('user', 'type_user'));
+            if (!is_null($id)) {
+                $user = User::find($id);
+                if (!is_null($user)) {
+                    return view('master.user.detail', compact('user'));
+                }
+            } else {
+                $user = User::find(Auth::user()->id);
+                if (!is_null($user)) {
+                    return view('master.user.detail', compact('user'));
+                }
             }
         } catch (Exception $e) {
             return redirect()

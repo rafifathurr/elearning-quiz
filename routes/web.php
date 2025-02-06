@@ -124,6 +124,14 @@ Route::group(['middleware' => ['role:admin|user']], function () {
     });
 });
 
+//Admin | User
+Route::group(['middleware' => ['role:user']], function () {
+    Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {
+        Route::get('/', [UserController::class, 'show'])->name('show');
+        Route::get('edit', [UserController::class, 'edit'])->name('edit');
+        Route::match(['put', 'patch'], '{id}', [UserController::class, 'update'])->name('update');
+    });
+});
 //Admin | User | Finance
 Route::group(['middleware' => ['role:admin|user|finance']], function () {
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {

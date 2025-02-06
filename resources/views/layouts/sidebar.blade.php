@@ -184,6 +184,14 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item ">
+                        <a href="{{ route('my-account.show') }}" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>
+                                My Account
+                            </p>
+                        </a>
+                    </li>
                 @endhasrole
                 <li class="nav-item">
                     <a href="{{ route('logout') }}" class="nav-link">

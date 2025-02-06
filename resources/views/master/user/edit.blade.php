@@ -1,96 +1,94 @@
 @extends('layouts.section')
 @section('content')
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Edit User #{{ $user->id }}</h1>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
+
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12">
-                    <div class="card ">
-
+                <div class="col-12 mt-4">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title font-weight-bold">Edit {{ $user->hasRole('admin') ? 'User' : 'Account' }}
+                                -
+                                {{ $user->name }}</h3>
+                        </div>
                         <!-- form start -->
-                        <form action="{{ route('master.user.update', ['id' => $user->id]) }}" method="post">
+                        <form method="post"
+                            @if ($user->hasRole('admin')) action="{{ route('master.user.update', ['id' => $user->id]) }}" @else action="{{ route('my-account.update', ['id' => $user->id]) }}" @endif>
                             @csrf
                             @method('patch')
                             <div class="card-body">
+                                @if (Auth::user()->hasRole('admin'))
+                                    <div class="form-group">
+                                        <label for="username">Username <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                            id="username" name="username" placeholder="Username"
+                                            value="{{ old('username', $user->username) }}">
 
-                                <div class="form-group">
-                                    <label for="username">Username <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('username') is-invalid @enderror"
-                                        id="username" name="username" placeholder="Username"
-                                        value="{{ old('username', $user->username) }}">
+                                        @error('username')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
 
-                                    @error('username')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
+                                    <div class="form-group">
+                                        <label for="name">Nama <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                            id="name" name="name" placeholder="Nama"
+                                            oninput="this.value = this.value.toUpperCase();"
+                                            value="{{ old('name', $user->name) }}">
+                                        @error('name')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
 
-                                <div class="form-group">
-                                    <label for="name">Nama <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        id="name" name="name" placeholder="Nama"
-                                        oninput="this.value = this.value.toUpperCase();"
-                                        value="{{ old('name', $user->name) }}">
-                                    @error('name')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="email">Email <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('email') is-invalid @enderror"
-                                        id="email" name="email" placeholder="Email"
-                                        value="{{ old('email', $user->email) }}">
-                                    @error('email')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-
-
-                                <div class="form-group">
-                                    <label for="roles">Pilih Role
-                                        <span class="text-danger ml-1">*</span>
-                                    </label>
-
-                                    <input type="hidden" id="value_role" value="{{ json_encode($user->getRoleNames()) }}">
-
-                                    <select class="form-control @error('roles[]') is-invalid @enderror" name="roles[]"
-                                        id="roles" multiple="multiple" data-placeholder="Pilih Role"
-                                        style="width: 100%;" required>
-                                        @foreach ($roles as $role)
-                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                    <div class="form-group">
+                                        <label for="email">Email <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('email') is-invalid @enderror"
+                                            id="email" name="email" placeholder="Email"
+                                            value="{{ old('email', $user->email) }}">
+                                        @error('email')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
 
 
+                                    <div class="form-group">
+                                        <label for="roles">Pilih Role
+                                            <span class="text-danger ml-1">*</span>
+                                        </label>
 
-                                <div class="form-group">
-                                    <label for="phone">Phone <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                                        id="phone" name="phone" placeholder="Phone"
-                                        value="{{ old('phone', $user->phone) }}">
+                                        <input type="hidden" id="value_role"
+                                            value="{{ json_encode($user->getRoleNames()) }}">
 
-                                    @error('phone')
-                                        <div class="alert alert-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
+                                        <select class="form-control @error('roles[]') is-invalid @enderror" name="roles[]"
+                                            id="roles" multiple="multiple" data-placeholder="Pilih Role"
+                                            style="width: 100%;" required>
+                                            @foreach ($roles as $role)
+                                                <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
+
+
+                                    <div class="form-group">
+                                        <label for="phone">Phone <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('phone') is-invalid @enderror"
+                                            id="phone" name="phone" placeholder="Phone"
+                                            value="{{ old('phone', $user->phone) }}">
+
+                                        @error('phone')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                @endif
                                 <div class="form-group">
                                     <label for="password">Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror"
