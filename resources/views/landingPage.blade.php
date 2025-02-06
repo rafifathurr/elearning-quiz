@@ -37,11 +37,11 @@
         }
 
         .tagline .card {
-            border-radius: 2rem;
-            background-color: #E3F2FD;
-            border: 1px solid rgb(164, 164, 233);
+            border-radius: 1.5rem;
+
 
         }
+
 
         .tagline .card-body {
             display: flex;
@@ -184,60 +184,61 @@
                 </h3>
                 <div class="row  px-4">
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 ">
+                        <div class="card h-100 " style="background-color: #FFECB3;">
                             <div class="card-body text-center ">
-                                <img src="{{ asset('img/why1.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Bimbingan Lengkap</h4>
-                                <p class="text-muted">Tersedia kelas dan bimbingan konsultasi secara online dan offline
+                                <img src="{{ asset('img/why11.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Bimbingan Lengkap</h4>
+                                <p style="color: #388E3C">Tersedia kelas dan bimbingan konsultasi secara online dan offline
                                     dengan Try Out berkala
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 ">
+                        <div class="card h-100 " style="background-color: #C5E1A5;">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/why2.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Try Out Mandiri</h4>
-                                <p class="text-muted">Tersedia paket Try Out mandiri yang dapat dilakukan dimanapun dan
+                                <img src="{{ asset('img/why12.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Try Out Mandiri</h4>
+                                <p style="color: #33691E">Tersedia paket Try Out mandiri yang dapat dilakukan dimanapun dan
                                     kapanpun</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 ">
+                        <div class="card h-100 " style="background-color: #1976D2">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/why3.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Pengajar Kompeten</h4>
-                                <p class="text-muted">Dibimbing oleh tenaga pengajar yang kompeten di bidangnya</p>
+                                <img src="{{ asset('img/why13.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Pengajar Kompeten</h4>
+                                <p style="color: #E3F2FD">Dibimbing oleh tenaga pengajar yang kompeten di bidangnya</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 ">
+                        <div class="card h-100 " style="background-color: #C5E1A5;">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/why4.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Sistem Digital</h4>
-                                <p class="text-muted">Menggunakan sistem digital selama periode bimbingan</p>
+                                <img src="{{ asset('img/why14.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Sistem Digital</h4>
+                                <p style="color: #33691E">Menggunakan sistem digital selama periode bimbingan</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100 ">
+                        <div class="card h-100 " style="background-color: #1976D2">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/why7.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Materi Terupdate</h4>
-                                <p class="text-muted">Pembaharuan materi secara berkala</p>
+                                <img src="{{ asset('img/why17.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Materi Terupdate</h4>
+                                <p style="color: #E3F2FD">Pembaharuan materi secara berkala</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 my-3">
-                        <div class="card h-100  ">
+                        <div class="card h-100  " style="background-color: #FFECB3;">
                             <div class="card-body text-center">
-                                <img src="{{ asset('img/why8.png') }}" class="img-fluid" style="max-height: 250px">
-                                <h4 class="font-weight-bold text-blue">Kelas Representatif
+                                <img src="{{ asset('img/why18.png') }}" class="img-fluid" style="max-height: 250px">
+                                <h4 class="font-weight-bold" style="color: #f2ab1a;">Kelas Representatif
                                 </h4>
-                                <p class="text-muted">Ruangan kelas yang nyaman dan representatif untuk pembelajaran</p>
+                                <p style="color: #388E3C">Ruangan kelas yang nyaman dan representatif untuk pembelajaran
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -311,7 +312,7 @@
                         <i class="fas fa-address-book mr-2 text-primary"></i>Kontak Kita
                     </h3>
 
-                    <p class="text-muted">Hubungi kami kapan saja melalui WhatsApp untuk informasi lebih
+                    <p>Hubungi kami kapan saja melalui WhatsApp untuk informasi lebih
                         lanjut.</p>
 
                     <!-- Kontak WhatsApp 1 -->
