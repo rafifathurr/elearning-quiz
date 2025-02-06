@@ -13,6 +13,7 @@
                                     {{ $user->name }}</h3>
                             @else
                                 <h3 class="card-title font-weight-bold">Ubah Password</h3>
+                            @endif
                         </div>
                         <!-- form start -->
                         <form method="post"
