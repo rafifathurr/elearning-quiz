@@ -116,7 +116,7 @@
                                 </div>
 
                                 <div class="pt-3 d-flex">
-                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                    <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Back</a>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </div>
