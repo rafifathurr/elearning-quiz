@@ -45,9 +45,11 @@
                                 </div>
                             </div>
                             <div class="d-flex pt-3 ">
-                                <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Back</a>
+
                                 @hasrole('user')
                                     <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">Edit</a>
+                                @else
+                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Back</a>
                                 @endhasrole
                             </div>
                         </div>

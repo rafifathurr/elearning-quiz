@@ -13,7 +13,7 @@
                         </div>
                         <!-- form start -->
                         <form method="post"
-                            @if ($user->hasRole('admin')) action="{{ route('master.user.update', ['id' => $user->id]) }}" @else action="{{ route('my-account.update', ['id' => $user->id]) }}" @endif>
+                            @if (Auth::user()->hasRole('admin')) action="{{ route('master.user.update', ['id' => $user->id]) }}" @else action="{{ route('my-account.update', ['id' => $user->id]) }}" @endif>
                             @csrf
                             @method('patch')
                             <div class="card-body">
@@ -92,8 +92,8 @@
                                 <div class="form-group">
                                     <label for="password">Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                        id="password" name="password" placeholder="Password"
-                                        value="{{ old('password') }}">
+                                        id="password" name="password" placeholder="Password" value="{{ old('password') }}"
+                                        @hasrole('user') required @endhasrole>
 
                                     @error('password')
                                         <div class="alert alert-danger mt-2">
@@ -106,7 +106,7 @@
                                     <label for="re_password">Re Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('re_password') is-invalid @enderror"
                                         id="re_password" name="re_password" placeholder="Re Password"
-                                        value="{{ old('re_password') }}">
+                                        value="{{ old('re_password') }}" @hasrole('user') required @endhasrole>
 
                                     @error('re_password')
                                         <div class="alert alert-danger mt-2">
@@ -116,9 +116,14 @@
                                 </div>
 
                                 <div class="pt-3 d-flex">
-                                    <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Back</a>
+                                    @if (Auth::user()->hasRole('admin'))
+                                        <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2"> Back</a>
+                                    @else
+                                        <a href="{{ route('my-account.show') }}" class="btn btn-danger mr-2"> Back</a>
+                                    @endif
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
+
                             </div>
                             <!-- /.card-body -->
                         </form>
