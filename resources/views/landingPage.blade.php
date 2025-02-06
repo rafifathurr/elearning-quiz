@@ -179,7 +179,7 @@
         <div class="tagline">
             <div class="p-3 ">
                 <h3 class="text-center font-weight-bold my-3">
-                    Kenapa Harus Bratacerdas <span style="font-size: 2.4rem" class="text-blue"><i
+                    Kenapa Harus Brata Cerdas <span style="font-size: 2.4rem" class="text-blue"><i
                             class="fas fa-question"></i></span>
                 </h3>
                 <div class="row  px-4">
@@ -188,8 +188,9 @@
                             <div class="card-body text-center ">
                                 <img src="{{ asset('img/why11.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Bimbingan Lengkap</h4>
-                                <p style="color: #388E3C">Tersedia kelas dan bimbingan konsultasi secara online dan offline
-                                    dengan Try Out berkala
+                                <p style="color: #388E3C">Brata Cerdas menyediakan kelas ONLINE dan OFFLINE untuk bimbingan
+                                    dan konsultasi dengan Try Out berkala
+
                                 </p>
                             </div>
                         </div>
@@ -199,8 +200,9 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why12.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Try Out Mandiri</h4>
-                                <p style="color: #33691E">Tersedia paket Try Out mandiri yang dapat dilakukan dimanapun dan
-                                    kapanpun</p>
+                                <p style="color: #33691E">Brata Cerdas memberikan paket Try Out mandiri yang dapat dilakukan
+                                    dimanapun dan kapanpun
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -209,7 +211,9 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why13.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Pengajar Kompeten</h4>
-                                <p style="color: #E3F2FD">Dibimbing oleh tenaga pengajar yang kompeten di bidangnya</p>
+                                <p style="color: #E3F2FD">Brata Cerdas bekerja sama dengan tenaga pengajar yang kompeten bi
+                                    bidangnya
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -218,7 +222,9 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why14.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Sistem Digital</h4>
-                                <p style="color: #33691E">Menggunakan sistem digital selama periode bimbingan</p>
+                                <p style="color: #33691E">Brata Cerdas membangun Sistem Digital sebagai platform yang
+                                    digunakan selama bimbingan
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -227,7 +233,8 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why17.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Materi Terupdate</h4>
-                                <p style="color: #E3F2FD">Pembaharuan materi secara berkala</p>
+                                <p style="color: #E3F2FD">Brata Cerdas memperbaharui materi secara berkala
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -237,7 +244,8 @@
                                 <img src="{{ asset('img/why18.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Kelas Representatif
                                 </h4>
-                                <p style="color: #388E3C">Ruangan kelas yang nyaman dan representatif untuk pembelajaran
+                                <p style="color: #388E3C">Brata Cerdas menyiapkan kelas yang nyaman dan representatif untuk
+                                    proses bimbingan dan konsultasi
                                 </p>
                             </div>
                         </div>
