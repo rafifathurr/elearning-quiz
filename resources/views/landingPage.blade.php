@@ -177,32 +177,41 @@
                         <li class="nav-item"><a class="nav-link font-weight-bold" href="#home">Home</a></li>
                         <li class="nav-item"><a class="nav-link font-weight-bold" href="#contact">Kontak</a></li>
                         <li class="nav-item"><a class="nav-link font-weight-bold" href="#package">Paket</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold" href="#" data-toggle="modal"
+                                data-target="#videoModal">
+                                E-Flyer
+                            </a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav ml-auto nav-mobile-adjust">
                         @if (Auth::check())
                             <li class="nav-item"><a href="{{ route('home') }}"
                                     class="nav-link font-weight-bold">Dashboard</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
-                                    <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="{{ route('logout') }}" class="dropdown-item"><i
-                                            class="fas fa-sign-out-alt mr-2"></i> Logout</a>
-                                </div>
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a href="{{ route('login') }}" class="nav-link font-weight-bold">
-                                    <i class="fa fa-sign-in-alt mr-1"></i> Login
-                                </a>
-                            </li>
                         @endif
                     </ul>
                 </div>
-
-
+                <ul class=" navbar-nav  ml-auto nav-mobile-adjust">
+                    @if (Auth::check())
+                        <li class="nav-item dropdown">
+                            <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
+                                <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="{{ route('logout') }}" class="dropdown-item"><i
+                                        class="fas fa-sign-out-alt mr-2"></i>
+                                    Logout</a>
+                            </div>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a href="{{ route('login') }}" class="nav-link font-weight-bold">
+                                <i class="fa fa-sign-in-alt mr-1"></i> Login
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </div>
         </nav>
 
