@@ -130,6 +130,36 @@
     </style>
 
     <body class="hold-transition layout-top-nav">
+        @if (!Auth::check())
+            <!-- Modal untuk Video -->
+            <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content"
+                        style="border-radius: 10px; background-color: #FFF8E1; color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                        <div class="modal-header"
+                            style="background-color: #1976D2; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                            <h5 class="modal-title font-weight-bold" id="videoModalLabel" style="color: #f2ab1a;">Brata
+                                Cerdas
+                            </h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                                style="font-size: 24px; background: none; border: none; transition: 0.3s;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <!-- Embed Video -->
+                            <video id="videoFrame" width="100%" height="400px" controls autoplay muted
+                                style="border-radius: 8px;">
+                                <source src="{{ asset('img/videoBrata.mp4') }}" type="video/mp4">
+                                Browser Anda tidak mendukung tag video.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Navbar --}}
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-white" id="navbar">
             <div class="container">
@@ -211,7 +241,8 @@
                             <div class="card-body text-center">
                                 <img src="{{ asset('img/why12.png') }}" class="img-fluid" style="max-height: 250px">
                                 <h4 class="font-weight-bold" style="color: #f2ab1a;">Try Out Mandiri</h4>
-                                <p style="color: #33691E">Brata Cerdas memberikan paket Try Out mandiri yang dapat dilakukan
+                                <p style="color: #33691E">Brata Cerdas memberikan paket Try Out mandiri yang dapat
+                                    dilakukan
                                     dimanapun dan kapanpun
                                 </p>
                             </div>
@@ -373,6 +404,7 @@
 
         @push('javascript-bottom')
             @include('js.order.script')
+            <!-- Script Back to Top & Navbar -->
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const backToTopButton = document.querySelector('.back-to-top');
@@ -417,6 +449,30 @@
                         }
 
                         lastScrollY = currentScroll; // Update posisi scroll terakhir
+                    });
+                });
+            </script>
+
+            <!-- Script Modal Video -->
+            <script>
+                $(document).ready(function() {
+                    // Tampilkan modal setelah 2 detik saat halaman dimuat
+                    setTimeout(function() {
+                        $('#videoModal').modal('show');
+                    }, 2000);
+
+                    // Mulai video saat modal dibuka
+                    $('#videoModal').on('shown.bs.modal', function() {
+                        var video = document.getElementById("videoFrame");
+                        video.currentTime = 0; // Pastikan video mulai dari awal
+                        video.play(); // Putar video saat modal muncul
+                    });
+
+                    // Hentikan video saat modal ditutup
+                    $('#videoModal').on('hidden.bs.modal', function() {
+                        var video = document.getElementById("videoFrame");
+                        video.pause(); // Hentikan video
+                        video.currentTime = 0; // Reset video ke awal
                     });
                 });
             </script>
