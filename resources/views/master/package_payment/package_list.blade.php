@@ -24,12 +24,36 @@
         color: inherit !important white;
     }
 
-    .meeting-info {
+    .meeting-info,
+    .member-info {
         font-size: 1rem;
         font-weight: bold;
-        color: #ffc107;
-        /* Warna kuning agar kontras */
     }
+
+    .meeting-info {
+        color: #ffc107;
+        /* Kuning */
+    }
+
+    .member-info {
+        color: #28FFBF;
+        /* Hijau terang agar lebih kontras */
+    }
+
+
+
+    /* Gaya pembatas */
+    .divider {
+        font-size: 1rem;
+        font-weight: bold;
+        color: white;
+        /* Warna putih supaya kontras dengan button */
+        opacity: 0.7;
+        /* Sedikit transparan agar lebih elegan */
+        margin: 0 5px;
+        /* Spasi kiri dan kanan agar tidak terlalu mepet */
+    }
+
 
     .price-badge {
         background: white;
@@ -46,11 +70,25 @@
             @if (Auth::check())
                 <button onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
                     class="stylish-button w-100 shadow-sm">
-                    <span><i class="fas fa-box"></i> {{ $package->name }}</span>
+                    <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
 
-                    @if (isset($package->class) && $package->class > 0)
-                        <span class="meeting-info">{{ $package->class }}x Pertemuan</span>
-                    @endif
+                    <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                        @if (isset($package->class) && $package->class > 0)
+                            <span class="meeting-info">
+                                <i class="fas fa-calendar-alt"></i> {{ $package->class }}x Pertemuan
+                            </span>
+                        @endif
+
+                        @if (isset($package->class) && $package->class > 0 && isset($package->max_member) && $package->max_member > 0)
+                            <span class="divider">|</span> <!-- Pembatas -->
+                        @endif
+
+                        @if (isset($package->max_member) && $package->max_member > 0)
+                            <span class="member-info">
+                                <i class="fas fa-users"></i> {{ $package->max_member }} Peserta
+                            </span>
+                        @endif
+                    </div>
 
                     <span class="price-badge">
                         {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
@@ -58,11 +96,25 @@
                 </button>
             @else
                 <a href="{{ route('login') }}" class="stylish-button w-full shadow-sm">
-                    <span><i class="fas fa-box"></i> {{ $package->name }}</span>
+                    <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
 
-                    @if (isset($package->class) && $package->class > 0)
-                        <span class="meeting-info">{{ $package->class }}x Pertemuan</span>
-                    @endif
+                    <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                        @if (isset($package->class) && $package->class > 0)
+                            <span class="meeting-info">
+                                <i class="fas fa-calendar-alt"></i> {{ $package->class }}x Pertemuan
+                            </span>
+                        @endif
+
+                        @if (isset($package->class) && $package->class > 0 && isset($package->max_member) && $package->max_member > 0)
+                            <span class="divider">|</span> <!-- Pembatas -->
+                        @endif
+
+                        @if (isset($package->max_member) && $package->max_member > 0)
+                            <span class="member-info">
+                                <i class="fas fa-users"></i> {{ $package->max_member }} Peserta
+                            </span>
+                        @endif
+                    </div>
 
                     <span class="price-badge">
                         {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
