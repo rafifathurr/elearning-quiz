@@ -76,7 +76,7 @@
                                     <div class="col-md-8 col-sm-12">
                                         <input class="form-control @error('max_member') is-invalid @enderror" type="number"
                                             name="max_member" id="max_member"
-                                            value="{{ old('max_member'), $package->max_member }}"
+                                            value="{{ old('max_member', $package->max_member) }}"
                                             placeholder="Maksimal Peserta">
                                         @error('max_member')
                                             <div class="alert alert-danger mt-2">
