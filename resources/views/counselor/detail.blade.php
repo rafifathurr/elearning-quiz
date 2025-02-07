@@ -112,8 +112,14 @@
                                         <form id="form-daftar-peserta" action="{{ route('class.storeAttendance') }}"
                                             method="POST">
                                             @csrf
-                                            <div class="card-header bg-gray-light">
-                                                <h5><i class="fas fa-user-friends"></i> DAFTAR PESERTA</h5>
+                                            <div class="card-header bg-gray-light d-flex justify-content-between">
+                                                <h5 class="w-100 text-left "><i class="fas fa-user-friends"></i>
+                                                    DAFTAR
+                                                    PESERTA</h5>
+                                                @if (isset($class->package->max_member) && $class->package->max_member > 0)
+                                                    <h5 class="w-100 text-right ">Max:
+                                                        {{ $class->package->max_member . ' Peserta' }}</h5>
+                                                @endif
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive py-3">

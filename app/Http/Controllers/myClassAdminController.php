@@ -389,8 +389,21 @@ class myClassAdminController extends Controller
                 'class_id' => 'required|exists:class_packages,id' // Validasi class_id di database
             ]);
 
+            // Ambil max_member dari class package
+            $classPackage = ClassPackage::with('package')->findOrFail($validatedData['class_id']);
+            $max_member = $classPackage->package->max_member;
+
             // Ambil data yang sudah ada di session
             $existingMembers = Session::get('new_member', []); // Ambil data lama, default []
+
+            // Jika max_member tidak null dan lebih dari 0, baru lakukan pengecekan
+            if (!is_null($max_member) && $max_member > 0) {
+                if (count($existingMembers) >= $max_member) {
+                    return redirect()
+                        ->back()
+                        ->with(['failed' => "Jumlah peserta sudah mencapai batas maksimal yaitu {$max_member} peserta."]);
+                }
+            }
 
             // Data baru
             $order_packages = [];
@@ -411,12 +424,20 @@ class myClassAdminController extends Controller
                     ];
                 }
             }
-
+            $updatedMembers = array_merge($existingMembers, $order_packages);
+            // Jika max_member tidak null dan lebih dari 0, lakukan pengecekan lagi setelah menambahkan peserta
+            if (!is_null($max_member) && $max_member > 0) {
+                if (count($updatedMembers) > $max_member) {
+                    return redirect()
+                        ->back()
+                        ->with(['failed' => "Jumlah peserta melebihi batas maksimal yaitu {$max_member} peserta."]);
+                }
+            }
             // Gabungkan data baru dengan data lama
-            Session::put('new_member', array_merge($existingMembers, $order_packages));
+            Session::put('new_member',   $updatedMembers);
 
             // Periksa hasil dari sesi
-            $updatedMembers = Session::get('new_member');
+
 
             if (!empty($order_packages)) {
                 return redirect()
