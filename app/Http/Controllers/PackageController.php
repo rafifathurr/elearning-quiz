@@ -32,14 +32,17 @@ class PackageController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
-                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning m-1" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                $btn_action .= '<button class="btn btn-sm btn-danger m-1" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
 
                 $btn_action .= '<div>';
                 return $btn_action;
             })
             ->addColumn('class', function ($data) {
                 return !is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-';
+            })
+            ->addColumn('max_member', function ($data) {
+                return !is_null($data->max_member) && $data->max_member > 0 ? $data->max_member . ' Peserta' : '-';
             })
             ->addColumn('price', function ($data) {
                 $price = '<div>' . 'Rp. ' . number_format($data->price, 0, ',', '.');
@@ -81,7 +84,7 @@ class PackageController extends Controller
             })
 
 
-            ->only(['id', 'name', 'class', 'price', 'quiz', 'date_class', 'type_package', 'status', 'action'])
+            ->only(['id', 'name', 'class', 'max_member', 'price', 'quiz', 'date_class', 'type_package', 'status', 'action'])
             ->rawColumns(['status', 'action', 'price', 'quiz', 'date_class'])
             ->make(true);
 
@@ -116,6 +119,7 @@ class PackageController extends Controller
                 'name' => 'required',
                 'price' => 'required',
                 'class' => 'nullable',
+                'max_member' => 'nullable',
                 'id_type_package' => 'required'
             ]);
 
@@ -124,6 +128,7 @@ class PackageController extends Controller
                 'name' => $request->name,
                 'price' => $request->price,
                 'class' => $request->class,
+                'max_member' => $request->max_member,
                 'id_type_package' => $request->id_type_package
             ]);
 
@@ -204,6 +209,7 @@ class PackageController extends Controller
                     'name' => 'required',
                     'price' => 'required',
                     'class' => 'nullable',
+                    'max_member' => 'nullable',
                     'quiz_id' => 'nullable',
                     'id_type_package' => 'required'
                 ]);
@@ -215,6 +221,7 @@ class PackageController extends Controller
                         'name' => $request->name,
                         'price' => $request->price,
                         'class' => $request->class,
+                        'max_member' => $request->max_member,
                         'id_type_package' => $request->id_type_package
                     ]);
 

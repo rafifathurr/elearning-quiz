@@ -52,6 +52,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'max_member',
+                    defaultContent: '-'
+                },
+                {
                     data: 'date_class',
                     defaultContent: '-'
                 },

@@ -70,6 +70,21 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label for="max_member" class="col-md-4 control-label text-left">Maksimal Peserta
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        <input class="form-control @error('max_member') is-invalid @enderror" type="number"
+                                            name="max_member" id="max_member" value="{{ old('max_member') }}"
+                                            placeholder="Maksimal Peserta">
+                                        @error('max_member')
+                                            <div class="alert alert-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label for="date_class_id" class="col-md-4 control-label text-left">Pilih Jadwal Kelas
                                     </label>
                                     <div class="col-md-8 col-sm-12">

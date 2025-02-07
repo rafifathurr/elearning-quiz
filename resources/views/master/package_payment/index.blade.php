@@ -33,6 +33,7 @@
                                                 <th>Nama Paket</th>
                                                 <th>Tipe Paket</th>
                                                 <th>Pertemuan</th>
+                                                <th>Maksimal Peserta</th>
                                                 <th>Jadwal Kelas</th>
                                                 <th>Harga</th>
                                                 <th>Daftar Test</th>
