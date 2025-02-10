@@ -211,6 +211,7 @@ Route::group(['middleware' => ['role:admin']], function () {
         Route::group(['controller' => PackageMemberController::class, 'prefix' => 'member', 'as' => 'member.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
             Route::get('index', 'index')->name('index');
+            Route::get('export', 'export')->name('export');
         });
 
         Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {

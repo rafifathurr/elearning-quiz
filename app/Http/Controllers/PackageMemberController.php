@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MemberExport;
 use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderPackage;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PackageMemberController extends Controller
@@ -28,7 +30,7 @@ class PackageMemberController extends Controller
 
         $query = OrderPackage::query()
             ->whereNull('deleted_at')
-            ->whereNotNull('class')
+            ->where('class', '>', 0)
             ->whereIn('order_id', $orderId);
 
         // Filter berdasarkan paket jika dipilih
@@ -46,15 +48,23 @@ class PackageMemberController extends Controller
         return DataTables::of($member)
             ->addIndexColumn()
             ->addColumn('package', function ($data) {
-                return $data->package->name;
+                return $data->package ? $data->package->name  : '-';
             })
             ->addColumn('user', function ($data) {
-                return $data->order->user->name;
+                return $data->order ? $data->order->user->name : '-';
             })
             ->addColumn('date', function ($data) {
                 return $data->dateClass ? $data->dateClass->name : '-';
             })
             ->only(['package', 'user', 'date'])
             ->make(true);
+    }
+
+    public function export(Request $request)
+    {
+        $packageFilter = $request->input('packageFilter');
+        $dateFilter = $request->input('dateClassFilter');
+
+        return Excel::download(new MemberExport($packageFilter, $dateFilter), 'member_data.xlsx');
     }
 }

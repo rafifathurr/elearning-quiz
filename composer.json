@@ -12,7 +12,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.17",
         "laravel/tinker": "^2.8",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "*",
         "realrashid/sweet-alert": "^7.2",
         "spatie/laravel-permission": "^6.9",
         "yajra/laravel-datatables": "^10.1"
