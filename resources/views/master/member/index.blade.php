@@ -20,14 +20,25 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="form-group my-3">
-                                    <label for="packageFilter">Filter Nama Paket</label>
-                                    <select id="packageFilter" class="form-control w-25">
-                                        <option value="">-- Pilih Nama Paket --</option>
-                                        @foreach ($packages as $package)
-                                            <option value="{{ $package->id }}">{{ $package->name }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="packageFilter">Filter Nama Paket:</label>
+                                        <select id="packageFilter" class="form-control">
+                                            <option value="">-- Semua Paket --</option>
+                                            @foreach ($packages as $package)
+                                                <option value="{{ $package->id }}">{{ $package->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="dateClassFilter">Filter Tanggal Kelas:</label>
+                                        <select id="dateClassFilter" class="form-control">
+                                            <option value="">-- Semua Jadwal Kelas --</option>
+                                            @foreach ($dateClasses as $date)
+                                                <option value="{{ $date->id }}">{{ $date->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="table-responsive mt-3">
@@ -57,6 +68,9 @@
         @include('js.master.member.script')
         <script>
             dataTable();
+
+            $('#packageFilter').select2();
+            $('#dateClassFilter').select2();
         </script>
     @endpush
 @endsection

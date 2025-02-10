@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderPackage;
 use App\Models\Package;
@@ -14,13 +15,15 @@ class PackageMemberController extends Controller
     {
         $datatable_route = route('master.member.dataTable');
         $packages = Package::whereNull('deleted_at')->where('class', '>', 0)->get();
-        return view('master.member.index', compact('datatable_route', 'packages'));
+        $dateClasses = DateClass::whereNull('deleted_at')->get();
+        return view('master.member.index', compact('datatable_route', 'packages', 'dateClasses'));
     }
 
 
     public function dataTable()
     {
         $packageFilter = request()->get('package');
+        $dateClassFilter = request()->get('dateClass');
         $orderId = Order::whereNull('deleted_at')->where('status', 100)->pluck('id');
 
         $query = OrderPackage::query()
@@ -28,9 +31,14 @@ class PackageMemberController extends Controller
             ->whereNotNull('class')
             ->whereIn('order_id', $orderId);
 
-        // Terapkan filter jika ada
+        // Filter berdasarkan paket jika dipilih
         if ($packageFilter) {
             $query->where('package_id', $packageFilter);
+        }
+
+        // Filter berdasarkan nama tanggal kelas jika dipilih
+        if ($dateClassFilter) {
+            $query->where('date_class_id', $dateClassFilter);
         }
 
         $member = $query->get();
@@ -44,7 +52,7 @@ class PackageMemberController extends Controller
                 return $data->order->user->name;
             })
             ->addColumn('date', function ($data) {
-                return $data->package->dateClass ? $data->package->dateClass->name : '-';
+                return $data->dateClass ? $data->dateClass->name : '-';
             })
             ->only(['package', 'user', 'date'])
             ->make(true);

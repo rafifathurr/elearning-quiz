@@ -32,7 +32,8 @@
             ajax: {
                 url: url,
                 data: function(d) {
-                    d.package = $('#packageFilter').val(); // Kirim filter paket ke server
+                    d.package = $('#packageFilter').val(); // Filter paket
+                    d.dateClass = $('#dateClassFilter').val(); // Filter tanggal kelas
                 },
                 error: function(xhr, error, code) {
                     swalError(xhr.statusText);
@@ -58,9 +59,14 @@
             ]
         });
 
-        // Event listener untuk filter select
+        // Event listener untuk filter paket
         $('#packageFilter').on('change', function() {
-            table.ajax.reload(); // Reload DataTable setelah memilih paket
+            table.ajax.reload();
+        });
+
+        // Event listener untuk filter tanggal kelas
+        $('#dateClassFilter').on('change', function() {
+            table.ajax.reload();
         });
     }
 </script>
