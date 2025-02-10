@@ -27,11 +27,13 @@ class PackageMemberController extends Controller
         $packageFilter = request()->get('package');
         $dateClassFilter = request()->get('dateClass');
         $orderId = Order::whereNull('deleted_at')->where('status', 100)->pluck('id');
+        $packageId = Package::whereNull('deleted_at')->pluck('id');
 
         $query = OrderPackage::query()
             ->whereNull('deleted_at')
             ->where('class', '>', 0)
-            ->whereIn('order_id', $orderId);
+            ->whereIn('order_id', $orderId)
+            ->whereIn('package_id', $packageId);
 
         // Filter berdasarkan paket jika dipilih
         if ($packageFilter) {

@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Order;
 use App\Models\OrderPackage;
+use App\Models\Package;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -21,9 +22,11 @@ class MemberExport implements FromCollection, WithHeadings
     public function collection()
     {
         $orderId = Order::whereNull('deleted_at')->where('status', 100)->pluck('id');
+        $packageId = Package::whereNull('deleted_at')->pluck('id');
         return OrderPackage::whereNull('deleted_at')
             ->where('class', '>', 0)
             ->whereIn('order_id', $orderId)
+            ->whereIn('package_id', $packageId)
             ->with(['package', 'order.user', 'dateClass']) // Pastikan load relasi yang dibutuhkan
             ->when($this->packageFilter, function ($query) {
                 $query->whereHas('package', function ($q) {
