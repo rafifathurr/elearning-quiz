@@ -67,6 +67,20 @@ class PackageMemberController extends Controller
         $packageFilter = $request->input('packageFilter');
         $dateFilter = $request->input('dateClassFilter');
 
-        return Excel::download(new MemberExport($packageFilter, $dateFilter), 'member_data.xlsx');
+        $package = $packageFilter ? Package::find($packageFilter) : null;
+        $date = $dateFilter ? DateClass::find($dateFilter) : null;
+
+        // Tentukan nama file berdasarkan filter yang dipilih
+        if ($package && $date) {
+            $fileName = "Data Peserta - {$package->name} - {$date->name}.xlsx";
+        } elseif ($package) {
+            $fileName = "Data Peserta - {$package->name} - Semua Jadwal.xlsx";
+        } elseif ($date) {
+            $fileName = "Data Peserta - Semua Paket - {$date->name}.xlsx";
+        } else {
+            $fileName = "Data Peserta - Semua Paket - Semua Jadwal.xlsx";
+        }
+
+        return Excel::download(new MemberExport($packageFilter, $dateFilter), $fileName);
     }
 }
