@@ -14,6 +14,7 @@ use App\Http\Controllers\myClassController;
 use App\Http\Controllers\myTestController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PackageMemberController;
 use App\Http\Controllers\TypePackageController;
 use App\Http\Controllers\UserController;
 
@@ -207,6 +208,10 @@ Route::group(['middleware' => ['role:admin']], function () {
         });
         Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
 
+        Route::group(['controller' => PackageMemberController::class, 'prefix' => 'member', 'as' => 'member.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::get('index', 'index')->name('index');
+        });
 
         Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
             Route::get('create', 'create')->name('create');

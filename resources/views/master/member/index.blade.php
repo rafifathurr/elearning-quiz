@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Paket Test</h1>
+                        <h1 class="m-0">Daftar Peserta</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -20,31 +20,25 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="d-flex">
-                                    <a href="{{ route('master.package.create') }}" class="btn btn-primary btn-sm m-2">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        Tambah Paket Test
-                                    </a>
-                                    <a href="{{ route('master.member.index') }}" class="btn btn-secondary btn-sm m-2">
-                                        <i class="fas fa-user-check mr-1"></i>
-                                        Daftar Peserta
-                                    </a>
+                                <div class="form-group my-3">
+                                    <label for="packageFilter">Filter Nama Paket</label>
+                                    <select id="packageFilter" class="form-control w-25">
+                                        <option value="">-- Pilih Nama Paket --</option>
+                                        @foreach ($packages as $package)
+                                            <option value="{{ $package->id }}">{{ $package->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-package">
+                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-member-package">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
-                                                <th>Tipe Paket</th>
-                                                <th>Pertemuan</th>
-                                                <th>Maksimal Peserta</th>
+                                                <th>Nama Peserta</th>
                                                 <th>Jadwal Kelas</th>
-                                                <th>Harga</th>
-                                                <th>Daftar Test</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -60,7 +54,7 @@
 
     </div>
     @push('javascript-bottom')
-        @include('js.master.package_payment.script')
+        @include('js.master.member.script')
         <script>
             dataTable();
         </script>
