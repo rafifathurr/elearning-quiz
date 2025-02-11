@@ -31,7 +31,8 @@
                                 <div class="input-group">
                                     <input type="text" name="name"
                                         class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap"
-                                        oninput="this.value = this.value.toUpperCase();" value="{{ old('name') }}">
+                                        oninput="this.value = this.value.toUpperCase();" value="{{ old('name') }}"
+                                        required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>
@@ -50,7 +51,7 @@
                                 <div class="input-group">
                                     <input type="text" name="username"
                                         class="form-control @error('username') is-invalid @enderror" placeholder="Username"
-                                        value="{{ old('username') }}">
+                                        value="{{ old('username') }}" required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>
@@ -69,7 +70,7 @@
                                 <div class="input-group">
                                     <input type="text" name="email"
                                         class="form-control @error('email') is-invalid @enderror" placeholder="Email"
-                                        value="{{ old('email') }}">
+                                        value="{{ old('email') }}" required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-envelope"></span>
@@ -88,7 +89,7 @@
                                 <div class="input-group">
                                     <input type="text" name="phone" id="phone"
                                         class="form-control @error('phone') is-invalid @enderror"
-                                        placeholder="Nomor Handphone" value="{{ old('phone') }}">
+                                        placeholder="Nomor Handphone" value="{{ old('phone') }}" required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-phone-alt"></span>
@@ -106,7 +107,8 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <input type="password" name="password" id="password"
-                                        class="form-control @error('password') is-invalid @enderror" placeholder="Password">
+                                        class="form-control @error('password') is-invalid @enderror" placeholder="Password"
+                                        required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-lock"></span>
@@ -125,7 +127,7 @@
                                 <div class="input-group">
                                     <input type="password" name="re_password" id="re_password"
                                         class="form-control @error('re_password') is-invalid @enderror"
-                                        placeholder="Re-Password">
+                                        placeholder="Re-Password" required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-lock"></span>
@@ -146,7 +148,7 @@
                         </div>
                         <div class="row justify-content-center mt-4">
                             <div class="col-12 text-center">
-                                Punya Akun ? <a href="{{ route('login') }}" class="">Login</a>
+                                Punya Akun ? <a href="{{ route('login') }}" required class="">Login</a>
                             </div>
                         </div>
                     </form>
