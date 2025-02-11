@@ -129,7 +129,8 @@ class PackageController extends Controller
                 'price' => $request->price,
                 'class' => $request->class,
                 'max_member' => $request->max_member,
-                'id_type_package' => $request->id_type_package
+                'id_type_package' => $request->id_type_package,
+                'description' => $request->description
             ]);
 
             // Cek apakah ada quiz yang dipilih
@@ -222,7 +223,8 @@ class PackageController extends Controller
                         'price' => $request->price,
                         'class' => $request->class,
                         'max_member' => $request->max_member,
-                        'id_type_package' => $request->id_type_package
+                        'id_type_package' => $request->id_type_package,
+                        'description' => $request->description
                     ]);
 
                 // Hapus package_test lama
