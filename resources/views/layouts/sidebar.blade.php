@@ -31,7 +31,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
                 <li class="nav-item {{ $display }}">
-                    <a href="{{ route('home') }}" class="nav-link">
+                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-home"></i>
                         <p>
                             Home
@@ -41,7 +41,8 @@
 
                 @hasanyrole('admin|user|counselor')
                     <li class="nav-item {{ $display }}">
-                        <a href="{{ route('mytest.index') }}" class="nav-link">
+                        <a href="{{ route('mytest.index') }}"
+                            class="nav-link {{ request()->routeIs('mytest.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>
                             <p>
                                 @hasrole('user')
@@ -56,7 +57,8 @@
 
                 @hasrole('user')
                     <li class="nav-item {{ $display }}">
-                        <a href="{{ route('myclass.index') }}" class="nav-link">
+                        <a href="{{ route('myclass.index') }}"
+                            class="nav-link {{ request()->routeIs('myclass.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
                                 My Class
@@ -75,7 +77,8 @@
                         $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
                         $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
                         ?>
-                        <a href="{{ route('order.index') }}" class="nav-link">
+                        <a href="{{ route('order.index') }}"
+                            class="nav-link {{ request()->routeIs('order.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
                                 @hasrole('admin|finance')
@@ -93,7 +96,8 @@
 
                 @hasrole('counselor')
                     <li class="nav-item {{ $display }}">
-                        <a href="{{ route('class.index') }}" class="nav-link">
+                        <a href="{{ route('class.index') }}"
+                            class="nav-link {{ request()->routeIs('class.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
                                 My Class
@@ -104,7 +108,8 @@
 
                 @hasanyrole('admin|counselor')
                     <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.dateclass.index') }}" class="nav-link">
+                        <a href="{{ route('master.dateclass.index') }}"
+                            class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>
                                 Jadwal Kelas
@@ -116,7 +121,8 @@
                 @hasanyrole('admin|package-manager|question-operator')
                     @hasrole('admin')
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('admin.quiz.index') }}" class="nav-link">
+                            <a href="{{ route('admin.quiz.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.quiz.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-file"></i>
                                 <p>
                                     Daftar Tes
@@ -127,7 +133,8 @@
 
                     @hasanyrole('admin|question-operator')
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.aspect.index') }}" class="nav-link">
+                            <a href="{{ route('master.aspect.index') }}"
+                                class="nav-link {{ request()->routeIs('master.aspect.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-cubes"></i>
                                 <p>
                                     Aspek Pertanyaan
@@ -135,7 +142,8 @@
                             </a>
                         </li>
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.question.index') }}" class="nav-link">
+                            <a href="{{ route('master.question.index') }}"
+                                class="nav-link {{ request()->routeIs('master.question.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-clipboard-list"></i>
                                 <p>
                                     Bank Soal
@@ -146,7 +154,8 @@
 
                     @hasanyrole('admin|package-manager')
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.typePackage.index') }}" class="nav-link">
+                            <a href="{{ route('master.typePackage.index') }}"
+                                class="nav-link {{ request()->routeIs('master.typePackage.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Kategori Paket
@@ -154,7 +163,8 @@
                             </a>
                         </li>
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.package.index') }}" class="nav-link">
+                            <a href="{{ route('master.package.index') }}"
+                                class="nav-link {{ request()->routeIs('master.package.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-gift"></i>
                                 <p>
                                     Daftar Paket
@@ -165,7 +175,8 @@
 
                     @hasrole('admin')
                         <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.user.index') }}" class="nav-link">
+                            <a href="{{ route('master.user.index') }}"
+                                class="nav-link {{ request()->routeIs('master.user.index') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>
                                     Daftar Pengguna
@@ -177,7 +188,8 @@
                 @endhasrole
                 @hasrole('user')
                     <li class="nav-item ">
-                        <a href="{{ route('contact') }}" class="nav-link">
+                        <a href="{{ route('contact') }}"
+                            class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-phone-square"></i>
                             <p>
                                 Contact Person
@@ -185,7 +197,8 @@
                         </a>
                     </li>
                     <li class="nav-item ">
-                        <a href="{{ route('my-account.show') }}" class="nav-link">
+                        <a href="{{ route('my-account.show') }}"
+                            class="nav-link {{ request()->routeIs('my-account.show') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-user"></i>
                             <p>
                                 My Account
@@ -194,7 +207,7 @@
                     </li>
                 @endhasrole
                 <li class="nav-item">
-                    <a href="{{ route('logout') }}" class="nav-link">
+                    <a href="{{ route('logout') }}" class="nav-link ">
                         <i class="nav-icon fas fa-power-off"></i>
                         <p>
                             Log Out
@@ -210,7 +223,7 @@
 </aside>
 
 {{-- <li class="nav-item {{ $display }}">
-    <a href="{{ route('quiz.listQuiz') }}" class="nav-link">
+    <a href="{{ route('quiz.listQuiz') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
         <i class="nav-icon fas fa-book"></i>
         <p>
             Daftar Quiz
@@ -218,7 +231,7 @@
     </a>
 </li>
 <li class="nav-item {{ $display }}">
-    <a href="{{ route('quiz.historyQuiz') }}" class="nav-link">
+    <a href="{{ route('quiz.historyQuiz') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
         <i class="nav-icon fas fa-book"></i>
         <p>
             Riwayat Quiz
@@ -227,7 +240,7 @@
 </li> --}}
 
 {{-- <li class="nav-item {{ $display }}">
-    <a href="{{ route('master.payment.index') }}" class="nav-link">
+    <a href="{{ route('master.payment.index') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
         <i class="nav-icon fas fa-credit-card"></i>
         <p>
             Payment Package
