@@ -47,6 +47,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
+                                                <th>Tanggal Mendaftar</th>
                                                 <th>Nama Peserta</th>
                                                 <th>Jadwal Kelas</th>
                                             </tr>

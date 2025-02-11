@@ -27,6 +27,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'created_at',
+                    defaultContent: '-'
+                },
+                {
                     data: 'user',
                     defaultContent: '-'
                 },

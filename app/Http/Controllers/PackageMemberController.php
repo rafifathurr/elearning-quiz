@@ -45,6 +45,10 @@ class PackageMemberController extends Controller
             $query->where('date_class_id', $dateClassFilter);
         }
 
+        if (!$packageFilter && !$dateClassFilter) {
+            $query->orderBy('package_id', 'ASC');
+        }
+
         $member = $query->get();
 
         return DataTables::of($member)
@@ -52,13 +56,16 @@ class PackageMemberController extends Controller
             ->addColumn('package', function ($data) {
                 return $data->package ? $data->package->name  : '-';
             })
+            ->addColumn('created_at', function ($data) {
+                return $data->order ? \Carbon\Carbon::parse($data->order->created_at)->translatedFormat('d F Y H:i') : '-';
+            })
             ->addColumn('user', function ($data) {
                 return $data->order ? $data->order->user->name : '-';
             })
             ->addColumn('date', function ($data) {
                 return $data->dateClass ? $data->dateClass->name : '-';
             })
-            ->only(['package', 'user', 'date'])
+            ->only(['package', 'created_at', 'user', 'date'])
             ->make(true);
     }
 
