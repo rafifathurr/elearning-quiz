@@ -1,16 +1,6 @@
 @extends('layouts.section')
 @section('content')
-    <div class="px-3 py-1">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">User</h1>
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </div>
+    <div class="px-3 py-4">
         <!-- /.content-header -->
         <!-- Main content -->
         <section class="content">
@@ -18,11 +8,14 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card card-lightblue">
+                            <div class="card-header">
+                                <h3 class="font-weight-bold">Daftar Pengguna</h3>
+                            </div>
                             <div class="card-body">
                                 <a href="{{ route('master.user.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus mr-1"></i>
-                                    Tambah User
+                                    Tambah Pengguna
                                 </a>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">

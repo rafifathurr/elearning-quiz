@@ -106,7 +106,7 @@
                     </li>
                 @endhasrole
 
-                @hasanyrole('admin|counselor')
+                @hasanyrole('admin')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.dateclass.index') }}"
                             class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'active' : '' }}">

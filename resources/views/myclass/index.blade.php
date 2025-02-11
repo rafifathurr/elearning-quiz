@@ -20,7 +20,7 @@
                             </div>
                         @endif
 
-                        <div class="card">
+                        <div class="card card-lightblue">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">My Class</h3>
                             </div>

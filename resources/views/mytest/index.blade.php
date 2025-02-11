@@ -10,7 +10,7 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card card-lightblue">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">
                                     @hasrole('user')

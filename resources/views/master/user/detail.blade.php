@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 mt-4">
-                    <div class="card card-info">
+                    <div class="card card-lightblue">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title font-weight-bold">Detail User - {{ $user->name }}</h3>
