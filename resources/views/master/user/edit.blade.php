@@ -4,12 +4,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 mt-4">
-                    <div class="card card-info">
+                    <div class="card card-lightblue">
                         <div class="card-header">
                             @if (Auth::user()->hasRole('admin'))
                                 <h3 class="card-title font-weight-bold">Edit
                                     {{ $user->hasRole('admin') ? 'User' : 'Account' }}
-                                    -
+                                    |
                                     {{ $user->name }}</h3>
                             @else
                                 <h3 class="card-title font-weight-bold">Ubah Password</h3>

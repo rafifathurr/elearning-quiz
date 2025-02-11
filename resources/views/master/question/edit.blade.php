@@ -1,27 +1,17 @@
 @extends('layouts.section')
 @section('content')
-    <div class="px-3 py-1">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">{{ $disabled == '' ? 'Ubah' : 'Detail' }} Pertanyaan</h1>
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content-header -->
+    <div class="px-3 py-4">
+
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-gray-light" id="headingTwo">
-                                <h2 class="card-title mb-0 font-weight-bold">
-                                    Pertanyaan Nomor #{{ $quiz_question->id }}
+                        <div class="card ">
+                            <div class="card-header bg-lightblue" id="headingTwo">
+                                <h2 class="card-title  font-weight-bold">
+                                    {{ $disabled == '' ? 'Edit' : 'Detail' }} Pertanyaan #{{ $quiz_question->id }}
                                 </h2>
                             </div>
 
