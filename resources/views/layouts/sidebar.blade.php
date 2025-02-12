@@ -27,7 +27,7 @@
         </div>
 
         <!-- Sidebar Menu -->
-        <nav class="mt-2">
+        <nav class="my-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
                 <li class="nav-item {{ $display }}">
@@ -218,7 +218,7 @@
                         </a>
                     </li>
                 @endhasrole
-                <li class="nav-item">
+                <li class="nav-item mb-3">
                     <a href="{{ route('logout') }}" class="nav-link ">
                         <i class="nav-icon fas fa-power-off"></i>
                         <p>
