@@ -112,6 +112,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'proof_payment',
+                    defaultContent: '-'
+                },
+                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',
@@ -256,23 +260,16 @@
     }
 
     function payOrder(orderId) {
-        console.log('Payment Order ID:', orderId);
+        console.log('Order ID:', orderId); // Debugging
         let token = $('meta[name="csrf-token"]').attr('content');
-
         let totalHarga = $('#totalPrice').text();
         let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
 
-
-
         Swal.fire({
-            title: 'Pembayaran Paket',
+            title: `Pembayaran Paket Order`,
             text: `Total Harga: ${totalHarga}`,
-            input: 'select',
-            inputOptions: {
-                non_tunai: "Non Tunai",
-                tunai: "Tunai",
-            },
-            inputPlaceholder: "Pilih Metode Pembayaran",
+            html: `
+            <input type="file" id="uploadImage" class="swal2-file-input" accept="image/*" aria-label="Upload Bukti Pembayaran" style="display: block; margin: 0 auto; width: 100%; padding: 10px ;border: 1px solid #ddd; border-radius: 5px; font-size: 16px; ">`,
             showCancelButton: true,
             allowOutsideClick: false,
             customClass: {
@@ -280,40 +277,42 @@
                 cancelButton: 'btn btn-danger mb-3',
             },
             buttonsStyling: false,
-            confirmButtonText: 'Yes',
+            confirmButtonText: 'Upload',
             cancelButtonText: 'Cancel',
-            preConfirm: (paymentMethod) => {
-                if (!paymentMethod) {
-                    Swal.showValidationMessage('Harap pilih metode pembayaran');
+            preConfirm: () => {
+                const uploadImage = document.getElementById('uploadImage').files[0];
+                if (!uploadImage) {
+                    Swal.showValidationMessage('Harap Upload Bukti Pembayaran');
+                    return false;
                 }
-                return paymentMethod;
+                return uploadImage; // Return the file object
             },
         }).then(result => {
             if (result.isConfirmed) {
-                console.log('Metode Pembayaran:', result.value);
+                const formData = new FormData();
+                formData.append('proof_payment', result.value);
+                formData.append('_token', token);
+                formData.append('totalPrice', totalHargaNumeric);
+
                 swalProcess();
                 $.ajax({
                     url: '{{ url('order/payment') }}/' + orderId,
                     type: 'POST',
-                    cache: false,
-                    data: {
-                        _token: token,
-                        payment_method: result.value,
-                        totalPrice: totalHargaNumeric,
-                    },
+                    processData: false, // Important for FormData
+                    contentType: false, // Important for FormData
+                    data: formData,
                     success: function(data) {
-                        console.log('Success Response:', data);
+                        console.log('Success Response:', data); // Debugging
                         location.reload();
                     },
                     error: function(xhr, error, code) {
-                        console.log('Error:', xhr, error, code);
+                        console.log('Error:', xhr, error, code); // Debugging
                         swalError(error);
                     }
                 });
             }
         });
     }
-
 
     function approveOrder(id) {
         let token = $('meta[name="csrf-token"]').attr('content');
@@ -387,15 +386,24 @@
         });
     }
 
-
-    // function payOrder(id, name) {
-    //     console.log('Order ID:', id); // Debugging
+    // function payOrder(orderId) {
+    //     console.log('Payment Order ID:', orderId);
     //     let token = $('meta[name="csrf-token"]').attr('content');
 
+    //     let totalHarga = $('#totalPrice').text();
+    //     let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
+
+
+
     //     Swal.fire({
-    //         title: `Bukti Pembayaran: ${name}`,
-    //         html: `
-    //         <input type="file" id="uploadImage" class="swal2-file-input" accept="image/*" aria-label="Upload Bukti Pembayaran" style="display: block; margin: 0 auto; width: 100%; padding: 10px ;border: 1px solid #ddd; border-radius: 5px; font-size: 16px; ">`,
+    //         title: 'Pembayaran Paket',
+    //         text: `Total Harga: ${totalHarga}`,
+    //         input: 'select',
+    //         inputOptions: {
+    //             non_tunai: "Non Tunai",
+    //             tunai: "Tunai",
+    //         },
+    //         inputPlaceholder: "Pilih Metode Pembayaran",
     //         showCancelButton: true,
     //         allowOutsideClick: false,
     //         customClass: {
@@ -403,41 +411,41 @@
     //             cancelButton: 'btn btn-danger mb-3',
     //         },
     //         buttonsStyling: false,
-    //         confirmButtonText: 'Upload',
+    //         confirmButtonText: 'Yes',
     //         cancelButtonText: 'Cancel',
-    //         preConfirm: () => {
-    //             const uploadImage = document.getElementById('uploadImage').files[0];
-    //             if (!uploadImage) {
-    //                 Swal.showValidationMessage('Harap Upload Bukti Pembayaran');
-    //                 return false;
+    //         preConfirm: (paymentMethod) => {
+    //             if (!paymentMethod) {
+    //                 Swal.showValidationMessage('Harap pilih metode pembayaran');
     //             }
-    //             return uploadImage; // Return the file object
+    //             return paymentMethod;
     //         },
     //     }).then(result => {
     //         if (result.isConfirmed) {
-    //             const formData = new FormData();
-    //             formData.append('upload_image', result.value);
-    //             formData.append('_token', token);
-
+    //             console.log('Metode Pembayaran:', result.value);
     //             swalProcess();
     //             $.ajax({
-    //                 url: `/order/payment/${id}`,
+    //                 url: '{{ url('order/payment') }}/' + orderId,
     //                 type: 'POST',
-    //                 processData: false, // Important for FormData
-    //                 contentType: false, // Important for FormData
-    //                 data: formData,
+    //                 cache: false,
+    //                 data: {
+    //                     _token: token,
+    //                     payment_method: result.value,
+    //                     totalPrice: totalHargaNumeric,
+    //                 },
     //                 success: function(data) {
-    //                     console.log('Success Response:', data); // Debugging
+    //                     console.log('Success Response:', data);
     //                     location.reload();
     //                 },
     //                 error: function(xhr, error, code) {
-    //                     console.log('Error:', xhr, error, code); // Debugging
+    //                     console.log('Error:', xhr, error, code);
     //                     swalError(error);
     //                 }
     //             });
     //         }
     //     });
     // }
+
+
 
     // function dataTable() {
     //     const url = $('#url_dt').val();

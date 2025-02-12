@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\File;
 
 class OrderController extends Controller
 {
@@ -96,6 +97,11 @@ class OrderController extends Controller
 
                 return $payment;
             })
+            ->addColumn('proof_payment', function ($data) {
+                if (!is_null($data->proof_payment)) {
+                    return '<a href="' . asset($data->proof_payment) . '" target= "_blank"><i class="fas fa-download mr-1"></i> Bukti Pembayaran</a>';
+                }
+            })
             ->addColumn('payment_date', function ($data) {
                 $date = \Carbon\Carbon::parse($data->payment_date)->translatedFormat('d F Y H:i');
                 return $date;
@@ -109,8 +115,8 @@ class OrderController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['user', 'total_price', 'payment_method', 'payment_date', 'action'])
-            ->rawColumns(['total_price', 'action'])
+            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'payment_date', 'action'])
+            ->rawColumns(['total_price', 'proof_payment', 'action'])
             ->make(true);
     }
 
@@ -224,21 +230,47 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         try {
+            $request->validate([
+                'proof_payment' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
             $order = Order::find($id);
             if ($order) {
-                $update_order = Order::where('id', $id)->update([
-                    'status' => 10,
-                    'total_price' => (int) $request->totalPrice,
-                    'payment_method' => $request->payment_method,
-                    'payment_date' => now(),
-                ]);
+                if ($request->hasFile('proof_payment')) {
+                    $path = 'public/order/proof' .  $id;
+                    $path_store = 'storage/order/proof' .  $id;
 
-                if ($update_order) {
-                    DB::commit();
-                    session()->flash('success', 'Berhasil Melakukan Pembayaran Paket');
+                    if (Storage::exists($path)) {
+                        Storage::deleteDirectory($path);
+                    }
+                    Storage::makeDirectory($path);
+                    // Ubah izin folder menjadi 775 setelah membuat folder
+                    $folderPath = storage_path('app/' . $path);
+                    File::chmod($folderPath, 0775);  // Set izin folder menjadi 775
+
+                    $file_name = $id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('proof_payment')->getClientOriginalExtension();
+
+                    $request->file('proof_payment')->storePubliclyAs($path, $file_name);
+
+                    $attachment = $path_store . '/' . $file_name;
+
+                    $update_order = Order::where('id', $id)->update([
+                        'status' => 10,
+                        'total_price' => (int) $request->totalPrice,
+                        'payment_method' => 'non_tunai',
+                        'payment_date' => now(),
+                        'proof_payment' => $attachment
+                    ]);
+
+                    if ($update_order) {
+                        DB::commit();
+                        session()->flash('success', 'Berhasil Melakukan Pembayaran Paket');
+                    } else {
+                        DB::rollBack();
+                        session()->flash('failed', 'Gagal Melakukan Pembayaran Paket');
+                    }
                 } else {
                     DB::rollBack();
-                    session()->flash('failed', 'Gagal Melakukan Pembayaran Paket');
+                    session()->flash('failed', 'Gagal Upload Bukti Pembayaran');
                 }
             } else {
                 session()->flash('failed', 'Tidak Ada Order Yang Ditemukan');
@@ -248,6 +280,7 @@ class OrderController extends Controller
             session()->flash('failed', $e->getMessage());
         }
     }
+
 
     public function approve(string $id)
     {
@@ -384,6 +417,35 @@ class OrderController extends Controller
         }
     }
 
+    // public function payment(Request $request, string $id)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $order = Order::find($id);
+    //         if ($order) {
+    //             $update_order = Order::where('id', $id)->update([
+    //                 'status' => 10,
+    //                 'total_price' => (int) $request->totalPrice,
+    //                 'payment_method' => $request->payment_method,
+    //                 'payment_date' => now(),
+    //             ]);
+
+    //             if ($update_order) {
+    //                 DB::commit();
+    //                 session()->flash('success', 'Berhasil Melakukan Pembayaran Paket');
+    //             } else {
+    //                 DB::rollBack();
+    //                 session()->flash('failed', 'Gagal Melakukan Pembayaran Paket');
+    //             }
+    //         } else {
+    //             session()->flash('failed', 'Tidak Ada Order Yang Ditemukan');
+    //         }
+    //     } catch (Exception $e) {
+    //         Log::error($e->getMessage());
+    //         session()->flash('failed', $e->getMessage());
+    //     }
+    // }
+
     // Ada select untuk jadwal kelas
     // public function dataTable()
     // {
@@ -477,5 +539,6 @@ class OrderController extends Controller
     //     }
     //     return view('order.history');
     // }
+
 
 }
