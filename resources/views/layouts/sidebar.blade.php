@@ -93,6 +93,18 @@
                     </li>
                 @endhasanyrole
 
+                @hasrole('user')
+                    <li class="nav-item {{ $display }}">
+                        <a href="{{ route('order.history') }}"
+                            class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-list-alt"></i>
+                            <p>
+                                Riwayat Order
+                            </p>
+                        </a>
+                    </li>
+                @endhasrole
+
 
                 @hasrole('counselor')
                     <li class="nav-item {{ $display }}">

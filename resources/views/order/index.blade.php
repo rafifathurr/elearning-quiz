@@ -7,6 +7,20 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-md-12">
+                        @hasrole('user')
+                            <div class="callout callout-info">
+                                <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
+                                <p>Silakan lakukan pembayaran ke rekening berikut:</p>
+                                <ul class="list-unstyled m-2">
+                                    <li class="text-primary"><i class="fas fa-credit-card"></i> BRI -<strong>123 456
+                                            7890</strong> (Brata
+                                        Cerdas)</li>
+                                    <li class="text-lightblue"><i class="fas fa-credit-card"></i> Mandiri - <strong>987
+                                            654 3210</strong>
+                                        (Brata Cerdas)</li>
+                                </ul>
+                            </div>
+                        @endhasrole
                         <div class="card  card-lightblue">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">

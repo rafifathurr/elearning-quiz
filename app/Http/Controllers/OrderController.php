@@ -512,33 +512,49 @@ class OrderController extends Controller
 
 
 
-    // public function history(Request $request)
-    // {
+    public function history(Request $request)
+    {
 
-    //     if ($request->ajax()) {
-    //         $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
-    //             $query->where('status', 100)
-    //                 ->orWhere('status', 10);
-    //         })->whereNull('deleted_at')->get();
+        if ($request->ajax()) {
+            $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
+                $query->where('status', 100)
+                    ->orWhere('status', 10)
+                    ->orWhere('status', 1)->whereNotNull('proof_payment');
+            })->whereNull('deleted_at')->get();
 
-    //         return DataTables::of($order)
-    //             ->addIndexColumn()
-    //             ->addColumn('payment_date', function ($data) {
-    //                 return \Carbon\Carbon::parse($data->payment_date)->translatedFormat('l, d F Y');
-    //             })
+            return DataTables::of($order)
+                ->addIndexColumn()
+                ->addColumn('payment_date', function ($data) {
+                    return \Carbon\Carbon::parse($data->payment_date)->translatedFormat('l, d F Y');
+                })
+                ->addColumn('status_payment', function ($data) {
+                    $list_view = '<div align="center">';
+                    if ($data->status == 100) {
+                        $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
+                    } elseif ($data->status == 10) {
+                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                    } else {
+                        $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
+                    }
+                    $list_view .= '</div>';
+                    return $list_view;
+                })
 
-    //             ->addColumn('total_price', function ($data) {
-    //                 return 'Rp.' . number_format($data->total_price, 0, ',', '.');
-    //             })
-    //             ->addColumn('action', function ($data) {
-    //                 return '<button onclick="showDetail(' . $data->id . ')" class="btn btn-sm btn-info my-1 ml-1"><i class="fas fa-eye"></i></button>';
-    //             })
-    //             ->only(['payment_method', 'payment_date', 'total_price', 'action'])
-    //             ->rawColumns(['action', 'payment_date', 'total_price'])
-    //             ->make(true);
-    //     }
-    //     return view('order.history');
-    // }
-
-
+                ->addColumn('total_price', function ($data) {
+                    return 'Rp.' . number_format($data->total_price, 0, ',', '.');
+                })
+                ->addColumn('order_package', function ($data) {
+                    $list_view = '<div align="center">';
+                    foreach ($data->orderPackages->whereNull('deleted_at') as $order) {
+                        $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . $order->package->name . '</span>';
+                    };
+                    $list_view .= '</div>';
+                    return $list_view;
+                })
+                ->only(['status_payment', 'payment_date', 'total_price', 'order_package'])
+                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'order_package'])
+                ->make(true);
+        }
+        return view('order.history');
+    }
 }

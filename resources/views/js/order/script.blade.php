@@ -143,6 +143,38 @@
 
     }
 
+    function history() {
+        try {
+            $('#dt-history').DataTable({
+                responsive: true,
+                autoWidth: false,
+                processing: true,
+                serverSide: true,
+                ajax: $('#url').val(),
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        width: '5%'
+                    },
+                    {
+                        data: 'payment_date'
+                    },
+                    {
+                        data: 'status_payment'
+                    },
+                    {
+                        data: 'order_package'
+                    },
+                    {
+                        data: 'total_price'
+                    },
+
+                ]
+            });
+        } catch (error) {
+            console.error('DataTables Error:', error);
+        }
+    }
 
 
     function checkOut(id, name) {
