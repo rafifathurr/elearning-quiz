@@ -23,15 +23,18 @@
 
     function dataTable() {
         const url = $('#url_dt').val();
-        $('#dt-order').DataTable({
-            responsive: true,
+        const table = $('#dt-order').DataTable({
+            responsive: false, // Responsiveness dimatikan agar footer terlihat
             autoWidth: false,
             processing: true,
             serverSide: true,
+            scrollX: true, // Supaya tidak terpotong saat scroll
+            fixedHeader: {
+                header: true // Menjaga posisi search tetap fixed
+            },
             ajax: {
                 url: url,
                 dataSrc: function(json) {
-                    // Update total price
                     $('#totalPrice').html(json.totalPrice);
                     const orderId = json.data.length > 0 ? json.data[0].order_id : null;
 
@@ -72,10 +75,22 @@
                     defaultContent: '-',
                     orderable: false,
                     searchable: false
-                },
+                }
             ]
         });
+
+        // ✅ Perbaiki header/footer saat resize layar
+        $(window).on('resize', function() {
+            table.columns.adjust().draw();
+            table.fixedHeader.adjust();
+        });
+
+        // ✅ Deteksi perubahan ukuran pada DataTables
+        $('#dt-order').on('responsive-resize.dt', function() {
+            table.columns.adjust().draw();
+        });
     }
+
 
     function dataTableAdmin() {
         const url = $('#url_dt').val();

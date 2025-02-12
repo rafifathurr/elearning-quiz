@@ -63,6 +63,13 @@
         border-radius: 8px;
         font-size: 0.9rem;
     }
+
+    .per-peserta {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: black;
+        /* Warna menarik */
+    }
 </style>
 <ul class="text-center list-unstyled p-2 m-0">
     @forelse ($packages as $package)
@@ -85,14 +92,20 @@
 
                         @if (isset($package->max_member) && $package->max_member > 0)
                             <span class="member-info">
-                                <i class="fas fa-users"></i> {{ $package->max_member }} Peserta
+                                <i class="fas fa-users mr-1"></i>Max: {{ $package->max_member }} Peserta
                             </span>
                         @endif
                     </div>
 
                     <span class="price-badge">
-                        {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
+                        @if ($package->price > 0)
+                            Rp. {{ number_format($package->price, 0, ',', '.') }} <span class="per-peserta">/
+                                Peserta</span>
+                        @else
+                            Gratis
+                        @endif
                     </span>
+
                 </button>
             @else
                 <a href="{{ route('login') }}" class="stylish-button w-full shadow-sm">
@@ -111,13 +124,18 @@
 
                         @if (isset($package->max_member) && $package->max_member > 0)
                             <span class="member-info">
-                                <i class="fas fa-users"></i> {{ $package->max_member }} Peserta
+                                <i class="fas fa-users mr-1"></i>Max: {{ $package->max_member }} Peserta
                             </span>
                         @endif
                     </div>
 
                     <span class="price-badge">
-                        {{ $package->price > 0 ? 'Rp. ' . number_format($package->price, 0, ',', '.') : 'Gratis' }}
+                        @if ($package->price > 0)
+                            Rp. {{ number_format($package->price, 0, ',', '.') }} <span class="per-peserta">/
+                                Peserta</span>
+                        @else
+                            Gratis
+                        @endif
                     </span>
                 </a>
             @endif
