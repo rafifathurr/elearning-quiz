@@ -609,6 +609,12 @@ class OrderController extends Controller
     {
         try {
             $order = Order::find($id);
+
+            if ($order->user_id != Auth::user()->id) {
+                return redirect()
+                    ->back()
+                    ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
+            };
             $order_package = OrderPackage::whereNull('deleted_at')
                 ->where('order_id', $id)
                 ->get();

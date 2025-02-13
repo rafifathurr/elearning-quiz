@@ -342,7 +342,7 @@
                     <i class="fas fa-money-bill-wave"></i> Transfer
                 </button>
                 <button id="btn-briva" class="swal2-confirm btn-lg" 
-                        style="background: #0A3D91; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;">
+                        style="background: #0A3D91; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;" disabled>
                     <i class="fas fa-university"></i> BRIVA
                 </button>
             </div>
