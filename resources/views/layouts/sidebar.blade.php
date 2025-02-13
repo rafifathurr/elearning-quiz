@@ -67,7 +67,29 @@
                     </li>
                 @endhasrole
 
-                @hasanyrole('admin|user|finance')
+                @hasanyrole('admin|finance')
+                    <li class="nav-item {{ $display }}">
+                        <?php
+                        $orderIds = App\Models\Order::whereNull('deleted_at')
+                            ->where('user_id', Auth::user()->id)
+                            ->where('status', 1)
+                            ->pluck('id');
+                        $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                        $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
+                        ?>
+                        <a href="{{ route('order.listOrder') }}"
+                            class="nav-link {{ request()->routeIs('order.index') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shopping-cart"></i>
+                            <p>
+                                Daftar Order <span
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
+
+                            </p>
+                        </a>
+                    </li>
+                @endhasanyrole
+
+                @hasrole('user')
                     <li class="nav-item {{ $display }}">
                         <?php
                         $orderIds = App\Models\Order::whereNull('deleted_at')
@@ -81,19 +103,11 @@
                             class="nav-link {{ request()->routeIs('order.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
-                                @hasrole('admin|finance')
-                                    Daftar Order <span
-                                        class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
-                                @else
-                                    My Order <span
-                                        class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
-                                @endhasrole
+                                My Order <span
+                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
                             </p>
                         </a>
                     </li>
-                @endhasanyrole
-
-                @hasrole('user')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('order.history') }}"
                             class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">

@@ -24,11 +24,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        if (User::find(Auth::user()->id)->hasRole('user')) {
-            $datatable_route = route('order.dataTable');
-        } else {
-            $datatable_route = route('order.dataTable2');
-        }
+        $datatable_route = route('order.dataTable');
         return view('order.index', compact('datatable_route'));
     }
 
@@ -82,7 +78,14 @@ class OrderController extends Controller
             ->make(true);
     }
 
-    public function dataTable2()
+    public function listOrder()
+    {
+        $datatable_route = route('order.dataTable2');
+
+        return view('order.index', compact('datatable_route'));
+    }
+
+    public function dataTableListOrder()
     {
         $order = Order::whereNull('deleted_at')->where('status', 10)->get();
 

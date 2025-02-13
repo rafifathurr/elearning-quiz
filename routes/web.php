@@ -83,6 +83,21 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
 });
 
+//Hanya User
+Route::group(['middleware' => ['role:user']], function () {
+    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        Route::get('index', 'index')->name('index');
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('get-schedule/{id}', 'getSchedule')->name('getSchedule');
+        Route::get('history', 'history')->name('history');
+        Route::get('detail-transfer/{id}', 'detailTransfer')->name('detailTransfer');
+        Route::match(['put', 'patch'], 'upload-payment/{id}', 'uploadPayment')->name('uploadPayment');
+        Route::post('checkout/{id}', 'checkout')->name('checkout');
+        Route::post('payment/{id}', 'payment')->name('payment');
+        Route::delete('delete/{id}', 'destroy')->name('destroy');
+    });
+});
+
 //Admin | User
 Route::group(['middleware' => ['role:admin|user']], function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
@@ -106,16 +121,6 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('review-quiz/{id}', [QuizController::class, 'reviewQuiz'])->name('reviewQuiz');
     });
 
-    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('get-schedule/{id}', 'getSchedule')->name('getSchedule');
-        Route::get('history', 'history')->name('history');
-        Route::get('detail-transfer/{id}', 'detailTransfer')->name('detailTransfer');
-        Route::match(['put', 'patch'], 'upload-payment/{id}', 'uploadPayment')->name('uploadPayment');
-        Route::post('checkout/{id}', 'checkout')->name('checkout');
-        Route::post('payment/{id}', 'payment')->name('payment');
-        Route::delete('delete/{id}', 'destroy')->name('destroy');
-    });
 
     Route::group(['controller' => KecermatanController::class, 'prefix' => 'kecermatan', 'as' => 'kecermatan.'], function () {
         Route::get('play/{quiz}', 'play')->name('play');
@@ -134,7 +139,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
     });
 });
 
-//Admin | User
+//finance | paket manager | question operator | User
 Route::group(['middleware' => ['role:user|finance|counselor|package-manager|question-operator']], function () {
     Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {
         Route::get('/', [UserController::class, 'show'])->name('show');
@@ -142,17 +147,13 @@ Route::group(['middleware' => ['role:user|finance|counselor|package-manager|ques
         Route::match(['put', 'patch'], '{id}', [UserController::class, 'update'])->name('update');
     });
 });
-//Admin | User | Finance
-Route::group(['middleware' => ['role:admin|user|finance']], function () {
-    Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('index', 'index')->name('index');
-    });
-});
+
 
 // Admin | Finance
 Route::group(['middleware' => ['role:admin|finance']], function () {
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
-        Route::get('datatable2', 'dataTable2')->name('dataTable2');
+        Route::get('list-order', 'listOrder')->name('listOrder');
+        Route::get('datatable-list-order', 'dataTableListOrder')->name('dataTableListOrder');
         Route::post('approve/{id}', 'approve')->name('approve');
         Route::post('reject/{id}', 'reject')->name('reject');
     });
