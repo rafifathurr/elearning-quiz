@@ -28,6 +28,26 @@
     @php
         Session::forget('failed');
     @endphp
+@elseif (Session::has('berhasil'))
+    <script type="text/javascript">
+        Swal.fire({
+            icon: 'success',
+            title: '{{ Session::get('berhasil') }}',
+            customClass: {
+                confirmButton: 'btn btn-primary mb-3',
+            },
+            confirmButtonText: "Lihat Paket",
+            buttonsStyling: false,
+            showCloseButton: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ route('order.index') }}";
+            }
+        });
+    </script>
+    @php
+        Session::forget('berhasil');
+    @endphp
 @endif
 <script>
     function swalProcess() {

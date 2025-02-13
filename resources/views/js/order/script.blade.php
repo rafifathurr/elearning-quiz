@@ -31,6 +31,7 @@
     });
 
 
+
     function dataTable() {
         const url = $('#url_dt').val();
         const table = $('#dt-order').DataTable({
@@ -218,7 +219,7 @@
                 }
 
                 Swal.fire({
-                    title: `Checkout Paket: ${name}`,
+                    title: `Ambil Paket: ${name}`,
                     html: scheduleOptions, // Tampilkan select jadwal jika ada
                     icon: 'question',
                     showCancelButton: true,

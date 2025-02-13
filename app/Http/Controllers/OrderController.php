@@ -213,10 +213,10 @@ class OrderController extends Controller
 
             if ($add_order_package) {
                 DB::commit();
-                session()->flash('success', 'Berhasil Checkout Paket');
+                session()->flash('berhasil', 'Berhasil Ambil Paket');
             } else {
                 DB::rollBack();
-                session()->flash('failed', 'Gagal Checkout Paket');
+                session()->flash('failed', 'Gagal Ambil Paket');
             }
         } catch (Exception $e) {
             session()->flash('failed', $e->getMessage());
