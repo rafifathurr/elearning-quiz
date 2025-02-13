@@ -110,6 +110,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('get-schedule/{id}', 'getSchedule')->name('getSchedule');
         Route::get('history', 'history')->name('history');
+        Route::get('detail-transfer/{id}', 'detailTransfer')->name('detailTransfer');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');

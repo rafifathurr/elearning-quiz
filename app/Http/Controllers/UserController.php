@@ -150,7 +150,7 @@ class UserController extends Controller
                         DB::commit();
                         return redirect()
                             ->route('master.user.index')
-                            ->with(['success' => 'Berhasilkan Menambahkan User']);
+                            ->with(['success' => 'Berhasil Menambahkan User']);
                     } else {
                         Mail::to($request->email)->send(new SendOtpMail($otp));
                         DB::commit();

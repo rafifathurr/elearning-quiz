@@ -92,11 +92,6 @@ class OrderController extends Controller
             ->addColumn('total_price', function ($data) {
                 return 'Rp. ' . number_format($data->total_price, 0, ',', '.');
             })
-            ->addColumn('payment_method', function ($data) {
-                $payment = ($data->payment_method == 'non_tunai') ? 'Non Tunai' : 'Tunai';
-
-                return $payment;
-            })
             ->addColumn('proof_payment', function ($data) {
                 if (!is_null($data->proof_payment)) {
                     return '<a href="' . asset($data->proof_payment) . '" target= "_blank"><i class="fas fa-download mr-1"></i> Bukti Pembayaran</a>';
@@ -227,6 +222,49 @@ class OrderController extends Controller
     }
 
     public function payment(Request $request, string $id)
+    {
+        DB::beginTransaction();
+        try {
+            $order = Order::find($id);
+            if ($order) {
+                $update_order = Order::where('id', $id)->update([
+                    'status' => 2,
+                    'total_price' => (int) $request->totalPrice,
+                    'payment_method' => $request->payment_method,
+                    'payment_date' => now()
+                ]);
+
+                if ($update_order) {
+                    DB::commit();
+
+                    // Jika metode pembayaran transfer, arahkan ke detailTransfer
+                    if ($request->payment_method == 'transfer') {
+                        return response()->json([
+                            'success' => true,
+                            'redirect_url' => route('order.detailTransfer', ['id' => $id])
+                        ]);
+                    }
+
+                    // Jika bukan transfer, arahkan ke home atau halaman sukses lainnya
+                    return response()->json([
+                        'success' => true,
+                        'redirect_url' => route('home')
+                    ]);
+                } else {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Gagal Melakukan Pembayaran Paket'], 500);
+                }
+            } else {
+                return response()->json(['success' => false, 'message' => 'Tidak Ada Order Yang Ditemukan'], 404);
+            }
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function uploadPayment(Request $request, string $id)
     {
         DB::beginTransaction();
         try {
@@ -519,6 +557,7 @@ class OrderController extends Controller
             $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
                 $query->where('status', 100)
                     ->orWhere('status', 10)
+                    ->orWhere('status', 2)
                     ->orWhere('status', 1)->whereNotNull('proof_payment');
             })->whereNull('deleted_at')->get();
 
@@ -532,7 +571,9 @@ class OrderController extends Controller
                     if ($data->status == 100) {
                         $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
                     } elseif ($data->status == 10) {
-                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                        $list_view .= '<span class="badge bg-maroon  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                    } elseif ($data->status == 2) {
+                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Pembayaran</span>';
                     } else {
                         $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
                     }
@@ -547,18 +588,39 @@ class OrderController extends Controller
                     $year = \Carbon\Carbon::parse($data->created_at)->format('y'); // Ambil 2 digit terakhir tahun
                     return 'BC' . $year . $data->id;
                 })
-                ->addColumn('order_package', function ($data) {
-                    $list_view = '<div align="center">';
-                    foreach ($data->orderPackages->whereNull('deleted_at') as $order) {
-                        $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . $order->package->name . '</span>';
-                    };
-                    $list_view .= '</div>';
-                    return $list_view;
+                ->addColumn('action', function ($data) {
+                    if ($data->status == 2) {
+                        $btn_action = '<div align="center">';
+                        $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
+                        $btn_action .= '</div>';
+                        return $btn_action;
+                    } else {
+                        return null;
+                    }
                 })
-                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'order_package'])
-                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'order_package'])
+                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
+                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
                 ->make(true);
         }
         return view('order.history');
+    }
+
+    function detailTransfer(string $id)
+    {
+        try {
+            $order = Order::find($id);
+            $order_package = OrderPackage::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
+            $totalPrice = $order_package->sum(function ($data) {
+                return $data->package->price;
+            });
+
+            return view('order.detail-transfer', compact('order', 'order_package', 'totalPrice'));
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with('failed', $e->getMessage());
+        }
     }
 }

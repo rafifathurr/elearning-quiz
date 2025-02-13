@@ -25,8 +25,8 @@
                                                 <th>Order Id</th>
                                                 <th>Tanggal Pembayaran</th>
                                                 <th>Status Pembayaran</th>
-                                                <th>Daftar Paket</th>
                                                 <th>Total Pembayaran</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                     </table>

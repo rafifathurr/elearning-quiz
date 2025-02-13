@@ -8,26 +8,6 @@
                 <div class="row">
                     <div class="col-md-12">
                         @hasrole('user')
-                            <div class="callout callout-info">
-                                <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
-                                <p>Silakan lakukan pembayaran ke rekening berikut:</p>
-
-                                <div class="d-flex flex-wrap align-items-center p-2 bg-white rounded shadow-sm">
-                                    <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" class="img-fluid mr-2"
-                                        style="height: 30px;">
-                                    <span class="fw-bold badge text-white px-3 py-2 mr-2"
-                                        style="background-color: #0A3D91;">Bank BRI</span>
-                                    <div class="d-flex flex-column">
-                                        <strong id="rekening" class="text-dark">038501001542300</strong>
-                                        <small class="text-muted">a.n. ATLAS KAPITAL PERKASA</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary ml-auto" onclick="copyRekening()">
-                                        <i class="fas fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <small class="text-success" id="copy-alert" style="display: none;">Nomor rekening berhasil
-                                    disalin!</small>
-                            </div>
                         @endhasrole
                         <div class="card  card-lightblue">
                             <div class="card-header">

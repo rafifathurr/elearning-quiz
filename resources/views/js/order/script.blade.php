@@ -21,6 +21,16 @@
         });
     });
 
+    $(document).ready(function() {
+        $('#table-detail').DataTable({
+            "paging": false, // Menonaktifkan pagination
+            "info": false, // Menonaktifkan informasi "Showing X of Y entries"
+            "searching": false, // Menonaktifkan kolom pencarian
+            "ordering": false, // (Opsional) Menonaktifkan fitur sorting
+        });
+    });
+
+
     function dataTable() {
         const url = $('#url_dt').val();
         const table = $('#dt-order').DataTable({
@@ -166,10 +176,14 @@
                         data: 'status_payment'
                     },
                     {
-                        data: 'order_package'
+                        data: 'total_price'
                     },
                     {
-                        data: 'total_price'
+                        data: 'action',
+                        width: '20%',
+                        defaultContent: '-',
+                        orderable: false,
+                        searchable: false
                     },
 
                 ]
@@ -310,6 +324,78 @@
     }
 
     function payOrder(orderId) {
+        console.log('Payment Order ID:', orderId);
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        let totalHarga = $('#totalPrice').text();
+        let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
+
+        Swal.fire({
+            title: 'Pembayaran Paket',
+            html: `
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 1.1rem; font-weight: bold;">
+                Total Harga: <span style="color: #d9534f;">${totalHarga}</span>
+            </div>
+            <div style="display: grid; gap: 10px; margin-top: 15px;">
+                <button id="btn-transfer" class="swal2-confirm btn-lg" 
+                        style="background: #007bff; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;">
+                    <i class="fas fa-money-bill-wave"></i> Transfer
+                </button>
+                <button id="btn-briva" class="swal2-confirm btn-lg" 
+                        style="background: #0A3D91; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;">
+                    <i class="fas fa-university"></i> BRIVA
+                </button>
+            </div>
+        `,
+            showCancelButton: true,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            customClass: {
+                cancelButton: 'btn btn-danger btn-lg',
+            },
+            cancelButtonText: 'Batal',
+            didOpen: () => {
+                document.getElementById('btn-transfer').addEventListener('click', function() {
+                    processPayment('transfer');
+                });
+                document.getElementById('btn-briva').addEventListener('click', function() {
+                    processPayment('briva');
+                });
+            }
+        });
+
+        function processPayment(paymentMethod) {
+            swalProcess();
+            $.ajax({
+                url: '{{ url('order/payment') }}/' + orderId,
+                type: 'POST',
+                cache: false,
+                data: {
+                    _token: token,
+                    payment_method: paymentMethod,
+                    totalPrice: totalHargaNumeric,
+                },
+                success: function(data) {
+                    console.log('Success Response:', data);
+
+                    if (data.redirect_url) {
+                        window.location.href = data
+                            .redirect_url; // Arahkan ke URL yang diberikan dari backend
+                    } else {
+                        location.reload();
+                    }
+                },
+
+                error: function(xhr, error, code) {
+                    console.log('Error:', xhr, error, code);
+                    swalError(error);
+                }
+            });
+        }
+    }
+
+
+    function uploadPayment(orderId) {
         console.log('Order ID:', orderId); // Debugging
         let token = $('meta[name="csrf-token"]').attr('content');
         let totalHarga = $('#totalPrice').text();
@@ -436,6 +522,64 @@
         });
     }
 
+    // payOrder input gambar
+    // function payOrder(orderId) {
+    //     console.log('Order ID:', orderId); // Debugging
+    //     let token = $('meta[name="csrf-token"]').attr('content');
+    //     let totalHarga = $('#totalPrice').text();
+    //     let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
+
+    //     Swal.fire({
+    //         title: `Pembayaran Paket Order`,
+    //         text: `Total Harga: ${totalHarga}`,
+    //         html: `
+    //         <input type="file" id="uploadImage" class="swal2-file-input" accept="image/*" aria-label="Upload Bukti Pembayaran" style="display: block; margin: 0 auto; width: 100%; padding: 10px ;border: 1px solid #ddd; border-radius: 5px; font-size: 16px; ">`,
+    //         showCancelButton: true,
+    //         allowOutsideClick: false,
+    //         customClass: {
+    //             confirmButton: 'btn btn-primary mr-2 mb-3',
+    //             cancelButton: 'btn btn-danger mb-3',
+    //         },
+    //         buttonsStyling: false,
+    //         confirmButtonText: 'Upload',
+    //         cancelButtonText: 'Cancel',
+    //         preConfirm: () => {
+    //             const uploadImage = document.getElementById('uploadImage').files[0];
+    //             if (!uploadImage) {
+    //                 Swal.showValidationMessage('Harap Upload Bukti Pembayaran');
+    //                 return false;
+    //             }
+    //             return uploadImage; // Return the file object
+    //         },
+    //     }).then(result => {
+    //         if (result.isConfirmed) {
+    //             const formData = new FormData();
+    //             formData.append('proof_payment', result.value);
+    //             formData.append('_token', token);
+    //             formData.append('totalPrice', totalHargaNumeric);
+
+    //             swalProcess();
+    //             $.ajax({
+    //                 url: '{{ url('order/payment') }}/' + orderId,
+    //                 type: 'POST',
+    //                 processData: false, // Important for FormData
+    //                 contentType: false, // Important for FormData
+    //                 data: formData,
+    //                 success: function(data) {
+    //                     console.log('Success Response:', data); // Debugging
+    //                     location.reload();
+    //                 },
+    //                 error: function(xhr, error, code) {
+    //                     console.log('Error:', xhr, error, code); // Debugging
+    //                     swalError(error);
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
+
+
+    //payOrder lama yang ada input select method pembayaran
     // function payOrder(orderId) {
     //     console.log('Payment Order ID:', orderId);
     //     let token = $('meta[name="csrf-token"]').attr('content');
