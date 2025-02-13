@@ -70,6 +70,12 @@ Route::group(['prefix' => 'account', 'as' => 'account.'], function () {
     Route::post('store', [UserController::class, 'store'])->name('store');
 });
 
+Route::group(['controller' => AuthController::class, 'prefix' => 'password', 'as' => 'password.'], function () {
+    Route::get('forgot-password',  'showForgotPasswordForm')->name('request');
+    Route::post('forgot-password',  'sendResetLinkEmail')->name('email');
+    Route::get('reset-password/{token}',  'showResetForm')->name('reset');
+    Route::post('reset-password',  'resetPassword')->name('update');
+});
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [DashboardController::class, 'index'])->name('home');

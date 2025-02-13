@@ -69,6 +69,11 @@
                             Tidak Punya Akun ? <a href="{{ route('account.create') }}" class="">Daftar Akun</a>
                         </div>
                     </div>
+                    {{-- <div class="row justify-content-center mt-4">
+                        <div class="col-12 text-center">
+                            <a href="{{ route('password.request') }}" class="">Lupa Password</a>
+                        </div>
+                    </div> --}}
                 </div>
                 <!-- /.card-body -->
             </div>

@@ -11,14 +11,19 @@
                             <div class="callout callout-info">
                                 <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
                                 <p>Silakan lakukan pembayaran ke rekening berikut:</p>
-                                <ul class="list-unstyled m-2">
-                                    <li class="text-primary"><i class="fas fa-credit-card"></i> BRI -<strong>123 456
-                                            7890</strong> (Brata
-                                        Cerdas)</li>
-                                    <li class="text-lightblue"><i class="fas fa-credit-card"></i> Mandiri - <strong>987
-                                            654 3210</strong>
-                                        (Brata Cerdas)</li>
-                                </ul>
+
+                                <h6 class="m-2 d-flex align-items-center">
+                                    <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" class="img-fluid mr-2"
+                                        style="height: 25px;">
+                                    <span class="fw-bold badge text-white mr-2" style="background-color: #0A3D91;">Bank
+                                        BRI</span>
+                                    <strong id="rekening" class="mr-2">038501001542300</strong>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="copyRekening()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </h6>
+                                <small class="text-success" id="copy-alert" style="display: none;">Nomor rekening berhasil
+                                    disalin!</small>
                             </div>
                         @endhasrole
                         <div class="card  card-lightblue">
@@ -94,5 +99,15 @@
                 dataTable();
             </script>
         @endrole
+        <script>
+            function copyRekening() {
+                var rekening = document.getElementById("rekening").innerText;
+                navigator.clipboard.writeText(rekening).then(() => {
+                    var alertBox = document.getElementById("copy-alert");
+                    alertBox.style.display = "inline"; // Tampilkan alert
+                    setTimeout(() => alertBox.style.display = "none", 2000); // Hilangkan alert setelah 2 detik
+                });
+            }
+        </script>
     @endpush
 @endsection
