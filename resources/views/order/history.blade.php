@@ -22,6 +22,7 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Order Id</th>
                                                 <th>Tanggal Pembayaran</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Daftar Paket</th>

@@ -543,6 +543,10 @@ class OrderController extends Controller
                 ->addColumn('total_price', function ($data) {
                     return 'Rp.' . number_format($data->total_price, 0, ',', '.');
                 })
+                ->addColumn('order_id', function ($data) {
+                    $year = \Carbon\Carbon::parse($data->created_at)->format('y'); // Ambil 2 digit terakhir tahun
+                    return 'BC' . $year . $data->id;
+                })
                 ->addColumn('order_package', function ($data) {
                     $list_view = '<div align="center">';
                     foreach ($data->orderPackages->whereNull('deleted_at') as $order) {
@@ -551,7 +555,7 @@ class OrderController extends Controller
                     $list_view .= '</div>';
                     return $list_view;
                 })
-                ->only(['status_payment', 'payment_date', 'total_price', 'order_package'])
+                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'order_package'])
                 ->rawColumns(['payment_date', 'status_payment', 'total_price', 'order_package'])
                 ->make(true);
         }

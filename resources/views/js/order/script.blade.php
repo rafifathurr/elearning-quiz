@@ -157,6 +157,9 @@
                         width: '5%'
                     },
                     {
+                        data: 'order_id'
+                    },
+                    {
                         data: 'payment_date'
                     },
                     {
