@@ -30,7 +30,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label" for="email">Nomor Handhphone </label>
+                                <label class="col-sm-3 col-form-label" for="email">Nomor Handphone </label>
                                 <div class="col-sm-9 col-form-label">
                                     {{ $user->phone }}
                                 </div>
@@ -46,11 +46,11 @@
                             </div>
                             <div class="d-flex pt-3 ">
 
-                                @hasrole('user')
+                                @hasrole('admin')
+                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Kembali</a>
+                                @else
                                     <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">Ubah
                                         Password</a>
-                                @else
-                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger mr-2">Kembali</a>
                                 @endhasrole
                             </div>
                         </div>

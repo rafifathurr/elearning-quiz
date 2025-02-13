@@ -133,7 +133,7 @@ Route::group(['middleware' => ['role:admin|user']], function () {
 });
 
 //Admin | User
-Route::group(['middleware' => ['role:user']], function () {
+Route::group(['middleware' => ['role:user|finance|counselor|package-manager|question-operator']], function () {
     Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {
         Route::get('/', [UserController::class, 'show'])->name('show');
         Route::get('edit', [UserController::class, 'edit'])->name('edit');

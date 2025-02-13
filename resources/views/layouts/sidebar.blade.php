@@ -208,6 +208,8 @@
                             </p>
                         </a>
                     </li>
+                @endhasrole
+                @hasanyrole('user|package-manager|question-operator|counselor|finance')
                     <li class="nav-item ">
                         <a href="{{ route('my-account.show') }}"
                             class="nav-link {{ request()->routeIs('my-account.show') ? 'active' : '' }}">
@@ -217,7 +219,7 @@
                             </p>
                         </a>
                     </li>
-                @endhasrole
+                @endhasanyrole
                 <li class="nav-item mb-3">
                     <a href="{{ route('logout') }}" class="nav-link ">
                         <i class="nav-icon fas fa-power-off"></i>
