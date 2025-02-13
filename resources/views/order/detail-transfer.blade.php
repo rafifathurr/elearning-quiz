@@ -128,5 +128,15 @@
     </div>
     @push('javascript-bottom')
         @include('js.order.script')
+        <script>
+            function copyRekening() {
+                var rekening = document.getElementById("rekening").innerText;
+                navigator.clipboard.writeText(rekening).then(() => {
+                    var alertBox = document.getElementById("copy-alert");
+                    alertBox.style.display = "inline"; // Tampilkan alert
+                    setTimeout(() => alertBox.style.display = "none", 2000); // Hilangkan alert setelah 2 detik
+                });
+            }
+        </script>
     @endpush
 @endsection
