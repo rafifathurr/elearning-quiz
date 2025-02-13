@@ -6,16 +6,36 @@
                 <div class="col-12 mt-4">
                     <div class="card card-lightblue">
                         <div class="card-header">
-                            <div class="d-flex  align-items-center">
+                            <div class="d-flex justify-content-between  align-items-center">
                                 <?php
                                 $year = \Carbon\Carbon::parse($order->created_at)->format('y'); ?>
-                                <h3 class="card-title font-weight-bold">Detail Transfer #{{ 'BC' . $year . $order->id }}
+                                <h3 class="card-title font-weight-bold">Order Id #{{ 'BC' . $year . $order->id }}
                                 </h3>
+                                <h3 class="card-title font-weight-bold">
+                                    {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y ') }}</h3>
                             </div>
                         </div>
                         <div class="card-body">
-                            <h3 class="font-weight-bold">Daftar Paket</h3>
-                            <div class="table-responsive py-3">
+                            <h5 class="font-weight-bold">Detail Pemesan</h5>
+                            <div class="alert alert-default-info" role="alert">
+                                <div class="row">
+                                    <h6 class="col-md-3">Nama</h6>
+                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                        {{ $order->user->name }}</h6>
+                                </div>
+                                <div class="row">
+                                    <h6 class="col-md-3">Email</h6>
+                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                        {{ $order->user->email }}</h6>
+                                </div>
+                                <div class="row">
+                                    <h6 class="col-md-3">No Handphone</h6>
+                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                        {{ $order->user->phone }}</h6>
+                                </div>
+                            </div>
+                            <h5 class="font-weight-bold">Detail Pesanan</h5>
+                            <div class="table-responsive py-1">
                                 <table id="table-detail" class="table table-bordered table-hover text-center">
                                     <thead>
                                         <tr>
