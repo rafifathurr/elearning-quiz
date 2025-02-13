@@ -293,25 +293,30 @@ class OrderController extends Controller
 
                     $update_order = Order::where('id', $id)->update([
                         'status' => 10,
-                        'total_price' => (int) $request->totalPrice,
-                        'payment_method' => 'non_tunai',
-                        'payment_date' => now(),
                         'proof_payment' => $attachment
                     ]);
 
                     if ($update_order) {
                         DB::commit();
-                        session()->flash('success', 'Berhasil Melakukan Pembayaran Paket');
+                        return redirect()
+                            ->route('order.history')
+                            ->with(['success' => 'Berhasil Upload Bukti Pembayaran']);
                     } else {
                         DB::rollBack();
-                        session()->flash('failed', 'Gagal Melakukan Pembayaran Paket');
+                        return redirect()
+                            ->back()
+                            ->with(['failed' => 'Gagal Upload Bukti Pembayaran']);
                     }
                 } else {
                     DB::rollBack();
-                    session()->flash('failed', 'Gagal Upload Bukti Pembayaran');
+                    return redirect()
+                        ->back()
+                        ->with(['failed' => 'Gagal Upload Bukti Pembayaran']);
                 }
             } else {
-                session()->flash('failed', 'Tidak Ada Order Yang Ditemukan');
+                return redirect()
+                    ->back()
+                    ->with(['failed' => 'Gagal Upload Bukti Pembayaran']);
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -379,41 +384,10 @@ class OrderController extends Controller
         try {
             $order = Order::findOrFail($id);
 
-            $last_order = Order::where('user_id', $order->user_id)->where('status', 1)->first();
+            $reject_order = $order->update([
+                'status' => 2
+            ]);
 
-            if ($last_order) {
-                $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
-
-                $get_package_in_order = [];
-
-                foreach ($order_package as $item) {
-                    $get_package_in_order[] = [
-                        'package_id' => $item->package_id,
-                        'class' => $item->class,
-                        'current_class' => $item->current_class,
-                        'order_id' => $last_order->id,
-                    ];
-                }
-                $move_package_to_last_order = OrderPackage::insert($get_package_in_order);
-
-                if ($move_package_to_last_order) {
-                    OrderPackage::where('order_id', $id)->delete();
-                    $order_deleted = $order->delete();
-                    if ($order_deleted) {
-                        DB::commit();
-                        session()->flash('success', 'Berhasil Menolak Order');
-                        return;
-                    } else {
-                        throw new Exception('Gagal mengubah status order.');
-                    }
-                } else {
-                    throw new Exception('Gagal mengubah status order.');
-                }
-            } else {
-                $reject_order = $order->update([
-                    'status' => 1
-                ]);
-            }
             if ($reject_order) {
                 DB::commit();
                 session()->flash('success', 'Berhasil Menolak Order');
@@ -455,31 +429,57 @@ class OrderController extends Controller
         }
     }
 
-    // public function payment(Request $request, string $id)
+    // Reject kondisi kalau ada order di my order data yang di reject pindah ke order baru
+    // order yang direject dihapus
+    // public function reject(string $id)
     // {
     //     DB::beginTransaction();
     //     try {
-    //         $order = Order::find($id);
-    //         if ($order) {
-    //             $update_order = Order::where('id', $id)->update([
-    //                 'status' => 10,
-    //                 'total_price' => (int) $request->totalPrice,
-    //                 'payment_method' => $request->payment_method,
-    //                 'payment_date' => now(),
-    //             ]);
+    //         $order = Order::findOrFail($id);
 
-    //             if ($update_order) {
-    //                 DB::commit();
-    //                 session()->flash('success', 'Berhasil Melakukan Pembayaran Paket');
+    //         $last_order = Order::where('user_id', $order->user_id)->where('status', 1)->first();
+
+    //         if ($last_order) {
+    //             $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
+
+    //             $get_package_in_order = [];
+
+    //             foreach ($order_package as $item) {
+    //                 $get_package_in_order[] = [
+    //                     'package_id' => $item->package_id,
+    //                     'class' => $item->class,
+    //                     'current_class' => $item->current_class,
+    //                     'order_id' => $last_order->id,
+    //                 ];
+    //             }
+    //             $move_package_to_last_order = OrderPackage::insert($get_package_in_order);
+
+    //             if ($move_package_to_last_order) {
+    //                 OrderPackage::where('order_id', $id)->delete();
+    //                 $order_deleted = $order->delete();
+    //                 if ($order_deleted) {
+    //                     DB::commit();
+    //                     session()->flash('success', 'Berhasil Menolak Order');
+    //                     return;
+    //                 } else {
+    //                     throw new Exception('Gagal mengubah status order.');
+    //                 }
     //             } else {
-    //                 DB::rollBack();
-    //                 session()->flash('failed', 'Gagal Melakukan Pembayaran Paket');
+    //                 throw new Exception('Gagal mengubah status order.');
     //             }
     //         } else {
-    //             session()->flash('failed', 'Tidak Ada Order Yang Ditemukan');
+    //             $reject_order = $order->update([
+    //                 'status' => 1
+    //             ]);
+    //         }
+    //         if ($reject_order) {
+    //             DB::commit();
+    //             session()->flash('success', 'Berhasil Menolak Order');
+    //         } else {
+    //             throw new Exception('Gagal mengubah status order.');
     //         }
     //     } catch (Exception $e) {
-    //         Log::error($e->getMessage());
+    //         DB::rollBack();
     //         session()->flash('failed', $e->getMessage());
     //     }
     // }

@@ -79,6 +79,28 @@
                         </div>
                         <small class="text-success" id="copy-alert" style="display: none;">Nomor rekening berhasil
                             disalin!</small>
+
+                        <div class="card mt-4 border shadow-sm">
+                            <div class="card-body">
+                                <div class="alert alert-default-info" role="alert">
+                                    <h6 class="alert-heading"> Berita Acara: <strong>"Order Id - Nama"</strong></h6>
+                                </div>
+                                <form action="{{ route('order.uploadPayment', ['id' => $order->id]) }}" method="post"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    @method('patch')
+                                    <div class="form-group row ">
+                                        <label for="proof_payment" class="col-md-4 control-label text-left">Upload Bukti
+                                            Pembayaran <span class="text-danger">*</span></label>
+                                        <input type="file" class="form-control" name="proof_payment" id="proof_payment"
+                                            accept="image/jpeg,image/jpg,image/png" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Kirim
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
