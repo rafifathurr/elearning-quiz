@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InvoiceMail;
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
 use App\Models\Order;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -226,6 +228,9 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::find($id);
+            $order_package = OrderPackage::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
             if ($order) {
                 $update_order = Order::where('id', $id)->update([
                     'status' => 2,
@@ -239,10 +244,13 @@ class OrderController extends Controller
 
                     // Jika metode pembayaran transfer, arahkan ke detailTransfer
                     if ($request->payment_method == 'transfer') {
-                        return response()->json([
-                            'success' => true,
-                            'redirect_url' => route('order.detailTransfer', ['id' => $id])
-                        ]);
+                        $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package));
+                        if ($sendMail) {
+                            return response()->json([
+                                'success' => true,
+                                'redirect_url' => route('order.detailTransfer', ['id' => $id])
+                            ]);
+                        }
                     }
 
                     // Jika bukan transfer, arahkan ke home atau halaman sukses lainnya
