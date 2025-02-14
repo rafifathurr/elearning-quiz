@@ -334,7 +334,10 @@ class OrderController extends Controller
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            session()->flash('failed', $e->getMessage());
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()])
+                ->withInput();
         }
     }
 

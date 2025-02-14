@@ -100,16 +100,23 @@
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             <p>
                                 My Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
+                                    class="badge badge-danger ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
                             </p>
                         </a>
                     </li>
                     <li class="nav-item {{ $display }}">
+                        <?php
+                        $historyOrder = App\Models\Order::whereNull('deleted_at')
+                            ->where('user_id', Auth::user()->id)
+                            ->where('status', 2)
+                            ->count();
+                        ?>
                         <a href="{{ route('order.history') }}"
                             class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-list-alt"></i>
                             <p>
-                                Riwayat Order
+                                Riwayat Order <span
+                                    class="badge badge-danger ml-1 position-absolute">{{ $historyOrder > 0 ? $historyOrder : '' }}</span>
                             </p>
                         </a>
                     </li>
