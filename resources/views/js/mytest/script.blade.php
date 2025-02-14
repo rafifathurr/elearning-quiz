@@ -18,6 +18,10 @@
                     searchable: false
                 },
                 {
+                    data: 'updated_at',
+                    defaultContent: '-'
+                },
+                {
                     data: 'package',
                     defaultContent: '-'
                 },

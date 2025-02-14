@@ -194,6 +194,9 @@ class myTestController extends Controller
 
         return DataTables::of($myTest)
             ->addIndexColumn()
+            ->addColumn('updated_at', function ($data) {
+                return \Carbon\Carbon::parse($data->updated_at)->translatedFormat('d F Y H:i');;
+            })
             ->addColumn('name', function ($data) {
                 return $data->order->user->name;
             })
@@ -226,8 +229,8 @@ class myTestController extends Controller
             })
 
 
-            ->only(['name', 'package', 'quiz', 'type_quiz', 'action'])
-            ->rawColumns(['action'])
+            ->only(['name', 'package', 'quiz', 'type_quiz', 'action', 'updated_at'])
+            ->rawColumns(['action', 'updated_at'])
             ->make(true);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderDetail;
 use App\Models\Result;
 use App\Models\ResultDetail;
 use App\Models\User;
@@ -173,6 +174,9 @@ class AuthController extends Controller
                             $result->update([
                                 'finish_time' => $endTime,
                                 'total_score' => $total_score
+                            ]);
+                            OrderDetail::where('id', $result->order_detail_id)->update([
+                                'updated_at' => now()
                             ]);
                             return redirect()->route('home')->with(['success' => 'Login Berhasil']);
                         }

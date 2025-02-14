@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Quiz;
 use App\Http\Controllers\Controller;
 use App\Mail\FinishMail;
 use App\Models\AspectQuestion;
+use App\Models\OrderDetail;
 use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizAnswer;
@@ -792,6 +793,13 @@ class QuizController extends Controller
                 'finish_time' => now(),
             ]);
 
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $orderDetailId = Result::where('id', $request->resultId)->pluck('order_detail_id');
+
+                OrderDetail::where('id', $orderDetailId)->update([
+                    'updated_at' => now()
+                ]);
+            }
             // if (User::find(Auth::user()->id)->hasRole('user')) {
             //     $data = [
             //         'result' => $resultData,

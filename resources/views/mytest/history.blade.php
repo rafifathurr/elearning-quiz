@@ -23,6 +23,7 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Waktu Test</th>
                                                 <th>Nama Paket</th>
                                                 <th>Nama Pengguna</th>
                                                 <th>Nama Test</th>

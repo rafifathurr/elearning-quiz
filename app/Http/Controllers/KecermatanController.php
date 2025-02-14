@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\FinishMail;
+use App\Models\OrderDetail;
 use App\Models\Quiz\Quiz;
 use App\Models\Result;
 use App\Models\ResultDetail;
@@ -523,6 +524,13 @@ class KecermatanController extends Controller
                 'total_score' => $totalScore,
                 'finish_time' => now(),
             ]);
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $orderDetailId = Result::where('id', $request->resultId)->pluck('order_detail_id');
+
+                OrderDetail::where('id', $orderDetailId)->update([
+                    'updated_at' => now()
+                ]);
+            }
             // if (User::find(Auth::user()->id)->hasRole('user')) {
             //     $data = [
             //         'result' => $resultData,
