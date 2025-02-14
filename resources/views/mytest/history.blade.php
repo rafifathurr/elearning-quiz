@@ -10,21 +10,23 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card card-lightblue">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">Riwayat
-                                    {{ $detailPackage->quiz->name . '(' . $detailPackage->quiz->type_aspect . ')' . ' | ' . $detailPackage->package->name }}
+                                <h3 class="font-weight-bold">
+                                    Riwayat Test
                                 </h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
-                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-history">
+                                    <table class="table table-bordered table-hover w-100 datatable" id="dt-history-test">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Jumlah Percobaan</th>
-                                                <th>Persentase Skor</th>
+                                                <th>Nama Paket</th>
+                                                <th>Nama Pengguna</th>
+                                                <th>Nama Test</th>
+                                                <th>Tipe Test</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -43,7 +45,7 @@
     @push('javascript-bottom')
         @include('js.mytest.script')
         <script>
-            dataTableHistory();
+            dataTableAdmin();
         </script>
     @endpush
 @endsection

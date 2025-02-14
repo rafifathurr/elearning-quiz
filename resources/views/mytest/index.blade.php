@@ -13,11 +13,7 @@
                         <div class="card card-lightblue">
                             <div class="card-header">
                                 <h3 class="font-weight-bold">
-                                    @hasrole('user')
-                                        My Test
-                                    @else
-                                        Riwayat Test
-                                    @endhasrole
+                                    My Test
                                 </h3>
                             </div>
                             <div class="card-body">
@@ -28,9 +24,6 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
-                                                @hasrole('admin')
-                                                    <th>Nama Pengguna</th>
-                                                @endhasrole
                                                 <th>Nama Test</th>
                                                 <th>Tipe Test</th>
                                                 <th>Action</th>
@@ -50,14 +43,8 @@
     </div>
     @push('javascript-bottom')
         @include('js.mytest.script')
-        @hasrole('admin')
-            <script>
-                dataTableAdmin();
-            </script>
-        @else
-            <script>
-                dataTable();
-            </script>
-            @endif
-        @endpush
-    @endsection
+        <script>
+            dataTable();
+        </script>
+    @endpush
+@endsection

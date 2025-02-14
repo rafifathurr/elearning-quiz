@@ -1,7 +1,7 @@
 <script type="text/javascript">
     function dataTableAdmin() {
         const url = $('#url_dt').val();
-        $('#dt-mytest').DataTable({
+        $('#dt-history-test').DataTable({
             responsive: true,
             autoWidth: false,
             processing: true,
@@ -74,45 +74,6 @@
                 },
                 {
                     data: 'type_quiz',
-                    defaultContent: '-'
-                },
-                {
-                    data: 'action',
-                    width: '20%',
-                    defaultContent: '-',
-                    orderable: false,
-                    searchable: false
-                },
-            ]
-
-        });
-
-    }
-
-    function dataTableHistory() {
-        const url = $('#url_dt').val();
-        $('#dt-history').DataTable({
-            responsive: true,
-            autoWidth: false,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: url,
-                error: function(xhr, error, code) {
-                    swalError(xhr.statusText);
-                }
-            },
-            columns: [{
-                    data: 'DT_RowIndex',
-                    width: '5%',
-                    searchable: false
-                },
-                {
-                    data: 'attempt',
-                    defaultContent: '-'
-                },
-                {
-                    data: 'total_score',
                     defaultContent: '-'
                 },
                 {

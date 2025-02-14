@@ -39,21 +39,17 @@
                     </a>
                 </li>
 
-                @hasanyrole('admin|user|counselor')
+                @hasrole('user')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('mytest.index') }}"
                             class="nav-link {{ request()->routeIs('mytest.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>
                             <p>
-                                @hasrole('user')
-                                    My Test
-                                    @elsehasanyrole('admin|counselor')
-                                    Riwayat Test
-                                @endhasrole
+                                My Test
                             </p>
                         </a>
                     </li>
-                @endhasanyrole
+                @endhasrole
 
                 @hasrole('user')
                     <li class="nav-item {{ $display }}">
@@ -119,6 +115,17 @@
                     </li>
                 @endhasrole
 
+                @hasanyrole('admin|counselor')
+                    <li class="nav-item {{ $display }}">
+                        <a href="{{ route('mytest.history') }}"
+                            class="nav-link {{ request()->routeIs('mytest.history') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>
+                                Riwayat Test
+                            </p>
+                        </a>
+                    </li>
+                @endhasanyrole
 
                 @hasrole('counselor')
                     <li class="nav-item {{ $display }}">
@@ -224,7 +231,7 @@
                     </li>
                 @endhasrole
                 @hasanyrole('user|package-manager|question-operator|counselor|finance')
-                    <li class="nav-item ">
+                    <li class="nav-item {{ $display }}">
                         <a href="{{ route('my-account.show') }}"
                             class="nav-link {{ request()->routeIs('my-account.show') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-user"></i>

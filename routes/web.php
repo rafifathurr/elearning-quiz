@@ -96,6 +96,10 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');
     });
+    Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
+    });
 });
 
 //Admin | User
@@ -159,17 +163,6 @@ Route::group(['middleware' => ['role:admin|finance']], function () {
     });
 });
 
-//Admin | User | Konselor
-Route::group(['middleware' => ['role:admin|user|counselor']], function () {
-    Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
-        Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('index', 'index')->name('index');
-        Route::get('datatable-history', 'dataTableHistory')->name('dataTableHistory');
-        Route::get('history', 'history')->name('history');
-        Route::get('review/{id}', 'review')->name('review');
-        Route::delete('{id}', 'destroy')->name('destroy');
-    });
-});
 
 // Admin | Konselor
 Route::group(['middleware' => ['role:admin|counselor']], function () {
@@ -179,6 +172,12 @@ Route::group(['middleware' => ['role:admin|counselor']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('dateclass', DateClassController::class)->parameters(['dateclass' => 'id']);
+    });
+    Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
+        Route::get('datatable-history', 'dataTableHistory')->name('dataTableHistory');
+        Route::get('history', 'history')->name('history');
+        Route::get('review/{id}', 'review')->name('review');
+        Route::delete('{id}', 'destroy')->name('destroy');
     });
 });
 
