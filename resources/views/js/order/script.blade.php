@@ -229,7 +229,7 @@
                         cancelButton: 'btn btn-danger mb-3',
                     },
                     buttonsStyling: false,
-                    confirmButtonText: 'Checkout',
+                    confirmButtonText: 'Ambil Paket',
                     cancelButtonText: 'Batal',
                     didOpen: () => {
                         // Pastikan dropdown sudah ter-render

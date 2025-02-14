@@ -99,7 +99,10 @@ class OrderController extends Controller
             })
             ->addColumn('proof_payment', function ($data) {
                 if (!is_null($data->proof_payment)) {
-                    return '<a href="' . asset($data->proof_payment) . '" target= "_blank"><i class="fas fa-download mr-1"></i> Bukti Pembayaran</a>';
+                    return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-download mr-1"></i> Bukti Pembayaran</a>';
+
+                    // Tab baru bukan download
+                    // return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-eye mr-1"></i> Lihat Bukti</a>';
                 }
             })
             ->addColumn('payment_date', function ($data) {
@@ -285,8 +288,8 @@ class OrderController extends Controller
             $order = Order::find($id);
             if ($order) {
                 if ($request->hasFile('proof_payment')) {
-                    $path = 'public/order/proof' .  $id;
-                    $path_store = 'storage/order/proof' .  $id;
+                    $path = 'private/order/proof' .  $id;
+                    $path_store = 'order/proof' .  $id;
 
                     if (Storage::exists($path)) {
                         Storage::deleteDirectory($path);
@@ -298,7 +301,7 @@ class OrderController extends Controller
 
                     $file_name = $id . '-' . uniqid() . '-' . strtotime(date('Y-m-d H:i:s')) . '.' . $request->file('proof_payment')->getClientOriginalExtension();
 
-                    $request->file('proof_payment')->storePubliclyAs($path, $file_name);
+                    $request->file('proof_payment')->storeAs($path, $file_name);
 
                     $attachment = $path_store . '/' . $file_name;
 
@@ -333,6 +336,33 @@ class OrderController extends Controller
             Log::error($e->getMessage());
             session()->flash('failed', $e->getMessage());
         }
+    }
+
+    public function downloadProof($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order || !$order->proof_payment) {
+            abort(404);
+        }
+
+        // Cek apakah user memiliki izin untuk melihat bukti pembayaran ini
+        if (!User::find(Auth::user()->id)->hasAnyRole('admin', 'finance')) {
+            abort(403);
+        }
+
+
+        $path = storage_path('app/private/' . $order->proof_payment);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path);
+
+        // Tab baru bukan download
+        // return response()->file($path);
+
     }
 
 
