@@ -160,6 +160,7 @@ Route::group(['middleware' => ['role:admin|finance']], function () {
         Route::get('datatable-list-order', 'dataTableListOrder')->name('dataTableListOrder');
         Route::post('approve/{id}', 'approve')->name('approve');
         Route::post('reject/{id}', 'reject')->name('reject');
+        Route::get('download-payment/{id}',  'downloadProof')->name('downloadPayment');
     });
 });
 

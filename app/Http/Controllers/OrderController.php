@@ -570,7 +570,9 @@ class OrderController extends Controller
                     ->orWhere('status', 10)
                     ->orWhere('status', 2)
                     ->orWhere('status', 1)->whereNotNull('proof_payment');
-            })->whereNull('deleted_at')->get();
+            })->whereNull('deleted_at')
+                ->orderByDesc('created_at')
+                ->get();;
 
             return DataTables::of($order)
                 ->addIndexColumn()
