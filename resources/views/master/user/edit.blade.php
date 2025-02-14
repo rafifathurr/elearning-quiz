@@ -97,7 +97,7 @@
                                     <label for="password">Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror"
                                         id="password" name="password" placeholder="Password" value="{{ old('password') }}"
-                                        @hasrole('user') required @endhasrole>
+                                        @unless (auth()->user()->hasRole('admin')) required @endunless>
 
                                     @error('password')
                                         <div class="alert alert-danger mt-2">
@@ -110,7 +110,8 @@
                                     <label for="re_password">Re Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('re_password') is-invalid @enderror"
                                         id="re_password" name="re_password" placeholder="Re Password"
-                                        value="{{ old('re_password') }}" @hasrole('user') required @endhasrole>
+                                        value="{{ old('re_password') }}"
+                                        @unless (auth()->user()->hasRole('admin')) required @endunless>
 
                                     @error('re_password')
                                         <div class="alert alert-danger mt-2">
