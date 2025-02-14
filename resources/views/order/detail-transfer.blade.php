@@ -103,7 +103,9 @@
                         <div class="card mt-4 border shadow-sm">
                             <div class="card-body">
                                 <div class="alert alert-default-info" role="alert">
-                                    <h6 class="alert-heading"> Berita Acara: <strong>"Order Id - Nama"</strong></h6>
+                                    <h6 class="alert-heading"> Berita:
+                                        <strong>"{{ 'BC' . $year . $order->id . '-' . $order->user->name }}"</strong>
+                                    </h6>
                                 </div>
                                 <form action="{{ route('order.uploadPayment', ['id' => $order->id]) }}" method="post"
                                     enctype="multipart/form-data">

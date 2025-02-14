@@ -67,12 +67,28 @@
                 </tr>
             </tfoot>
         </table>
+        <!-- Informasi Pembayaran -->
+        <h4 style="background: #dc3545; color: #fff; padding: 10px; border-radius: 5px;">Informasi Pembayaran</h4>
+        <p>Silakan lakukan pembayaran ke rekening berikut:</p>
+        <div style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+            <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" style="height: 30px; margin-right: 10px;">
+            <span style="font-weight: bold; background: #0A3D91; color: #fff; padding: 5px 10px; border-radius: 3px;">
+                Bank BRI
+            </span>
+        </div>
+        <p><strong>Nomor Rekening:</strong> 038501001542300 <strong>(ATLAS KAPITAL PERKASA)</strong> </p>
+        <p></p>
+        <p><strong>Berita:</strong> <span
+                style="color: blue; font-weight: bold;">"BC{{ \Carbon\Carbon::parse($order->created_at)->format('y') }}{{ $order->id }}-{{ $order->user->name }}"</span>
+        </p>
+        <p style="color: red; font-size: 12px;">Harap gunakan berita transfer agar pembayaran dapat diverifikasi.</p>
 
         <p style="text-align: center;">Jika ada pertanyaan, silakan hubungi kami.</p>
         <p style="text-align: center;">
-            <a href="{{ route('order.history') }}"
-                style="background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">Cek
-                Riwayat Pesanan</a>
+            <a href="{{ route('order.detailTransfer', ['id' => $order->id]) }}"
+                style="background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                Upload Bukti Pembayaran
+            </a>
         </p>
     </div>
 </body>
