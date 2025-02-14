@@ -79,7 +79,7 @@
         <p><strong>Nomor Rekening:</strong> 038501001542300 <strong>(ATLAS KAPITAL PERKASA)</strong> </p>
         <p></p>
         <p><strong>Berita:</strong> <span
-                style="color: blue; font-weight: bold;">"BC{{ \Carbon\Carbon::parse($order->created_at)->format('y') }}{{ $order->id }}-{{ $order->user->name }}"</span>
+                style="color: blue; font-weight: bold;">"BC{{ \Carbon\Carbon::parse($order->created_at)->format('y') }}{{ $order->id }}"</span>
         </p>
         <p style="color: red; font-size: 12px;">Harap gunakan berita transfer agar pembayaran dapat diverifikasi.</p>
 
