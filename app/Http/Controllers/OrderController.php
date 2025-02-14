@@ -80,9 +80,9 @@ class OrderController extends Controller
 
     public function listOrder()
     {
-        $datatable_route = route('order.dataTable2');
+        $datatable_route = route('order.dataTableListOrder');
 
-        return view('order.index', compact('datatable_route'));
+        return view('order.list-order', compact('datatable_route'));
     }
 
     public function dataTableListOrder()

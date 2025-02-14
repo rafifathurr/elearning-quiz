@@ -78,8 +78,8 @@
                         $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
                         ?>
                         <a href="{{ route('order.listOrder') }}"
-                            class="nav-link {{ request()->routeIs('order.index') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
+                            class="nav-link {{ request()->routeIs('order.listOrder') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shopping-bag"></i>
                             <p>
                                 Daftar Order <span
                                     class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
