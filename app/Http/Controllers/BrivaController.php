@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\BrivaService;
+use App\Services\BrivaServices;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Log;
@@ -11,7 +11,7 @@ class BrivaController extends Controller
 {
     protected $brivaService;
 
-    public function __construct(BrivaService $brivaService)
+    public function __construct(BrivaServices $brivaService)
     {
         $this->brivaService = $brivaService;
     }

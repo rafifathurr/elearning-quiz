@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class BrivaService
+class BrivaServices
 {
     private $clientId;
     private $clientSecret;
