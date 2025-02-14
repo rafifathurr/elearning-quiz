@@ -103,11 +103,21 @@
 
                             <div class="card mt-4 border shadow-sm">
                                 <div class="card-body">
-                                    <div class="alert alert-default-info" role="alert">
+                                    <div class="alert alert-default-info d-flex">
                                         <h6 class="alert-heading"> Berita:
-                                            <strong>"{{ 'BC' . $year . $order->id . '-' . $order->user->name }}"</strong>
+                                            <strong>"
+                                                <strong id="berita">{{ 'BC' . $year . $order->id }}</strong>"
+                                            </strong>
                                         </h6>
+                                        <button class="btn btn-sm btn-outline-primary mx-2" onclick="copyBerita()">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                        <small class="text-success font-weight-bolder" id="copy-berita-alert"
+                                            style="display: none;">Berita
+                                            berhasil
+                                            disalin!</small>
                                     </div>
+
                                     <form action="{{ route('order.uploadPayment', ['id' => $order->id]) }}" method="post"
                                         enctype="multipart/form-data">
                                         @csrf
@@ -140,6 +150,15 @@
                     var alertBox = document.getElementById("copy-alert");
                     alertBox.style.display = "inline"; // Tampilkan alert
                     setTimeout(() => alertBox.style.display = "none", 2000); // Hilangkan alert setelah 2 detik
+                });
+            }
+
+            function copyBerita() {
+                var berita = document.getElementById("berita").innerText;
+                navigator.clipboard.writeText(berita).then(() => {
+                    var beritaBox = document.getElementById("copy-berita-alert");
+                    beritaBox.style.display = "inline";
+                    setTimeout(() => beritaBox.style.display = "none", 2000);
                 });
             }
         </script>

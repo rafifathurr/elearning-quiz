@@ -337,6 +337,7 @@
             <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 1.1rem; font-weight: bold;">
                 Total Harga: <span style="color: #d9534f;">${totalHarga}</span>
             </div>
+            <p style="font-weight: bold;margin-top: 0.2rem;">Pilih Metode Pembayaran </p>
             <div style="display: grid; gap: 10px; margin-top: 15px;">
                 <button id="btn-transfer" class="swal2-confirm btn-lg" 
                         style="background: #007bff; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;">
@@ -357,7 +358,17 @@
             cancelButtonText: 'Batal',
             didOpen: () => {
                 document.getElementById('btn-transfer').addEventListener('click', function() {
-                    processPayment('transfer');
+                    Swal.fire({
+                        title: 'Konfirmasi Pembayaran',
+                        text: 'Anda memilih metode pembayaran Transfer.',
+                        icon: 'info',
+                        showCloseButton: true,
+                        confirmButtonText: 'Lanjutkan'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            processPayment('transfer');
+                        }
+                    });
                 });
                 document.getElementById('btn-briva').addEventListener('click', function() {
                     processPayment('briva');
