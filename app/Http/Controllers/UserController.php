@@ -257,8 +257,8 @@ class UserController extends Controller
                 $user = User::findOrFail($id);
                 if ($request->filled('password')) {
                     $updateData['password'] = bcrypt($request->password);
+                    $user->update($updateData);
                 }
-                $user->update($updateData);
                 DB::commit();
 
                 return redirect()
@@ -304,18 +304,19 @@ class UserController extends Controller
 
             $user = User::find($id);
 
-            if (!is_null($user)) {
-
-                $user_deleted = User::where('id', $id)->update([
-                    'deleted_at' => date('Y-m-d H:i:s')
-                ]);
-                if ($user_deleted) {
-                    DB::commit();
-                    session()->flash('success', 'Berhasil Hapus Data User');
-                } else {
-                    DB::rollBack();
-                    session()->flash('failed', 'Gagal Hapus Data User');
-                }
+            if (!$user) {
+                session()->flash('failed', 'User Tidak Ditemukan');
+            }
+            $user_deleted = User::where('id', $id)->update([
+                'deleted_at' => date('Y-m-d H:i:s'),
+                'email' => 'brata' . now()->timestamp . $user->id . '@bcbratacerdas.com'
+            ]);
+            if ($user_deleted) {
+                DB::commit();
+                session()->flash('success', 'Berhasil Hapus Data User');
+            } else {
+                DB::rollBack();
+                session()->flash('failed', 'Gagal Hapus Data User');
             }
         } catch (Exception $e) {
             return redirect()
