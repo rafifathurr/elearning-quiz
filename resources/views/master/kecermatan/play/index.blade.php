@@ -62,6 +62,10 @@
 
 
             function answerKecermatan(element) {
+                if (durasi <= 1) {
+                    console.log("Waktu hampir habis, jawaban tidak dikirim.");
+                    return;
+                }
                 let selectedAnswer = $(element).find('input[name="answer_list"]').val();
                 let resultId = $('#result_id').val();
                 let token = $('meta[name="csrf-token"]').attr('content');
@@ -283,10 +287,13 @@
 
                     durasi--;
                 } else {
+                    clearInterval(intervalWaktu);
+                    localStorage.removeItem('waktuSisa');
+
                     Swal.fire({
                         icon: 'info',
-                        title: 'Berpindah ke kombinasi berikutnya',
-                        text: `Anda akan diarahkan ke kombinasi berikutnya.`,
+                        title: 'Waktu habis!',
+                        text: 'Berpindah ke kombinasi berikutnya.',
                         toast: false,
                         position: 'center',
                         showConfirmButton: false,
@@ -295,10 +302,9 @@
                         allowEnterKey: false,
                         timer: 1000,
                         timerProgressBar: true,
+                    }).then(() => {
+                        moveNextCombination();
                     });
-                    clearInterval(intervalWaktu);
-                    moveNextCombination();
-                    localStorage.removeItem('waktuSisa');
                 }
             }
 
