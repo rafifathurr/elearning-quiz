@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\Quiz\QuizController;
 use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
-use App\Http\Controllers\BRIVAController;
+use App\Http\Controllers\BrivaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DateClassController;
 use App\Http\Controllers\KecermatanController;
@@ -41,8 +41,8 @@ use Laravel\Socialite\Facades\Socialite;
 */
 
 //tes briva
-Route::post('/briva/inquiry', [BRIVAController::class, 'inquiry']);
-Route::post('/briva/payment', [BRIVAController::class, 'payment']);
+Route::post('/briva/inquiry', [BrivaController::class, 'inquiry']);
+Route::post('/briva/payment', [BrivaController::class, 'payment']);
 
 //Google Login
 Route::get('/auth/google', [AuthController::class, 'redirect']);

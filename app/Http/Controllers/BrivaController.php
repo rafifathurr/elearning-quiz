@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\BRIVAService;
 use Illuminate\Support\Facades\Log;
 
-class BRIVAController extends Controller
+class BrivaController extends Controller
 {
     protected $brivaService;
 
