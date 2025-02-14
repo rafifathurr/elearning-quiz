@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Quiz\QuizController;
 use App\Http\Controllers\PaymentPackageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AspectQuestionController;
+use App\Http\Controllers\BRIVAController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DateClassController;
 use App\Http\Controllers\KecermatanController;
@@ -38,6 +39,10 @@ use Laravel\Socialite\Facades\Socialite;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+//tes briva
+Route::post('/briva/inquiry', [BRIVAController::class, 'inquiry']);
+Route::post('/briva/payment', [BRIVAController::class, 'payment']);
 
 //Google Login
 Route::get('/auth/google', [AuthController::class, 'redirect']);
