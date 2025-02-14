@@ -331,9 +331,10 @@
         let totalHarga = $('#totalPrice').text();
         let totalHargaNumeric = parseFloat(totalHarga.replace('Rp. ', '').replace(/,/g, '').replace(/\./g, ''));
 
-        Swal.fire({
-            title: 'Pembayaran Paket',
-            html: `
+        function showPaymentOptions() {
+            Swal.fire({
+                title: 'Pembayaran Paket',
+                html: `
             <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 1.1rem; font-weight: bold;">
                 Total Harga: <span style="color: #d9534f;">${totalHarga}</span>
             </div>
@@ -349,32 +350,38 @@
                 </button>
             </div>
         `,
-            showCancelButton: true,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            customClass: {
-                cancelButton: 'btn btn-danger btn-lg',
-            },
-            cancelButtonText: 'Batal',
-            didOpen: () => {
-                document.getElementById('btn-transfer').addEventListener('click', function() {
-                    Swal.fire({
-                        title: 'Konfirmasi Pembayaran',
-                        text: 'Anda memilih metode pembayaran Transfer.',
-                        icon: 'info',
-                        showCloseButton: true,
-                        confirmButtonText: 'Lanjutkan'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            processPayment('transfer');
-                        }
+                showCancelButton: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                customClass: {
+                    cancelButton: 'btn btn-danger btn-lg',
+                },
+                cancelButtonText: 'Batal',
+                didOpen: () => {
+                    document.getElementById('btn-transfer').addEventListener('click', function() {
+                        Swal.fire({
+                            title: 'Konfirmasi Pembayaran',
+                            text: 'Anda memilih metode pembayaran Transfer.',
+                            icon: 'info',
+                            showCloseButton: true,
+                            confirmButtonText: 'Lanjutkan',
+                            cancelButtonText: 'Kembali'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                processPayment('transfer');
+                            } else {
+                                showPaymentOptions
+                                    (); // Munculkan kembali pilihan pembayaran jika batal
+                            }
+                        });
                     });
-                });
-                document.getElementById('btn-briva').addEventListener('click', function() {
-                    processPayment('briva');
-                });
-            }
-        });
+
+                    document.getElementById('btn-briva').addEventListener('click', function() {
+                        processPayment('briva');
+                    });
+                }
+            });
+        }
 
         function processPayment(paymentMethod) {
             swalProcess();
@@ -389,22 +396,22 @@
                 },
                 success: function(data) {
                     console.log('Success Response:', data);
-
                     if (data.redirect_url) {
-                        window.location.href = data
-                            .redirect_url; // Arahkan ke URL yang diberikan dari backend
+                        window.location.href = data.redirect_url;
                     } else {
                         location.reload();
                     }
                 },
-
                 error: function(xhr, error, code) {
                     console.log('Error:', xhr, error, code);
                     swalError(error);
                 }
             });
         }
+
+        showPaymentOptions(); // Panggil fungsi untuk menampilkan popup pilihan pembayaran
     }
+
 
 
     function uploadPayment(orderId) {
