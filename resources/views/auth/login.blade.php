@@ -44,7 +44,7 @@
                                     <a href="javascript:;"
                                         class="input-group-text bg-transparent border-left-0 @error('password') border-danger @enderror"
                                         onclick="togglePasswordVisibility()">
-                                        <i class='fas fa-eye text-secondary' id="password-icon"></i>
+                                        <i class='fas fa-eye text-secondary' style=" opacity: 0.3;" id="password-icon"></i>
                                     </a>
                                     <div class="input-group-text">
                                         <span class="fas fa-lock"></span>
