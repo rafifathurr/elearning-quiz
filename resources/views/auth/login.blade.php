@@ -37,9 +37,15 @@
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror" placeholder="Password">
+                                <input type="password" name="password" id="password"
+                                    class="form-control border-right-0 @error('password') is-invalid @enderror"
+                                    placeholder="Password">
                                 <div class="input-group-append">
+                                    <a href="javascript:;"
+                                        class="input-group-text bg-transparent border-left-0 @error('password') border-danger @enderror"
+                                        onclick="togglePasswordVisibility()">
+                                        <i class='fas fa-eye text-secondary' id="password-icon"></i>
+                                    </a>
                                     <div class="input-group-text">
                                         <span class="fas fa-lock"></span>
                                     </div>
@@ -92,6 +98,21 @@
                 // Kirim form setelah menghapus remainingTime
                 this.closest('form').submit(); // Menyubmit form
             });
+
+            function togglePasswordVisibility() {
+                const passwordField = document.getElementById('password');
+                const passwordIcon = document.getElementById('password-icon');
+
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    passwordIcon.classList.remove('fa-eye');
+                    passwordIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    passwordIcon.classList.add('fa-eye');
+                    passwordIcon.classList.remove('fa-eye-slash');
+                }
+            }
         </script>
     @endpush
 @endsection
