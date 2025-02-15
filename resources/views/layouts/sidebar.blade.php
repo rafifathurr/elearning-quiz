@@ -93,6 +93,7 @@
                         if (App\Models\User::find(Auth::user()->id)->hasRole('user')) {
                             $orderIds = App\Models\Order::whereNull('deleted_at')
                                 ->where('user_id', Auth::user()->id)
+                                ->whereNull('order_by')
                                 ->where('status', 1)
                                 ->pluck('id');
                         } else {
