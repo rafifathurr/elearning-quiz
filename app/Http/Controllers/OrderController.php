@@ -25,7 +25,11 @@ class OrderController extends Controller
     public function index()
     {
         $datatable_route = route('order.dataTable');
-        return view('order.index', compact('datatable_route'));
+        $orderFor = Order::whereNull('deleted_at')
+            ->where('order_by', Auth::user()->id)
+            ->where('status', 1)
+            ->first();
+        return view('order.index', compact('datatable_route', 'orderFor'));
     }
 
     public function dataTable()

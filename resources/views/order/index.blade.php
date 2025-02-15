@@ -9,9 +9,15 @@
                     <div class="col-md-12">
                         <div class="card  card-lightblue">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">
-                                    My Order
-                                </h3>
+                                @hasrole('user')
+                                    <h3 class="font-weight-bold">
+                                        My Order
+                                    </h3>
+                                @else
+                                    <h3 class="font-weight-bold">
+                                        Order Untuk {{ $orderFor->user->name }}
+                                    </h3>
+                                @endhasrole
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
