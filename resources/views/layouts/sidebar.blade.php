@@ -159,7 +159,8 @@
                 @endhasanyrole
 
                 @hasanyrole('admin|package-manager|question-operator')
-                    @hasrole('admin')
+
+                    @hasanyrole('admin|question-operator')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('admin.quiz.index') }}"
                                 class="nav-link {{ request()->routeIs('admin.quiz.index') ? 'active' : '' }}">
@@ -169,9 +170,6 @@
                                 </p>
                             </a>
                         </li>
-                    @endhasrole
-
-                    @hasanyrole('admin|question-operator')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.aspect.index') }}"
                                 class="nav-link {{ request()->routeIs('master.aspect.index') ? 'active' : '' }}">

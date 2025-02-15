@@ -18,12 +18,12 @@
                                         </h5>
                                         <div class="d-flex pt-3 justify-content-center">
                                             <div class="mx-2">
-                                                @if (auth()->user()->hasRole('admin'))
-                                                    <a href="{{ route('admin.quiz.index') }}" class="btn btn-lg btn-danger">
+                                                @if (auth()->user()->hasRole('user'))
+                                                    <a href="{{ url()->previous() }}" class="btn btn-lg btn-danger">
                                                         <i class="fas fa-arrow-left mr-2"></i>Kembali
                                                     </a>
-                                                @elseif (auth()->user()->hasRole('user'))
-                                                    <a href="{{ url()->previous() }}" class="btn btn-lg btn-danger">
+                                                @else
+                                                    <a href="{{ route('admin.quiz.index') }}" class="btn btn-lg btn-danger">
                                                         <i class="fas fa-arrow-left mr-2"></i>Kembali
                                                     </a>
                                                 @endif
