@@ -140,6 +140,15 @@ class OrderController extends Controller
         return response()->json(['schedules' => $schedules]);
     }
 
+    public function getUser()
+    {
+        $users = User::whereNull('deleted_at')->whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })->get();
+
+        return response()->json(['users' => $users]);
+    }
+
 
     public function checkout(Request $request, string $id)
     {
@@ -207,6 +216,86 @@ class OrderController extends Controller
                 $new_order = Order::lockforUpdate()->create([
                     'status' => 1,
                     'user_id' => $user_id,
+                ]);
+                $add_order_package = OrderPackage::lockforUpdate()->create([
+                    'package_id' => $id,
+                    'order_id' => $new_order->id,
+                    'class' => $package->class,
+                    'current_class' => 0,
+                    'date_class_id' => $schedule_id
+                ]);
+            }
+
+            if ($add_order_package) {
+                DB::commit();
+                session()->flash('berhasil', 'Berhasil Ambil Paket');
+            } else {
+                DB::rollBack();
+                session()->flash('failed', 'Gagal Ambil Paket');
+            }
+        } catch (Exception $e) {
+            session()->flash('failed', $e->getMessage());
+        }
+    }
+
+    public function checkoutCounselor(Request $request, string $id)
+    {
+        DB::beginTransaction();
+        try {
+
+            $counselor_id = Auth::user()->id;
+            $package  = Package::find($id);
+            $schedule_id = $request->input('schedule_id');
+            $user_id = $request->input('user_id');
+            $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
+            $user_id = (!empty($user_id) && $user_id != '0') ? intval($user_id) : null;
+
+            Log::info('schedule id: ' . $schedule_id);
+            Log::info('User id: ' . $user_id);
+
+
+
+
+            $orderPackageId = OrderPackage::whereHas('order', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id)
+                    ->where('status', 100);
+            })
+                ->whereNull('deleted_at')
+                ->where('class', '>', 0)
+                ->where('package_id', $id)
+                ->pluck('id');
+
+
+            if (!is_null($package->class)) {
+                if (!is_null($orderPackageId) && $orderPackageId->isNotEmpty()) {
+                    $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
+                    $on_going_class = ClassPackage::whereIn('id', $classId)
+                        ->whereColumn('current_meeting', '<', 'total_meeting')
+                        ->exists();
+
+                    if ($on_going_class) {
+                        DB::rollBack();
+                        session()->flash('failed', 'Kelas sedang berjalan. Selesaikan kelas Anda terlebih dahulu.');
+                        return;
+                    }
+                }
+            }
+
+            $exist_order = Order::where('user_id',  $user_id)->where('order_by',  $counselor_id)->where('status', 1)->first();
+            if ($exist_order) {
+
+                $add_order_package = OrderPackage::lockforUpdate()->create([
+                    'package_id' => $id,
+                    'order_id' => $exist_order->id,
+                    'class' => $package->class,
+                    'current_class' => 0,
+                    'date_class_id' => $schedule_id
+                ]);
+            } else {
+                $new_order = Order::lockforUpdate()->create([
+                    'status' => 1,
+                    'user_id' => $user_id,
+                    'order_by' => $counselor_id,
                 ]);
                 $add_order_package = OrderPackage::lockforUpdate()->create([
                     'package_id' => $id,

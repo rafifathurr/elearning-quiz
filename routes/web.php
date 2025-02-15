@@ -100,12 +100,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
 });
 
+//Order User Konselor
+Route::group(['middleware' => ['role:user|counselor']], function () {
 
-//Hanya User
-Route::group(['middleware' => ['role:user']], function () {
-
-    //Order User
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
+        //Order User
         Route::get('index', 'index')->name('index');
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('get-schedule/{id}', 'getSchedule')->name('getSchedule');
@@ -115,7 +114,17 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');
+
+        Route::get('get-users', 'getUser')->name('getUser');
+        Route::post('checkout-counselor/{id}', 'checkoutCounselor')->name('checkoutCounselor');
     });
+});
+
+
+//Hanya User
+Route::group(['middleware' => ['role:user']], function () {
+
+
 
     //Daftar Test User
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {

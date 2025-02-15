@@ -541,6 +541,118 @@
         });
     }
 
+    function checkOutCounselor(id, name) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        // Ambil daftar user dan jadwal kelas
+        $.ajax({
+            url: '{{ url('order/get-users') }}', // Ganti dengan endpoint yang sesuai
+            type: 'GET',
+            success: function(usersResponse) {
+                $.ajax({
+                    url: '{{ url('order/get-schedule') }}/' + id,
+                    type: 'GET',
+                    success: function(scheduleResponse) {
+                        let userOptions =
+                            '<select class="form-control mb-3" id="selected_user" required>';
+                        userOptions += '<option value="" disabled selected>Pilih User</option>';
+                        usersResponse.users.forEach(user => {
+                            userOptions +=
+                                `<option value="${user.id}">${user.name}</option>`;
+                        });
+                        userOptions += '</select>';
+
+                        let scheduleOptions = '';
+                        if (scheduleResponse.schedules.length > 0) {
+                            scheduleOptions =
+                                '<select class="form-control mb-3" id="selected_schedule" required>';
+                            scheduleOptions +=
+                                '<option value="" disabled selected>Pilih Jadwal Kelas</option>';
+                            scheduleResponse.schedules.forEach(schedule => {
+                                scheduleOptions +=
+                                    `<option value="${schedule.id}">${schedule.name}</option>`;
+                            });
+                            scheduleOptions += '</select>';
+                        }
+
+                        Swal.fire({
+                            title: `Ambil Paket: ${name}`,
+                            html: userOptions +
+                                scheduleOptions, // Tambahkan pilihan user dan jadwal
+                            icon: 'question',
+                            showCancelButton: true,
+                            allowOutsideClick: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary mr-2 mb-3',
+                                cancelButton: 'btn btn-danger mb-3',
+                            },
+                            buttonsStyling: false,
+                            confirmButtonText: 'Ambil Paket',
+                            cancelButtonText: 'Batal',
+                            didOpen: () => {
+                                console.log('Dropdown Loaded:', $('#selected_user')
+                                    .length, $('#selected_schedule').length);
+                            },
+                            preConfirm: () => {
+                                const selectedUser = $('#selected_user').val();
+                                const selectedSchedule = $('#selected_schedule')
+                                    .val();
+
+                                if (!selectedUser) {
+                                    Swal.showValidationMessage(
+                                        'Pilih user terlebih dahulu!');
+                                    return false;
+                                }
+                                if (scheduleResponse.schedules.length > 0 && !
+                                    selectedSchedule) {
+                                    Swal.showValidationMessage(
+                                        'Pilih jadwal terlebih dahulu!');
+                                    return false;
+                                }
+
+                                return {
+                                    userId: parseInt(selectedUser),
+                                    scheduleId: selectedSchedule ? parseInt(
+                                        selectedSchedule) : null
+                                };
+                            }
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: '{{ url('order/checkout-counselor') }}/' +
+                                        id,
+                                    type: 'POST',
+                                    data: {
+                                        _token: token,
+                                        user_id: result.value.userId,
+                                        schedule_id: result.value.scheduleId
+                                    },
+                                    success: function(data) {
+                                        console.log('Success Response:',
+                                            data);
+                                        location.reload();
+                                    },
+                                    error: function(xhr, error, code) {
+                                        console.log('Error:', xhr, error,
+                                            code);
+                                        swalError(error);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    error: function() {
+                        Swal.fire('Gagal', 'Tidak dapat memuat jadwal.', 'error');
+                    }
+                });
+            },
+            error: function() {
+                Swal.fire('Gagal', 'Tidak dapat memuat daftar user.', 'error');
+            }
+        });
+    }
+
+
     // payOrder input gambar
     // function payOrder(orderId) {
     //     console.log('Order ID:', orderId); // Debugging
