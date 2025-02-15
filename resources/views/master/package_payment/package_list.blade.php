@@ -85,8 +85,8 @@
     @forelse ($packages as $package)
         <li class="mb-3">
             @if (Auth::check())
-                @hasrole('user')
-                    <button onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
+                @hasrole('counselor')
+                    <button onclick="checkOutCounselor({{ $package->id }}, '{{ $package->name }}')"
                         class="stylish-button w-100 shadow-sm">
                         <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
                         @if (isset($package->class) && $package->class > 0)
@@ -125,7 +125,7 @@
 
                     </button>
                 @else
-                    <button onclick="checkOutCounselor({{ $package->id }}, '{{ $package->name }}')"
+                    <button onclick="checkOut({{ $package->id }}, '{{ $package->name }}')"
                         class="stylish-button w-100 shadow-sm">
                         <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
                         @if (isset($package->class) && $package->class > 0)
