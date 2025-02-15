@@ -34,11 +34,16 @@ class OrderController extends Controller
 
     public function dataTable()
     {
-        if (User::find(Auth::user()->id)->hasRole('user')) {
+        if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
             $order_ids = Order::whereNull('deleted_at')
                 ->where('user_id', Auth::user()->id)
                 ->where('status', 1)
                 ->whereNull('order_by')
+                ->pluck('id');
+        } elseif (User::find(Auth::user()->id)->hasAllRoles(['counselor', 'user'])) {
+            $order_ids = Order::whereNull('deleted_at')
+                ->where('order_by', Auth::user()->id)
+                ->where('status', 1)
                 ->pluck('id');
         } else {
             $order_ids = Order::whereNull('deleted_at')
@@ -359,7 +364,7 @@ class OrderController extends Controller
 
                     // Jika metode pembayaran transfer, arahkan ke detailTransfer
                     if ($request->payment_method == 'transfer') {
-                        if (User::find(Auth::user()->id)->hasRole('user')) {
+                        if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
                             $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
                         } else {
                             $sendMail = Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
@@ -590,7 +595,7 @@ class OrderController extends Controller
     {
 
         if ($request->ajax()) {
-            if (User::find(Auth::user()->id)->hasRole('user')) {
+            if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
                 $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
                     $query->where('status', 100)
                         ->orWhere('status', 10)
@@ -660,7 +665,7 @@ class OrderController extends Controller
     {
         try {
             $order = Order::find($id);
-            if (User::find(Auth::user()->id)->hasRole('user')) {
+            if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
                 if ($order->user_id != Auth::user()->id) {
                     return redirect()
                         ->back()

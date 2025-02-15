@@ -9,15 +9,22 @@
                     <div class="col-md-12">
                         <div class="card  card-lightblue">
                             <div class="card-header">
-                                @hasrole('user')
+                                @hasrole('counselor')
+                                    @if (!is_null($orderFor))
+                                        <h3 class="font-weight-bold">
+                                            Order Untuk {{ $orderFor->user->name }}
+                                        </h3>
+                                    @else
+                                        <h3 class="font-weight-bold">
+                                            My Order
+                                        </h3>
+                                    @endif
+                                @else
                                     <h3 class="font-weight-bold">
                                         My Order
                                     </h3>
-                                @else
-                                    <h3 class="font-weight-bold">
-                                        Order Untuk {{ $orderFor->user->name }}
-                                    </h3>
                                 @endhasrole
+
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">

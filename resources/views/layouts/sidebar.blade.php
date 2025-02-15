@@ -90,19 +90,22 @@
                 @hasanyrole('user|counselor')
                     <li class="nav-item {{ $display }}">
                         <?php
-                        if (App\Models\User::find(Auth::user()->id)->hasRole('user')) {
-                            $orderIds = App\Models\Order::whereNull('deleted_at')
-                                ->where('user_id', Auth::user()->id)
-                                ->whereNull('order_by')
-                                ->where('status', 1)
-                                ->pluck('id');
+                        $user = Auth::user(); // Simpan instance user
+                        
+                        // Cek peran pengguna
+                        $isUser = $user->hasRole('user');
+                        $isCounselor = $user->hasRole('counselor');
+                        
+                        if ($isUser && !$isCounselor) {
+                            // Jika hanya 'user' tanpa 'counselor'
+                            $orderIds = App\Models\Order::whereNull('deleted_at')->where('user_id', $user->id)->whereNull('order_by')->where('status', 1)->pluck('id');
                         } else {
-                            $orderIds = App\Models\Order::whereNull('deleted_at')
-                                ->where('order_by', Auth::user()->id)
-                                ->where('status', 1)
-                                ->pluck('id');
+                            // Jika 'counselor' atau memiliki kedua role 'user' dan 'counselor'
+                            $orderIds = App\Models\Order::whereNull('deleted_at')->where('order_by', $user->id)->where('status', 1)->pluck('id');
                         }
+                        
                         $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                        
                         $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
                         ?>
                         <a href="{{ route('order.index') }}"
@@ -116,16 +119,12 @@
                     </li>
                     <li class="nav-item {{ $display }}">
                         <?php
-                        if (App\Models\User::find(Auth::user()->id)->hasRole('user')) {
-                            $historyOrder = App\Models\Order::whereNull('deleted_at')
-                                ->where('user_id', Auth::user()->id)
-                                ->where('status', 2)
-                                ->count();
+                        if ($isUser && !$isCounselor) {
+                            // Jika hanya 'user' tanpa 'counselor'
+                            $historyOrder = App\Models\Order::whereNull('deleted_at')->where('user_id', $user->id)->where('status', 2)->count();
                         } else {
-                            $historyOrder = App\Models\Order::whereNull('deleted_at')
-                                ->where('order_by', Auth::user()->id)
-                                ->where('status', 2)
-                                ->count();
+                            // Jika 'counselor' atau memiliki kedua role 'user' dan 'counselor'
+                            $historyOrder = App\Models\Order::whereNull('deleted_at')->where('order_by', $user->id)->where('status', 2)->count();
                         }
                         ?>
                         <a href="{{ route('order.history') }}"
@@ -138,6 +137,7 @@
                         </a>
                     </li>
                 @endhasanyrole
+
 
                 @hasanyrole('admin|counselor')
                     <li class="nav-item {{ $display }}">
