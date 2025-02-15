@@ -16,14 +16,16 @@ class InvoiceMail extends Mailable
 
     public $order;
     public $order_package;
+    public $totalPrice;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($order, $order_package)
+    public function __construct($order, $order_package, $totalPrice)
     {
         $this->order = $order;
         $this->order_package = $order_package;
+        $this->totalPrice = $totalPrice;
     }
 
     /**
@@ -37,7 +39,7 @@ class InvoiceMail extends Mailable
             ->with([
                 'order' => $this->order,
                 'order_package' => $this->order_package,
-                'totalPrice' => $this->order->total_price
+                'totalPrice' => $this->totalPrice
             ]);
     }
 

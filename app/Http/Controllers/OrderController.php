@@ -342,9 +342,10 @@ class OrderController extends Controller
                 ->where('order_id', $id)
                 ->get();
             if ($order) {
+                $totalPrice =  (int) $request->totalPrice;
                 $update_order = Order::where('id', $id)->update([
                     'status' => 2,
-                    'total_price' => (int) $request->totalPrice,
+                    'total_price' => $totalPrice,
                     'payment_method' => $request->payment_method,
                     'payment_date' => now()
                 ]);
@@ -355,9 +356,9 @@ class OrderController extends Controller
                     // Jika metode pembayaran transfer, arahkan ke detailTransfer
                     if ($request->payment_method == 'transfer') {
                         if (User::find(Auth::user()->id)->hasRole('user')) {
-                            $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package));
+                            $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
                         } else {
-                            $sendMail = Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package));
+                            $sendMail = Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
                         }
                         if ($sendMail) {
                             return response()->json([
