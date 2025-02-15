@@ -19,4 +19,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function orderBy()
+    {
+        return $this->belongsTo(User::class, 'order_by');
+    }
 }

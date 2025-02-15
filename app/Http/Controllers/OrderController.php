@@ -30,10 +30,19 @@ class OrderController extends Controller
 
     public function dataTable()
     {
-        $order_ids = Order::whereNull('deleted_at')
-            ->where('user_id', Auth::user()->id)
-            ->where('status', 1)
-            ->pluck('id');
+        if (User::find(Auth::user()->id)->hasRole('user')) {
+            $order_ids = Order::whereNull('deleted_at')
+                ->where('user_id', Auth::user()->id)
+                ->where('status', 1)
+                ->whereNull('order_by')
+                ->pluck('id');
+        } else {
+            $order_ids = Order::whereNull('deleted_at')
+                ->where('order_by', Auth::user()->id)
+                ->where('status', 1)
+                ->pluck('id');
+        }
+
 
         $order_package = OrderPackage::whereNull('deleted_at')
             ->whereIn('order_id', $order_ids)
@@ -253,8 +262,14 @@ class OrderController extends Controller
             Log::info('schedule id: ' . $schedule_id);
             Log::info('User id: ' . $user_id);
 
-
-
+            $onGoingOrder = Order::where('order_by',  $counselor_id)->where('status', 1)->first();
+            if ($onGoingOrder) {
+                if ($user_id != $onGoingOrder->user_id) {
+                    DB::rollBack();
+                    session()->flash('failed', 'Silahkan Bayar Pesanan Dahulu Sebelum Berganti User.');
+                    return;
+                }
+            }
 
             $orderPackageId = OrderPackage::whereHas('order', function ($query) use ($user_id) {
                 $query->where('user_id', $user_id)
@@ -339,7 +354,11 @@ class OrderController extends Controller
 
                     // Jika metode pembayaran transfer, arahkan ke detailTransfer
                     if ($request->payment_method == 'transfer') {
-                        $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package));
+                        if (User::find(Auth::user()->id)->hasRole('user')) {
+                            $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package));
+                        } else {
+                            $sendMail = Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package));
+                        }
                         if ($sendMail) {
                             return response()->json([
                                 'success' => true,
@@ -562,6 +581,108 @@ class OrderController extends Controller
         }
     }
 
+    public function history(Request $request)
+    {
+
+        if ($request->ajax()) {
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
+                    $query->where('status', 100)
+                        ->orWhere('status', 10)
+                        ->orWhere('status', 2)
+                        ->orWhere('status', 1)->whereNotNull('proof_payment');
+                })->whereNull('deleted_at')
+                    ->orderByDesc('created_at')
+                    ->get();;
+            } else {
+                $order = Order::where('order_by', Auth::user()->id)->where(function ($query) {
+                    $query->where('status', 100)
+                        ->orWhere('status', 10)
+                        ->orWhere('status', 2)
+                        ->orWhere('status', 1)->whereNotNull('proof_payment');
+                })->whereNull('deleted_at')
+                    ->orderByDesc('created_at')
+                    ->get();;
+            }
+            return DataTables::of($order)
+                ->addIndexColumn()
+                ->addColumn('payment_date', function ($data) {
+                    return \Carbon\Carbon::parse($data->payment_date)->translatedFormat('l, d F Y');
+                })
+                ->addColumn('status_payment', function ($data) {
+                    $list_view = '<div align="center">';
+                    if ($data->status == 100) {
+                        $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
+                    } elseif ($data->status == 10) {
+                        $list_view .= '<span class="badge bg-maroon  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                    } elseif ($data->status == 2) {
+                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Pembayaran</span>';
+                    } else {
+                        $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
+                    }
+                    $list_view .= '</div>';
+                    return $list_view;
+                })
+
+                ->addColumn('total_price', function ($data) {
+                    return 'Rp.' . number_format($data->total_price, 0, ',', '.');
+                })
+                ->addColumn('order_id', function ($data) {
+                    $year = \Carbon\Carbon::parse($data->created_at)->format('y'); // Ambil 2 digit terakhir tahun
+                    return 'BC' . $year . $data->id;
+                })
+                ->addColumn('order_by', function ($data) {
+                    return  $data->orderBy ? $data->orderBy->name : '-';
+                })
+                ->addColumn('action', function ($data) {
+                    if ($data->status == 2) {
+                        $btn_action = '<div align="center">';
+                        $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
+                        $btn_action .= '</div>';
+                        return $btn_action;
+                    } else {
+                        return null;
+                    }
+                })
+                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'order_by', 'action'])
+                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
+                ->make(true);
+        }
+        return view('order.history');
+    }
+
+    function detailTransfer(string $id)
+    {
+        try {
+            $order = Order::find($id);
+            if (User::find(Auth::user()->id)->hasRole('user')) {
+                if ($order->user_id != Auth::user()->id) {
+                    return redirect()
+                        ->back()
+                        ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
+                };
+            } else {
+                if ($order->order_by != Auth::user()->id) {
+                    return redirect()
+                        ->back()
+                        ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
+                };
+            }
+            $order_package = OrderPackage::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
+            $totalPrice = $order_package->sum(function ($data) {
+                return $data->package->price;
+            });
+
+            return view('order.detail-transfer', compact('order', 'order_package', 'totalPrice'));
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with('failed', $e->getMessage());
+        }
+    }
+
     // Reject kondisi kalau ada order di my order data yang di reject pindah ke order baru
     // order yang direject dihapus
     // public function reject(string $id)
@@ -681,87 +802,4 @@ class OrderController extends Controller
     //         ->make(true);
     // }
 
-
-
-    public function history(Request $request)
-    {
-
-        if ($request->ajax()) {
-            $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
-                $query->where('status', 100)
-                    ->orWhere('status', 10)
-                    ->orWhere('status', 2)
-                    ->orWhere('status', 1)->whereNotNull('proof_payment');
-            })->whereNull('deleted_at')
-                ->orderByDesc('created_at')
-                ->get();;
-
-            return DataTables::of($order)
-                ->addIndexColumn()
-                ->addColumn('payment_date', function ($data) {
-                    return \Carbon\Carbon::parse($data->payment_date)->translatedFormat('l, d F Y');
-                })
-                ->addColumn('status_payment', function ($data) {
-                    $list_view = '<div align="center">';
-                    if ($data->status == 100) {
-                        $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
-                    } elseif ($data->status == 10) {
-                        $list_view .= '<span class="badge bg-maroon  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
-                    } elseif ($data->status == 2) {
-                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Pembayaran</span>';
-                    } else {
-                        $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
-                    }
-                    $list_view .= '</div>';
-                    return $list_view;
-                })
-
-                ->addColumn('total_price', function ($data) {
-                    return 'Rp.' . number_format($data->total_price, 0, ',', '.');
-                })
-                ->addColumn('order_id', function ($data) {
-                    $year = \Carbon\Carbon::parse($data->created_at)->format('y'); // Ambil 2 digit terakhir tahun
-                    return 'BC' . $year . $data->id;
-                })
-                ->addColumn('action', function ($data) {
-                    if ($data->status == 2) {
-                        $btn_action = '<div align="center">';
-                        $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
-                        $btn_action .= '</div>';
-                        return $btn_action;
-                    } else {
-                        return null;
-                    }
-                })
-                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
-                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
-                ->make(true);
-        }
-        return view('order.history');
-    }
-
-    function detailTransfer(string $id)
-    {
-        try {
-            $order = Order::find($id);
-
-            if ($order->user_id != Auth::user()->id) {
-                return redirect()
-                    ->back()
-                    ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
-            };
-            $order_package = OrderPackage::whereNull('deleted_at')
-                ->where('order_id', $id)
-                ->get();
-            $totalPrice = $order_package->sum(function ($data) {
-                return $data->package->price;
-            });
-
-            return view('order.detail-transfer', compact('order', 'order_package', 'totalPrice'));
-        } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with('failed', $e->getMessage());
-        }
-    }
 }

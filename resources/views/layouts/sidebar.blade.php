@@ -85,50 +85,22 @@
                     </li>
                 @endhasanyrole
 
-                @hasrole('counselor')
-                    <li class="nav-item {{ $display }}">
-                        <?php
-                        $orderIds = App\Models\Order::whereNull('deleted_at')
-                            ->where('user_id', Auth::user()->id)
-                            ->where('status', 1)
-                            ->pluck('id');
-                        $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
-                        $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
-                        ?>
-                        <a href="{{ route('order.index') }}"
-                            class="nav-link {{ request()->routeIs('order.index') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>
-                                Order Konselor <span
-                                    class="badge badge-danger ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item {{ $display }}">
-                        <?php
-                        $historyOrder = App\Models\Order::whereNull('deleted_at')
-                            ->where('user_id', Auth::user()->id)
-                            ->where('status', 2)
-                            ->count();
-                        ?>
-                        <a href="{{ route('order.history') }}"
-                            class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-list-alt"></i>
-                            <p>
-                                Riwayat Order Konselor <span
-                                    class="badge badge-danger ml-1 position-absolute">{{ $historyOrder > 0 ? $historyOrder : '' }}</span>
-                            </p>
-                        </a>
-                    </li>
-                @endhasrole
 
-                @hasrole('user')
+
+                @hasanyrole('user|counselor')
                     <li class="nav-item {{ $display }}">
                         <?php
-                        $orderIds = App\Models\Order::whereNull('deleted_at')
-                            ->where('user_id', Auth::user()->id)
-                            ->where('status', 1)
-                            ->pluck('id');
+                        if (App\Models\User::find(Auth::user()->id)->hasRole('user')) {
+                            $orderIds = App\Models\Order::whereNull('deleted_at')
+                                ->where('user_id', Auth::user()->id)
+                                ->where('status', 1)
+                                ->pluck('id');
+                        } else {
+                            $orderIds = App\Models\Order::whereNull('deleted_at')
+                                ->where('order_by', Auth::user()->id)
+                                ->where('status', 1)
+                                ->pluck('id');
+                        }
                         $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
                         $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
                         ?>
@@ -143,10 +115,17 @@
                     </li>
                     <li class="nav-item {{ $display }}">
                         <?php
-                        $historyOrder = App\Models\Order::whereNull('deleted_at')
-                            ->where('user_id', Auth::user()->id)
-                            ->where('status', 2)
-                            ->count();
+                        if (App\Models\User::find(Auth::user()->id)->hasRole('user')) {
+                            $historyOrder = App\Models\Order::whereNull('deleted_at')
+                                ->where('user_id', Auth::user()->id)
+                                ->where('status', 2)
+                                ->count();
+                        } else {
+                            $historyOrder = App\Models\Order::whereNull('deleted_at')
+                                ->where('order_by', Auth::user()->id)
+                                ->where('status', 2)
+                                ->count();
+                        }
                         ?>
                         <a href="{{ route('order.history') }}"
                             class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">
@@ -157,7 +136,7 @@
                             </p>
                         </a>
                     </li>
-                @endhasrole
+                @endhasanyrole
 
                 @hasanyrole('admin|counselor')
                     <li class="nav-item {{ $display }}">

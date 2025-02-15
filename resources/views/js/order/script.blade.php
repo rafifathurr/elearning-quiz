@@ -180,6 +180,9 @@
                         data: 'total_price'
                     },
                     {
+                        data: 'order_by'
+                    },
+                    {
                         data: 'action',
                         width: '20%',
                         defaultContent: '-',

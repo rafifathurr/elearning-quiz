@@ -26,6 +26,7 @@
                                                 <th>Tanggal Pembayaran</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Total Pembayaran</th>
+                                                <th>Dipesankan Oleh</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

@@ -71,7 +71,6 @@
         <h4 style="background: #dc3545; color: #fff; padding: 10px; border-radius: 5px;">Informasi Pembayaran</h4>
         <p>Silakan lakukan pembayaran ke rekening berikut:</p>
         <div style="display: flex; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-            <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" style="height: 30px; margin-right: 10px;">
             <span style="font-weight: bold; background: #0A3D91; color: #fff; padding: 5px 10px; border-radius: 3px;">
                 Bank BRI
             </span>
