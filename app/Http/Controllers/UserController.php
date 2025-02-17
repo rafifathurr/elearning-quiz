@@ -41,6 +41,9 @@ class UserController extends Controller
          */
         $dataTable = DataTables::of($users)
             ->addIndexColumn()
+            ->addColumn('id', function ($data) {
+                return $data->id;
+            })
             ->addColumn('role', function ($data) {
 
                 $list_view = '<div align="center">';
@@ -49,6 +52,17 @@ class UserController extends Controller
                 };
                 $list_view .= '</div>';
                 return $list_view;
+            })
+            ->addColumn('status', function ($data) {
+                // Cek apakah status aktif (1) atau tidak (0)
+                $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
+
+                $toggle_status = '<div class="custom-control custom-switch">';
+                $toggle_status .= '<input type="checkbox" class="custom-control-input" id="status' . $data->id . '" ' . $checked . '>';
+                $toggle_status .= '<label class="custom-control-label" for="status' . $data->id . '">' . ($data->status == 1 ? 'Aktif' : 'Tidak Aktif') . '</label>';
+                $toggle_status .= '</div>';
+
+                return $toggle_status;
             })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
@@ -64,11 +78,20 @@ class UserController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['name', 'username', 'email', 'role', 'action'])
-            ->rawColumns(['action', 'role'])
+            ->only(['id', 'name', 'username', 'email', 'role', 'action', 'status'])
+            ->rawColumns(['action', 'status', 'role'])
             ->make(true);
 
         return $dataTable;
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $user->status = $request->status;
+        $user->save();
+
+        return response()->json(['success' => true, 'status' => $user->status ? 'Aktif' : 'Tidak Aktif']);
     }
 
     public function create()

@@ -32,6 +32,11 @@ class AuthController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if ($user) {
+            // Jika user ditemukan tetapi statusnya 0, kembalikan pesan akun tidak aktif
+            if ($user->status == 0) {
+                return redirect()->route('login')->with(['failed' => 'Akun Anda tidak aktif']);
+            }
+
             // Jika user sudah ada, langsung login
             $user->update([
                 'deleted_at' => null
@@ -144,6 +149,13 @@ class AuthController extends Controller
             $user = User::where($field, $email_or_username)
                 ->whereNull('deleted_at') // Pastikan pengguna belum dihapus
                 ->first();
+
+            if ($user && $user->status == 0) {
+                return redirect()
+                    ->back()
+                    ->with(['failed' => 'Akun Anda tidak aktif'])
+                    ->withInput();
+            }
 
             // Verifikasi password secara manual
             if ($user && Hash::check($request->password, $user->password)) {

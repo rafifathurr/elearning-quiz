@@ -124,8 +124,6 @@ Route::group(['middleware' => ['role:user|counselor']], function () {
 //Hanya User
 Route::group(['middleware' => ['role:user']], function () {
 
-
-
     //Daftar Test User
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
@@ -244,6 +242,7 @@ Route::group(['middleware' => ['role:admin']], function () {
         //Pengguna
         Route::group(['controller' => UserController::class, 'prefix' => 'user', 'as' => 'user.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::post('update-status/{id}', 'updateStatus')->name('updateStatus');
         });
         Route::resource('user', UserController::class)->parameters(['user' => 'id']);
 
