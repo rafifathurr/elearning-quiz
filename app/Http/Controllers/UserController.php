@@ -334,7 +334,7 @@ class UserController extends Controller
             }
             $user_deleted = User::where('id', $id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
-                'email' => 'brata' . now()->timestamp . $user->id . '@bcbratacerdas.com'
+                'email' => $user->email . '_BC' . now()->timestamp . $user->id
             ]);
             if ($user_deleted) {
                 DB::commit();
