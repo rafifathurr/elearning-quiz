@@ -637,9 +637,6 @@ class OrderController extends Controller
                     $year = \Carbon\Carbon::parse($data->created_at)->format('y'); // Ambil 2 digit terakhir tahun
                     return 'BC' . $year . $data->id;
                 })
-                ->addColumn('order_by', function ($data) {
-                    return  $data->orderBy ? $data->orderBy->name : '-';
-                })
                 ->addColumn('action', function ($data) {
                     if ($data->status == 2) {
                         $btn_action = '<div align="center">';
@@ -650,8 +647,11 @@ class OrderController extends Controller
                         return null;
                     }
                 })
-                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'order_by', 'action'])
+                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
                 ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
+                ->setRowClass(function ($data) {
+                    return (!is_null($data->order_by) && $data->order_by != Auth::user()->id) ? 'bg-olive text-white' : '';
+                })
                 ->make(true);
         }
         return view('order.history');

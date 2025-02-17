@@ -15,7 +15,7 @@
                                 </h3>
                             </div>
 
-                            <div class="card-body">
+                            <div class="card-body ">
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url" value="{{ url()->current() }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="dt-history">
@@ -26,7 +26,6 @@
                                                 <th>Tanggal Pembayaran</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Total Pembayaran</th>
-                                                <th>Dipesankan Oleh</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
