@@ -650,8 +650,10 @@ class OrderController extends Controller
                 ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
                 ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
                 ->setRowClass(function ($data) {
-                    return (!is_null($data->order_by) && $data->order_by != Auth::user()->id) ? 'bg-olive text-white' : '';
+                    return (!is_null($data->order_by) && $data->order_by != Auth::user()->id) ||
+                        ($data->user_id != Auth::user()->id) ? 'bg-olive text-white' : '';
                 })
+
                 ->make(true);
         }
         return view('order.history');
