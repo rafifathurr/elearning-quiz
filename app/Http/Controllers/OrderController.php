@@ -638,14 +638,14 @@ class OrderController extends Controller
                     return 'BC' . $year . $data->id;
                 })
                 ->addColumn('action', function ($data) {
-                    if ($data->status == 2) {
-                        $btn_action = '<div align="center">';
-                        $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
-                        $btn_action .= '</div>';
-                        return $btn_action;
-                    } else {
-                        return null;
-                    }
+                    // if ($data->status == 2) {
+                    $btn_action = '<div align="center">';
+                    $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
+                    $btn_action .= '</div>';
+                    return $btn_action;
+                    // } else {
+                    //     return null;
+                    // }
                 })
                 ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
                 ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
