@@ -31,6 +31,25 @@
             </tr>
         </table>
 
+        <!-- Informasi dipesankan oleh -->
+        @if ((!is_null($order->order_by) && $order->order_by != Auth::user()->id) || $order->user_id != Auth::user()->id)
+            <h4 style="background: maroon; color: #fff; padding: 10px; border-radius: 5px;">Dipesankan Oleh</h4>
+            <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px;">Nama</td>
+                    <td style="padding: 8px; font-weight: bold;">{{ $order->orderBy->name }}</td>
+                </tr>
+                <tr style="background: #f9f9f9;">
+                    <td style="padding: 8px;">Email</td>
+                    <td style="padding: 8px; font-weight: bold;">{{ $order->orderBy->email }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Nomor Handphone</td>
+                    <td style="padding: 8px; font-weight: bold;">{{ $order->orderBy->phone }}</td>
+                </tr>
+            </table>
+        @endif
+
         <!-- Detail Pesanan -->
         <h4 style="background: #28a745; color: #fff; padding: 10px; border-radius: 5px;">Detail Pesanan</h4>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
