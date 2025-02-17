@@ -162,7 +162,7 @@ class OrderController extends Controller
 
     public function getUser()
     {
-        $users = User::whereNull('deleted_at')->whereHas('roles', function ($query) {
+        $users = User::whereNull('deleted_at')->where('status', 1)->whereHas('roles', function ($query) {
             $query->where('name', 'user');
         })->get();
 
