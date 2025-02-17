@@ -126,12 +126,18 @@
 
         .select2-container {
             z-index: 9999 !important;
+            margin-bottom: 1rem !important;
             /* Menjamin dropdown tampil di atas modal */
         }
 
         .swal2-popup {
             z-index: 1050 !important;
             /* Pastikan popup Swal berada di bawah dropdown */
+        }
+
+        .swal2-popup .select2-selection {
+            margin-bottom: 1rem !important;
+            /* Menambah jarak di dalam dropdown */
         }
 
         /* Bentuk Belah Ketupat */

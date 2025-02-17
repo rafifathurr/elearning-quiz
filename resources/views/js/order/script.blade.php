@@ -594,7 +594,7 @@
                                     .length, $('#selected_schedule').length);
 
                                 $('#selected_user').select2({
-                                    placeholder: 'Cari user...',
+                                    placeholder: 'Pilih Pengguna',
                                     allowClear: true
                                 });
                             },
