@@ -117,10 +117,12 @@ class OrderController extends Controller
             })
             ->addColumn('proof_payment', function ($data) {
                 if (!is_null($data->proof_payment)) {
+
+                    //Download Gambar
                     return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-download mr-1"></i> Bukti Pembayaran</a>';
 
                     // Tab baru bukan download
-                    // return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-eye mr-1"></i> Lihat Bukti</a>';
+                    return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-eye mr-1"></i> Lihat Bukti</a>';
                 }
             })
             ->addColumn('payment_date', function ($data) {
@@ -479,11 +481,11 @@ class OrderController extends Controller
             abort(404);
         }
 
-        return response()->download($path);
+        // download foto
+        // return response()->download($path);
 
         // Tab baru bukan download
-        // return response()->file($path);
-
+        return response()->file($path);
     }
 
 
