@@ -16,24 +16,50 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            {{-- Detail Pemesan --}}
                             <h5 class="font-weight-bold">Detail Pemesan</h5>
-                            <div class="alert alert-default-info" role="alert">
+                            <div class="alert bg-lightblue" role="alert">
                                 <div class="row">
-                                    <h6 class="col-md-3">Nama</h6>
+                                    <h6 class="col-md-3 font-weight-bold">Nama</h6>
                                     <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
                                         {{ $order->user->name }}</h6>
                                 </div>
                                 <div class="row">
-                                    <h6 class="col-md-3">Email</h6>
+                                    <h6 class="col-md-3 font-weight-bold">Email</h6>
                                     <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
                                         {{ $order->user->email }}</h6>
                                 </div>
                                 <div class="row">
-                                    <h6 class="col-md-3">No Handphone</h6>
+                                    <h6 class="col-md-3 font-weight-bold">No Handphone</h6>
                                     <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
                                         {{ $order->user->phone }}</h6>
                                 </div>
                             </div>
+
+                            {{-- Detail Dipesankan Oleh --}}
+                            @if ((!is_null($order->order_by) && $order->order_by != Auth::user()->id) || $order->user_id != Auth::user()->id)
+                                <h5 class="font-weight-bold">Dipesankan Oleh</h5>
+                                <div class="alert bg-maroon" role="alert">
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Nama</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ $order->orderBy->name }}</h6>
+                                    </div>
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Email</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ $order->orderBy->email }}</h6>
+                                    </div>
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">No Handphone</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ $order->orderBy->phone }}</h6>
+                                    </div>
+                                </div>
+                            @endif
+
+
+                            {{-- Detail Pesanan --}}
                             <h5 class="font-weight-bold">Detail Pesanan</h5>
                             <div class="table-responsive py-1">
                                 <table id="table-detail" class="table table-bordered table-hover text-center">
