@@ -592,6 +592,11 @@
                             didOpen: () => {
                                 console.log('Dropdown Loaded:', $('#selected_user')
                                     .length, $('#selected_schedule').length);
+
+                                $('#selected_user').select2({
+                                    placeholder: 'Cari user...',
+                                    allowClear: true
+                                });
                             },
                             preConfirm: () => {
                                 const selectedUser = $('#selected_user').val();

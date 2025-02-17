@@ -20,6 +20,16 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             /* Menambahkan efek bayangan saat hover */
         }
+
+        .select2-container {
+            z-index: 9999 !important;
+            /* Menjamin dropdown tampil di atas modal */
+        }
+
+        .swal2-popup {
+            z-index: 1050 !important;
+            /* Pastikan popup Swal berada di bawah dropdown */
+        }
     </style>
     <div class="py-1">
         <!-- Content Header (Page header) -->

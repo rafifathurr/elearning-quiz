@@ -124,7 +124,15 @@
             }
         }
 
+        .select2-container {
+            z-index: 9999 !important;
+            /* Menjamin dropdown tampil di atas modal */
+        }
 
+        .swal2-popup {
+            z-index: 1050 !important;
+            /* Pastikan popup Swal berada di bawah dropdown */
+        }
 
         /* Bentuk Belah Ketupat */
     </style>
