@@ -595,25 +595,19 @@ class OrderController extends Controller
     {
 
         if ($request->ajax()) {
-            if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
-                $order = Order::where('user_id', Auth::user()->id)->where(function ($query) {
-                    $query->where('status', 100)
-                        ->orWhere('status', 10)
-                        ->orWhere('status', 2)
-                        ->orWhere('status', 1)->whereNotNull('proof_payment');
-                })->whereNull('deleted_at')
-                    ->orderByDesc('created_at')
-                    ->get();;
-            } else {
-                $order = Order::where('order_by', Auth::user()->id)->where(function ($query) {
-                    $query->where('status', 100)
-                        ->orWhere('status', 10)
-                        ->orWhere('status', 2)
-                        ->orWhere('status', 1)->whereNotNull('proof_payment');
-                })->whereNull('deleted_at')
-                    ->orderByDesc('created_at')
-                    ->get();;
-            }
+
+            $order = Order::where(function ($query) {
+                $query->where('user_id', Auth::user()->id)
+                    ->orWhere('order_by', Auth::user()->id);
+            })->where(function ($query) {
+                $query->where('status', 100)
+                    ->orWhere('status', 10)
+                    ->orWhere('status', 2)
+                    ->orWhere('status', 1)->whereNotNull('proof_payment');
+            })->whereNull('deleted_at')
+                ->orderByDesc('created_at')
+                ->get();
+
             return DataTables::of($order)
                 ->addIndexColumn()
                 ->addColumn('payment_date', function ($data) {
@@ -665,18 +659,11 @@ class OrderController extends Controller
     {
         try {
             $order = Order::find($id);
-            if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
-                if ($order->user_id != Auth::user()->id) {
-                    return redirect()
-                        ->back()
-                        ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
-                };
-            } else {
-                if ($order->order_by != Auth::user()->id) {
-                    return redirect()
-                        ->back()
-                        ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
-                };
+
+            if ($order->user_id != Auth::user()->id && $order->order_by != Auth::user()->id) {
+                return redirect()
+                    ->back()
+                    ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
             }
             $order_package = OrderPackage::whereNull('deleted_at')
                 ->where('order_id', $id)

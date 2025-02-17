@@ -119,13 +119,13 @@
                     </li>
                     <li class="nav-item {{ $display }}">
                         <?php
-                        if ($isUser && !$isCounselor) {
-                            // Jika hanya 'user' tanpa 'counselor'
-                            $historyOrder = App\Models\Order::whereNull('deleted_at')->where('user_id', $user->id)->where('status', 2)->count();
-                        } else {
-                            // Jika 'counselor' atau memiliki kedua role 'user' dan 'counselor'
-                            $historyOrder = App\Models\Order::whereNull('deleted_at')->where('order_by', $user->id)->where('status', 2)->count();
-                        }
+                        $historyOrder = App\Models\Order::whereNull('deleted_at')
+                            ->where(function ($query) {
+                                $query->where('user_id', Auth::user()->id)->orWhere('order_by', Auth::user()->id);
+                            })
+                            ->where('status', 2)
+                            ->count();
+                        
                         ?>
                         <a href="{{ route('order.history') }}"
                             class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">
