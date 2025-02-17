@@ -558,7 +558,7 @@
                         userOptions += '<option value="" disabled selected>Pilih User</option>';
                         usersResponse.users.forEach(user => {
                             userOptions +=
-                                `<option value="${user.id}">${user.name}</option>`;
+                                `<option value="${user.id}">${user.name} | ${user.email}</option>`;
                         });
                         userOptions += '</select>';
 
