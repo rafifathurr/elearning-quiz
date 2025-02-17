@@ -597,10 +597,6 @@
                                     placeholder: 'Cari Pengguna...',
                                     allowClear: true
                                 });
-                                $('#selected_schedule').select2({
-                                    placeholder: 'Cari Jadwal...',
-                                    allowClear: true
-                                });
                             },
                             preConfirm: () => {
                                 const selectedUser = $('#selected_user').val();
