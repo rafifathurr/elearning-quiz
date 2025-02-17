@@ -263,20 +263,21 @@ class AuthController extends Controller
 
         $email = $request->email;
         $token = Str::random(60); // Token acak
+        $user = User::where('email', $email)->first();
 
         // Simpan token ke database dengan updateOrInsert
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $email],
             [
-                'token' => Hash::make($token), // Simpan dalam bentuk hash
+                'token' => $token,
                 'created_at' => now()
             ]
         );
 
         // Kirim email reset password
-        Mail::send('auth.mail.forgot-password', ['token' => $token, 'email' => $email], function ($message) use ($email) {
+        Mail::send('auth.mail.forgot-password', ['token' => $token, 'user' => $user], function ($message) use ($email) {
             $message->to($email);
-            $message->subject('Reset Password Notification');
+            $message->subject('Notifikasi Lupa Password');
         });
 
         return back()->with('success', 'Link reset password telah dikirim ke email Anda.');
@@ -291,30 +292,37 @@ class AuthController extends Controller
     // Memproses reset password
     public function resetPassword(Request $request)
     {
-        $request->validate([
-            'password' => 'required|min:6|confirmed',
-            'token' => 'required'
-        ]);
+        try {
+            $request->validate([
+                'password' => 'required|min:6|confirmed',
+                'token' => 'required'
+            ]);
 
-        // Cari token di database
-        $reset = DB::table('password_reset_tokens')->where('token', Hash::make($request->token))->first();
+            // Cari token yang sesuai
+            $reset = DB::table('password_reset_tokens')->where('token', $request->token)->first();
 
-        if (!$reset) {
-            return back()->withErrors(['token' => 'Token reset password tidak valid atau sudah kedaluwarsa.']);
+
+            // Jika token tidak ditemukan atau tidak cocok
+            if (!$reset) {
+                return back()->with('failed', 'Token reset password tidak valid atau sudah kedaluwarsa.');
+            }
+
+            // Ambil user berdasarkan email
+            $user = User::where('email', $reset->email)->first();
+
+            if (!$user) {
+                return back()->with('failed', 'User tidak ditemukan.');
+            }
+
+            // Update password user
+            $user->update(['password' => Hash::make($request->password)]);
+
+            // Hapus token setelah digunakan
+            DB::table('password_reset_tokens')->where('email', $reset->email)->delete();
+
+            return redirect()->route('login')->with('success', 'Password berhasil direset, silakan login.');
+        } catch (Exception $e) {
+            return back()->with('failed', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $user = User::where('email', $reset->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'User tidak ditemukan.']);
-        }
-
-        // Update password user
-        $user->update(['password' => Hash::make($request->password)]);
-
-        // Hapus token reset setelah digunakan
-        DB::table('password_reset_tokens')->where('email', $reset->email)->delete();
-
-        return redirect()->route('login')->with('success', 'Password berhasil direset, silakan login.');
     }
 }
