@@ -1,5 +1,13 @@
 @extends('layouts.section')
 @section('content')
+    <style>
+        .custom-background {
+            background-color: #cefad8 !important;
+            /* Hijau muda */
+            color: #155724 !important;
+            /* Teks hijau tua untuk kontras */
+        }
+    </style>
     <div class="px-3 py-4">
         <!-- /.content-header -->
         <!-- Main content -->

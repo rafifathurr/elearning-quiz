@@ -651,7 +651,7 @@ class OrderController extends Controller
                 ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
                 ->setRowClass(function ($data) {
                     return (!is_null($data->order_by) && $data->order_by != Auth::user()->id) ||
-                        ($data->user_id != Auth::user()->id) ? 'bg-olive text-white' : '';
+                        ($data->user_id != Auth::user()->id) ? 'custom-background' : '';
                 })
 
                 ->make(true);
