@@ -221,6 +221,8 @@ class UserController extends Controller
                     'roles.*' => 'string|exists:roles,name',
                     'phone' => 'required|string',
                     'password' => 'nullable|string',
+                    'password' => 'nullable|string',
+                    're_password' => 'required_with:password|same:password',
                 ]);
 
 

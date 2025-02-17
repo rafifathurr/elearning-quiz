@@ -106,31 +106,35 @@
     document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password');
         const re_password = document.getElementById('re_password');
+        const phone = document.getElementById('phone');
 
         function checkRePassword(event) {
-            var input = event.target;
-
-            if (input.id === 're_password' && input.value !== password.value) {
-                input.setCustomValidity('Password Tidak Sama.');
+            if (password.value.length > 0) {
+                re_password.setAttribute('required', 'required'); // Set required jika password diisi
             } else {
-                input.setCustomValidity('');
+                re_password.removeAttribute('required'); // Hapus required jika password kosong
+            }
+
+            if (re_password.value !== password.value) {
+                re_password.setCustomValidity('Password Tidak Sama.');
+            } else {
+                re_password.setCustomValidity('');
             }
         }
-        re_password.addEventListener('input', checkRePassword);
-
-        var phone = document.getElementById('phone');
 
         function validateInput(event) {
             var input = event.target;
-            // Menghapus karakter non-angka
-            input.value = input.value.replace(/\D/g, '');
+            input.value = input.value.replace(/\D/g, ''); // Hapus karakter non-angka
 
-            if (input.id === 'phone' && input.value.length < 10 || input.value.length > 13) {
+            if (input.id === 'phone' && (input.value.length < 10 || input.value.length > 13)) {
                 input.setCustomValidity('Nomor HP terdiri dari 10 sampai 13 angka.');
             } else {
                 input.setCustomValidity('');
             }
         }
+
+        password.addEventListener('input', checkRePassword);
+        re_password.addEventListener('input', checkRePassword);
         phone.addEventListener('input', validateInput);
     });
 </script>
