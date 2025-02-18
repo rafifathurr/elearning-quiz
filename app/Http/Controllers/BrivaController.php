@@ -12,13 +12,76 @@ class BrivaController extends Controller
 
     public function inquiry(Request $request)
     {
-        return response()->json($request->all());
+
+        // Ambil data dari request
+        $data = $request->all();
+
+        // Bangun struktur response sesuai dengan dokumentasi yang diberikan
+        $response = [
+            'responseCode' => '2002400', // Response code tetap
+            'responseMessage' => 'Successful', // Response message
+            'virtualAccountData' => [
+                'partnerServiceId' => trim($data['partnerServiceId']),
+                'customerNo' => $data['customerNo'],
+                'virtualAccountNo' => $data['virtualAccountNo'],
+                'virtualAccountName' => 'John Doe', // Contoh nama, bisa diganti sesuai logika
+                'inquiryRequestId' => $data['inquiryRequestId'],
+                'totalAmount' => [
+                    'value' => '200000.00', // Total amount yang sudah ditentukan
+                    'currency' => 'IDR',
+                ],
+                'inquiryStatus' => '00', // Status inquiry
+                'inquiryReason' => [
+                    'english' => 'Success',
+                    'indonesia' => 'Sukses',
+                ],
+                'additionalInfo' => [
+                    'idApp' => 'TEST',
+                    'info1' => 'info 1 harus diisi', // Contoh info tambahan
+                ]
+            ]
+        ];
+
+        // Kembalikan response dalam format JSON
+        return response()->json($response);
     }
 
     public function payment(Request $request)
     {
-        return response()->json($request->all());
+        // Ambil data dari request
+        $data = $request->all();
+
+        // Bangun struktur response sesuai dengan format yang diberikan
+        $response = [
+            'responseCode' => '2002500', // Response code tetap
+            'responseMessage' => 'Successful', // Response message
+            'virtualAccountData' => [
+                'partnerServiceId' => trim($data['partnerServiceId']),
+                'customerNo' => $data['customerNo'],
+                'virtualAccountNo' => $data['virtualAccountNo'],
+                'virtualAccountName' => 'John Doe', // Nama yang statis, bisa diganti sesuai logika
+                'paymentRequestId' => $data['paymentRequestId'],
+                'paidAmount' => [
+                    'value' => '10001.00', // Jumlah yang dibayar
+                    'currency' => 'IDR',
+                ],
+                'paymentFlagStatus' => '00', // Status pembayaran
+                'paymentFlagReason' => [
+                    'english' => 'Success',
+                    'indonesia' => 'Sukses',
+                ]
+            ],
+            'additionalInfo' => [
+                'idApp' => 'TEST',
+                'passApp' => $data['additionalInfo']['passApp'], // Ambil passApp dari request
+                'info1' => 'info 1 diisi', // Info tambahan
+            ]
+        ];
+
+        // Kembalikan response dalam format JSON
+        return response()->json($response);
     }
+
 
 
 
