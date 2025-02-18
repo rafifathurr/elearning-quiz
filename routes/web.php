@@ -322,3 +322,7 @@ Route::group(['middleware' => ['role:admin|question-operator']], function () {
         Route::resource('quiz', \App\Http\Controllers\Admin\Quiz\QuizController::class);
     });
 });
+
+Route::fallback(function () {
+    abort(404);  // Mengarahkan ke halaman 404
+});
