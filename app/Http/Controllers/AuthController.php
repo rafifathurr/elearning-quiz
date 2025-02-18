@@ -257,13 +257,21 @@ class AuthController extends Controller
     // Mengirimkan link reset password ke email
     public function sendResetLinkEmail(Request $request)
     {
+        $email = $request->email;
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return redirect()
+                ->back()
+                ->with('failed', 'Email Tidak Terdaftar!');
+        }
         $request->validate([
             'email' => 'required|email|exists:users,email'
         ]);
 
-        $email = $request->email;
+
         $token = Str::random(60); // Token acak
-        $user = User::where('email', $email)->first();
+
 
         // Simpan token ke database dengan updateOrInsert
         DB::table('password_reset_tokens')->updateOrInsert(
