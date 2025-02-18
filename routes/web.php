@@ -41,8 +41,10 @@ use Laravel\Socialite\Facades\Socialite;
 */
 
 //tes briva
-Route::post('/briva/inquiry', [BrivaController::class, 'inquiry']);
-Route::post('/briva/payment', [BrivaController::class, 'payment']);
+// Route::post('/briva/inquiry', [BrivaController::class, 'inquiry']);
+// Route::post('/briva/payment', [BrivaController::class, 'payment']);
+
+
 
 
 //Google Login
