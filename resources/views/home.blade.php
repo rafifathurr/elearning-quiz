@@ -1,6 +1,20 @@
 @extends('layouts.section')
 @section('content')
     <style>
+        .back-to-top {
+            position: fixed;
+            bottom: 50px;
+            right: 30px;
+            display: none;
+            /* Tombol tidak muncul kecuali di-scroll */
+            z-index: 999;
+        }
+
+        .back-to-top.show {
+            display: block;
+            /* Tampilkan tombol saat ada scroll */
+        }
+
         .custom-shape {
             display: inline-block;
             position: relative;
@@ -97,8 +111,34 @@
             </div>
 
         </section>
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
+            <i class="fas fa-chevron-up"></i>
+        </a>
     </div>
     @push('javascript-bottom')
         @include('js.order.script')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const backToTopButton = document.querySelector('.back-to-top');
+
+                backToTopButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Mencegah tindakan default anchor
+
+                    // Scroll halus ke atas
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 250px
+                        backToTopButton.classList.add('show');
+                    } else {
+                        backToTopButton.classList.remove('show');
+                    }
+                });
+            });
+        </script>
     @endpush
 @endsection
