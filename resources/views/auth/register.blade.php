@@ -86,7 +86,7 @@
 
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="phone"
+                                <input type="text" name="phone" id="phone"
                                     class="form-control @error('phone') is-invalid @enderror" placeholder="Nomor Handphone"
                                     value="{{ old('phone') }}" required>
                                 <div class="input-group-append">
