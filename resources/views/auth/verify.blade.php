@@ -10,22 +10,30 @@
         }
     </style>
 
-    <body class="hold-transition login-page">
+    <body class="hold-transition login-page" style="background-color: #f4f6f9;">
         <div class="login-box">
-            <!-- /.login-logo -->
             <div class="card card-outline card-primary">
-                <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Verifikasi Akun</label>
+                <div class="card-body text-center">
+                    <h4 class="font-weight-bold text-primary">
+                        <i class="fas fa-shield-alt mr-2"></i>Verifikasi Akun
+                    </h4>
+                    <p class="text-muted">
+                        Kami telah mengirimkan kode verifikasi ke email <strong>{{ $email }}</strong>.
+                        Silakan masukkan kode tersebut untuk melanjutkan.
+                    </p>
+
                     <form action="{{ route('otp.verify.post') }}" method="post">
                         @csrf
+                        <input type="hidden" name="email" value="{{ $email }}">
+
                         <div class="form-group">
-                            <input type="hidden" name="email" value="{{ $email }}">
                             <div class="input-group">
-                                <input type="text" name="otp" class="form-control @error('otp') is-invalid @enderror"
-                                    placeholder="Kode Verifikasi">
+                                <input type="text" name="otp"
+                                    class="form-control text-center font-weight-bold @error('otp') is-invalid @enderror"
+                                    placeholder="Kode OTP" maxlength="6" style="letter-spacing: 5px; font-size: 20px;">
                                 <div class="input-group-append">
                                     <div class="input-group-text">
-                                        <span class="fas fa-envelope"></span>
+                                        <span class="fas fa-key text-primary"></span>
                                     </div>
                                 </div>
                                 @error('otp')
@@ -35,18 +43,18 @@
                                 @enderror
                             </div>
                         </div>
+
                         <div class="row pt-3">
-                            <div class="col-4">
-                                <button type="submit" class="btn btn-primary btn-block font-weight-bold">Kirim</button>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-block font-weight-bold"
+                                    style="transition: 0.3s; background: linear-gradient(45deg, #007bff, #0056b3); border: none;">
+                                    <i class="fas fa-paper-plane"></i> Verifikasi
+                                </button>
                             </div>
                         </div>
-
                     </form>
                 </div>
-                <!-- /.card-body -->
             </div>
-            <!-- /.card -->
         </div>
-        <!-- /.login-box -->
     </body>
 @endsection

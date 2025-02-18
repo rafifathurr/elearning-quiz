@@ -10,21 +10,28 @@
         }
     </style>
 
-    <body class="hold-transition login-page">
+    <body class="hold-transition login-page" style="background-color: #f4f6f9;">
         <div class="login-box">
             <!-- /.login-logo -->
             <div class="card card-outline card-primary">
-                <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Brata Cerdas</label>
+                <div class="card-body text-center">
+                    <label class="h4 pb-2 font-weight-bold text-primary">
+                        <i class="fas fa-lock mr-2"></i>Reset Password
+                    </label>
+                    <p class="text-muted small">
+                        Masukkan email Anda untuk menerima tautan reset password.
+                    </p>
+
                     <form action="{{ route('password.email') }}" method="post">
                         @csrf
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="email"
-                                    class="form-control @error('email') is-invalid @enderror" placeholder="Masukan Email">
+                                <input type="email" name="email"
+                                    class="form-control @error('email') is-invalid @enderror"
+                                    placeholder="Masukkan Email Anda" required>
                                 <div class="input-group-append">
                                     <div class="input-group-text">
-                                        <span class="fas fa-envelope"></span>
+                                        <span class="fas fa-envelope text-primary"></span>
                                     </div>
                                 </div>
                                 @error('email')
@@ -34,16 +41,22 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row pt-3 d-flex justify-content-end">
-                            <div class="col-12 text-center">
-                                <button type="submit" id="login"
-                                    class="btn btn-primary btn-block font-weight-bold">Request Password Baru</button>
+
+                        <div class="row pt-3">
+                            <div class="col-12">
+                                <button type="submit" id="login" class="btn btn-primary btn-block font-weight-bold"
+                                    style="transition: 0.3s; background: linear-gradient(45deg, #007bff, #0056b3); border: none;">
+                                    <i class="fas fa-paper-plane"></i> Kirim Tautan Reset
+                                </button>
                             </div>
                         </div>
                     </form>
+
                     <div class="row justify-content-center mt-4">
                         <div class="col-12 text-left">
-                            <a href="{{ route('login') }}" class="">Login</a>
+                            <a href="{{ route('login') }}" class="text-primary font-weight-bold">
+                                <i class="fas fa-arrow-left"></i> Kembali ke Login
+                            </a>
                         </div>
                     </div>
                 </div>

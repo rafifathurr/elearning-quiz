@@ -10,22 +10,26 @@
         }
     </style>
 
-    <body class="hold-transition login-page">
+    <body class="hold-transition login-page" style="background-color: #f4f6f9;">
         <div class="login-box">
             <!-- /.login-logo -->
             <div class="card card-outline card-primary">
-                <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Brata Cerdas</label>
+                <div class="card-body text-center">
+                    <h4 class="font-weight-bold text-primary">
+                        <i class="fas fa-user-circle mr-2"></i>Selamat Datang!
+                    </h4>
+                    <p class="text-muted">Silakan masuk untuk melanjutkan.</p>
+
                     <form action="{{ route('authenticate') }}" method="post">
                         @csrf
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" name="username"
                                     class="form-control @error('username') is-invalid @enderror"
-                                    placeholder="Email Atau Username">
+                                    placeholder="Email atau Username" required>
                                 <div class="input-group-append">
                                     <div class="input-group-text">
-                                        <span class="fas fa-envelope"></span>
+                                        <span class="fas fa-envelope text-primary"></span>
                                     </div>
                                 </div>
                                 @error('username')
@@ -35,19 +39,21 @@
                                 @enderror
                             </div>
                         </div>
+
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="password" name="password" id="password"
                                     class="form-control border-right-0 @error('password') is-invalid @enderror"
-                                    placeholder="Password">
+                                    placeholder="Password" required>
                                 <div class="input-group-append">
-                                    <a href="javascript:;"
-                                        class="input-group-text bg-transparent border-left-0 @error('password') border-danger @enderror"
-                                        onclick="togglePasswordVisibility()">
-                                        <i class='fas fa-eye text-secondary' style=" opacity: 0.3;" id="password-icon"></i>
+                                    <a href="javascript:;" onclick="togglePasswordVisibility()"
+                                        class="input-group-text bg-transparent border-left-0">
+                                        <i class='fas fa-eye text-secondary' style="opacity: 0.5;" id="password-icon"></i>
                                     </a>
+                                </div>
+                                <div class="input-group-append">
                                     <div class="input-group-text">
-                                        <span class="fas fa-lock"></span>
+                                        <span class="fas fa-lock text-primary"></span>
                                     </div>
                                 </div>
                                 @error('password')
@@ -57,29 +63,39 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row pt-3 d-flex justify-content-end">
-                            <div class="col-4">
-                                <button type="submit" id="login" class="btn btn-primary btn-block font-weight-bold">Log
-                                    In</button>
+
+                        <div class="row pt-3">
+                            <div class="col-12">
+                                <button type="submit" id="login" class="btn btn-primary btn-block font-weight-bold"
+                                    style="transition: 0.3s; background: linear-gradient(45deg, #007bff, #0056b3); border: none;">
+                                    <i class="fas fa-sign-in-alt"></i> Masuk
+                                </button>
                             </div>
                         </div>
                     </form>
-                    <div class="social-auth-links text-center mb-3">
-                        <p>- Atau -</p>
-                        <a href="{{ url('/auth/google') }}" class="btn btn-block btn-primary">
-                            <i class="fab fa-google mr-2"></i> Login Menggunakan Google
+
+                    <div class="social-auth-links text-center mt-3">
+                        <p class="text-muted">Atau masuk dengan</p>
+                        <a href="{{ url('/auth/google') }}" class="btn btn-block btn-danger"
+                            style="transition: 0.3s; background: linear-gradient(45deg, #db4437, #b23121);">
+                            <i class="fab fa-google mr-2"></i> Google
                         </a>
                     </div>
+
                     <div class="row justify-content-center mt-4">
                         <div class="col-12 text-center">
-                            Tidak Punya Akun ? <a href="{{ route('account.create') }}" class="">Daftar Akun</a>
+                            <p>Belum punya akun? <a href="{{ route('account.create') }}"
+                                    class="text-primary font-weight-bold">Daftar sekarang</a></p>
                         </div>
                     </div>
-                    {{-- <div class="row justify-content-center mt-4">
+
+                    <div class="row justify-content-center">
                         <div class="col-12 text-center">
-                            <a href="{{ route('password.request') }}" class="">Lupa Password</a>
+                            <a href="{{ route('password.request') }}" class="text-muted">
+                                <i class="fas fa-key"></i> Lupa Password?
+                            </a>
                         </div>
-                    </div> --}}
+                    </div>
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -87,6 +103,7 @@
         </div>
         <!-- /.login-box -->
     </body>
+
     @push('javascript-bottom')
         <script>
             document.getElementById('login').addEventListener('click', function(e) {
