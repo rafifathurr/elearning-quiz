@@ -47,9 +47,9 @@ use Laravel\Socialite\Facades\Socialite;
 Route::prefix('snap/v1.0')->group(function () {
     Route::post('/transfer-va/inquiry', [BrivaController::class, 'inquiry']);
     Route::post('/transfer-va/payment', [BrivaController::class, 'payment']);
+    Route::post('/access-token/b2b', [BrivaController::class, 'getAccessToken']);
 });
-
-
+Route::get('/generate-signature', [BrivaController::class, 'generateSignature']);
 
 
 //Google Login

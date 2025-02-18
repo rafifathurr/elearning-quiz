@@ -14,5 +14,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'snap/v1.0/transfer-va/inquiry',
         'snap/v1.0/transfer-va/payment',
+        'snap/v1.0/access-token/b2b'
     ];
 }
