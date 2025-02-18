@@ -89,13 +89,13 @@
                         </div>
                     </div>
 
-                    <div class="row justify-content-center">
+                    {{-- <div class="row justify-content-center">
                         <div class="col-12 text-center">
                             <a href="{{ route('password.request') }}" class="text-muted">
                                 <i class="fas fa-key"></i> Lupa Password?
                             </a>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <!-- /.card-body -->
             </div>
