@@ -13,23 +13,7 @@ class BrivaController extends Controller
     public function getAccessToken()
     {
         $clientId = "7505935e79b645f993f86f3f11eaecc0";
-        $privateKey = <<<EOD
-        -----BEGIN RSA PRIVATE KEY-----
-        MIICWgIBAAKBgH6veQmFrdI9yXmAUoDTFJzSQPJspPpx71wbVM1NBUZx4w7C2V0g
-        AadmMnhswn1PjSur7mmFqn687iMgLaiNKk6yTdGi3CWEH3eQov1ycWAOxCIZm+Yi
-        XN/8fJiKP6LaeNQBQUwNI7fV7/NxzlJbJix79HYUV18ktTMnRCdMBEMtAgMBAAEC
-        gYAJZ/nyrQxE6fWFofN+QS3snufXmB1/wunkytq3C5ryqg4T0H/XHENDLKFes6SV
-        LUzsCy3+g8Au/NQpo4AAXcrgRioMOAaIQf3u1F9QeV8DF11WMRYmOyeiR0ISq6Y6
-        /tw80e+jgqhN+7+AYuu/g8MxBQ7yaqtctCzq2tEi9cCCAQJBAMEeIY1nfjCuH/6P
-        y21aeWLH8nKKjN5Ce321QROFAjIBNsatDVusQMoNLBD3oxEotNg65LLCuIkhMOcI
-        Dd6qXW0CQQCn77Gog3mHGH5GhP+wTytcT6YboirLoifyZZicCOCTCvBX6UqsNyRX
-        QBoPE1+pzutDWF9REqHKvJHI6nXeYqTBAkA4BQiQn1vwvSIU0xucvikGKaA/78cL
-        VlfCUIjvI59OaCG+okaEuEQXGJkW1u8btCY5r2PWIzwqs1EfQ6vaUqtFAkAnsp2I
-        fCvKJ5wSB3Z5sv1JAPr/JUKAiIBw6Fs+50pO+BMAdQFV3GMWzOxcC/RdK7CpZsaB
-        X6onRpQfrmzWePMBAkArRh5A01Z7Dd81UT4iAuLVXeFx5/qgwTeVrDchgXU9aOTi
-        Uodp8yHf/pv+qZd8uCmnfGj63s49Zk1ByaFIpEQn
-        -----END RSA PRIVATE KEY-----
-        EOD;
+        $privateKey = env('PRIVATE_KEY');
 
         // Panggil helper untuk generate signature
         $signatureData = SignatureHelper::generateSignature($clientId, $privateKey);
@@ -56,6 +40,8 @@ class BrivaController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData); // Body dengan grantType
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout 10 detik
+
 
         $response = curl_exec($ch);
         $error = curl_error($ch);
@@ -74,28 +60,18 @@ class BrivaController extends Controller
     {
         $clientId = "7505935e79b645f993f86f3f11eaecc0";
 
-        $privateKey = <<<EOD
------BEGIN RSA PRIVATE KEY-----
-MIICWgIBAAKBgH6veQmFrdI9yXmAUoDTFJzSQPJspPpx71wbVM1NBUZx4w7C2V0g
-AadmMnhswn1PjSur7mmFqn687iMgLaiNKk6yTdGi3CWEH3eQov1ycWAOxCIZm+Yi
-XN/8fJiKP6LaeNQBQUwNI7fV7/NxzlJbJix79HYUV18ktTMnRCdMBEMtAgMBAAEC
-gYAJZ/nyrQxE6fWFofN+QS3snufXmB1/wunkytq3C5ryqg4T0H/XHENDLKFes6SV
-LUzsCy3+g8Au/NQpo4AAXcrgRioMOAaIQf3u1F9QeV8DF11WMRYmOyeiR0ISq6Y6
-/tw80e+jgqhN+7+AYuu/g8MxBQ7yaqtctCzq2tEi9cCCAQJBAMEeIY1nfjCuH/6P
-y21aeWLH8nKKjN5Ce321QROFAjIBNsatDVusQMoNLBD3oxEotNg65LLCuIkhMOcI
-Dd6qXW0CQQCn77Gog3mHGH5GhP+wTytcT6YboirLoifyZZicCOCTCvBX6UqsNyRX
-QBoPE1+pzutDWF9REqHKvJHI6nXeYqTBAkA4BQiQn1vwvSIU0xucvikGKaA/78cL
-VlfCUIjvI59OaCG+okaEuEQXGJkW1u8btCY5r2PWIzwqs1EfQ6vaUqtFAkAnsp2I
-fCvKJ5wSB3Z5sv1JAPr/JUKAiIBw6Fs+50pO+BMAdQFV3GMWzOxcC/RdK7CpZsaB
-X6onRpQfrmzWePMBAkArRh5A01Z7Dd81UT4iAuLVXeFx5/qgwTeVrDchgXU9aOTi
-Uodp8yHf/pv+qZd8uCmnfGj63s49Zk1ByaFIpEQn
------END RSA PRIVATE KEY-----
-EOD;
+        // Ambil private key dari .env
+        $privateKey = env('PRIVATE_KEY');
+
+        if (!$privateKey) {
+            return response()->json(['error' => 'Private Key not found'], 500);
+        }
 
         date_default_timezone_set('UTC');
         $xTimestamp = gmdate("Y-m-d\TH:i:s.000\Z");
 
         $stringToSign = $clientId . "|" . $xTimestamp;
+
         openssl_sign($stringToSign, $signature, $privateKey, OPENSSL_ALGO_SHA256);
         $xSignature = base64_encode($signature);
 
@@ -104,6 +80,7 @@ EOD;
             'X-Timestamp' => $xTimestamp
         ]);
     }
+
 
 
     public function inquiry(Request $request)
