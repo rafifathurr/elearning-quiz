@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 //tes briva
-Route::prefix('v1')->group(function () {
+Route::prefix('snap/v1.0')->group(function () {
     Route::post('/transfer-va/inquiry', [BrivaController::class, 'inquiry']);
     Route::post('/transfer-va/payment', [BrivaController::class, 'payment']);
 });

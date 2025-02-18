@@ -12,7 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        '/briva/inquiry',
-        '/briva/payment',
+        'snap/v1.0/transfer-va/inquiry',
+        'snap/v1.0/transfer-va/payment',
     ];
 }

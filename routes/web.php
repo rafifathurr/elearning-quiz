@@ -44,6 +44,11 @@ use Laravel\Socialite\Facades\Socialite;
 // Route::post('/briva/inquiry', [BrivaController::class, 'inquiry']);
 // Route::post('/briva/payment', [BrivaController::class, 'payment']);
 
+Route::prefix('snap/v1.0')->group(function () {
+    Route::post('/transfer-va/inquiry', [BrivaController::class, 'inquiry']);
+    Route::post('/transfer-va/payment', [BrivaController::class, 'payment']);
+});
+
 
 
 
