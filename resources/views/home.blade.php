@@ -60,7 +60,7 @@
 
         /* Gradient text */
         .text-gradient {
-            background: linear-gradient(45deg, #007bff, #00c6ff);
+            background: linear-gradient(45deg, #003366, #0056b3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
