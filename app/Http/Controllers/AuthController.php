@@ -294,8 +294,17 @@ class AuthController extends Controller
     // Menampilkan halaman reset password
     public function showResetForm($token)
     {
+        // Cek apakah token masih ada di database
+        $reset = DB::table('password_reset_tokens')->where('token', $token)->first();
+
+        // Jika token tidak ditemukan, redirect ke halaman lupa password
+        if (!$reset) {
+            return redirect()->route('password.request')->with('failed', 'Token reset password tidak valid atau sudah digunakan.');
+        }
+
         return view('auth.reset-password', compact('token'));
     }
+
 
     // Memproses reset password
     public function resetPassword(Request $request)
