@@ -78,7 +78,7 @@
                             <i class="nav-icon fas fa-shopping-bag"></i>
                             <p>
                                 Daftar Order <span
-                                    class="badge badge-info ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
+                                    class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
 
                             </p>
                         </a>
