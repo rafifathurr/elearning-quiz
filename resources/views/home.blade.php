@@ -50,6 +50,56 @@
             margin-bottom: 1rem !important;
             /* Menambah jarak di dalam dropdown */
         }
+
+        .welcome-text {
+            font-size: 28px;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        /* Gradient text */
+        .text-gradient {
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animasi wave emoji */
+        .wave {
+            display: inline-block;
+            animation: waveAnim 1s infinite;
+        }
+
+        /* Animasi fade-in */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1.5s ease-in-out forwards 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes waveAnim {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            50% {
+                transform: rotate(15deg);
+            }
+        }
     </style>
     <div class="py-1">
         <!-- Content Header (Page header) -->
@@ -62,8 +112,12 @@
         </div>
         <!-- Main content -->
         <section class="content">
-            <div class="col-md-12 mb-2">
-                <h3>Selamat Datang, <b>{{ auth()->user()->name }}</b> !</h3>
+            <div class="col-md-12 mb-4 text-center">
+                <h3 class="welcome-text">
+                    <span class="wave">👋</span> Selamat Datang,
+                    <b class="text-gradient">{{ auth()->user()->name }}</b>
+                </h3>
+                <p class="text-muted fade-in">Kami senang melihat Anda kembali.</p>
             </div>
             <div class="container-fluid">
 
