@@ -141,9 +141,9 @@ class OrderController extends Controller
                     return '<a href="' . route('order.downloadPayment', $data->id) . '" target="_blank"><i class="fas fa-eye mr-1"></i> Lihat Bukti</a>';
                 }
             })
-            ->addColumn('payment_date', function ($data) {
-                $date = \Carbon\Carbon::parse($data->payment_date)->translatedFormat('d F Y H:i');
-                return $date;
+            ->addColumn('order_id', function ($data) {
+                $year = \Carbon\Carbon::parse($data->created_at)->format('y');
+                return 'BC' . $year . $data->id;
             })
             ->addColumn('status_payment', function ($data) {
                 $list_view = '<div align="center">';
@@ -168,7 +168,7 @@ class OrderController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'payment_date', 'action', 'status_payment'])
+            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'order_id', 'action', 'status_payment'])
             ->rawColumns(['total_price', 'proof_payment', 'action', 'status_payment'])
             ->make(true);
     }

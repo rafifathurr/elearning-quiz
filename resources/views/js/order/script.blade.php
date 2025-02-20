@@ -125,6 +125,10 @@
                     searchable: false
                 },
                 {
+                    data: 'order_id',
+                    defaultContent: '-'
+                },
+                {
                     data: 'user',
                     defaultContent: '-'
                 },
@@ -134,10 +138,6 @@
                 },
                 {
                     data: 'payment_method',
-                    defaultContent: '-'
-                },
-                {
-                    data: 'payment_date',
                     defaultContent: '-'
                 },
                 {

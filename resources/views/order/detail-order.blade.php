@@ -61,6 +61,8 @@
 
                             {{-- Detail Pesanan --}}
                             <h5 class="font-weight-bold">Detail Pesanan</h5>
+                            <span class="badge bg-primary p-2" style="font-size: 1rem">Waktu Pemesanan:
+                                {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y H:i') }}</span>
                             <div class="table-responsive py-1">
                                 <table id="table-detail" class="table table-bordered table-hover text-center">
                                     <thead>
