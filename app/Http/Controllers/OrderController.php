@@ -105,7 +105,13 @@ class OrderController extends Controller
 
     public function dataTableListOrder()
     {
-        $order = Order::whereNull('deleted_at')->where('status', 10)->get();
+        $order = Order::where(function ($query) {
+            $query->where('status', 100)
+                ->orWhere('status', 10)
+                ->orWhere('status', 2)->whereNotNull('proof_payment');
+        })->whereNull('deleted_at')
+            ->orderByDesc('created_at')
+            ->get();;
 
         return DataTables::of($order)
             ->addIndexColumn()
@@ -129,18 +135,57 @@ class OrderController extends Controller
                 $date = \Carbon\Carbon::parse($data->payment_date)->translatedFormat('d F Y H:i');
                 return $date;
             })
+            ->addColumn('status_payment', function ($data) {
+                $list_view = '<div align="center">';
+                if ($data->status == 100) {
+                    $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
+                } elseif ($data->status == 10) {
+                    $list_view .= '<span class="badge bg-warning  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                } else {
+                    $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
+                }
+                $list_view .= '</div>';
+                return $list_view;
+            })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-
-                $btn_action .= '<button class="btn btn-sm btn-success ml-2" onclick="approveOrder(' . $data->id . ')" title="Terima">Terima</button>';
-                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="rejectOrder(' . $data->id . ')" title="Tolak">Tolak</button>';
+                if ($data->status == 10) {
+                    $btn_action .= '<button class="btn btn-sm btn-success ml-2" onclick="approveOrder(' . $data->id . ')" title="Terima">Terima</button>';
+                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="rejectOrder(' . $data->id . ')" title="Tolak">Tolak</button>';
+                }
+                $btn_action .= '<a href="' . route('order.detailOrder', ['id' => $data->id]) . '"  class="btn btn-sm btn-primary ml-2" >Detail</a>';
 
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'payment_date', 'action'])
-            ->rawColumns(['total_price', 'proof_payment', 'action'])
+            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'payment_date', 'action', 'status_payment'])
+            ->rawColumns(['total_price', 'proof_payment', 'action', 'status_payment'])
             ->make(true);
+    }
+
+    function detailOrder(string $id)
+    {
+        try {
+            $order = Order::find($id);
+            $admin = User::find(Auth::user()->id)->hasRole('admin');
+            if (!$admin) {
+                return redirect()
+                    ->back()
+                    ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
+            }
+            $order_package = OrderPackage::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
+            $totalPrice = $order_package->sum(function ($data) {
+                return $data->package->price;
+            });
+
+            return view('order.detail-order', compact('order', 'order_package', 'totalPrice'));
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with('failed', $e->getMessage());
+        }
     }
 
     public function getSchedule($id)

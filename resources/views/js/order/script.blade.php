@@ -142,6 +142,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'status_payment',
+                    defaultContent: '-'
+                },
+                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',

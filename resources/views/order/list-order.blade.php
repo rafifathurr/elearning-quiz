@@ -25,6 +25,7 @@
                                                 <th>Metode Pembayaran</th>
                                                 <th>Waktu Pembayaran</th>
                                                 <th>Bukti Pembayaran</th>
+                                                <th>Status Pesanan</th>
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>

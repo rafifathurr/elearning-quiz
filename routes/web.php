@@ -200,6 +200,7 @@ Route::group(['middleware' => ['role:admin|finance']], function () {
     // Kelola Daftar Order
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('list-order', 'listOrder')->name('listOrder');
+        Route::get('detail-order/{id}', 'detailOrder')->name('detailOrder');
         Route::get('datatable-list-order', 'dataTableListOrder')->name('dataTableListOrder');
         Route::post('approve/{id}', 'approve')->name('approve');
         Route::post('reject/{id}', 'reject')->name('reject');
