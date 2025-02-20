@@ -105,13 +105,16 @@
 
     function dataTableAdmin() {
         const url = $('#url_dt').val();
-        $('#dt-order').DataTable({
+        table = $('#dt-order').DataTable({
             responsive: true,
             autoWidth: false,
             processing: true,
             serverSide: true,
             ajax: {
                 url: url,
+                data: function(d) {
+                    d.status = $('#statusFilter').val(); // Filter status
+                },
                 error: function(xhr, error, code) {
                     swalError(xhr.statusText);
                 }
@@ -154,6 +157,11 @@
                 },
             ]
 
+        });
+        // Event listener untuk filter paket
+        $('#statusFilter').on('change', function() {
+            console.log('status dipilih');
+            table.ajax.reload();
         });
 
     }

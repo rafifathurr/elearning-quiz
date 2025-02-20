@@ -105,13 +105,23 @@ class OrderController extends Controller
 
     public function dataTableListOrder()
     {
-        $order = Order::where(function ($query) {
-            $query->where('status', 100)
-                ->orWhere('status', 10)
-                ->orWhere('status', 2)->whereNotNull('proof_payment');
-        })->whereNull('deleted_at')
-            ->orderByDesc('created_at')
-            ->get();;
+        $statusFilter = request()->get('status');
+        $data = Order::query()
+            ->where(function ($query) {
+                $query->where('status', 100)
+                    ->orWhere('status', 10)
+                    ->orWhere('status', 2)->whereNotNull('proof_payment');
+            })->whereNull('deleted_at');
+
+        // Filter berdasarkan paket jika dipilih
+        if ($statusFilter) {
+            $data->where('status', $statusFilter);
+        }
+
+        if (!$statusFilter) {
+            $data->orderByDesc('created_at');
+        }
+        $order = $data->get();
 
         return DataTables::of($order)
             ->addIndexColumn()

@@ -14,6 +14,17 @@
                                 </h3>
                             </div>
                             <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4 my-1">
+                                        <label for="statusFilter">Filter Status Order:</label>
+                                        <select id="statusFilter" name="statusFilter" class="form-control">
+                                            <option value="">-- Semua Status --</option>
+                                            <option value="100">Berhasil</option>
+                                            <option value="10">Menunggu Konfirmasi</option>
+                                            <option value="2">Ditolak</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="dt-order">
@@ -23,7 +34,7 @@
                                                 <th>Nama Pengguna</th>
                                                 <th>Total Harga</th>
                                                 <th>Metode Pembayaran</th>
-                                                <th>Waktu Pembayaran</th>
+                                                <th>Waktu Pemesanan</th>
                                                 <th>Bukti Pembayaran</th>
                                                 <th>Status Pesanan</th>
                                                 <th class="text-center">Action</th>
