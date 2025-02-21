@@ -360,7 +360,18 @@ class OrderController extends Controller
 
             $exist_order = Order::where('user_id',  $user_id)->where('order_by',  $counselor_id)->where('status', 1)->first();
             if ($exist_order) {
+                $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
+                    ->where('package_id', $id)
+                    ->whereNull('deleted_at')
+                    ->where('class', '>', 0)
+                    ->exists();
 
+                if ($duplicate_package) {
+                    // Jika duplikat, rollback dan kirim pesan
+                    DB::rollBack();
+                    session()->flash('failed', 'Paket Kelas Sudah Ada, Silahkan Lihat Di MyOrder.');
+                    return;
+                }
                 $add_order_package = OrderPackage::lockforUpdate()->create([
                     'package_id' => $id,
                     'order_id' => $exist_order->id,
