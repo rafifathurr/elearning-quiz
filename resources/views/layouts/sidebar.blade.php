@@ -252,17 +252,17 @@
                     </a>
                 </li> --}}
 
-                @unless (auth()->user()->hasRole('admin'))
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('my-account.show') }}"
-                            class="nav-link {{ request()->routeIs('my-account.show') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>
-                                My Account
-                            </p>
-                        </a>
-                    </li>
-                @endunless
+                {{-- @unless (auth()->user()->hasRole('admin')) --}}
+                <li class="nav-item {{ $display }}">
+                    <a href="{{ route('my-account.show') }}"
+                        class="nav-link {{ request()->routeIs('my-account.show') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>
+                            My Account
+                        </p>
+                    </a>
+                </li>
+                {{-- @endunless --}}
 
                 <li class="nav-item mb-3">
                     <a href="{{ route('logout') }}" class="nav-link ">

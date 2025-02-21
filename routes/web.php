@@ -105,6 +105,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [DashboardController::class, 'index'])->name('home');
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
+
+    // Edit Akun
+    Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {
+        Route::get('/', [UserController::class, 'show'])->name('show');
+        Route::get('edit', [UserController::class, 'edit'])->name('edit');
+        Route::match(['put', 'patch'], '{id}', [UserController::class, 'updatePassword'])->name('updatePassword');
+    });
 });
 
 //Order User Konselor
@@ -184,15 +191,6 @@ Route::group(['middleware' => ['role:admin|user|question-operator']], function (
 });
 
 
-//finance | paket manager | question operator | User
-Route::group(['middleware' => ['role:user|finance|counselor|package-manager|question-operator']], function () {
-    // Edit Akun
-    Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {
-        Route::get('/', [UserController::class, 'show'])->name('show');
-        Route::get('edit', [UserController::class, 'edit'])->name('edit');
-        Route::match(['put', 'patch'], '{id}', [UserController::class, 'update'])->name('update');
-    });
-});
 
 
 // Admin | Finance

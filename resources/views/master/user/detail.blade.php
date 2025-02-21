@@ -5,7 +5,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-10 col-sm-12 mt-4">
                     <div class="card shadow-lg border-0">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-lightblue text-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 font-weight-bold">
                                 <i class="fas fa-user-circle mr-2"></i>Detail User - {{ $user->name }}
                             </h5>
@@ -41,17 +41,19 @@
                                     </tr>
                                 </table>
                             </div>
-                            <div class="d-flex justify-content-end pt-3">
-                                @hasrole('admin')
-                                    <a href="{{ route('master.user.index') }}" class="btn btn-danger">
-                                        <i class="fas fa-arrow-left mr-2"></i>Kembali
-                                    </a>
-                                @else
-                                    <a href="{{ route('my-account.edit') }}" class="btn btn-warning text-white">
+
+                            @if ($user->id == Auth::user()->id)
+                                <div class="d-flex justify-content-end pt-3">
+                                    <a href="{{ route('my-account.edit') }}" class="btn bg-maroon text-white">
                                         <i class="fas fa-key mr-2"></i>Ubah Password
                                     </a>
-                                @endhasrole
-                            </div>
+                                </div>
+                            @else
+                                <a href="{{ route('master.user.index') }}" class="btn btn-danger">
+                                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                                </a>
+                            @endif
+
                         </div>
                     </div>
                 </div>
