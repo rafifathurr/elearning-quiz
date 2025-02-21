@@ -81,12 +81,17 @@ class myClassAdminController extends Controller
 
     public function getOrderPackages($package_id)
     {
+        $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
+            $query->whereColumn('current_meeting', '<', 'total_meeting');
+        })
+            ->pluck('order_package_id');
         $orderPackages = OrderPackage::whereHas('order', function ($query) {
             $query->whereNull('deleted_at')
                 ->where('status', 100);
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
+            ->whereNotIn('id', $orderPackageIdInAttendance)
             ->with('order.user') // Eager Loading
             ->get();
 
