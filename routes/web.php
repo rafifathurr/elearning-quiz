@@ -226,8 +226,8 @@ Route::group(['middleware' => ['role:admin|counselor']], function () {
     });
 });
 
-// Hanya Konselor
-Route::group(['middleware' => ['role:counselor']], function () {
+// Konselor | Kelas Operator
+Route::group(['middleware' => ['role:counselor|class-operator']], function () {
     // Kelola Kelas Konselor
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');

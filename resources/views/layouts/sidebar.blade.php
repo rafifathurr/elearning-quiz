@@ -151,7 +151,7 @@
                     </li>
                 @endhasanyrole
 
-                @hasrole('counselor')
+                @hasanyrole('counselor|class-operator')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('class.index') }}"
                             class="nav-link {{ request()->routeIs('class.index') ? 'active' : '' }}">
@@ -161,14 +161,16 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item {{ $display }}">
-                        <a href="{{ route('master.member.index') }}"
-                            class="nav-link {{ request()->routeIs('master.member.index') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-user-check mr-1"></i>
-                            <p> Daftar Peserta</p>
-                        </a>
-                    </li>
-                @endhasrole
+                    @hasanyrole('class-operator')
+                        <li class="nav-item {{ $display }}">
+                            <a href="{{ route('master.member.index') }}"
+                                class="nav-link {{ request()->routeIs('master.member.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-check mr-1"></i>
+                                <p> Daftar Peserta</p>
+                            </a>
+                        </li>
+                    @endhasanyrole
+                @endhasanyrole
 
                 @hasanyrole('admin')
                     <li class="nav-item {{ $display }}">
