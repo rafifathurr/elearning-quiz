@@ -630,6 +630,16 @@ class OrderController extends Controller
                     'deleted_at' => date('Y-m-d H:i:s')
                 ]);
 
+                $exists_order_package = OrderPackage::where('order_id', $order_package->order_id)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                // Jika tidak ada OrderPackage yang aktif, hapus Order
+                if (!$exists_order_package) {
+                    OrderPackage::where('order_id', $order_package->order_id)->delete();
+                    Order::where('id', $order_package->order_id)->delete();
+                }
+
                 if ($order_cancel) {
                     DB::commit();
                     session()->flash('success', 'Berhasil Menghapus Paket');
