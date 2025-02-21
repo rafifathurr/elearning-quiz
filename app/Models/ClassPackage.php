@@ -12,7 +12,7 @@ class ClassPackage extends Model
 
     public function classCounselor()
     {
-        return $this->hasMany(classCounselor::class, 'class_id', 'id');
+        return $this->hasMany(ClassCounselor::class, 'class_id', 'id');
     }
 
     public function package()

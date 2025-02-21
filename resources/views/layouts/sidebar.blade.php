@@ -157,7 +157,7 @@
                             class="nav-link {{ request()->routeIs('class.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
-                                My Class
+                                My Class Konselor
                             </p>
                         </a>
                     </li>
