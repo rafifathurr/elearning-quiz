@@ -30,7 +30,11 @@ class myClassAdminController extends Controller
     public function dataTable()
     {
         if (User::find(User::find(Auth::user()->id)->hasRole('counselor'))) {
-            $myClass = ClassPackage::whereNull('deleted_at')->where('user_id', Auth::user()->id)->get();
+            $myClass = ClassPackage::whereNull('deleted_at')
+                ->whereHas('classCounselor', function ($query) {
+                    $query->where('counselor_id', Auth::user()->id);
+                })
+                ->get();
         } else {
             $myClass = ClassPackage::whereNull('deleted_at')->get();
         }
