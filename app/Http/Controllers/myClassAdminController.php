@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassAttendance;
+use App\Models\ClassCounselor;
 use App\Models\ClassPackage;
+use App\Models\ClassUser;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -26,8 +29,11 @@ class myClassAdminController extends Controller
     }
     public function dataTable()
     {
-        $myClass = ClassPackage::whereNull('deleted_at')->where('user_id', Auth::user()->id)->get();
-
+        if (User::find(User::find(Auth::user()->id)->hasRole('counselor'))) {
+            $myClass = ClassPackage::whereNull('deleted_at')->where('user_id', Auth::user()->id)->get();
+        } else {
+            $myClass = ClassPackage::whereNull('deleted_at')->get();
+        }
         $dataTable = DataTables::of($myClass)
             ->addIndexColumn()
             ->addColumn('package', function ($data) {
@@ -56,35 +62,91 @@ class myClassAdminController extends Controller
 
     public function create()
     {
-        $classPackageId = ClassPackage::whereNull('deleted_at')
-            ->whereColumn('current_meeting', '<', 'total_meeting')
-            ->where('user_id', Auth::user()->id)
-            ->pluck('package_id');
-
         $packages = Package::whereNull('deleted_at')
             ->where('class', '>', 0)
-            ->whereNotIn('id', $classPackageId)
             ->get();
 
-        return view('counselor.create', compact('packages'));
+        $counselors = User::whereNull('deleted_at')
+            ->where('status', 1)
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'counselor');
+            })->get();
+
+        return view('counselor.create', compact('packages', 'counselors'));
     }
+
+    public function getOrderPackages($package_id)
+    {
+        $orderPackages = OrderPackage::whereHas('order', function ($query) {
+            $query->whereNull('deleted_at')
+                ->where('status', 100);
+        })
+            ->whereNull('deleted_at')
+            ->where('package_id', $package_id)
+            ->with('order.user') // Eager Loading
+            ->get();
+
+        return response()->json($orderPackages);
+    }
+
+
 
     public function store(Request $request)
     {
         try {
             DB::beginTransaction();
             $package = Package::find($request->package_id);
+
+            // Pengecekan Max Member
+            $total_participants = count($request->order_package_id);
+
+            if ($total_participants > $package->max_member) {
+                return redirect()
+                    ->back()
+                    ->with(['failed' => "Batas maksimal {$package->max_member} peserta."])
+                    ->withInput();
+            }
+
             $add_class = ClassPackage::lockForUpdate()->create([
                 'package_id' => $request->package_id,
                 'total_meeting' => $package->class,
                 'current_meeting' => 0,
-                'user_id' => Auth::user()->id,
 
             ]);
 
-            if ($add_class) {
+            //add Class Counselor
+            $class_counselor = [];
+            foreach ($request->counselor_id as $counselor) {
+                $class_counselor[] = [
+                    'class_id' => $add_class->id,
+                    'counselor_id' => $counselor
+                ];
+            }
+
+            $add_class_counselor = ClassCounselor::insert($class_counselor);
+
+            //Add Class User
+            $class_user = [];
+            foreach ($request->order_package_id as $order_package_id) {
+                $orderPackage = OrderPackage::with('order') // Eager loading relasi 'order'
+                    ->find($order_package_id);
+
+                // Pastikan $orderPackage ditemukan
+                if ($orderPackage && $orderPackage->order) {
+                    $class_user[] = [
+                        'class_id' => $add_class->id,
+                        'order_package_id' => $order_package_id,
+                        'user_id' => $orderPackage->order->user_id
+                    ];
+                }
+            }
+
+
+            $add_class_user = ClassUser::insert($class_user);
+
+            if ($add_class && $add_class_counselor && $add_class_user) {
                 DB::commit();
-                return redirect()->route('class.show', ['id' => $add_class->id])->with(['success' => 'Berhasil Menambahkan Kelas']);
+                return redirect()->route('class.index')->with(['success' => 'Berhasil Menambahkan Kelas']);
             } else {
                 DB::rollBack();
                 return redirect()
@@ -105,12 +167,6 @@ class myClassAdminController extends Controller
     {
         try {
             $class = ClassPackage::find($id);
-
-            if ($class->user_id != Auth::user()->id) {
-                return redirect()
-                    ->back()
-                    ->with('failed', 'Anda Tidak Bisa Akses Kelas Ini');
-            }
 
 
             $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {

@@ -15,6 +15,23 @@
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group row">
+                                        <label for="name" class="col-md-4 control-label text-left">Nama Kelas
+                                            <span class="text-danger ml-1">*</span>
+                                        </label>
+                                        <div class="col-md-8 col-sm-12">
+                                            <input class="form-control @error('name') is-invalid @enderror" type="text"
+                                                name="name" id="name" value="{{ old('name') }}"
+                                                placeholder="Nama Kelas" required>
+                                            @error('name')
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <!-- Select Paket -->
+                                    <div class="form-group row">
                                         <label class="col-md-4 control-label text-left" for="package_id">Paket <span
                                                 class="text-danger">*</span></label>
                                         <div class="col-md-8 col-sm-12">
@@ -22,14 +39,7 @@
                                                 id="package_id" name="package_id" required>
                                                 <option value="" selected>Pilih Paket</option>
                                                 @foreach ($packages as $package)
-                                                    @if (!is_null(old('package_id')) && old('package_id') == $package->id)
-                                                        <option value="{{ $package->id }}" selected>
-                                                            {{ $package->name }}
-                                                        </option>
-                                                    @else
-                                                        <option value="{{ $package->id }}">{{ $package->name }}
-                                                        </option>
-                                                    @endif
+                                                    <option value="{{ $package->id }}">{{ $package->name }}</option>
                                                 @endforeach
                                             </select>
                                             @error('package_id')
@@ -40,6 +50,60 @@
                                         </div>
                                     </div>
 
+                                    <div class="card card-info">
+                                        <div class="card-header font-weight-bold">
+                                            Daftar Konselor
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <label for="counselor_id" class="col-md-4 control-label text-left">Pilih
+                                                    Konselor<span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <select
+                                                        class="form-control @error('counselor_id[]') is-invalid @enderror"
+                                                        name="counselor_id[]" id="counselor_id"
+                                                        data-placeholder="Pilih Konselor" style="width: 100%;" required>
+                                                        @foreach ($counselors as $counselor)
+                                                            <option value="{{ $counselor->id }}">
+                                                                {{ $counselor->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('counselor_id[]')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-info">
+                                        <div class="card-header font-weight-bold">
+                                            Dafar Peserta
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Select Peserta (Order Packages) -->
+                                            <div class="form-group row">
+                                                <label for="order_package_id" class="col-md-4 control-label text-left">Pilih
+                                                    Peserta<span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <select
+                                                        class="form-control @error('order_package_id[]') is-invalid @enderror"
+                                                        name="order_package_id[]" id="order_package_id"
+                                                        data-placeholder="Pilih Peserta" style="width: 100%;" required>
+                                                        <option value="">Pilih Peserta Terlebih Dahulu</option>
+                                                    </select>
+                                                    @error('order_package_id[]')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="pt-3 ">
                                         <div class="d-flex justify-content-end mt-3">
@@ -62,7 +126,46 @@
     @push('javascript-bottom')
         <script>
             $('#package_id').select2();;
+            $('#counselor_id').select2({
+                multiple: true,
+            });
+            $('#order_package_id').select2({
+                multiple: true,
+            });
+
+            $('#counselor_id').val('').trigger('change');
+            $('#order_package_id').val('').trigger('change');
         </script>
+
+        <script>
+            $(document).ready(function() {
+                $('#package_id').on('change', function() {
+                    var package_id = $(this).val();
+                    $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
+
+                    if (package_id) {
+                        $.ajax({
+                            url: '{{ url('class/get-order-packages') }}/' + package_id,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(data) {
+                                $('#order_package_id').append(
+                                    '<option value="">Pilih Peserta</option>');
+                                $.each(data, function(key, value) {
+                                    $('#order_package_id').append(
+                                        '<option value="' + value.id + '">' + value
+                                        .order.user.name + '</option>'
+                                    );
+                                });
+                            }
+                        });
+                    } else {
+                        $('#order_package_id').append('<option value="">Pilih Paket Terlebih Dahulu</option>');
+                    }
+                });
+            });
+        </script>
+
         @include('js.master.user.script')
     @endpush
 @endsection
