@@ -87,6 +87,38 @@
 
     }
 
+    function dataTableAttendance() {
+
+        $('#dt-attendance').DataTable({
+            responsive: true,
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: $('#url').val(),
+                error: function(xhr, error, code) {
+                    swalError(xhr.statusText);
+                }
+            },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    width: '5%',
+                    searchable: false
+                },
+                {
+                    data: 'attendance_date',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'status',
+                    defaultContent: '-'
+                },
+            ]
+
+        });
+
+    }
+
     function dataTableDetail() {
         const url = $('#url_dt').val();
         $('#dt-myclass').DataTable({

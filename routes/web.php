@@ -150,6 +150,7 @@ Route::group(['middleware' => ['role:user']], function () {
         Route::get('index', 'index')->name('index');
         Route::get('detail/{orderId}/{packageId}', 'detail')->name('detail');
         Route::get('datatable2/{orderId}/{packageId}', 'dataTableDetail')->name('dataTableDetail');
+        Route::get('attendance/{orderPackageId}', 'dataTableAttendance')->name('dataTableAttendance');
     });
 });
 

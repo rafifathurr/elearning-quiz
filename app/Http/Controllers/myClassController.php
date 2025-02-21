@@ -63,9 +63,11 @@ class myClassController extends Controller
             ->addColumn('action', function ($data) {
                 $encryptedOrderId = encrypt($data->order_id);
                 $encryptedPackageId = encrypt($data->package_id);
+                $encryptedOrderPackageId = encrypt($data->id);
 
                 $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $encryptedOrderId, 'packageId' => $encryptedPackageId]) . '" class="btn btn-sm btn-success">Test</a>';
+                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $encryptedOrderId, 'packageId' => $encryptedPackageId]) . '" class="btn btn-sm btn-success m-1">Test</a>';
+                $btn_action .= '<a href="' . route('myclass.dataTableAttendance', ['orderPackageId' => $encryptedOrderPackageId]) . '" class="btn btn-sm btn-primary m-1">Absensi</a>';
                 $btn_action .= '</div>';
                 return $btn_action;
             })
@@ -74,6 +76,33 @@ class myClassController extends Controller
             ->make(true);
     }
 
+    public function dataTableAttendance(Request $request, $orderPackageId)
+    {
+        if ($request->ajax()) {
+            $decryptedOrderPackageId = decrypt($orderPackageId);
+            $attendance = ClassAttendance::where('order_package_id', $decryptedOrderPackageId)->get();
+
+            return DataTables::of($attendance)
+                ->addIndexColumn()
+                ->addColumn('attendance_date', function ($data) {
+                    return \Carbon\Carbon::parse($data->attendance_date)->translatedFormat('l, d F Y');
+                })
+                ->addColumn('status', function ($data) {
+                    $status = null;
+                    if ($data->attendance == 0) {
+                        $status = '<span class="badge p-2 bg-danger" style="font-size: 1rem; font-weight: bold;">Tidak Hadir</span>';
+                    } else {
+                        $status = '<span class="badge p-2 bg-success" style="font-size: 1rem; font-weight: bold;">Hadir</span>';
+                    }
+                    return $status;
+                })
+
+                ->only(['attendance_date', 'status'])
+                ->rawColumns(['status'])
+                ->make(true);
+        }
+        return view('myclass.attendance');
+    }
 
     public function detail($orderId, $packageId)
     {
