@@ -232,7 +232,7 @@ Route::group(['middleware' => ['role:counselor|class-operator']], function () {
     // Kelola Kelas Konselor
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('get-order-packages/{package_id}', 'getOrderPackages')->name('getOrderPackages');
+        Route::get('get-order-packages/{package_id}/{date_class_id}', 'getOrderPackages')->name('getOrderPackages');
         Route::post('store-attendance', 'storeAttendance')->name('storeAttendance');
         Route::post('update-attendance', 'updateAttendance')->name('updateAttendance');
         Route::post('store-test', 'storeTest')->name('storeTest');

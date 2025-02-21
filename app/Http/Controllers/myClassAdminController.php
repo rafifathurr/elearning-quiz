@@ -6,6 +6,7 @@ use App\Models\ClassAttendance;
 use App\Models\ClassCounselor;
 use App\Models\ClassPackage;
 use App\Models\ClassUser;
+use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -76,10 +77,12 @@ class myClassAdminController extends Controller
                 $query->where('name', 'counselor');
             })->get();
 
-        return view('counselor.create', compact('packages', 'counselors'));
+        $dates = DateClass::whereNull('deleted_at')->get();
+
+        return view('counselor.create', compact('packages', 'counselors', 'dates'));
     }
 
-    public function getOrderPackages($package_id)
+    public function getOrderPackages($package_id, $date_class_id)
     {
         $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
             $query->whereColumn('current_meeting', '<', 'total_meeting');
@@ -91,6 +94,7 @@ class myClassAdminController extends Controller
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
+            ->where('date_class_id', $date_class_id)
             ->whereNotIn('id', $orderPackageIdInAttendance)
             ->with('order.user') // Eager Loading
             ->get();

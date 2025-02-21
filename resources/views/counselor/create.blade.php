@@ -50,6 +50,26 @@
                                         </div>
                                     </div>
 
+                                    <!-- Select Jadwal -->
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-left" for="date_class_id">Jadwal Kelas
+                                            <span class="text-danger">*</span></label>
+                                        <div class="col-md-8 col-sm-12">
+                                            <select class="form-control @error('date_class_id') is-invalid @enderror"
+                                                id="date_class_id" name="date_class_id" required>
+                                                <option value="" selected>Pilih Jadwal Kelas</option>
+                                                @foreach ($dates as $date)
+                                                    <option value="{{ $date->id }}">{{ $date->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('date_class_id')
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
                                     <div class="card card-info">
                                         <div class="card-header font-weight-bold">
                                             Daftar Konselor
@@ -125,7 +145,8 @@
 
     @push('javascript-bottom')
         <script>
-            $('#package_id').select2();;
+            $('#package_id').select2();
+            $('#date_class_id').select2();
             $('#counselor_id').select2({
                 multiple: true,
             });
@@ -139,29 +160,41 @@
 
         <script>
             $(document).ready(function() {
-                $('#package_id').on('change', function() {
-                    var package_id = $(this).val();
+                function getOrderPackages() {
+                    var package_id = $('#package_id').val();
+                    var date_class_id = $('#date_class_id').val();
                     $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
 
-                    if (package_id) {
+                    // Cek jika kedua parameter terisi
+                    if (package_id && date_class_id) {
                         $.ajax({
-                            url: '{{ url('class/get-order-packages') }}/' + package_id,
+                            url: '{{ url('class/get-order-packages') }}/' + package_id + '/' + date_class_id,
                             type: "GET",
                             dataType: "json",
                             success: function(data) {
-                                $('#order_package_id').append(
-                                    '<option value="">Pilih Peserta</option>');
+                                $('#order_package_id').append('<option value="">Pilih Peserta</option>');
                                 $.each(data, function(key, value) {
                                     $('#order_package_id').append(
-                                        '<option value="' + value.id + '">' + value
-                                        .order.user.name + '</option>'
+                                        '<option value="' + value.id + '">' + value.order.user
+                                        .name + '</option>'
                                     );
                                 });
                             }
                         });
                     } else {
-                        $('#order_package_id').append('<option value="">Pilih Paket Terlebih Dahulu</option>');
+                        $('#order_package_id').append(
+                            '<option value="">Pilih Paket dan Jadwal Terlebih Dahulu</option>');
                     }
+                }
+
+                // Event Listener ketika Paket berubah
+                $('#package_id').on('change', function() {
+                    getOrderPackages();
+                });
+
+                // Event Listener ketika Jadwal berubah
+                $('#date_class_id').on('change', function() {
+                    getOrderPackages();
                 });
             });
         </script>
