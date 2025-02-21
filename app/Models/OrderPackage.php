@@ -25,4 +25,16 @@ class OrderPackage extends Model
     {
         return $this->belongsTo(Order::class, 'order_id', 'id');
     }
+
+    public function classPackage()
+    {
+        return $this->hasOneThrough(
+            ClassPackage::class,   // Model tujuan
+            ClassAttendance::class, // Model perantara
+            'order_package_id',   // Foreign key di ClassAttendance
+            'id',                 // Primary key di ClassPackage
+            'id',                 // Primary key di OrderPackage
+            'class_id'            // Foreign key di ClassAttendance
+        );
+    }
 }

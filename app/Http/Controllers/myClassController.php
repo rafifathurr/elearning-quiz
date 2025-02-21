@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassAttendance;
+use App\Models\ClassPackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -60,6 +61,14 @@ class myClassController extends Controller
             ->addColumn('class', function ($data) {
                 return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
             })
+            ->addColumn('class_name', function ($data) {
+                // Memeriksa apakah ada data classPackage
+                if ($data->classPackage) {
+                    return $data->classPackage->name; // Asumsikan 'name' adalah kolom nama kelas
+                } else {
+                    return '-';
+                }
+            })
             ->addColumn('action', function ($data) {
                 $encryptedOrderId = encrypt($data->order_id);
                 $encryptedPackageId = encrypt($data->package_id);
@@ -71,7 +80,7 @@ class myClassController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['package', 'class', 'action'])
+            ->only(['package', 'class', 'class_name', 'action'])
             ->rawColumns(['action'])
             ->make(true);
     }
@@ -101,7 +110,12 @@ class myClassController extends Controller
                 ->rawColumns(['status'])
                 ->make(true);
         }
-        return view('myclass.attendance');
+        $decryptedOrderPackageId = decrypt($orderPackageId);
+        // Mengambil class_id pertama kali ditemukan
+        $classId = ClassAttendance::where('order_package_id', $decryptedOrderPackageId)
+            ->value('class_id');
+        $class = ClassPackage::find($classId);
+        return view('myclass.attendance', compact('class'));
     }
 
     public function detail($orderId, $packageId)
@@ -116,8 +130,11 @@ class myClassController extends Controller
                 ->where('package_id', $decryptedPackageId)
                 ->whereNull('deleted_at')
                 ->first();
-
-            return view('myclass.detail', compact('datatable_route', 'detailPackage'));
+            $className = OrderPackage::where('order_id', $decryptedOrderId)
+                ->where('package_id', $decryptedPackageId)
+                ->whereNull('deleted_at')
+                ->first();
+            return view('myclass.detail', compact('datatable_route', 'detailPackage', 'className'));
         } catch (Exception $e) {
             return redirect()
                 ->back()

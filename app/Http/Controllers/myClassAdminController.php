@@ -113,6 +113,7 @@ class myClassAdminController extends Controller
 
             $add_class = ClassPackage::lockForUpdate()->create([
                 'package_id' => $request->package_id,
+                'name' => $request->name,
                 'total_meeting' => $package->class,
                 'current_meeting' => 0,
 

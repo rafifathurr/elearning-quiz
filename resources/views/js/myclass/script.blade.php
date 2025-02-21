@@ -71,6 +71,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'class_name',
+                    defaultContent: '-'
+                },
+                {
                     data: 'class',
                     defaultContent: '-'
                 },
