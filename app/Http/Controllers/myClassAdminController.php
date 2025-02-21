@@ -173,23 +173,6 @@ class myClassAdminController extends Controller
             $class = ClassPackage::find($id);
 
 
-            $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
-                $query->whereColumn('current_meeting', '<', 'total_meeting');
-            })
-                ->pluck('order_package_id');
-
-
-            $listOrder = OrderPackage::whereHas('order', function ($query) {
-                $query->whereNull('deleted_at')
-                    ->where('status', 100);
-            })
-                ->whereNull('deleted_at')
-                ->where('package_id', $class->package_id)
-                ->whereNotIn('id', $orderPackageIdInAttendance)
-                ->get();
-
-
-
             $filterDate = ClassAttendance::where('class_id', $id)
                 ->select('attendance_date')
                 ->distinct()
@@ -235,13 +218,10 @@ class myClassAdminController extends Controller
                     ->get();
             }
 
+            $listMember = ClassUser::where('class_id', $id)->get();
 
-            $listMember = null;
-            if (Session::has('new_member')) {
-                $listMember = Session::get('new_member');
-            }
 
-            return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
+            return view('counselor.detail', compact('class', 'listClass', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
         } catch (Exception $e) {
             return redirect()
                 ->back()
@@ -268,13 +248,16 @@ class myClassAdminController extends Controller
                 'current_meeting' => $currentMeeting + 1
             ]);
 
+            $existAttendance = ClassAttendance::where('class_id', $request->class_id)->exists();
 
-            if (isset($request->order_package_id)) {
-                foreach ($request->order_package_id as $order) {
+            if (!$existAttendance) {
+                $attendances = $request->input('attendance', []); // Default kosong jika tidak ada data
+                $class_user = ClassUser::where('class_id', $request->class_id)->get();
+                foreach ($class_user as $new_attendance) {
                     $class_attendance[] = [
-                        'order_package_id' => $order,
+                        'order_package_id' => $new_attendance->order_package_id,
                         'class_id' => $request->class_id,
-                        'attendance' => 1,
+                        'attendance' => isset($attendances[$new_attendance->order_package_id]) ? 1 : 0,
                         'attendance_date' => now()
                     ];
                 }
@@ -439,93 +422,175 @@ class myClassAdminController extends Controller
     }
 
 
-    public function storeMember(Request $request)
-    {
-        try {
-            // Validasi input
-            $validatedData = $request->validate([
-                'order_package_id' => 'required|array', // Harus array
-                'order_package_id.*' => 'exists:order_packages,id', // Validasi ID di database
-                'class_id' => 'required|exists:class_packages,id' // Validasi class_id di database
-            ]);
-
-            // Ambil max_member dari class package
-            $classPackage = ClassPackage::with('package')->findOrFail($validatedData['class_id']);
-            $max_member = $classPackage->package->max_member;
-
-            // Ambil data yang sudah ada di session
-            $existingMembers = Session::get('new_member', []); // Ambil data lama, default []
-
-            // Jika max_member tidak null dan lebih dari 0, baru lakukan pengecekan
-            if (!is_null($max_member) && $max_member > 0) {
-                if (count($existingMembers) >= $max_member) {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => "Jumlah peserta sudah mencapai batas maksimal yaitu {$max_member} peserta."]);
-                }
-            }
-
-            // Data baru
-            $order_packages = [];
-            foreach ($validatedData['order_package_id'] as $package) {
-                $orderPackage = OrderPackage::with('order')->find($package);
-
-                // Periksa apakah kombinasi class_id dan order_package_id sudah ada
-                $isDuplicate = collect($existingMembers)->contains(function ($member) use ($validatedData, $orderPackage) {
-                    return $member['class_id'] == $validatedData['class_id'] && $member['order_package_id'] == $orderPackage->id;
-                });
-
-                // Jika tidak duplikat, tambahkan ke array baru
-                if (!$isDuplicate) {
-                    $order_packages[] = [
-                        'order_package_id' => $orderPackage->id,
-                        'class_id' => $validatedData['class_id'],
-                        'user_name' => $orderPackage->order->user->name
-                    ];
-                }
-            }
-            $updatedMembers = array_merge($existingMembers, $order_packages);
-            // Jika max_member tidak null dan lebih dari 0, lakukan pengecekan lagi setelah menambahkan peserta
-            if (!is_null($max_member) && $max_member > 0) {
-                if (count($updatedMembers) > $max_member) {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => "Jumlah peserta melebihi batas maksimal yaitu {$max_member} peserta."]);
-                }
-            }
-            // Gabungkan data baru dengan data lama
-            Session::put('new_member',   $updatedMembers);
-
-            // Periksa hasil dari sesi
+    // public function show($id, Request $request)
+    // {
+    //     try {
+    //         $class = ClassPackage::find($id);
 
 
-            if (!empty($order_packages)) {
-                return redirect()
-                    ->back()
-                    ->with(['success' => 'Peserta Berhasil Ditambahkan']);
-            } else {
-                return redirect()
-                    ->back()
-                    ->with(['failed' => 'Tidak ada peserta baru yang ditambahkan (semua data sudah ada).']);
-            }
-        } catch (Exception $e) {
-            return redirect()
-                ->back()
-                ->with(['failed' => 'Terjadi kesalahan: ' . $e->getMessage()]);
-        }
-    }
+    //         $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
+    //             $query->whereColumn('current_meeting', '<', 'total_meeting');
+    //         })
+    //             ->pluck('order_package_id');
 
 
-    public function removeMember($index)
-    {
-        $members = Session::get('new_member', []);
-        if (isset($members[$index])) {
-            unset($members[$index]);
-            Session::put('new_member', array_values($members)); // Reset array index
-            session()->flash('success', 'Berhasil Hapus Data Peserta');
-        }
-        session()->flash('failed', 'Gagal Hapus Data Peserta');
-    }
+    //         $listOrder = OrderPackage::whereHas('order', function ($query) {
+    //             $query->whereNull('deleted_at')
+    //                 ->where('status', 100);
+    //         })
+    //             ->whereNull('deleted_at')
+    //             ->where('package_id', $class->package_id)
+    //             ->whereNotIn('id', $orderPackageIdInAttendance)
+    //             ->get();
+
+
+
+    //         $filterDate = ClassAttendance::where('class_id', $id)
+    //             ->select('attendance_date')
+    //             ->distinct()
+    //             ->orderBy('attendance_date', 'asc')
+    //             ->get();
+
+    //         // Filter data berdasarkan tanggal yang dipilih
+    //         $selectedDate = $request->get('filter_data');
+
+    //         // Cek apakah ada kehadiran terakhir untuk hari yang sama
+    //         $currentDate = Carbon::now()->format('Y-m-d');
+    //         $latestAttendance = ClassAttendance::where('class_id', $id)
+    //             ->whereDate('attendance_date', $currentDate)
+    //             ->latest('attendance_date')
+    //             ->first();
+
+    //         if ($latestAttendance) {
+    //             if ($selectedDate) {
+    //                 $listClass = ClassAttendance::where('class_id', $id)
+    //                     ->when($selectedDate, function ($query, $selectedDate) {
+    //                         return $query->where('attendance_date', $selectedDate);
+    //                     })
+    //                     ->with(['orderPackage.order.user'])
+    //                     ->get();
+    //             } else {
+    //                 $listClass = ClassAttendance::where('class_id', $id)
+    //                     ->where('attendance_date', $latestAttendance->attendance_date)
+    //                     ->with(['orderPackage.order.user'])
+    //                     ->get();
+    //             }
+    //         } elseif ($selectedDate) {
+    //             $listClass = ClassAttendance::where('class_id', $id)
+    //                 ->when($selectedDate, function ($query, $selectedDate) {
+    //                     return $query->where('attendance_date', $selectedDate);
+    //                 })
+    //                 ->with(['orderPackage.order.user'])
+    //                 ->get();
+    //         } else {
+    //             $listClass = ClassAttendance::where('class_id', $id)
+    //                 ->select('order_package_id')
+    //                 ->distinct()
+    //                 ->with(['orderPackage.order.user'])
+    //                 ->get();
+    //         }
+
+
+    //         $listMember = null;
+    //         if (Session::has('new_member')) {
+    //             $listMember = Session::get('new_member');
+    //         }
+
+    //         return view('counselor.detail', compact('class', 'listClass', 'listOrder', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
+    //     } catch (Exception $e) {
+    //         return redirect()
+    //             ->back()
+    //             ->with('failed', $e->getMessage());
+    //     }
+    // }
+
+    // public function storeMember(Request $request)
+    // {
+    //     try {
+    //         // Validasi input
+    //         $validatedData = $request->validate([
+    //             'order_package_id' => 'required|array', // Harus array
+    //             'order_package_id.*' => 'exists:order_packages,id', // Validasi ID di database
+    //             'class_id' => 'required|exists:class_packages,id' // Validasi class_id di database
+    //         ]);
+
+    //         // Ambil max_member dari class package
+    //         $classPackage = ClassPackage::with('package')->findOrFail($validatedData['class_id']);
+    //         $max_member = $classPackage->package->max_member;
+
+    //         // Ambil data yang sudah ada di session
+    //         $existingMembers = Session::get('new_member', []); // Ambil data lama, default []
+
+    //         // Jika max_member tidak null dan lebih dari 0, baru lakukan pengecekan
+    //         if (!is_null($max_member) && $max_member > 0) {
+    //             if (count($existingMembers) >= $max_member) {
+    //                 return redirect()
+    //                     ->back()
+    //                     ->with(['failed' => "Jumlah peserta sudah mencapai batas maksimal yaitu {$max_member} peserta."]);
+    //             }
+    //         }
+
+    //         // Data baru
+    //         $order_packages = [];
+    //         foreach ($validatedData['order_package_id'] as $package) {
+    //             $orderPackage = OrderPackage::with('order')->find($package);
+
+    //             // Periksa apakah kombinasi class_id dan order_package_id sudah ada
+    //             $isDuplicate = collect($existingMembers)->contains(function ($member) use ($validatedData, $orderPackage) {
+    //                 return $member['class_id'] == $validatedData['class_id'] && $member['order_package_id'] == $orderPackage->id;
+    //             });
+
+    //             // Jika tidak duplikat, tambahkan ke array baru
+    //             if (!$isDuplicate) {
+    //                 $order_packages[] = [
+    //                     'order_package_id' => $orderPackage->id,
+    //                     'class_id' => $validatedData['class_id'],
+    //                     'user_name' => $orderPackage->order->user->name
+    //                 ];
+    //             }
+    //         }
+    //         $updatedMembers = array_merge($existingMembers, $order_packages);
+    //         // Jika max_member tidak null dan lebih dari 0, lakukan pengecekan lagi setelah menambahkan peserta
+    //         if (!is_null($max_member) && $max_member > 0) {
+    //             if (count($updatedMembers) > $max_member) {
+    //                 return redirect()
+    //                     ->back()
+    //                     ->with(['failed' => "Jumlah peserta melebihi batas maksimal yaitu {$max_member} peserta."]);
+    //             }
+    //         }
+    //         // Gabungkan data baru dengan data lama
+    //         Session::put('new_member',   $updatedMembers);
+
+    //         // Periksa hasil dari sesi
+
+
+    //         if (!empty($order_packages)) {
+    //             return redirect()
+    //                 ->back()
+    //                 ->with(['success' => 'Peserta Berhasil Ditambahkan']);
+    //         } else {
+    //             return redirect()
+    //                 ->back()
+    //                 ->with(['failed' => 'Tidak ada peserta baru yang ditambahkan (semua data sudah ada).']);
+    //         }
+    //     } catch (Exception $e) {
+    //         return redirect()
+    //             ->back()
+    //             ->with(['failed' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+    //     }
+    // }
+
+
+    // public function removeMember($index)
+    // {
+    //     $members = Session::get('new_member', []);
+    //     if (isset($members[$index])) {
+    //         unset($members[$index]);
+    //         Session::put('new_member', array_values($members)); // Reset array index
+    //         session()->flash('success', 'Berhasil Hapus Data Peserta');
+    //     }
+    //     session()->flash('failed', 'Gagal Hapus Data Peserta');
+    // }
 
 
 
