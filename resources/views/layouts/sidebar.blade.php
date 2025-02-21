@@ -161,6 +161,13 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item {{ $display }}">
+                        <a href="{{ route('master.member.index') }}"
+                            class="nav-link {{ request()->routeIs('master.member.index') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-user-check mr-1"></i>
+                            <p> Daftar Peserta</p>
+                        </a>
+                    </li>
                 @endhasrole
 
                 @hasanyrole('admin')

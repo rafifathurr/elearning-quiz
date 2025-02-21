@@ -238,6 +238,15 @@ Route::group(['middleware' => ['role:counselor']], function () {
         Route::delete('remove-member/{index}', 'removeMember')->name('removeMember');
     });
     Route::resource('class', myClassAdminController::class)->parameters(['class' => 'id']);
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        //Member Paket
+        Route::group(['controller' => PackageMemberController::class, 'prefix' => 'member', 'as' => 'member.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::get('index', 'index')->name('index');
+            Route::get('export', 'export')->name('export');
+        });
+    });
 });
 
 
@@ -278,13 +287,6 @@ Route::group(['middleware' => ['role:admin|package-manager']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('typePackage', TypePackageController::class)->parameters(['typePackage' => 'id']);
-
-        //Member Paket
-        Route::group(['controller' => PackageMemberController::class, 'prefix' => 'member', 'as' => 'member.'], function () {
-            Route::get('datatable', 'dataTable')->name('dataTable');
-            Route::get('index', 'index')->name('index');
-            Route::get('export', 'export')->name('export');
-        });
     });
 });
 

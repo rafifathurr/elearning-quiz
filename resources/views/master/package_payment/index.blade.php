@@ -18,10 +18,6 @@
                                         <i class="fas fa-plus mr-1"></i>
                                         Tambah Paket Test
                                     </a>
-                                    <a href="{{ route('master.member.index') }}" class="btn btn-secondary btn-sm m-2">
-                                        <i class="fas fa-user-check mr-1"></i>
-                                        Daftar Peserta
-                                    </a>
                                 </div>
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
