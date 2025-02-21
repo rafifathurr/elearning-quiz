@@ -35,7 +35,6 @@
                                                 <th>Nama Pengguna</th>
                                                 <th>Total Harga</th>
                                                 <th>Metode Pembayaran</th>
-                                                <th>Bukti Pembayaran</th>
                                                 <th>Status Pesanan</th>
                                                 <th class="text-center">Action</th>
                                             </tr>

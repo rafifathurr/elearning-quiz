@@ -159,17 +159,13 @@ class OrderController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
-                if ($data->status == 10) {
-                    $btn_action .= '<button class="btn btn-sm btn-success ml-2" onclick="approveOrder(' . $data->id . ')" title="Terima">Terima</button>';
-                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="rejectOrder(' . $data->id . ')" title="Tolak">Tolak</button>';
-                }
                 $btn_action .= '<a href="' . route('order.detailOrder', ['id' => $data->id]) . '"  class="btn btn-sm btn-primary ml-2" >Detail</a>';
 
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['user', 'total_price', 'payment_method', 'proof_payment', 'order_id', 'action', 'status_payment'])
-            ->rawColumns(['total_price', 'proof_payment', 'action', 'status_payment'])
+            ->only(['user', 'total_price', 'payment_method', 'order_id', 'action', 'status_payment'])
+            ->rawColumns(['total_price', 'action', 'status_payment'])
             ->make(true);
     }
 
@@ -552,6 +548,8 @@ class OrderController extends Controller
             if ($order) {
                 $approve_order = $order->update([
                     'status' => 100,
+                    'approval_date' => now(),
+                    'approval_by' => Auth::user()->id,
                 ]);
                 if ($approve_order) {
                     $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();

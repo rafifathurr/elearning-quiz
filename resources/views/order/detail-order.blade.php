@@ -61,8 +61,44 @@
 
                             {{-- Detail Pesanan --}}
                             <h5 class="font-weight-bold">Detail Pesanan</h5>
-                            <span class="badge bg-primary p-2" style="font-size: 1rem">Waktu Pemesanan:
-                                {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y H:i') }}</span>
+                            <div>
+                                <div class="row">
+                                    <h6 class="col-md-3 font-weight-bold">Waktu Pemesanan</h6>
+                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                        {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y H:i') }}
+                                    </h6>
+                                </div>
+                                <div class="row">
+                                    <h6 class="col-md-3 font-weight-bold">Bukti Pembayaran</h6>
+                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                        @if (!is_null($order->proof_payment))
+                                            <a href="{{ route('order.downloadPayment', $order->id) }}" target="_blank"><i
+                                                    class="fas fa-download mr-1"></i> Lihat Bukti</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </h6>
+                                </div>
+                            </div>
+
+                            @if ($order->status == 100 && $order->approveBy)
+                                <h5 class="font-weight-bold mt-2">Detail Approval</h5>
+                                <div class="alert bg-success">
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Nama Penerima</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ $order->approveBy->name }}
+                                        </h6>
+                                    </div>
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Waktu Diterima</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ \Carbon\Carbon::parse($order->approval_date)->translatedFormat('d F Y H:i') }}
+                                        </h6>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="table-responsive py-1">
                                 <table id="table-detail" class="table table-bordered table-hover text-center">
                                     <thead>
@@ -103,8 +139,23 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            <a href="{{ route('order.listOrder') }}" class="btn btn-success btn-sm mr-2"><i
-                                    class="fas fa-arrow-left mr-1"></i>Kembali</a>
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ route('order.listOrder') }}" class="btn btn-primary btn-sm m-1">
+                                    <i class="fas fa-arrow-left mr-1"></i>Kembali
+                                </a>
+                                @if ($order->status == 10)
+                                    <div>
+                                        <button class="btn btn-sm btn-success m-1"
+                                            onclick="approveOrder({{ $order->id }})">
+                                            <i class="fas fa-check mr-1"></i>Terima
+                                        </button>
+                                        <button class="btn btn-sm btn-danger m-1"
+                                            onclick="rejectOrder({{ $order->id }})">
+                                            <i class="fas fa-times mr-1"></i>Tolak
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

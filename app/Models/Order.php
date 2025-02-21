@@ -23,4 +23,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'order_by');
     }
+    public function approveBy()
+    {
+        return $this->belongsTo(User::class, 'approval_by');
+    }
 }

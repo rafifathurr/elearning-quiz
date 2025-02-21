@@ -141,10 +141,6 @@
                     defaultContent: '-'
                 },
                 {
-                    data: 'proof_payment',
-                    defaultContent: '-'
-                },
-                {
                     data: 'status_payment',
                     defaultContent: '-'
                 },
