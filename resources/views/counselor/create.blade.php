@@ -159,13 +159,14 @@
             $(document).ready(function() {
                 function getOrderPackages() {
                     var package_id = $('#package_id').val();
-                    var date_class_id = $('#date_class_id').val();
+                    var date_in_class = $('#date_class_id option:selected').text();
                     $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
 
                     // Cek jika kedua parameter terisi
                     if (package_id && date_class_id) {
                         $.ajax({
-                            url: '{{ url('class/get-order-packages') }}/' + package_id + '/' + date_class_id,
+                            url: '{{ url('class/get-order-packages') }}/' + package_id + '/' +
+                                encodeURIComponent(date_in_class),
                             type: "GET",
                             dataType: "json",
                             success: function(data) {

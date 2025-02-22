@@ -83,7 +83,7 @@ class myClassAdminController extends Controller
         return view('counselor.create', compact('packages', 'counselors', 'dates'));
     }
 
-    public function getOrderPackages($package_id, $date_class_id)
+    public function getOrderPackages($package_id, $date_in_class)
     {
         $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
             $query->whereColumn('current_meeting', '<', 'total_meeting');
@@ -95,7 +95,7 @@ class myClassAdminController extends Controller
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
-            ->where('date_class_id', $date_class_id)
+            ->where('date_in_class', $date_in_class)
             ->whereNotIn('id', $orderPackageIdInAttendance)
             ->with('order.user') // Eager Loading
             ->get();
