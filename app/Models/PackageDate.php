@@ -14,4 +14,8 @@ class PackageDate extends Model
     {
         return $this->hasOne(DateClass::class, 'id', 'date_class_id');
     }
+    public function classPackage()
+    {
+        return $this->belongsTo(DateClass::class, 'date_class_id');
+    }
 }

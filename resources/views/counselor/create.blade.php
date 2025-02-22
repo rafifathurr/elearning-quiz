@@ -56,11 +56,8 @@
                                             <span class="text-danger">*</span></label>
                                         <div class="col-md-8 col-sm-12">
                                             <select class="form-control @error('date_class_id') is-invalid @enderror"
-                                                id="date_class_id" name="date_class_id" required>
-                                                <option value="" selected>Pilih Jadwal Kelas</option>
-                                                @foreach ($dates as $date)
-                                                    <option value="{{ $date->id }}">{{ $date->name }}</option>
-                                                @endforeach
+                                                id="date_class_id" name="date_class_id" data-placeholder="Pilih Jadwal"
+                                                required>
                                             </select>
                                             @error('date_class_id')
                                                 <div class="alert alert-danger mt-2">
@@ -195,6 +192,33 @@
                 // Event Listener ketika Jadwal berubah
                 $('#date_class_id').on('change', function() {
                     getOrderPackages();
+                });
+            });
+            $(document).ready(function() {
+                // Event Listener ketika Paket berubah
+                $('#package_id').on('change', function() {
+                    var package_id = $(this).val();
+                    $('#date_class_id').empty(); // Kosongkan opsi sebelumnya
+
+                    if (package_id) {
+                        $.ajax({
+                            url: '{{ url('class/get-date-classes') }}/' + package_id,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(data) {
+                                $('#date_class_id').append(
+                                    '<option value="">Pilih Jadwal Kelas</option>');
+                                $.each(data, function(key, value) {
+                                    $('#date_class_id').append(
+                                        '<option value="' + value.id + '">' + value
+                                        .name + '</option>'
+                                    );
+                                });
+                            }
+                        });
+                    } else {
+                        $('#date_class_id').append('<option value="">Pilih Paket Terlebih Dahulu</option>');
+                    }
                 });
             });
         </script>

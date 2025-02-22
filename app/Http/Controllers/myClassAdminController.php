@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
+use App\Models\PackageDate;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -101,6 +102,18 @@ class myClassAdminController extends Controller
 
         return response()->json($orderPackages);
     }
+
+    public function getDateClasses($package_id)
+    {
+        // Dapatkan date_class_id dari tabel package_date yang terkait dengan package_id
+        $dateClasses = PackageDate::where('package_id', $package_id)
+            ->with('classPackage') // Eager Loading ke DateClass
+            ->get()
+            ->pluck('classPackage');
+
+        return response()->json($dateClasses);
+    }
+
 
 
 
