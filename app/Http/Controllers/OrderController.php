@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\InvoiceMail;
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
+use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -231,6 +232,11 @@ class OrderController extends Controller
             $schedule_id = $request->input('schedule_id');
             $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
 
+            $date_class = null;
+            if (!is_null($schedule_id)) {
+                $date_class = DateClass::find($schedule_id);
+            }
+
             Log::info('schedule id: ' . $schedule_id);
 
 
@@ -281,7 +287,8 @@ class OrderController extends Controller
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
-                    'date_class_id' => $schedule_id
+                    'date_class_id' => $schedule_id,
+                    'date_in_class' => !empty($date_class) ? $date_class->name : null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -293,7 +300,8 @@ class OrderController extends Controller
                     'order_id' => $new_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
-                    'date_class_id' => $schedule_id
+                    'date_class_id' => $schedule_id,
+                    'date_in_class' => !empty($date_class) ? $date_class->name : null,
                 ]);
             }
 
@@ -320,6 +328,11 @@ class OrderController extends Controller
             $user_id = $request->input('user_id');
             $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
             $user_id = (!empty($user_id) && $user_id != '0') ? intval($user_id) : null;
+
+            $date_class = null;
+            if (!is_null($schedule_id)) {
+                $date_class = DateClass::find($schedule_id);
+            }
 
             Log::info('schedule id: ' . $schedule_id);
             Log::info('User id: ' . $user_id);
@@ -377,7 +390,8 @@ class OrderController extends Controller
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
-                    'date_class_id' => $schedule_id
+                    'date_class_id' => $schedule_id,
+                    'date_in_class' => !empty($date_class) ? $date_class->name : null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -390,7 +404,8 @@ class OrderController extends Controller
                     'order_id' => $new_order->id,
                     'class' => $package->class,
                     'current_class' => 0,
-                    'date_class_id' => $schedule_id
+                    'date_class_id' => $schedule_id,
+                    'date_in_class' => !empty($date_class) ? $date_class->name : null,
                 ]);
             }
 
