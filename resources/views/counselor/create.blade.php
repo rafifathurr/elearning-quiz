@@ -39,7 +39,8 @@
                                                 id="package_id" name="package_id" required>
                                                 <option value="" selected>Pilih Paket</option>
                                                 @foreach ($packages as $package)
-                                                    <option value="{{ $package->id }}">{{ $package->name }}</option>
+                                                    <option value="{{ $package->id }}">{{ $package->name }} |
+                                                        {{ $package->typePackage->name }}</option>
                                                 @endforeach
                                             </select>
                                             @error('package_id')

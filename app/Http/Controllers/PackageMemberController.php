@@ -54,10 +54,14 @@ class PackageMemberController extends Controller
         return DataTables::of($member)
             ->addIndexColumn()
             ->addColumn('package', function ($data) {
-                return $data->package ? $data->package->name  : '-';
+                return $data->package
+                    ? $data->package->name . ' <span class="badge badge-info">' . $data->package->typePackage->name . '</span>'
+                    : '-';
             })
             ->addColumn('created_at', function ($data) {
-                return $data->order ? \Carbon\Carbon::parse($data->order->created_at)->translatedFormat('d F Y H:i') : '-';
+                return $data->order
+                    ? \Carbon\Carbon::parse($data->order->created_at)->translatedFormat('d F Y H:i')
+                    : '-';
             })
             ->addColumn('user', function ($data) {
                 return $data->order ? $data->order->user->name : '-';
@@ -65,6 +69,7 @@ class PackageMemberController extends Controller
             ->addColumn('date', function ($data) {
                 return $data->dateClass ? $data->dateClass->name : '-';
             })
+            ->rawColumns(['package']) // Pastikan kolom package dirender sebagai HTML
             ->only(['package', 'created_at', 'user', 'date'])
             ->make(true);
     }

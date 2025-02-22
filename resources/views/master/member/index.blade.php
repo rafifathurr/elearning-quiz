@@ -20,7 +20,8 @@
                                             <select id="packageFilter" name="packageFilter" class="form-control">
                                                 <option value="">-- Semua Paket --</option>
                                                 @foreach ($packages as $package)
-                                                    <option value="{{ $package->id }}">{{ $package->name }}</option>
+                                                    <option value="{{ $package->id }}">{{ $package->name }} |
+                                                    {{ $package->typePackage->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
