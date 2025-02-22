@@ -31,14 +31,14 @@ class myClassAdminController extends Controller
     }
     public function dataTable()
     {
-        if (User::find(User::find(Auth::user()->id)->hasRole('counselor'))) {
+        if (User::find(User::find(Auth::user()->id)->hasRole('class-operator'))) {
+            $myClass = ClassPackage::whereNull('deleted_at')->get();
+        } else {
             $myClass = ClassPackage::whereNull('deleted_at')
                 ->whereHas('classCounselor', function ($query) {
                     $query->where('counselor_id', Auth::user()->id);
                 })
                 ->get();
-        } else {
-            $myClass = ClassPackage::whereNull('deleted_at')->get();
         }
         $dataTable = DataTables::of($myClass)
             ->addIndexColumn()
