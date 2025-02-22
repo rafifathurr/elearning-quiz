@@ -85,23 +85,28 @@ class myClassAdminController extends Controller
 
     public function getOrderPackages($package_id, $date_in_class)
     {
+        // Decode URL untuk mendapatkan date_in_class yang benar
+        $date_in_class = urldecode($date_in_class);
+        Log::info('date_in_class: ' . $date_in_class);
+
         $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
             $query->whereColumn('current_meeting', '<', 'total_meeting');
-        })
-            ->pluck('order_package_id');
+        })->pluck('order_package_id');
+
         $orderPackages = OrderPackage::whereHas('order', function ($query) {
             $query->whereNull('deleted_at')
                 ->where('status', 100);
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
-            ->where('date_in_class', $date_in_class)
+            ->where('date_in_class', $date_in_class) // Mencari berdasarkan date_in_class
             ->whereNotIn('id', $orderPackageIdInAttendance)
             ->with('order.user') // Eager Loading
             ->get();
 
         return response()->json($orderPackages);
     }
+
 
     public function getDateClasses($package_id)
     {

@@ -160,11 +160,13 @@
             $(document).ready(function() {
                 function getOrderPackages() {
                     var package_id = $('#package_id').val();
-                    var date_in_class = $('#date_class_id option:selected').text();
+                    var date_in_class = $('#date_class_id option:selected').text()
+                .trim(); // Ambil teks sebagai date_in_class dan trim spasi
                     $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
 
                     // Cek jika kedua parameter terisi
-                    if (package_id && date_class_id) {
+                    if (package_id && date_in_class) {
+                        // Gunakan encodeURIComponent untuk mengatasi karakter khusus
                         $.ajax({
                             url: '{{ url('class/get-order-packages') }}/' + package_id + '/' +
                                 encodeURIComponent(date_in_class),
@@ -196,6 +198,7 @@
                     getOrderPackages();
                 });
             });
+
             $(document).ready(function() {
                 // Event Listener ketika Paket berubah
                 $('#package_id').on('change', function() {
