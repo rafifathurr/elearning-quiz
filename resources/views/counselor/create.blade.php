@@ -161,7 +161,7 @@
                 function getOrderPackages() {
                     var package_id = $('#package_id').val();
                     var date_in_class = $('#date_class_id option:selected').text()
-                .trim(); // Ambil teks sebagai date_in_class dan trim spasi
+                        .trim(); // Ambil teks sebagai date_in_class dan trim spasi
                     $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
 
                     // Cek jika kedua parameter terisi
@@ -215,7 +215,7 @@
                                     '<option value="">Pilih Jadwal Kelas</option>');
                                 $.each(data, function(key, value) {
                                     $('#date_class_id').append(
-                                        '<option value="' + value.id + '">' + value
+                                        '<option value="' + value.name + '">' + value
                                         .name + '</option>'
                                     );
                                 });

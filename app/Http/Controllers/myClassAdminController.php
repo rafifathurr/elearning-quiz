@@ -89,12 +89,8 @@ class myClassAdminController extends Controller
         $date_in_class = urldecode($date_in_class);
         Log::info('date_in_class: ' . $date_in_class);
 
-        $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
-            $query->whereColumn('current_meeting', '<', 'total_meeting');
-        })->pluck('order_package_id');
-        $orderPackageIdInMember = ClassUser::whereHas('class', function ($query) {
-            $query->whereColumn('current_meeting', '<', 'total_meeting');
-        })->pluck('order_package_id');
+
+        $orderPackageIdInMember = ClassUser::pluck('order_package_id');
 
         $orderPackages = OrderPackage::whereHas('order', function ($query) {
             $query->whereNull('deleted_at')
@@ -103,10 +99,7 @@ class myClassAdminController extends Controller
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
             ->where('date_in_class', $date_in_class)
-            ->where(function ($query) use ($orderPackageIdInAttendance, $orderPackageIdInMember) {
-                $query->whereNotIn('id', $orderPackageIdInAttendance)
-                    ->whereNotIn('id', $orderPackageIdInMember);
-            })
+            ->whereNotIn('id', $orderPackageIdInMember)
             ->with('order.user') // Eager Loading
             ->get();
 
@@ -456,6 +449,38 @@ class myClassAdminController extends Controller
         }
     }
 
+
+    //Kondisi kalau current = class maka muncul lagi namanya
+    // public function getOrderPackages($package_id, $date_in_class)
+    // {
+    //     // Decode URL untuk mendapatkan date_in_class yang benar
+    //     $date_in_class = urldecode($date_in_class);
+    //     Log::info('date_in_class: ' . $date_in_class);
+
+    //     $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
+    //         $query->whereColumn('current_meeting', '<', 'total_meeting');
+    //     })->pluck('order_package_id');
+    //     $orderPackageIdInMember = ClassUser::whereHas('class', function ($query) {
+    //         $query->whereColumn('current_meeting', '<', 'total_meeting');
+    //     })->pluck('order_package_id');
+
+    //     $orderPackages = OrderPackage::whereHas('order', function ($query) {
+    //         $query->whereNull('deleted_at')
+    //             ->where('status', 100);
+    //     })
+    //         ->whereNull('deleted_at')
+    //         ->where('package_id', $package_id)
+    //         ->where('date_in_class', $date_in_class)
+    //         ->where(function ($query) use ($orderPackageIdInAttendance, $orderPackageIdInMember) {
+    //             $query->whereNotIn('id', $orderPackageIdInAttendance)
+    //                 ->whereNotIn('id', $orderPackageIdInMember);
+    //         })
+    //         ->with('order.user') // Eager Loading
+    //         ->get();
+
+
+    //     return response()->json($orderPackages);
+    // }
 
     // public function show($id, Request $request)
     // {
