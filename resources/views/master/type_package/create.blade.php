@@ -62,7 +62,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="card card-maroon">
+                                    <div class="card card-maroon" style="margin-top: 2rem;">
                                         <div class="card-header">
                                             <h3 class="font-weight-bold card-title">Hak Akses</h3>
                                         </div>

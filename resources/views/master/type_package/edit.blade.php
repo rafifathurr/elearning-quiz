@@ -65,7 +65,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="card card-maroon mt-3">
+                                    <div class="card card-maroon" style="margin-top: 2rem;">
                                         <div class="card-header">
                                             <h3 class="font-weight-bold card-title">Hak Akses</h3>
                                         </div>
