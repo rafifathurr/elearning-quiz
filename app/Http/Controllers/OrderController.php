@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\InvoiceMail;
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
+use App\Models\ClassUser;
 use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -254,18 +255,24 @@ class OrderController extends Controller
 
             if (!is_null($package->class)) {
                 if (!is_null($orderPackageId) && $orderPackageId->isNotEmpty()) {
-                    $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
+                    // Cek apakah order_package_id sudah ada di ClassUser
+                    $isNotInClassUser = ClassUser::whereIn('order_package_id', $orderPackageId)->doesntExist();
+
+                    // Cek apakah class sedang berjalan (current_meeting < total_meeting)
+                    $classId = ClassUser::whereIn('order_package_id', $orderPackageId)->pluck('class_id');
                     $on_going_class = ClassPackage::whereIn('id', $classId)
                         ->whereColumn('current_meeting', '<', 'total_meeting')
                         ->exists();
 
-                    if ($on_going_class) {
+                    // Jika order_package belum ada di ClassUser ATAU sedang berjalan, tampilkan alert
+                    if ($isNotInClassUser || $on_going_class) {
                         DB::rollBack();
-                        session()->flash('failed', 'Kelas sedang berjalan. Selesaikan kelas Anda terlebih dahulu.');
+                        session()->flash('failed', 'Kelas sedang berjalan atau belum dimulai.');
                         return;
                     }
                 }
             }
+
 
             $exist_order = Order::where('user_id',  $user_id)->where('status', 1)->first();
             if ($exist_order) {
@@ -358,18 +365,24 @@ class OrderController extends Controller
 
             if (!is_null($package->class)) {
                 if (!is_null($orderPackageId) && $orderPackageId->isNotEmpty()) {
-                    $classId = ClassAttendance::where('order_package_id', $orderPackageId)->pluck('class_id');
+                    // Cek apakah order_package_id sudah ada di ClassUser
+                    $isNotInClassUser = ClassUser::whereIn('order_package_id', $orderPackageId)->doesntExist();
+
+                    // Cek apakah class sedang berjalan (current_meeting < total_meeting)
+                    $classId = ClassUser::whereIn('order_package_id', $orderPackageId)->pluck('class_id');
                     $on_going_class = ClassPackage::whereIn('id', $classId)
                         ->whereColumn('current_meeting', '<', 'total_meeting')
                         ->exists();
 
-                    if ($on_going_class) {
+                    // Jika order_package belum ada di ClassUser ATAU sedang berjalan, tampilkan alert
+                    if ($isNotInClassUser || $on_going_class) {
                         DB::rollBack();
-                        session()->flash('failed', 'Kelas sedang berjalan. Selesaikan kelas Anda terlebih dahulu.');
+                        session()->flash('failed', 'Kelas sedang berjalan atau belum dimulai.');
                         return;
                     }
                 }
             }
+
 
             $exist_order = Order::where('user_id',  $user_id)->where('order_by',  $counselor_id)->where('status', 1)->first();
             if ($exist_order) {
