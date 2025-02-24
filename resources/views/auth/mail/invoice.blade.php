@@ -73,7 +73,7 @@
                         <td style="border: 1px solid #ddd; padding: 8px;">
                             {{ $item->dateClass ? $item->dateClass->name : '-' }}</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Rp.
-                            {{ number_format($item->package->price, 0, ',', '.') }}</td>
+                            {{ number_format($item->price, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
             </tbody>

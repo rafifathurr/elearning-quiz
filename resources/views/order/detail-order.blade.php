@@ -126,15 +126,16 @@
                                                     {{ $item->dateClass ? $item->dateClass->name : '-' }}
                                                 </td>
                                                 <td>
-                                                    {{ 'Rp. ' . number_format($item->package->price, 0, ',', '.') }}
+                                                    {{ 'Rp. ' . number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
                                                 </td>
+
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot class="table-primary">
                                         <tr>
                                             <td colspan="4" class="text-right">Total:</td>
-                                            <td>{{ 'Rp. ' . number_format($totalPrice, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp. ' . number_format($order->total_price, 0, ',', '.') }}</td>
                                         </tr>
                                     </tfoot>
                                 </table>

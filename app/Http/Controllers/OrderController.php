@@ -431,6 +431,13 @@ class OrderController extends Controller
                 ->get();
             if ($order) {
                 $totalPrice =  (int) $request->totalPrice;
+                foreach ($order_package as $item) {
+                    if ($item->package) {
+                        $item->update([
+                            'price' => $item->package->price
+                        ]);
+                    }
+                }
                 $update_order = Order::where('id', $id)->update([
                     'status' => 2,
                     'total_price' => $totalPrice,
