@@ -120,14 +120,17 @@
                                                     </table>
                                                 </div>
                                             </div>
-
-                                            <button type="submit" class="btn btn-success m-2">Absensi</button>
+                                            @hasanyrole('counselor')
+                                                <button type="submit" class="btn btn-success m-2">Absensi</button>
+                                            @endhasanyrole
                                         </form>
                                     </div>
                                 @else
-                                    <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
-                                        {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
-                                        Test</button>
+                                    @hasanyrole('counselor')
+                                        <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
+                                            {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
+                                            Test</button>
+                                    @endhasanyrole
 
                                     @if ($latestAttendance)
                                         <form method="post" id="form-daftar-peserta"
@@ -185,15 +188,16 @@
                                         </div>
                                     </div>
 
-                                    @if (!$selectedDate)
-                                        <button class="btn btn-success my-3"
-                                            {{ $latestAttendance || $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
-                                        @if ($latestAttendance)
-                                            <button class="btn btn-warning my-3">Ubah Absensi</button>
+                                    @hasanyrole('counselor')
+                                        @if (!$selectedDate)
+                                            <button class="btn btn-success my-3"
+                                                {{ $latestAttendance || $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
+                                            @if ($latestAttendance)
+                                                <button class="btn btn-warning my-3">Ubah Absensi</button>
+                                            @endif
                                         @endif
-                                    @endif
-                                    </form>
-
+                                        </form>
+                                    @endhasanyrole
                                 @endif
                             </div>
                         </div>

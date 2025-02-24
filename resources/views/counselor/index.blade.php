@@ -29,6 +29,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
+                                                <th>Nama Kelas</th>
                                                 <th>Pertemuan Ke</th>
                                                 <th>Total Pertemuan</th>
                                                 <th>Action</th>

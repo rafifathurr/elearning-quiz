@@ -59,7 +59,7 @@ class myClassAdminController extends Controller
                 return $btn_action;
             })
 
-            ->only(['package', 'action', 'current_meeting', 'total_meeting'])
+            ->only(['package', 'name', 'action', 'current_meeting', 'total_meeting'])
             ->rawColumns(['action', 'current_meeting', 'total_meeting'])
             ->make(true);
 

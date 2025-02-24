@@ -197,6 +197,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'name',
+                    defaultContent: '-'
+                },
+                {
                     data: 'current_meeting',
                     defaultContent: '-'
                 },
