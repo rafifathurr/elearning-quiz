@@ -30,12 +30,59 @@ class PackageController extends Controller
         if (User::find($userId)->hasRole('admin')) {
             $categories = Package::whereNull('deleted_at')->get();
         } else {
-            $categories = Package::whereNull('deleted_at')
-                ->whereHas('typePackage.packageAccess', function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
+            // Ambil semua parent yang punya akses
+            $parents = TypePackage::where('id_parent', 0)
+                ->whereNull('deleted_at')
+                ->where(function ($query) use ($userId) {
+                    // Cek akses di parent
+                    $query->whereHas('packageAccess', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    })
+                        // Atau akses di salah satu children
+                        ->orWhereHas('children.packageAccess', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
                 })
+                ->with(['children' => function ($query) {
+                    $query->whereNull('deleted_at');
+                }])
+                ->get();
+
+            // Filter hasil berdasarkan aturan:
+            $filteredParents = $parents->map(function ($parent) use ($userId) {
+                // Cek apakah user punya akses di parent
+                $hasParentAccess = $parent->packageAccess()->where('user_id', $userId)->exists();
+
+                // Jika parent dipilih, ambil semua children-nya
+                if ($hasParentAccess) {
+                    return $parent;
+                }
+
+                // Jika tidak, cek children yang punya akses
+                $childrenWithAccess = $parent->children->filter(function ($child) use ($userId) {
+                    return $child->packageAccess()->where('user_id', $userId)->exists();
+                });
+
+                // Jika ada children dengan akses, tampilkan parent-nya tetapi hanya children yang punya akses
+                if ($childrenWithAccess->isNotEmpty()) {
+                    $parent->children = $childrenWithAccess;
+                    return $parent;
+                }
+
+                // Jika tidak ada akses, jangan tampilkan
+                return null;
+            })->filter(); // Hapus null value
+
+            // Ambil semua package yang terkait dengan hasil filter
+            $categories = Package::whereNull('deleted_at')
+                ->whereIn('id_type_package', $filteredParents->pluck('id')->merge(
+                    $filteredParents->pluck('children.*.id')->flatten()
+                ))
                 ->get();
         }
+
+
+
 
         $dataTable = DataTables::of($categories)
             ->addIndexColumn()
