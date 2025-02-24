@@ -23,4 +23,9 @@ class TypePackage extends Model
     {
         return $this->belongsTo(TypePackage::class, 'id_parent')->whereNull('deleted_at');
     }
+
+    public function packageAccess()
+    {
+        return $this->hasMany(PackageAccess::class, 'type_package_id', 'id');
+    }
 }

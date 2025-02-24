@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PackageAccess;
 use App\Models\TypePackage;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +55,10 @@ class TypePackageController extends Controller
     public function create()
     {
         $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
-        return view('master.type_package.create', compact('types'));
+        $users = User::whereNull('deleted_at')->where('status', 1)->whereHas('roles', function ($query) {
+            $query->where('name', 'package-manager');
+        })->get();
+        return view('master.type_package.create', compact('types', 'users'));
     }
 
     /**
@@ -75,7 +80,21 @@ class TypePackageController extends Controller
                 'id_parent' => isset($request->id_parent) ? $request->id_parent : 0,
             ]);
 
-            if ($add_type_package) {
+            if ($request->has('user_id') && !empty($request->user_id)) {
+                $packages_test = [];
+                foreach ($request->user_id as $user) {
+                    $packages_test[] = [
+                        'type_package_id' => $add_type_package->id,
+                        'user_id' => $user
+                    ];
+                }
+                // Insert hanya jika ada user_id yang dipilih
+                $add_package_access = PackageAccess::insert($packages_test);
+            } else {
+                $add_package_access = true; // Set true jika tidak ada user
+            }
+
+            if ($add_type_package && $add_package_access) {
                 DB::commit();
                 return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Menambahkan Kategori Paket']);
             } else {
@@ -103,7 +122,10 @@ class TypePackageController extends Controller
     {
         $type_package = TypePackage::find($id);
         $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
-        return view('master.type_package.edit', compact('type_package', 'types'));
+        $users = User::whereNull('deleted_at')->where('status', 1)->whereHas('roles', function ($query) {
+            $query->where('name', 'package-manager');
+        })->get();
+        return view('master.type_package.edit', compact('type_package', 'types', 'users'));
     }
 
     /**
@@ -125,7 +147,23 @@ class TypePackageController extends Controller
                     'id_parent' => isset($request->id_parent) ? $request->id_parent : 0,
                 ]);
 
-                if ($update_type_package) {
+                PackageAccess::where('type_package_id', $type_package->id)->delete();
+
+                if ($request->has('user_id') && !empty($request->user_id)) {
+                    $packages_test = [];
+                    foreach ($request->user_id as $user) {
+                        $packages_test[] = [
+                            'type_package_id' => $type_package->id,
+                            'user_id' => $user
+                        ];
+                    }
+                    // Insert hanya jika ada user_id yang dipilih
+                    $update_package_access = PackageAccess::insert($packages_test);
+                } else {
+                    $update_package_access = true; // Set true jika tidak ada user
+                }
+
+                if ($update_type_package && $update_package_access) {
                     DB::commit();
                     return redirect()->route('master.typePackage.index')->with(['success' => 'Berhasil Mengubah Kategori Paket']);
                 } else {

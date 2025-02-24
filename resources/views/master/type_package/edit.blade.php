@@ -65,6 +65,30 @@
                                         </div>
                                     </div>
 
+                                    <div class="card card-maroon mt-3">
+                                        <div class="card-header">
+                                            <h3 class="font-weight-bold card-title">Hak Akses</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <label for="user_id" class="col-md-4 control-label text-left">Pilih Paket
+                                                    Manajer
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <input type="hidden" id="value_user"
+                                                        value="{{ json_encode($type_package->packageAccess->pluck('user_id')->toArray()) }}">
+                                                    <select class="form-control @error('user_id[]') is-invalid @enderror"
+                                                        name="user_id[]" id="user_id"
+                                                        data-placeholder="Pilih Paket Manajer" style="width: 100%;">
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}" selected>
+                                                                {{ $user->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="pt-3 d-flex justify-content-end">
                                         <a href="{{ route('master.typePackage.index') }}" class="btn btn-danger mr-2">
@@ -82,5 +106,12 @@
     </div>
     @push('javascript-bottom')
         @include('js.master.type_package.script')
+        <script>
+            $('#user_id').select2({
+                multiple: true,
+            });
+            $('#user_id').val('').trigger('change');
+            $('#user_id').val(JSON.parse($('#value_user').val())).trigger('change');
+        </script>
     @endpush
 @endsection

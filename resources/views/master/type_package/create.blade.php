@@ -5,18 +5,18 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <div class="card card-lightblue">
-                            <div class="card-header">
-                                <h3 class="font-weight-bold card-title">Tambah Kategori Paket</h3>
-                            </div>
 
-                            <!-- form start -->
-                            <form method="post" action="{{ route('master.typePackage.store') }}">
-                                @csrf
+                        <!-- form start -->
+                        <form method="post" action="{{ route('master.typePackage.store') }}">
+                            @csrf
+                            <div class="card card-lightblue">
+                                <div class="card-header">
+                                    <h3 class="font-weight-bold card-title">Tambah Kategori Paket</h3>
+                                </div>
                                 <div class="card-body">
-
                                     <div class="form-group row">
-                                        <label for="name" class="col-md-4 control-label text-left">Nama Kategori Paket
+                                        <label for="name" class="col-md-4 control-label text-left">Nama Kategori
+                                            Paket
                                             <span class="text-danger ml-1">*</span>
                                         </label>
                                         <div class="col-md-8 col-sm-12">
@@ -62,7 +62,33 @@
                                             @enderror
                                         </div>
                                     </div>
-
+                                    <div class="card card-maroon">
+                                        <div class="card-header">
+                                            <h3 class="font-weight-bold card-title">Hak Akses</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <label for="user_id" class="col-md-4 control-label text-left">Pilih Paket
+                                                    Manajer
+                                                </label>
+                                                <div class="col-md-8 col-sm-12">
+                                                    <select class="form-control @error('user_id[]') is-invalid @enderror"
+                                                        name="user_id[]" id="user_id"
+                                                        data-placeholder="Pilih Paket Manajer" style="width: 100%;">
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">
+                                                                {{ $user->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('user_id[]')
+                                                        <div class="alert alert-danger mt-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="pt-3 d-flex justify-content-end">
                                         <a href="{{ route('master.typePackage.index') }}" class="btn btn-danger mr-2">
@@ -70,9 +96,8 @@
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </div>
-                                <!-- /.card-body -->
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -82,6 +107,10 @@
         @include('js.master.type_package.script')
         <script>
             $('#id_parent').select2();
+            $('#user_id').select2({
+                multiple: true,
+            });
+            $('#user_id').val('').trigger('change');
         </script>
     @endpush
 @endsection
