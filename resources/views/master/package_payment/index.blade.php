@@ -1,5 +1,42 @@
 @extends('layouts.section')
 @section('content')
+    <style>
+        .custom-tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* Tooltip Style */
+        .custom-tooltip:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            /* Adjust Position */
+            left: 50%;
+            transform: translateX(-50%);
+            background: maroon;
+            /* Background Biru */
+            color: #fff;
+            /* Warna Teks Putih */
+            padding: 5px 10px;
+            /* Padding */
+            border-radius: 4px;
+            /* Rounded Corners */
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            font-size: 0.85rem;
+            /* Ukuran Font */
+        }
+
+        /* Tampilkan Tooltip */
+        .custom-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
     <div class="px-3 py-4">
 
         <!-- Main content -->

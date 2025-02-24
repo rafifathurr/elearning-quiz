@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class PackageController extends Controller
 {
@@ -88,11 +89,13 @@ class PackageController extends Controller
             ->addColumn('date_class', function ($data) {
                 $list_view = '<div align="center">';
                 foreach ($data->packageDate as $package) {
-                    $list_view .= '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">' . $package->dateClass->name . '</span>';
-                };
+                    $short_text = Str::limit($package->dateClass->name, 20); // Potong teks jadi 20 karakter
+                    $list_view .= '<span class="badge bg-primary p-2 m-1 custom-tooltip" style="font-size: 0.9rem; font-weight: bold;" title="' . e($package->dateClass->name) . '">' . $short_text . '</span>';
+                }
                 $list_view .= '</div>';
                 return $list_view;
             })
+
 
 
             ->only(['id', 'name', 'class', 'max_member', 'price', 'quiz', 'date_class', 'type_package', 'status', 'action'])
