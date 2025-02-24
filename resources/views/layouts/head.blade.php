@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Brata Cerdas - Bimbel dan Konsultasi Ujian Penerimaan Akpol, Bintara Akmil dan ASN</title>
+    <title>Brata Cerdas - Bimbel dan Konsultasi Ujian Penerimaan Akpol, Bintara, Akmil, dan ASN</title>
 
     <link rel="icon" href="{{ asset('img/bclogo.png') }}" type="image/png">
 
