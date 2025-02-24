@@ -8,8 +8,10 @@ use App\Models\PackageDate;
 use App\Models\PackageTest;
 use App\Models\Quiz\Quiz;
 use App\Models\TypePackage;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -23,7 +25,16 @@ class PackageController extends Controller
 
     public function dataTable()
     {
-        $categories = Package::whereNull('deleted_at')->get();
+        $userId = Auth::user()->id;
+        if (User::find($userId)->hasRole('admin')) {
+            $categories = Package::whereNull('deleted_at')->get();
+        } else {
+            $categories = Package::whereNull('deleted_at')
+                ->whereHas('typePackage.packageAccess', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->get();
+        }
 
         $dataTable = DataTables::of($categories)
             ->addIndexColumn()
@@ -105,7 +116,30 @@ class PackageController extends Controller
     {
         $quizes = Quiz::whereNull('deleted_at')->get();
         $dates = DateClass::whereNull('deleted_at')->get();
-        $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+        $userId = Auth::user()->id;
+        if (User::find($userId)->hasRole('admin')) {
+            $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+        } else {
+            $types = TypePackage::where('id_parent', 0)
+                ->whereNull('deleted_at')
+                ->with(['children' => function ($query) use ($userId) {
+                    $query->whereNull('deleted_at')
+                        ->whereHas('packageAccess', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
+                }])
+                ->where(function ($query) use ($userId) {
+                    // Cek parent yang memiliki akses langsung
+                    $query->whereHas('packageAccess', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    })
+                        // Atau parent yang punya children dengan akses
+                        ->orWhereHas('children.packageAccess', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
+                })
+                ->get();
+        }
         return view('master.package_payment.create', compact('quizes', 'types', 'dates'));
     }
 
@@ -190,7 +224,30 @@ class PackageController extends Controller
             $package = Package::findOrFail($id);
             $quizes = Quiz::whereNull('deleted_at')->get();
             $dates = DateClass::whereNull('deleted_at')->get();
-            $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+            $userId = Auth::user()->id;
+            if (User::find($userId)->hasRole('admin')) {
+                $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+            } else {
+                $types = TypePackage::where('id_parent', 0)
+                    ->whereNull('deleted_at')
+                    ->with(['children' => function ($query) use ($userId) {
+                        $query->whereNull('deleted_at')
+                            ->whereHas('packageAccess', function ($q) use ($userId) {
+                                $q->where('user_id', $userId);
+                            });
+                    }])
+                    ->where(function ($query) use ($userId) {
+                        // Cek parent yang memiliki akses langsung
+                        $query->whereHas('packageAccess', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        })
+                            // Atau parent yang punya children dengan akses
+                            ->orWhereHas('children.packageAccess', function ($q) use ($userId) {
+                                $q->where('user_id', $userId);
+                            });
+                    })
+                    ->get();
+            }
 
             return view('master.package_payment.edit', compact('package', 'quizes', 'types', 'dates'));
         } catch (Exception $e) {
