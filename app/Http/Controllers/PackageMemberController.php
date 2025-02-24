@@ -7,6 +7,7 @@ use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderPackage;
 use App\Models\Package;
+use App\Models\PackageDate;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -94,5 +95,17 @@ class PackageMemberController extends Controller
         }
 
         return Excel::download(new MemberExport($packageFilter, $dateFilter), $fileName);
+    }
+
+    public function getDateClass(Request $request)
+    {
+        $package_id = $request->input('package_id');
+
+        $dateClasses = PackageDate::where('package_id', $package_id)
+            ->with('classPackage') // Eager Loading ke DateClass
+            ->get()
+            ->pluck('classPackage');
+
+        return response()->json($dateClasses);
     }
 }

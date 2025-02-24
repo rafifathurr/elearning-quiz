@@ -51,4 +51,36 @@
             table.ajax.reload();
         });
     }
+
+    $('#packageFilter').on('change', function() {
+        console.log('Paket berubah');
+        const dateClass = $(this).val();
+        const dateDropdown = $('#dateClassFilter');
+
+        // Kosongkan dropdown aspek
+        dateDropdown.empty();
+        dateDropdown.append('<option value="">-- Semua Jadwal Kelas --</option>');
+
+        if (dateClass) {
+            // Panggil API untuk mendapatkan data aspek berdasarkan type_aspect
+            $.ajax({
+                url: '{{ url('master/member/get-date') }}',
+                type: 'GET',
+                data: {
+                    package_id: dateClass
+                },
+                success: function(data) {
+                    // Tambahkan data ke dropdown aspek
+                    data.forEach(function(date) {
+                        dateDropdown.append(
+                            `<option value="${date.id}">${date.name}</option>`
+                        );
+                    });
+                },
+                error: function() {
+                    console.error('Gagal memuat data aspek');
+                }
+            });
+        }
+    });
 </script>
