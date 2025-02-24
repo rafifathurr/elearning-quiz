@@ -92,6 +92,9 @@ class myClassAdminController extends Controller
         $orderPackageIdInAttendance = ClassAttendance::whereHas('class', function ($query) {
             $query->whereColumn('current_meeting', '<', 'total_meeting');
         })->pluck('order_package_id');
+        $orderPackageIdInMember = ClassUser::whereHas('class', function ($query) {
+            $query->whereColumn('current_meeting', '<', 'total_meeting');
+        })->pluck('order_package_id');
 
         $orderPackages = OrderPackage::whereHas('order', function ($query) {
             $query->whereNull('deleted_at')
@@ -99,10 +102,14 @@ class myClassAdminController extends Controller
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
-            ->where('date_in_class', $date_in_class) // Mencari berdasarkan date_in_class
-            ->whereNotIn('id', $orderPackageIdInAttendance)
+            ->where('date_in_class', $date_in_class)
+            ->where(function ($query) use ($orderPackageIdInAttendance, $orderPackageIdInMember) {
+                $query->whereNotIn('id', $orderPackageIdInAttendance)
+                    ->whereNotIn('id', $orderPackageIdInMember);
+            })
             ->with('order.user') // Eager Loading
             ->get();
+
 
         return response()->json($orderPackages);
     }

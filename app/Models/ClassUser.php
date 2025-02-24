@@ -13,4 +13,9 @@ class ClassUser extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function class()
+    {
+        return $this->belongsTo(ClassPackage::class, 'class_id');
+    }
 }

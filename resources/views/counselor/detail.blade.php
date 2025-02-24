@@ -41,7 +41,7 @@
                         <div class="card">
                             <div class="card-header ">
                                 <div class="d-flex justify-content-between">
-                                    <h4 class="font-weight-bold">{{ $class->package->name }}</h4>
+                                    <h4 class="font-weight-bold">{{ $class->name }}</h4>
                                     @if ($listClass->isEmpty())
                                         <h4 class="font-weight-bold">
                                             {{ 'Pertemuan ' . $class->current_meeting + 1 }}
