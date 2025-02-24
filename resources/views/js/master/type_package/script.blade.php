@@ -52,6 +52,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'access',
+                    defaultContent: '-'
+                },
+                {
                     data: 'action',
                     width: '20%',
                     defaultContent: '-',

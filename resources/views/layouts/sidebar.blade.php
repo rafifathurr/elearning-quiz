@@ -217,15 +217,17 @@
                     @endhasanyrole
 
                     @hasanyrole('admin|package-manager')
-                        <li class="nav-item {{ $display }}">
-                            <a href="{{ route('master.typePackage.index') }}"
-                                class="nav-link {{ request()->routeIs('master.typePackage.index') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-cube"></i>
-                                <p>
-                                    Kategori Paket
-                                </p>
-                            </a>
-                        </li>
+                        @hasrole('admin')
+                            <li class="nav-item {{ $display }}">
+                                <a href="{{ route('master.typePackage.index') }}"
+                                    class="nav-link {{ request()->routeIs('master.typePackage.index') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-cube"></i>
+                                    <p>
+                                        Kategori Paket
+                                    </p>
+                                </a>
+                            </li>
+                        @endhasrole
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.package.index') }}"
                                 class="nav-link {{ request()->routeIs('master.package.index') ? 'active' : '' }}">

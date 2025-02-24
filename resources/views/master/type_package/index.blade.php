@@ -25,6 +25,7 @@
                                                 <th>Kategori</th>
                                                 <th>Kategori Induk</th>
                                                 <th>Deskripsi</th>
+                                                <th>Hak Akses</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

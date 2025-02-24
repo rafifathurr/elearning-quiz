@@ -34,6 +34,21 @@ class TypePackageController extends Controller
                     . '</span></div>';
             })
 
+            ->addColumn('access', function ($data) {
+                $span_access = '<div align="center">';
+                if ($data->packageAccess && count($data->packageAccess) > 0) {
+                    $span_access .=
+                        '<span class="badge bg-primary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;"><i class="fas fa-lock mr-1"></i> '
+                        .  count($data->packageAccess)
+                        . ' Package-Manager' . '</span>';
+                } else {
+                    $span_access .= '<span class="text-muted font-italic">Belum atur akses</span>';
+                }
+                $span_access .= '<div>';
+                return $span_access;
+            })
+
+
             ->addColumn('action', function ($data) {
                 $btn_action = '<div align="center">';
                 $btn_action .= '<a href="' . route('master.typePackage.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
@@ -42,8 +57,8 @@ class TypePackageController extends Controller
                 $btn_action .= '<div>';
                 return $btn_action;
             })
-            ->only(['name', 'description', 'parent', 'action'])
-            ->rawColumns(['description', 'parent', 'action'])
+            ->only(['name', 'description', 'parent', 'access', 'action'])
+            ->rawColumns(['description', 'parent', 'access', 'action'])
             ->make(true);
 
         return $dataTable;

@@ -71,15 +71,15 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group row">
-                                                <label for="user_id" class="col-md-4 control-label text-left">Pilih Paket
-                                                    Manajer
+                                                <label for="user_id" class="col-md-4 control-label text-left">Pilih Package
+                                                    Manager
                                                 </label>
                                                 <div class="col-md-8 col-sm-12">
                                                     <input type="hidden" id="value_user"
                                                         value="{{ json_encode($type_package->packageAccess->pluck('user_id')->toArray()) }}">
                                                     <select class="form-control @error('user_id[]') is-invalid @enderror"
                                                         name="user_id[]" id="user_id"
-                                                        data-placeholder="Pilih Paket Manajer" style="width: 100%;">
+                                                        data-placeholder="Pilih Package Manager" style="width: 100%;">
                                                         @foreach ($users as $user)
                                                             <option value="{{ $user->id }}" selected>
                                                                 {{ $user->name }}</option>
