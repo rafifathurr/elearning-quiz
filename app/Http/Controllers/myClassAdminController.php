@@ -143,7 +143,7 @@ class myClassAdminController extends Controller
                 'name' => $request->name,
                 'total_meeting' => $package->class,
                 'current_meeting' => 0,
-
+                'class_date' => $request->date_class_id,
             ]);
 
             //add Class Counselor

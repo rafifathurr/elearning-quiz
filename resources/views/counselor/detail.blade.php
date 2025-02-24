@@ -71,16 +71,20 @@
                                         <form id="form-daftar-peserta" action="{{ route('class.storeAttendance') }}"
                                             method="POST">
                                             @csrf
-                                            <div class="card-header bg-gray-light d-flex justify-content-between">
-                                                <h5 class="w-100 text-left "><i class="fas fa-user-friends"></i>
+                                            <div class="card-header bg-lightblue d-flex justify-content-between">
+                                                <h5 class="w-100 text-left font-weight-bold"><i
+                                                        class="fas fa-user-friends"></i>
                                                     DAFTAR
                                                     PESERTA</h5>
                                                 @if (isset($class->package->max_member) && $class->package->max_member > 0)
-                                                    <h5 class="w-100 text-right ">Max:
+                                                    <h5 class="w-100 text-right font-weight-bold ">Max:
                                                         {{ $class->package->max_member . ' Peserta' }}</h5>
                                                 @endif
                                             </div>
                                             <div class="card-body">
+                                                <span class="font-weight-bold badge bg-lightblue p-2"
+                                                    style="font-size: 1rem">Jadwal Kelas:
+                                                    {{ $class->class_date }}</span>
                                                 <div class="table-responsive py-3">
                                                     <table id="table-member"
                                                         class="table table-bordered table-hover text-center">
@@ -135,10 +139,18 @@
 
                                     @csrf
                                     <div class="card">
-                                        <div class="card-header bg-gradient-gray">
-                                            <h5><i class="fas fa-user-friends"></i> DAFTAR ANGGOTA</h5>
+                                        <div class="card-header bg-lightblue d-flex justify-content-between">
+                                            <h5 class="w-100 text-left font-weight-bold"><i class="fas fa-user-friends"></i>
+                                                DAFTAR PESERTA</h5>
+                                            @if (isset($class->package->max_member) && $class->package->max_member > 0)
+                                                <h5 class="w-100 text-right font-weight-bold ">Max:
+                                                    {{ $class->package->max_member . ' Peserta' }}</h5>
+                                            @endif
                                         </div>
                                         <div class="card-body">
+                                            <span class="font-weight-bold badge bg-lightblue p-2"
+                                                style="font-size: 1rem">Jadwal Kelas:
+                                                {{ $class->class_date }}</span>
                                             <div class="table-responsive py-3">
                                                 <table id="table-member"
                                                     class="table table-bordered table-hover text-center">
