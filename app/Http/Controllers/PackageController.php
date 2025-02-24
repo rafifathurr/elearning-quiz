@@ -121,18 +121,29 @@ class PackageController extends Controller
         $dates = DateClass::whereNull('deleted_at')->get();
         $userId = Auth::user()->id;
         if (User::find($userId)->hasRole('admin')) {
-            $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+            $types = TypePackage::where('id_parent', 0)
+                ->whereNull('deleted_at')
+                ->with('children.children') // Load semua children secara rekursif
+                ->get();
         } else {
             $types = TypePackage::where('id_parent', 0)
                 ->whereNull('deleted_at')
                 ->with(['children' => function ($query) use ($userId) {
                     $query->whereNull('deleted_at')
-                        ->whereHas('packageAccess', function ($q) use ($userId) {
-                            $q->where('user_id', $userId);
-                        });
+                        ->where(function ($subQuery) use ($userId) {
+                            // Children yang punya akses langsung
+                            $subQuery->whereHas('packageAccess', function ($q) use ($userId) {
+                                $q->where('user_id', $userId);
+                            })
+                                // Atau children yang parent-nya punya akses
+                                ->orWhereHas('parent.packageAccess', function ($q) use ($userId) {
+                                    $q->where('user_id', $userId);
+                                });
+                        })
+                        ->with('children'); // Load children secara rekursif
                 }])
                 ->where(function ($query) use ($userId) {
-                    // Cek parent yang memiliki akses langsung
+                    // Parent yang punya akses langsung
                     $query->whereHas('packageAccess', function ($q) use ($userId) {
                         $q->where('user_id', $userId);
                     })
@@ -143,6 +154,7 @@ class PackageController extends Controller
                 })
                 ->get();
         }
+
         return view('master.package_payment.create', compact('quizes', 'types', 'dates'));
     }
 
@@ -229,18 +241,29 @@ class PackageController extends Controller
             $dates = DateClass::whereNull('deleted_at')->get();
             $userId = Auth::user()->id;
             if (User::find($userId)->hasRole('admin')) {
-                $types = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+                $types = TypePackage::where('id_parent', 0)
+                    ->whereNull('deleted_at')
+                    ->with('children.children') // Load semua children secara rekursif
+                    ->get();
             } else {
                 $types = TypePackage::where('id_parent', 0)
                     ->whereNull('deleted_at')
                     ->with(['children' => function ($query) use ($userId) {
                         $query->whereNull('deleted_at')
-                            ->whereHas('packageAccess', function ($q) use ($userId) {
-                                $q->where('user_id', $userId);
-                            });
+                            ->where(function ($subQuery) use ($userId) {
+                                // Children yang punya akses langsung
+                                $subQuery->whereHas('packageAccess', function ($q) use ($userId) {
+                                    $q->where('user_id', $userId);
+                                })
+                                    // Atau children yang parent-nya punya akses
+                                    ->orWhereHas('parent.packageAccess', function ($q) use ($userId) {
+                                        $q->where('user_id', $userId);
+                                    });
+                            })
+                            ->with('children'); // Load children secara rekursif
                     }])
                     ->where(function ($query) use ($userId) {
-                        // Cek parent yang memiliki akses langsung
+                        // Parent yang punya akses langsung
                         $query->whereHas('packageAccess', function ($q) use ($userId) {
                             $q->where('user_id', $userId);
                         })
