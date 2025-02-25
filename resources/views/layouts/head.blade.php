@@ -18,7 +18,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <meta name="description"
-        content="Brata Cerdas menyediakan layanan bimbingan belajar dan konsultasi untuk ujian penerimaan aparatur negara seperti Penerimaan AKPOL, Bintara Polri, AKMIL, Bintara TNI, Aparatur Sipil Negara.  Brata Cerdas juga memberikan bimbingan belajar dan konsultasi untuk Ujian Masuk Perguruan Tinggi maupun Pemantapan Materi Akademik lainnya">
+        content="Brata Cerdas menyediakan layanan bimbingan belajar dan konsultasi untuk ujian penerimaan aparatur negara seperti Penerimaan AKPOL, Bintara Polri, AKMIL, Bintara TNI, Aparatur Sipil Negara.  Brata Cerdas juga memberikan bimbingan belajar dan konsultasi untuk Ujian Masuk Perguruan Tinggi maupun Pemantapan Materi Akademik lainnya">
+
+    <meta name="keywords"
+        content="bimbel, konsultasi, test penerimaan, akpol, akmil, bintara polri, bintara tni, ujian masuk perguruan tinggi, ujian masuk universitas">
 
     <title>Brata Cerdas - Bimbel dan Konsultasi Ujian Penerimaan Akpol, Bintara, Akmil, dan ASN</title>
 

@@ -68,17 +68,19 @@
                                         {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y H:i') }}
                                     </h6>
                                 </div>
-                                <div class="row">
-                                    <h6 class="col-md-3 font-weight-bold">Bukti Pembayaran</h6>
-                                    <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
-                                        @if (!is_null($order->proof_payment))
-                                            <a href="{{ route('order.downloadPayment', $order->id) }}" target="_blank"><i
-                                                    class="fas fa-download mr-1"></i> Lihat Bukti</a>
-                                        @else
-                                            -
-                                        @endif
-                                    </h6>
-                                </div>
+                                @if ($order->payment_method == 'transfer')
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Bukti Pembayaran</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            @if (!is_null($order->proof_payment))
+                                                <a href="{{ route('order.downloadPayment', $order->id) }}"
+                                                    target="_blank"><i class="fas fa-download mr-1"></i> Lihat Bukti</a>
+                                            @else
+                                                -
+                                            @endif
+                                        </h6>
+                                    </div>
+                                @endif
                             </div>
 
                             @if ($order->status == 100 && $order->approveBy)
