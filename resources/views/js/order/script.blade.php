@@ -366,6 +366,12 @@
                 },
                 cancelButtonText: 'Batal',
                 didOpen: () => {
+                    @if (Auth::check() && Auth::user()->username === 'test_user23')
+                        document.getElementById('btn-briva').disabled = false;
+                    @else
+                        document.getElementById('btn-briva').disabled = true;
+                    @endif
+
                     document.getElementById('btn-transfer').addEventListener('click', function() {
                         Swal.fire({
                             title: 'Konfirmasi Pembayaran',
