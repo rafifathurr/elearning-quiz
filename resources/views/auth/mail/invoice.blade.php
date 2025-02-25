@@ -103,7 +103,7 @@
 
         <p style="text-align: center;">Jika ada pertanyaan, silakan hubungi kami.</p>
         <p style="text-align: center;">
-            <a href="{{ route('order.detailTransfer', ['id' => $order->id]) }}"
+            <a href="{{ route('order.detailPayment', ['id' => $order->id]) }}"
                 style="background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                 Upload Bukti Pembayaran
             </a>

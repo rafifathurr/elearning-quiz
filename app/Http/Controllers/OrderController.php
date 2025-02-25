@@ -461,7 +461,7 @@ class OrderController extends Controller
                 if ($update_order) {
                     DB::commit();
 
-                    // Jika metode pembayaran transfer, arahkan ke detailTransfer
+                    // Jika metode pembayaran transfer, arahkan ke detailPayment
                     if ($request->payment_method == 'transfer') {
                         if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
                             $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
@@ -471,7 +471,7 @@ class OrderController extends Controller
                         if ($sendMail) {
                             return response()->json([
                                 'success' => true,
-                                'redirect_url' => route('order.detailTransfer', ['id' => $id])
+                                'redirect_url' => route('order.detailPayment', ['id' => $id])
                             ]);
                         }
                     }
@@ -749,7 +749,7 @@ class OrderController extends Controller
                 ->addColumn('action', function ($data) {
                     // if ($data->status == 2) {
                     $btn_action = '<div align="center">';
-                    $btn_action .= '<a href="' . route('order.detailTransfer', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
+                    $btn_action .= '<a href="' . route('order.detailPayment', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
                     $btn_action .= '</div>';
                     return $btn_action;
                     // } else {
@@ -768,7 +768,7 @@ class OrderController extends Controller
         return view('order.history');
     }
 
-    function detailTransfer(string $id)
+    function detailPayment(string $id)
     {
         try {
             $order = Order::find($id);
@@ -785,7 +785,7 @@ class OrderController extends Controller
                 return $data->package->price;
             });
 
-            return view('order.detail-transfer', compact('order', 'order_package', 'totalPrice'));
+            return view('order.detail-payment', compact('order', 'order_package', 'totalPrice'));
         } catch (Exception $e) {
             return redirect()
                 ->back()

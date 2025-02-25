@@ -123,7 +123,7 @@ Route::group(['middleware' => ['role:user|counselor']], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('get-schedule/{id}', 'getSchedule')->name('getSchedule');
         Route::get('history', 'history')->name('history');
-        Route::get('detail-transfer/{id}', 'detailTransfer')->name('detailTransfer');
+        Route::get('detail-pembayaran/{id}', 'detailPayment')->name('detailPayment');
         Route::match(['put', 'patch'], 'upload-payment/{id}', 'uploadPayment')->name('uploadPayment');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
         Route::post('payment/{id}', 'payment')->name('payment');
