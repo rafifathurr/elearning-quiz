@@ -155,6 +155,7 @@ class myTestController extends Controller
                 ->whereIn('order_id', $orderIds)
                 ->whereIn('package_id', $packageIds)
                 ->whereNull('deleted_at')
+                ->orderBy('updated_at', 'DESC')
                 ->get();
         } elseif (User::find(Auth::user()->id)->hasAllRoles(['counselor', 'admin', 'manager'])) {
             $orderIds = Order::whereNull('deleted_at')
@@ -172,6 +173,7 @@ class myTestController extends Controller
                 ->whereIn('order_id', $orderIds)
                 ->whereIn('package_id', $orderPackageIds)
                 ->whereNull('deleted_at')
+                ->orderBy('updated_at', 'DESC')
                 ->get();
         } else {
             $orderIds = Order::whereNull('deleted_at')
@@ -189,6 +191,7 @@ class myTestController extends Controller
                 ->whereIn('order_id', $orderIds)
                 ->whereIn('package_id', $orderPackageIds)
                 ->whereNull('deleted_at')
+                ->orderBy('updated_at', 'DESC')
                 ->get();
         }
 
