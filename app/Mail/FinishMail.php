@@ -35,7 +35,7 @@ class FinishMail extends Mailable
             ->view('auth.mail.finish')
             ->with(['data' => $this->data])
             ->attach($this->pdfPath, [
-                'as' => 'result_pdf.pdf',
+                'as' => basename($this->pdfPath),
                 'mime' => 'application/pdf',
             ]);
     }

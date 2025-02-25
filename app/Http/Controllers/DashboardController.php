@@ -98,9 +98,19 @@ class DashboardController extends Controller
                     $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'speed', 'accuracyLabel'));
                 }
 
-                // Simpan PDF ke file sementara
-                $pdfPath = storage_path('app/public/result_pdf.pdf');
+                // Dapatkan nama quiz dan nama peserta
+                $quizName = str_replace(' ', '_', strtolower($resultData->quiz->name)); // Ganti spasi dengan underscore
+                $participantName = str_replace(' ', '_', strtolower(Auth::user()->name)); // Ganti spasi dengan underscore
+
+                // Buat nama file yang unik
+                $pdfFileName = "{$quizName}_{$participantName}.pdf";
+
+                // Path penyimpanan PDF
+                $pdfPath = storage_path("app/public/{$pdfFileName}");
+
+                // Simpan PDF ke path yang telah dibuat
                 $pdf->save($pdfPath);
+
 
                 // Pastikan file PDF ada
                 if (!file_exists($pdfPath)) {
@@ -117,6 +127,11 @@ class DashboardController extends Controller
                         $resultData->update([
                             'status' => 1
                         ]);
+
+                        if (file_exists($pdfPath)) {
+                            unlink($pdfPath);
+                            Log::info("PDF berhasil dihapus: {$pdfPath}");
+                        }
                     }
                 }
             };
