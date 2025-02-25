@@ -127,10 +127,37 @@
                                     </div>
                                 @else
                                     @hasanyrole('counselor')
-                                        <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
-                                            {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
-                                            Test</button>
+                                        @if ($isCounselor)
+                                            <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
+                                                {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
+                                                Test</button>
+                                        @endif
                                     @endhasanyrole
+
+                                    <div class="card shadow-sm border-0">
+                                        <div class="card-header bg-info text-white">
+                                            <h5 class="m-0 font-weight-bold">
+                                                <i class="fas fa-user-tie mr-2"></i> KONSELOR KELAS
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            @if ($class->classCounselor->isNotEmpty())
+                                                <ul class="list-group list-group-flush">
+                                                    @foreach ($class->classCounselor as $item)
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <i class="fas fa-user-circle text-info mr-2"></i>
+                                                            <span
+                                                                class="font-weight-bold">{{ $item->counselor->name }}</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <p class="text-muted text-center m-0">Belum ada konselor yang ditugaskan.
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+
 
                                     @if ($latestAttendance)
                                         <form method="post" id="form-daftar-peserta"
@@ -189,13 +216,17 @@
                                     </div>
 
                                     @hasanyrole('counselor')
-                                        @if (!$selectedDate)
-                                            <button class="btn btn-success my-3"
-                                                {{ $latestAttendance || $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
-                                            @if ($latestAttendance)
-                                                <button class="btn btn-warning my-3">Ubah Absensi</button>
+                                        @if ($isCounselor)
+                                            {{-- Pastikan hanya counselor kelas ini yang bisa melihat tombol --}}
+                                            @if (!$selectedDate)
+                                                <button class="btn btn-success my-3"
+                                                    {{ $latestAttendance || $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Absensi</button>
+                                                @if ($latestAttendance)
+                                                    <button class="btn btn-warning my-3">Ubah Absensi</button>
+                                                @endif
                                             @endif
                                         @endif
+
                                         </form>
                                     @endhasanyrole
                                 @endif

@@ -31,7 +31,7 @@ class myClassAdminController extends Controller
     }
     public function dataTable()
     {
-        if (User::find(User::find(Auth::user()->id)->hasRole('class-operator'))) {
+        if (User::find(User::find(Auth::user()->id)->hasAnyRole('class-operator', 'manager'))) {
             $myClass = ClassPackage::whereNull('deleted_at')->get();
         } else {
             $myClass = ClassPackage::whereNull('deleted_at')
@@ -200,6 +200,10 @@ class myClassAdminController extends Controller
         try {
             $class = ClassPackage::find($id);
 
+            // Cek apakah user yang login adalah counselor dari kelas ini
+            $isCounselor = ClassCounselor::where('class_id', $id)
+                ->where('counselor_id', Auth::id())
+                ->exists();
 
             $filterDate = ClassAttendance::where('class_id', $id)
                 ->select('attendance_date')
@@ -249,7 +253,7 @@ class myClassAdminController extends Controller
             $listMember = ClassUser::where('class_id', $id)->get();
 
 
-            return view('counselor.detail', compact('class', 'listClass', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance'));
+            return view('counselor.detail', compact('class', 'listClass', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance', 'isCounselor'));
         } catch (Exception $e) {
             return redirect()
                 ->back()
