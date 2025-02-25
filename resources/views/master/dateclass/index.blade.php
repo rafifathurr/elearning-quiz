@@ -12,10 +12,12 @@
                                 <h3 class="font-weight-bold">Jadwal Kelas</h3>
                             </div>
                             <div class="card-body">
-                                <a href="{{ route('master.dateclass.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Tambah Jadwal Kelas
-                                </a>
+                                @hasanyrole('admin')
+                                    <a href="{{ route('master.dateclass.create') }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Tambah Jadwal Kelas
+                                    </a>
+                                @endhasanyrole
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="dt-dateclass">

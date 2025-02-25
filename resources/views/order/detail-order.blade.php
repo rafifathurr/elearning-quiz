@@ -147,16 +147,18 @@
                                     <i class="fas fa-arrow-left mr-1"></i>Kembali
                                 </a>
                                 @if ($order->status == 10)
-                                    <div>
-                                        <button class="btn btn-sm btn-success m-1"
-                                            onclick="approveOrder({{ $order->id }})">
-                                            <i class="fas fa-check mr-1"></i>Terima
-                                        </button>
-                                        <button class="btn btn-sm btn-danger m-1"
-                                            onclick="rejectOrder({{ $order->id }})">
-                                            <i class="fas fa-times mr-1"></i>Tolak
-                                        </button>
-                                    </div>
+                                    @hasanyrole('admin|finance')
+                                        <div>
+                                            <button class="btn btn-sm btn-success m-1"
+                                                onclick="approveOrder({{ $order->id }})">
+                                                <i class="fas fa-check mr-1"></i>Terima
+                                            </button>
+                                            <button class="btn btn-sm btn-danger m-1"
+                                                onclick="rejectOrder({{ $order->id }})">
+                                                <i class="fas fa-times mr-1"></i>Tolak
+                                            </button>
+                                        </div>
+                                    @endhasanyrole
                                 @endif
                             </div>
                         </div>

@@ -177,12 +177,15 @@ class OrderController extends Controller
     {
         try {
             $order = Order::find($id);
-            $admin = User::find(Auth::user()->id)->hasRole('admin');
-            if (!$admin) {
+
+            $allow_role = User::find(Auth::user()->id)->hasAnyRole('admin', 'finance', 'manager');
+
+            if (!$allow_role) {
                 return redirect()
                     ->back()
                     ->with('failed', 'Anda Tidak Bisa Akses Halaman Ini!');
             }
+
             $order_package = OrderPackage::whereNull('deleted_at')
                 ->where('order_id', $id)
                 ->get();
@@ -584,7 +587,7 @@ class OrderController extends Controller
         }
 
         // Cek apakah user memiliki izin untuk melihat bukti pembayaran ini
-        if (!User::find(Auth::user()->id)->hasAnyRole('admin', 'finance')) {
+        if (!User::find(Auth::user()->id)->hasAnyRole('admin', 'finance', 'manager')) {
             abort(403);
         }
 

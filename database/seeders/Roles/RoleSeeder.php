@@ -18,6 +18,7 @@ class RoleSeeder extends Seeder
         // Role::create(['name' => 'package-manager']);
         //Role::create(['name' => 'finance']);
         //Role::create(['name' => 'question-operator']);
-        Role::create(['name' => 'class-operator']);
+        //Role::create(['name' => 'class-operator']);
+        Role::create(['name' => 'manager']);
     }
 }

@@ -63,27 +63,7 @@
                     </li>
                 @endhasrole
 
-                @hasanyrole('admin|finance')
-                    <li class="nav-item {{ $display }}">
-                        <?php
-                        $orderIds = App\Models\Order::whereNull('deleted_at')
-                            ->where('user_id', Auth::user()->id)
-                            ->where('status', 1)
-                            ->pluck('id');
-                        $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
-                        $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
-                        ?>
-                        <a href="{{ route('order.listOrder') }}"
-                            class="nav-link {{ request()->routeIs('order.listOrder') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shopping-bag"></i>
-                            <p>
-                                Daftar Order <span
-                                    class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}</span>
 
-                            </p>
-                        </a>
-                    </li>
-                @endhasanyrole
 
 
 
@@ -139,7 +119,7 @@
                 @endhasanyrole
 
 
-                @hasanyrole('admin|counselor')
+                @hasanyrole('admin|counselor|manager')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('mytest.history') }}"
                             class="nav-link {{ request()->routeIs('mytest.history') ? 'active' : '' }}">
@@ -151,7 +131,33 @@
                     </li>
                 @endhasanyrole
 
-                @hasanyrole('counselor|class-operator')
+                @hasanyrole('admin|finance|manager')
+                    <li class="nav-item {{ $display }}">
+                        <?php
+                        $orderIds = App\Models\Order::whereNull('deleted_at')
+                            ->where('user_id', Auth::user()->id)
+                            ->where('status', 1)
+                            ->pluck('id');
+                        $orderPackage = App\Models\OrderPackage::whereIn('order_id', $orderIds)->whereNull('deleted_at')->count();
+                        $orderList = App\Models\Order::whereNull('deleted_at')->where('status', 10)->count();
+                        ?>
+                        <a href="{{ route('order.listOrder') }}"
+                            class="nav-link {{ request()->routeIs('order.listOrder') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shopping-bag"></i>
+                            <p>
+                                Daftar Order
+                                @hasanyrole('admin|finance')
+                                    <span
+                                        class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}
+                                    </span>
+                                @endhasanyrole
+
+                            </p>
+                        </a>
+                    </li>
+                @endhasanyrole
+
+                @hasanyrole('counselor|class-operator|manager')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('class.index') }}"
                             class="nav-link {{ request()->routeIs('class.index') ? 'active' : '' }}">
@@ -161,7 +167,7 @@
                             </p>
                         </a>
                     </li>
-                    @hasanyrole('class-operator')
+                    @hasanyrole('class-operator|manager')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.member.index') }}"
                                 class="nav-link {{ request()->routeIs('master.member.index') ? 'active' : '' }}">
@@ -172,7 +178,7 @@
                     @endhasanyrole
                 @endhasanyrole
 
-                @hasanyrole('admin')
+                @hasanyrole('admin|manager')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.dateclass.index') }}"
                             class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'active' : '' }}">

@@ -195,7 +195,7 @@ Route::group(['middleware' => ['role:admin|user|question-operator']], function (
 
 
 // Admin | Finance
-Route::group(['middleware' => ['role:admin|finance']], function () {
+Route::group(['middleware' => ['role:admin|finance|manager']], function () {
     // Kelola Daftar Order
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         Route::get('list-order', 'listOrder')->name('listOrder');
@@ -209,7 +209,7 @@ Route::group(['middleware' => ['role:admin|finance']], function () {
 
 
 // Admin | Konselor
-Route::group(['middleware' => ['role:admin|counselor']], function () {
+Route::group(['middleware' => ['role:admin|counselor|manager']], function () {
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         // Kelola Jadwal Kelas
         Route::group(['controller' => DateClassController::class, 'prefix' => 'dateclass', 'as' => 'dateclass.'], function () {
@@ -228,7 +228,7 @@ Route::group(['middleware' => ['role:admin|counselor']], function () {
 });
 
 // Konselor | Kelas Operator
-Route::group(['middleware' => ['role:counselor|class-operator']], function () {
+Route::group(['middleware' => ['role:counselor|class-operator|manager']], function () {
     // Kelola Kelas Konselor
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
