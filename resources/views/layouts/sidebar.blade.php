@@ -190,9 +190,9 @@
                     </li>
                 @endhasanyrole
 
-                @hasanyrole('admin|package-manager|question-operator')
+                @hasanyrole('admin|package-manager|question-operator|manager')
 
-                    @hasanyrole('admin|question-operator')
+                    @hasanyrole('admin|question-operator|manager')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('admin.quiz.index') }}"
                                 class="nav-link {{ request()->routeIs('admin.quiz.index') ? 'active' : '' }}">

@@ -13,10 +13,12 @@
                                 <h3 class="font-weight-bold">Bank Soal</h3>
                             </div>
                             <div class="card-body">
-                                <a href="{{ route('master.question.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Tambah Pertanyaan
-                                </a>
+                                @hasanyrole('admin|question-operator')
+                                    <a href="{{ route('master.question.create') }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Tambah Pertanyaan
+                                    </a>
+                                @endhasanyrole
                                 <div class="form-group my-3">
                                     <label for="filter-type_aspect">Filter Tipe Aspek</label>
                                     <select id="filter-type_aspect" class="form-control w-25">

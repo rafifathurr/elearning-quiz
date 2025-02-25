@@ -13,18 +13,19 @@
                                 <h3 class="font-weight-bold">Daftar Test</h3>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex">
-                                    <a href="{{ route('admin.quiz.create') }}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        Tambah Test
-                                    </a>
-                                    <a href="{{ route('master.kecermatan.create') }}" class="btn btn-info btn-sm ml-3">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        Tambah Test Kecermatan
+                                @hasanyrole('admin|question-operator')
+                                    <div class="d-flex">
+                                        <a href="{{ route('admin.quiz.create') }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus mr-1"></i>
+                                            Tambah Test
+                                        </a>
+                                        <a href="{{ route('master.kecermatan.create') }}" class="btn btn-info btn-sm ml-3">
+                                            <i class="fas fa-plus mr-1"></i>
+                                            Tambah Test Kecermatan
 
-                                    </a>
-                                </div>
-
+                                        </a>
+                                    </div>
+                                @endhasanyrole
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url" value="{{ url()->current() }}">
                                     <table class="table table-bordered table-hover w-100 datatable" id="datatable">

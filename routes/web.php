@@ -156,7 +156,7 @@ Route::group(['middleware' => ['role:user']], function () {
 
 
 //Admin | User | question-operator
-Route::group(['middleware' => ['role:admin|user|question-operator']], function () {
+Route::group(['middleware' => ['role:admin|user|question-operator|manager']], function () {
     // Play Quiz
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::group(['controller' => \App\Http\Controllers\Admin\Quiz\QuizController::class, 'prefix' => 'quiz', 'as' => 'quiz.'], function () {
@@ -299,7 +299,7 @@ Route::group(['middleware' => ['role:admin|package-manager']], function () {
 
 
 // Admin | Question Operator
-Route::group(['middleware' => ['role:admin|question-operator']], function () {
+Route::group(['middleware' => ['role:admin|question-operator|manager']], function () {
 
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         //Bank Soal
