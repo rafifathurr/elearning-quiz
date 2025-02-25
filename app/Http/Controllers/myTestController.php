@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassAttendance;
+use App\Models\ClassCounselor;
 use App\Models\ClassPackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -144,8 +145,8 @@ class myTestController extends Controller
 
     public function dataTableHistory()
     {
-        if (User::find(Auth::user()->id)->hasRole('counselor') && !User::find(Auth::user()->id)->hasRole('admin')) {
-            $classIds = ClassPackage::where('user_id', Auth::user()->id)->pluck('id');
+        if (User::find(Auth::user()->id)->hasRole('counselor') && !User::find(Auth::user()->id)->hasRole('admin') && !User::find(Auth::user()->id)->hasRole('manager')) {
+            $classIds = ClassCounselor::where('counselor_id', Auth::user()->id)->pluck('class_id');
             $orderPackageIds = ClassAttendance::whereIn('class_id', $classIds)->pluck('order_package_id');
             $packageIds = OrderPackage::whereIn('id', $orderPackageIds)->pluck('package_id');
             $orderIds = OrderPackage::whereIn('id', $orderPackageIds)->pluck('order_id');
@@ -155,7 +156,7 @@ class myTestController extends Controller
                 ->whereIn('package_id', $packageIds)
                 ->whereNull('deleted_at')
                 ->get();
-        } elseif (User::find(Auth::user()->id)->hasAllRoles(['counselor', 'admin'])) {
+        } elseif (User::find(Auth::user()->id)->hasAllRoles(['counselor', 'admin', 'manager'])) {
             $orderIds = Order::whereNull('deleted_at')
                 ->where('status', 100)
                 ->pluck('id');
