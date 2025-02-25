@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
+use App\Models\SupportBriva;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -474,9 +476,24 @@ class OrderController extends Controller
                                 'redirect_url' => route('order.detailPayment', ['id' => $id])
                             ]);
                         }
+                    } elseif ($request->payment_method == 'briva') {
+                        $insert_briva = SupportBriva::create([
+                            'order_id' => $id,
+                            'va' => implode('', array_map(fn() => mt_rand(0, 9), range(1, 18))),
+                            'source' => 'BRI',
+                            'latest_inquiry' => Str::random(20),
+                            'create_time' => now(),
+                            'payment_time' => null,
+                        ]);
+                        if ($insert_briva) {
+                            return response()->json([
+                                'success' => true,
+                                'redirect_url' => route('order.detailPayment', ['id' => $id])
+                            ]);
+                        }
                     }
 
-                    // Jika bukan transfer, arahkan ke home atau halaman sukses lainnya
+                    // Jika bukan transfer atau briva, arahkan ke home atau halaman sukses lainnya
                     return response()->json([
                         'success' => true,
                         'redirect_url' => route('home')

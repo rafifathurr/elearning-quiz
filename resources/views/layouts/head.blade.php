@@ -14,6 +14,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- CSRF -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <meta name="description"
+        content="Brata Cerdas menyediakan layanan bimbingan belajar dan konsultasi untuk ujian penerimaan aparatur negara seperti Penerimaan AKPOL, Bintara Polri, AKMIL, Bintara TNI, Aparatur Sipil Negara.  Brata Cerdas juga memberikan bimbingan belajar dan konsultasi untuk Ujian Masuk Perguruan Tinggi maupun Pemantapan Materi Akademik lainnya">
+
     <title>Brata Cerdas - Bimbel dan Konsultasi Ujian Penerimaan Akpol, Bintara, Akmil, dan ASN</title>
 
     <link rel="icon" href="{{ asset('img/bclogo.png') }}" type="image/png">
@@ -50,8 +56,6 @@
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 
-    <!-- CSRF -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
         .select2-container {

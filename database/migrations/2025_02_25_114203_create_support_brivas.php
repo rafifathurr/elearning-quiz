@@ -15,9 +15,9 @@ return new class extends Migration
             $table->engine = 'InnoDB';
             $table->integer('id')->autoIncrement();
             $table->integer('order_id')->nullable();
-            $table->integer('va')->nullable();
+            $table->unsignedBigInteger('va')->nullable();
             $table->string('source')->nullable();
-            $table->string('latest_inquiry')->nullable();
+            $table->text('latest_inquiry')->nullable();
             $table->timestamp('create_time')->nullable();
             $table->timestamp('payment_time')->nullable();
 

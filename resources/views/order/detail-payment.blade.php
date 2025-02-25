@@ -4,6 +4,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 mt-4">
+
                     <div class="card card-lightblue">
                         <div class="card-header">
                             <div class="d-flex justify-content-between  align-items-center">
@@ -107,61 +108,87 @@
                         </div>
                     </div>
                     @if ($order->status == 2)
-                        <div class="callout callout-info">
-                            <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
-                            <p>Silakan lakukan pembayaran ke rekening berikut:</p>
+                        {{-- Transfer --}}
+                        @if ($order->payment_method == 'transfer')
+                            <div class="callout callout-info">
+                                <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
+                                <p>Silakan lakukan pembayaran ke rekening berikut:</p>
 
-                            <div class="d-flex flex-wrap align-items-center p-2 bg-white rounded shadow-sm">
-                                <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" class="img-fluid mr-2"
-                                    style="height: 30px;">
-                                <span class="fw-bold badge text-white px-3 py-2 mr-2"
-                                    style="background-color: #0A3D91;">Bank
-                                    BRI</span>
-                                <div class="d-flex flex-column">
-                                    <strong id="rekening" class="text-dark">038501001542300</strong>
-                                    <small class="text-muted">a.n. ATLAS KAPITAL PERKASA</small>
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary ml-auto" onclick="copyRekening()">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
-                            </div>
-                            <small class="text-success" id="copy-alert" style="display: none;">Nomor rekening berhasil
-                                disalin!</small>
-
-                            <div class="card mt-4 border shadow-sm">
-                                <div class="card-body">
-                                    <div class="alert alert-default-info d-flex">
-                                        <h6 class="alert-heading"> Berita:
-                                            <strong>"
-                                                <strong id="berita">{{ 'BC' . $year . $order->id }}</strong>"
-                                            </strong>
-                                        </h6>
-                                        <button class="btn btn-sm btn-outline-primary mx-2" onclick="copyBerita()">
-                                            <i class="fas fa-copy"></i> Copy
-                                        </button>
-                                        <small class="text-success font-weight-bolder" id="copy-berita-alert"
-                                            style="display: none;">Berita
-                                            berhasil
-                                            disalin!</small>
+                                <div class="d-flex flex-wrap align-items-center p-2 bg-white rounded shadow-sm">
+                                    <img src="{{ asset('img/brilogo.png') }}" alt="BRI Logo" class="img-fluid mr-2"
+                                        style="height: 30px;">
+                                    <span class="fw-bold badge text-white px-3 py-2 mr-2"
+                                        style="background-color: #0A3D91;">Bank
+                                        BRI</span>
+                                    <div class="d-flex flex-column">
+                                        <strong id="rekening" class="text-dark">038501001542300</strong>
+                                        <small class="text-muted">a.n. ATLAS KAPITAL PERKASA</small>
                                     </div>
+                                    <button class="btn btn-sm btn-outline-primary ml-auto" onclick="copyRekening()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <small class="text-success" id="copy-alert" style="display: none;">Nomor rekening berhasil
+                                    disalin!</small>
 
-                                    <form action="{{ route('order.uploadPayment', ['id' => $order->id]) }}" method="post"
-                                        enctype="multipart/form-data">
-                                        @csrf
-                                        @method('patch')
-                                        <div class="form-group row ">
-                                            <label for="proof_payment" class="col-md-4 control-label text-left">Upload Bukti
-                                                Pembayaran <span class="text-danger">*</span></label>
-                                            <input type="file" class="form-control" name="proof_payment"
-                                                id="proof_payment" accept="image/jpeg,image/jpg,image/png" required>
+                                <div class="card mt-4 border shadow-sm">
+                                    <div class="card-body">
+                                        <div class="alert alert-default-info d-flex">
+                                            <h6 class="alert-heading"> Berita:
+                                                <strong>"
+                                                    <strong id="berita">{{ 'BC' . $year . $order->id }}</strong>"
+                                                </strong>
+                                            </h6>
+                                            <button class="btn btn-sm btn-outline-primary mx-2" onclick="copyBerita()">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                            <small class="text-success font-weight-bolder" id="copy-berita-alert"
+                                                style="display: none;">Berita
+                                                berhasil
+                                                disalin!</small>
                                         </div>
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            Kirim
-                                        </button>
-                                    </form>
+
+                                        <form action="{{ route('order.uploadPayment', ['id' => $order->id]) }}"
+                                            method="post" enctype="multipart/form-data">
+                                            @csrf
+                                            @method('patch')
+                                            <div class="form-group row ">
+                                                <label for="proof_payment" class="col-md-4 control-label text-left">Upload
+                                                    Bukti
+                                                    Pembayaran <span class="text-danger">*</span></label>
+                                                <input type="file" class="form-control" name="proof_payment"
+                                                    id="proof_payment" accept="image/jpeg,image/jpg,image/png" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                Kirim
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @elseif ($order->payment_method == 'briva')
+                            <div class="callout callout-info">
+                                <h5><i class="fas fa-university"></i> Informasi Pembayaran</h5>
+                                <p>Silakan lakukan pembayaran menggunakan virtual account berikut:</p>
+
+                                <div class="card border-info mt-3 shadow-sm">
+                                    <div class="card-body text-center d-flex justify-content-center align-items-center">
+                                        <h4 class="font-weight-bold mb-0 text-primary" id="va"
+                                            style="margin-right: 10px;">
+                                            {{ $order->supportBriva->va }}
+                                        </h4>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="copyVA()"
+                                            title="Salin VA" style="border-radius: 50%;">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div id="copySuccess" class="text-success text-center"
+                                        style="display: none; font-size: 0.9rem;">
+                                        <i class="fas fa-check-circle"></i> VA berhasil disalin!
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @endif
 
                 </div>
@@ -186,6 +213,25 @@
                     var beritaBox = document.getElementById("copy-berita-alert");
                     beritaBox.style.display = "inline";
                     setTimeout(() => beritaBox.style.display = "none", 2000);
+                });
+            }
+
+            function copyVA() {
+                var va = document.getElementById("va").innerText;
+                navigator.clipboard.writeText(va).then(() => {
+                    var alert = document.getElementById("copySuccess");
+                    alert.style.display = "block";
+                    alert.style.opacity = 1;
+
+                    setTimeout(() => {
+                        alert.style.transition = "opacity 0.5s";
+                        alert.style.opacity = 0;
+                    }, 1500);
+
+                    setTimeout(() => {
+                        alert.style.display = "none";
+                        alert.style.transition = ""; // Reset transition
+                    }, 2000);
                 });
             }
         </script>

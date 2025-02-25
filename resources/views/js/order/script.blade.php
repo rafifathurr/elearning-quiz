@@ -353,7 +353,7 @@
                     <i class="fas fa-money-bill-wave"></i> Transfer
                 </button>
                 <button id="btn-briva" class="swal2-confirm btn-lg" 
-                        style="background: #0A3D91; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;" disabled>
+                        style="background: #0A3D91; color: white; padding: 10px; border-radius: 5px; font-size: 1rem;">
                     <i class="fas fa-university"></i> BRIVA
                 </button>
             </div>
@@ -385,7 +385,21 @@
                     });
 
                     document.getElementById('btn-briva').addEventListener('click', function() {
-                        processPayment('briva');
+                        Swal.fire({
+                            title: 'Konfirmasi Pembayaran',
+                            text: 'Anda memilih metode pembayaran BRIVA.',
+                            icon: 'info',
+                            showCloseButton: true,
+                            confirmButtonText: 'Lanjutkan',
+                            cancelButtonText: 'Kembali'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                processPayment('briva');
+                            } else {
+                                showPaymentOptions
+                                    (); // Munculkan kembali pilihan pembayaran jika batal
+                            }
+                        });
                     });
                 }
             });

@@ -27,4 +27,9 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'approval_by');
     }
+
+    public function supportBriva()
+    {
+        return $this->hasOne(SupportBriva::class, 'order_id', 'id');
+    }
 }
