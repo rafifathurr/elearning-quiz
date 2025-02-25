@@ -7,6 +7,7 @@ use App\Models\TypePackage;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -50,12 +51,16 @@ class TypePackageController extends Controller
 
 
             ->addColumn('action', function ($data) {
-                $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('master.typePackage.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
-                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                    $btn_action = '<div align="center">';
+                    $btn_action .= '<a href="' . route('master.typePackage.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
 
-                $btn_action .= '<div>';
-                return $btn_action;
+                    $btn_action .= '<div>';
+                    return $btn_action;
+                } else {
+                    return null;
+                }
             })
             ->only(['name', 'description', 'parent', 'access', 'action'])
             ->rawColumns(['description', 'parent', 'access', 'action'])

@@ -27,7 +27,7 @@ class PackageController extends Controller
     public function dataTable()
     {
         $userId = Auth::user()->id;
-        if (User::find($userId)->hasRole('admin')) {
+        if (User::find($userId)->hasAnyRole('admin', 'manager')) {
             $categories = Package::whereNull('deleted_at')->get();
         } else {
             // Ambil semua parent yang punya akses
@@ -90,12 +90,16 @@ class PackageController extends Controller
                 return $data->id;
             })
             ->addColumn('action', function ($data) {
-                $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning m-1" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
-                $btn_action .= '<button class="btn btn-sm btn-danger m-1" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                if (User::find(Auth::user()->id)->hasAnyRole('admin', 'package-manager')) {
+                    $btn_action = '<div align="center">';
+                    $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning m-1" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                    $btn_action .= '<button class="btn btn-sm btn-danger m-1" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
 
-                $btn_action .= '<div>';
-                return $btn_action;
+                    $btn_action .= '<div>';
+                    return $btn_action;
+                } else {
+                    return null;
+                }
             })
             ->addColumn('class', function ($data) {
                 return !is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-';

@@ -54,29 +54,37 @@ class UserController extends Controller
                 return $list_view;
             })
             ->addColumn('status', function ($data) {
-                // Cek apakah status aktif (1) atau tidak (0)
-                $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                    // Cek apakah status aktif (1) atau tidak (0)
+                    $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
 
-                $toggle_status = '<div class="custom-control custom-switch">';
-                $toggle_status .= '<input type="checkbox" class="custom-control-input" id="status' . $data->id . '" ' . $checked . '>';
-                $toggle_status .= '<label class="custom-control-label" for="status' . $data->id . '">' . ($data->status == 1 ? 'Aktif' : 'Tidak Aktif') . '</label>';
-                $toggle_status .= '</div>';
+                    $toggle_status = '<div class="custom-control custom-switch">';
+                    $toggle_status .= '<input type="checkbox" class="custom-control-input" id="status' . $data->id . '" ' . $checked . '>';
+                    $toggle_status .= '<label class="custom-control-label" for="status' . $data->id . '">' . ($data->status == 1 ? 'Aktif' : 'Tidak Aktif') . '</label>';
+                    $toggle_status .= '</div>';
 
-                return $toggle_status;
+                    return $toggle_status;
+                } else {
+                    return $data->status == 1 ? 'Aktif' : 'Tidak Aktif';
+                }
             })
             ->addColumn('action', function ($data) {
-                $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail"><i class="fas fa-eye"></i></a>';
-                $btn_action .= '<a href="' . route('master.user.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                    $btn_action = '<div align="center">';
+                    $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail"><i class="fas fa-eye"></i></a>';
+                    $btn_action .= '<a href="' . route('master.user.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
 
-                /**
-                 * Validation User Logged In Equals with User Record id
-                 */
-                if (Auth::user()->id != $data->id) {
-                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                    /**
+                     * Validation User Logged In Equals with User Record id
+                     */
+                    if (Auth::user()->id != $data->id) {
+                        $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                    }
+                    $btn_action .= '</div>';
+                    return $btn_action;
+                } else {
+                    return null;
                 }
-                $btn_action .= '</div>';
-                return $btn_action;
             })
             ->only(['id', 'name', 'username', 'email', 'role', 'action', 'status'])
             ->rawColumns(['action', 'status', 'role'])

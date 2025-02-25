@@ -222,8 +222,8 @@
                         </li>
                     @endhasanyrole
 
-                    @hasanyrole('admin|package-manager')
-                        @hasrole('admin')
+                    @hasanyrole('admin|package-manager|manager')
+                        @hasanyrole('admin|manager')
                             <li class="nav-item {{ $display }}">
                                 <a href="{{ route('master.typePackage.index') }}"
                                     class="nav-link {{ request()->routeIs('master.typePackage.index') ? 'active' : '' }}">
@@ -233,7 +233,7 @@
                                     </p>
                                 </a>
                             </li>
-                        @endhasrole
+                        @endhasanyrole
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.package.index') }}"
                                 class="nav-link {{ request()->routeIs('master.package.index') ? 'active' : '' }}">
@@ -245,7 +245,7 @@
                         </li>
                     @endhasanyrole
 
-                    @hasrole('admin')
+                    @hasanyrole('admin|manager')
                         <li class="nav-item {{ $display }}">
                             <a href="{{ route('master.user.index') }}"
                                 class="nav-link {{ request()->routeIs('master.user.index') ? 'active' : '' }}">
@@ -255,7 +255,7 @@
                                 </p>
                             </a>
                         </li>
-                    @endhasrole
+                    @endhasanyrole
 
                 @endhasrole
                 {{-- 
