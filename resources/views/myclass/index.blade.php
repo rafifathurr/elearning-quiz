@@ -11,18 +11,29 @@
                 <div class="row">
                     <div class="col-12">
                         @if ($myClass && $myClass->isNotEmpty())
-                            <div class="alert alert-default-info" role="alert">
-                                <h4 class="alert-heading"> Kelas yang belum dimulai</h4>
-                                <hr>
-                                @foreach ($myClass as $class)
-                                    <p class="mb-1">{{ $loop->iteration . '. ' . $class->package->name }}</p>
-                                @endforeach
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-warning text-dark d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    <h5 class="m-0 font-weight-bold">Kelas yang Belum Dimulai</h5>
+                                </div>
+                                <div class="card-body p-3">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach ($myClass as $class)
+                                            <li class="list-group-item d-flex align-items-center">
+                                                <i class="fas fa-book text-warning mr-2"></i>
+                                                <span
+                                                    class="font-weight-bold">{{ $loop->iteration . '. ' . $class->package->name }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             </div>
                         @endif
 
+
                         <div class="card card-lightblue">
                             <div class="card-header">
-                                <h3 class="font-weight-bold">My Class</h3>
+                                <h3 class="font-weight-bold">Kelas Saya</h3>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-3">
