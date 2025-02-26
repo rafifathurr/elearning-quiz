@@ -603,13 +603,13 @@ class KecermatanController extends Controller
     public function showResult($resultId)
     {
         try {
-            if (User::find(Auth::user()->id)->hasRole('user')) {
+            if (User::find(Auth::user()->id)->hasRole('admin')) {
                 $result = Result::where('id', $resultId)
-                    ->where('user_id', Auth::id())
                     ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
                     ->firstOrFail();
             } else {
                 $result = Result::where('id', $resultId)
+                    ->where('user_id', Auth::id())
                     ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
                     ->firstOrFail();
             }
