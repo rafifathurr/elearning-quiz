@@ -133,17 +133,20 @@
                                 </h4>
 
                                 @if ($order->payment_method == 'transfer')
-                                    <h6 class="text-muted">Metode Pembayaran:
-                                        <span class="badge bg-maroon p-2 m-1"
-                                            style="font-size: 0.9rem; font-weight: bold;">Transfer
-                                        </span>
-                                    </h6>
-                                    <div class="row">
-                                        <h6 class="col-md-3 font-weight-bold">Bukti Pembayaran</h6>
-                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 text-muted">Metode Pembayaran</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span class="badge bg-lightblue p-2 m-1"
+                                                style="font-size: 0.9rem; font-weight: bold;">Transfer</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <h6 class="col-md-2 text-muted">Bukti Pembayaran</h6>
+                                        <h6 class="col-md-8"> <span class="d-none d-md-inline">:</span>
                                             @if (!is_null($order->proof_payment))
                                                 <a href="{{ route('order.downloadPayment', $order->id) }}" target="_blank"
-                                                    class="text-primary text-decoration-none"><i
+                                                    class="text-primary text-decoration-none font-weight-bold"><i
                                                         class="fas fa-download mr-1"></i> Lihat
                                                     Bukti</a>
                                             @else
@@ -152,32 +155,44 @@
                                         </h6>
                                     </div>
                                 @else
-                                    <h6 class="text-muted">Metode Pembayaran:
-                                        <span class="badge bg-lightblue p-2 m-1"
-                                            style="font-size: 0.9rem; font-weight: bold;">BRIVA
-                                        </span>
-                                    </h6>
-                                    <h6 class="text-muted">Waktu Pembayaran:
-                                        <span class="font-weight-bold text-dark">
-                                            {{ \Carbon\Carbon::parse($order->supportBriva->payment_time)->translatedFormat('d F Y H:i') }}
-                                        </span>
-
-                                    </h6>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 text-muted">Metode Pembayaran</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span class="badge bg-lightblue p-2 m-1"
+                                                style="font-size: 0.9rem; font-weight: bold;">BRIVA</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 text-muted">Nomor BRIVA</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span class="text-info font-weight-bold">{{ $order->supportBriva->va }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 text-muted">Waktu Pembayaran</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span class="font-weight-bold text-dark">
+                                                {{ \Carbon\Carbon::parse($order->supportBriva->payment_time)->translatedFormat('d F Y H:i') }}
+                                            </span>
+                                        </div>
+                                    </div>
                                 @endif
 
 
                                 @if ($order->approveBy)
                                     <hr>
-                                    <h6 class="text-muted">Detail Penerimaan:</h6>
-                                    <div class="row">
-                                        <h6 class="col-md-3 font-weight-bolder">Nama Penerima</h6>
-                                        <h6 class="col-md-3 font-weight-bolder"> <span class="d-none d-md-inline">:</span>
+                                    <div class="row mt-1">
+                                        <h6 class="col-md-2 text-muted">Nama Penerima</h6>
+                                        <h6 class="col-md-8 font-weight-bolder"> <span class="d-none d-md-inline">:</span>
                                             {{ $order->approveBy->name }}
                                         </h6>
                                     </div>
-                                    <div class="row">
-                                        <h6 class="col-md-3 font-weight-bolder">Waktu Diterima</h6>
-                                        <h6 class="col-md-3 font-weight-bolder"> <span class="d-none d-md-inline">:</span>
+                                    <div class="row mt-1">
+                                        <h6 class="col-md-2 text-muted">Waktu Diterima</h6>
+                                        <h6 class="col-md-8 font-weight-bolder"> <span class="d-none d-md-inline">:</span>
                                             {{ \Carbon\Carbon::parse($order->approval_date)->translatedFormat('d F Y H:i') }}
                                         </h6>
                                     </div>
