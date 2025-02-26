@@ -207,20 +207,18 @@
                                                     style="font-size: 0.9rem; font-weight: bold;">Transfer</span>
                                             </div>
                                         </div>
-                                        {{-- <div class="row mt-2">
+                                        <div class="row mt-2">
                                             <h6 class="col-md-2 text-muted">Bukti Pembayaran</h6>
-                                            <h6 class="col-md-8"> <span class="d-none d-md-inline">:</span>
+                                            <h6 class="col-md-8">
                                                 @if (!is_null($order->proof_payment))
-                                                    <a href="{{ route('order.downloadPayment', $order->id) }}"
-                                                        target="_blank"
-                                                        class="text-primary text-decoration-none font-weight-bold"><i
-                                                            class="fas fa-download mr-1"></i> Lihat
-                                                        Bukti</a>
+                                                    <img src="{{ route('order.viewPayment', $order->id) }}"
+                                                        alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm mt-2"
+                                                        style="max-width: 25%; height: auto;">
                                                 @else
-                                                    -
+                                                    <span>-</span>
                                                 @endif
                                             </h6>
-                                        </div> --}}
+                                        </div>
                                     @else
                                         <div class="row mt-1">
                                             <div class="col-md-2 text-muted">Metode Pembayaran</div>

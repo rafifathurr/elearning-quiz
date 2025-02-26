@@ -23,6 +23,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderController extends Controller
 {
@@ -612,6 +613,36 @@ class OrderController extends Controller
 
         // Tab baru bukan download
         return response()->file($path);
+    }
+
+    public function viewPayment($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order || !$order->proof_payment) {
+            abort(404);
+        }
+
+        // Cek apakah user memiliki akses ke order ini
+        if (Auth::user()->id != $order->user_id && Auth::user()->id != $order->order_by) {
+            abort(403);
+        }
+
+        $path = 'private/' . $order->proof_payment;
+
+        if (!Storage::exists($path)) {
+            abort(404);
+        }
+
+        // Mendapatkan konten file
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+
+        // Mengembalikan gambar dengan response manual
+        return new Response($file, 200, [
+            'Content-Type' => $type,
+            'Content-Disposition' => 'inline; filename="' . $order->proof_payment . '"'
+        ]);
     }
 
 

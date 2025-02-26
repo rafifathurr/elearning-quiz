@@ -131,6 +131,8 @@ Route::group(['middleware' => ['role:user|counselor']], function () {
 
         Route::get('get-users', 'getUser')->name('getUser');
         Route::post('checkout-counselor/{id}', 'checkoutCounselor')->name('checkoutCounselor');
+
+        Route::get('view-payment/{id}',  'viewPayment')->name('viewPayment');
     });
 });
 
