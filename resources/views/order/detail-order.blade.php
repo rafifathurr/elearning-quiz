@@ -83,7 +83,7 @@
                                 @endif
                             </div>
 
-                            @if ($order->status == 100 && $order->approveBy)
+                            @if ($order->status == 100 && $order->approveBy && $order->payment_method == 'transfer')
                                 <h5 class="font-weight-bold mt-2">Detail Approval</h5>
                                 <div class="alert bg-success">
                                     <div class="row">

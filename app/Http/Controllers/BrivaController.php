@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Helpers\SignatureHelper;
 use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\OrderPackage;
 use App\Models\SupportBriva;
 use App\Services\BrivaServices;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
@@ -16,17 +20,17 @@ class BrivaController extends Controller
     {
         // Validasi Input
         $request->validate([
-            'va' => 'required'
+            'virtualAccountNo' => 'required'
         ]);
 
         // Cari VA yang sudah dibuat di function payment
-        $briva = SupportBriva::where('va', $request->va)->first();
+        $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
 
         // Jika VA tidak ditemukan
         if (!$briva) {
             return response()->json([
-                'responseCode' => '4042414',
-                'responseMessage' => 'VA Not Found'
+                'responseCode' => '4042419',
+                'responseMessage' => 'Invalid Bill/Virtual Account'
             ], 404);
         }
 
@@ -37,6 +41,13 @@ class BrivaController extends Controller
             return response()->json([
                 'responseCode' => '4042414',
                 'responseMessage' => 'Order Not Found'
+            ], 404);
+        }
+
+        if ($order->status == 100) {
+            return response()->json([
+                'responseCode' => '4042414',
+                'responseMessage' => 'Paid Bill'
             ], 404);
         }
 
@@ -68,6 +79,137 @@ class BrivaController extends Controller
 
         return response()->json($response, 200);
     }
+
+    public function payment(Request $request)
+    {
+        // Validasi Input
+        $request->validate([
+            'virtualAccountNo' => 'required',
+            'paidAmount.value' => 'required|numeric',
+            'paidAmount.currency' => 'required|string'
+        ]);
+
+        // Cari VA yang sudah dibuat di function payment
+        $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
+
+        // Jika VA tidak ditemukan
+        if (!$briva) {
+            return response()->json([
+                'responseCode' => '4042519',
+                'responseMessage' => 'Invalid Bill/Virtual Account'
+            ], 404);
+        }
+
+        // Cari Order Berdasarkan order_id dari VA
+        $order = Order::find($briva->order_id);
+
+        if (!$order) {
+            return response()->json([
+                'responseCode' => '4042514',
+                'responseMessage' => 'Order Not Found'
+            ], 404);
+        }
+
+        if ($order->status == 100) {
+            return response()->json([
+                'responseCode' => '4042514',
+                'responseMessage' => 'Paid Bill'
+            ], 404);
+        }
+
+        // Cek apakah nominal yang dibayar sesuai dengan total harga order
+        if ($request->paidAmount['value'] != $order->total_price) {
+            return response()->json([
+                'responseCode' => '4042513',
+                'responseMessage' => 'Invalid Amount'
+            ], 404);
+        }
+
+        // Mulai DB Transaction
+        DB::beginTransaction();
+        try {
+            // Update Payment Status
+            $briva_update = $briva->update([
+                'payment_time' => now(),
+                'latest_inquiry' => now()
+            ]);
+
+            if ($briva_update) {
+                //update status order
+                $order_update = $order->update([
+                    'status' => 100,
+                    'approval_date' => now(),
+                ]);
+
+                //insert order detail
+                if ($order_update) {
+                    $order_package = OrderPackage::where('order_id', $order->id)->whereNull('deleted_at')->get();
+                    $order_detail = [];
+
+                    foreach ($order_package as $item) {
+                        if ($item->package) {
+                            if ($item->package->packageTest->isNotEmpty()) {
+                                foreach ($item->package->packageTest as $packageTest) {
+                                    $order_detail[] = [
+                                        'order_id' => $order->id,
+                                        'package_id' => $item->package_id,
+                                        'quiz_id' => $packageTest->quiz->id ?? null
+                                    ];
+                                }
+                            } else {
+                                $order_detail[] = [
+                                    'order_id' => $order->id,
+                                    'package_id' => $item->package_id,
+                                    'quiz_id' => null
+                                ];
+                            }
+                        }
+                    }
+                    OrderDetail::insert($order_detail);
+                }
+            }
+            // Commit Transaction
+            DB::commit();
+        } catch (Exception $e) {
+            // Rollback Transaction
+            DB::rollBack();
+            return response()->json([
+                'responseCode' => '500',
+                'responseMessage' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        // Data Response
+        $response = [
+            "responseCode" => "2002500",
+            "responseMessage" => "Successful",
+            "virtualAccountData" => [
+                "partnerServiceId" => "77777",
+                "customerNo" => str_pad($order->user_id, 13, '0', STR_PAD_LEFT),
+                "virtualAccountNo" => $briva->va,
+                "virtualAccountName" => $order->user->name,
+                "paymentRequestId" => (string) Str::uuid(),
+                "paidAmount" => [
+                    "value" => number_format($order->total_price, 2, '.', ''),
+                    "currency" => $request->paidAmount['currency']
+                ],
+                "paymentFlagStatus" => "00",
+                "paymentFlagReason" => [
+                    "english" => "Success",
+                    "indonesia" => "Sukses"
+                ]
+            ],
+            "additionalInfo" => [
+                "idApp" => "TEST",
+                "passApp" => "b7aee423dc7489dfa868426e5c950c677925f3b9",
+                "info1" => "info 1 diisi"
+            ]
+        ];
+
+        return response()->json($response, 200);
+    }
+
 
 
 
