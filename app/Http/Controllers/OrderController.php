@@ -767,6 +767,16 @@ class OrderController extends Controller
                     $list_view .= '</div>';
                     return $list_view;
                 })
+                ->addColumn('payment_method', function ($data) {
+                    $list_view = '<div align="center">';
+                    if ($data->payment_method == 'transfer') {
+                        $list_view .= '<span class="badge bg-maroon p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Transfer</span>';
+                    } else {
+                        $list_view .= '<span class="badge bg-lightblue p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">BRIVA</span>';
+                    }
+                    $list_view .= '</div>';
+                    return $list_view;
+                })
 
                 ->addColumn('total_price', function ($data) {
                     return 'Rp.' . number_format($data->total_price, 0, ',', '.');
@@ -785,8 +795,8 @@ class OrderController extends Controller
                     //     return null;
                     // }
                 })
-                ->only(['status_payment', 'order_id', 'payment_date', 'total_price', 'action'])
-                ->rawColumns(['payment_date', 'status_payment', 'total_price', 'action'])
+                ->only(['status_payment', 'payment_method', 'order_id', 'payment_date', 'total_price', 'action'])
+                ->rawColumns(['payment_date', 'payment_method', 'status_payment', 'total_price', 'action'])
                 ->setRowClass(function ($data) {
                     return (!is_null($data->order_by) && $data->order_by != Auth::user()->id) ||
                         ($data->user_id != Auth::user()->id) ? 'custom-background' : '';

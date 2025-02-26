@@ -179,6 +179,9 @@
                         data: 'order_id'
                     },
                     {
+                        data: 'payment_method'
+                    },
+                    {
                         data: 'payment_date'
                     },
                     {

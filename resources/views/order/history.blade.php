@@ -31,6 +31,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Order Id</th>
+                                                <th>Metode Pembayaran</th>
                                                 <th>Tanggal Pembayaran</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Total Pembayaran</th>
