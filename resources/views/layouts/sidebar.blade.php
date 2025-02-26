@@ -147,9 +147,11 @@
                             <p>
                                 Daftar Order
                                 @hasanyrole('admin|finance')
-                                    <span
-                                        class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}
-                                    </span>
+                                    @if ($orderList > 0)
+                                        <span
+                                            class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}
+                                        </span>
+                                    @endif
                                 @endhasanyrole
 
                             </p>
