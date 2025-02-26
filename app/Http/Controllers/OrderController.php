@@ -480,14 +480,22 @@ class OrderController extends Controller
                             ]);
                         }
                     } elseif ($request->payment_method == 'briva') {
+                        $year = now()->format('y'); // Ambil 2 digit terakhir tahun
+                        $orderId = str_pad($id, 5, '0', STR_PAD_LEFT); // Tambahkan 0 di depan agar panjangnya 5 digit
+                        $va = '00000' . $year . $orderId; // Gabungkan 00000 + Tahun + Order ID
+
+                        // Cek apakah panjangnya sudah 13 digit, jika belum tambahkan 0 di depan
+                        $va = str_pad($va, 13, '0', STR_PAD_LEFT);
+
                         $insert_briva = SupportBriva::create([
                             'order_id' => $id,
-                            'va' => implode('', array_map(fn() => mt_rand(0, 9), range(1, 18))),
+                            'va' => $va,
                             'source' => 'BRI',
-                            'latest_inquiry' => Str::random(20),
+                            'latest_inquiry' => null,
                             'create_time' => now(),
                             'payment_time' => null,
                         ]);
+
                         if ($insert_briva) {
                             return response()->json([
                                 'success' => true,
@@ -495,6 +503,7 @@ class OrderController extends Controller
                             ]);
                         }
                     }
+
 
                     // Jika bukan transfer atau briva, arahkan ke home atau halaman sukses lainnya
                     return response()->json([

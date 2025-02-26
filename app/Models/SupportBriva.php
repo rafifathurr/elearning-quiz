@@ -9,4 +9,5 @@ class SupportBriva extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    protected $table = 'support_brivas';
 }
