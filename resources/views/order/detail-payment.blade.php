@@ -207,6 +207,17 @@
                                                     style="font-size: 0.9rem; font-weight: bold;">Transfer</span>
                                             </div>
                                         </div>
+                                        @if (!is_null($order->rekening_number))
+                                            <div class="row mt-1">
+                                                <div class="col-md-2 text-muted">Rekening Tujuan</div>
+                                                <div class="col-md-8">
+                                                    <span class="d-none d-md-inline">:</span>
+                                                    <span
+                                                        class="text-lightblue font-weight-bold">{{ $order->rekening_number }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         <div class="row mt-2">
                                             <h6 class="col-md-2 text-muted">Bukti Pembayaran</h6>
                                             <h6 class="col-md-8">
