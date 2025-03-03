@@ -224,7 +224,9 @@
                                                 @if (!is_null($order->proof_payment))
                                                     <img src="{{ route('order.viewPayment', $order->id) }}"
                                                         alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm mt-2"
-                                                        style="max-width: 25%; height: auto;">
+                                                        style="max-width: 25%; height: auto; cursor: pointer;"
+                                                        data-toggle="modal" data-target="#paymentModal"
+                                                        onclick="showImageModal(this)">
                                                 @else
                                                     <span>-</span>
                                                 @endif
@@ -286,6 +288,23 @@
             </div>
         </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-lightblue">
+                    <h5 class="modal-title" id="paymentModalLabel">Bukti Pembayaran</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center bg-light">
+                    <img id="modalImage" src="" alt="Bukti Pembayaran" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('javascript-bottom')
         @include('js.order.script')
         <script>
@@ -324,6 +343,10 @@
                         alert.style.transition = ""; // Reset transition
                     }, 2000);
                 });
+            }
+
+            function showImageModal(img) {
+                document.getElementById("modalImage").src = img.src;
             }
         </script>
     @endpush
