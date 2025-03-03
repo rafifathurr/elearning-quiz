@@ -482,11 +482,11 @@ class OrderController extends Controller
                         }
                     } elseif ($request->payment_method == 'briva') {
                         $year = now()->format('y'); // Ambil 2 digit terakhir tahun
-                        $orderId = str_pad($id, 5, '0', STR_PAD_LEFT); // Tambahkan 0 di depan agar panjangnya 5 digit
-                        $va = '00000' . $year . $orderId; // Gabungkan 00000 + Tahun + Order ID
+                        // Gabungkan tahun dan order ID menjadi satu angka
+                        $digitOrderId = $year . $id;
 
                         // Cek apakah panjangnya sudah 13 digit, jika belum tambahkan 0 di depan
-                        $va = str_pad($va, 13, '0', STR_PAD_LEFT);
+                        $va = str_pad($digitOrderId, 13, '0', STR_PAD_LEFT);
 
                         $insert_briva = SupportBriva::create([
                             'order_id' => $id,
