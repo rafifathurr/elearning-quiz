@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassPackage;
 use App\Models\DateClass;
+use App\Models\OrderPackage;
 use App\Models\Package;
 use App\Models\PackageDate;
 use App\Models\PackageTest;
@@ -94,7 +96,7 @@ class PackageController extends Controller
                     $btn_action = '<div align="center">';
                     $btn_action .= '<a href="' . route('master.package.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning m-1" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
                     $btn_action .= '<button class="btn btn-sm btn-danger m-1" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
-
+                    $btn_action .= '<a href="' . route('master.package.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary m-1" title="Detail"><i class="fas fa-eye"></i></a>';
                     $btn_action .= '<div>';
                     return $btn_action;
                 } else {
@@ -428,6 +430,34 @@ class PackageController extends Controller
         }
     }
 
+    public function show(String $id)
+    {
+        try {
+            $package = Package::findOrFail($id);
+            if ($package) {
+                $orderPackage = OrderPackage::whereHas('order', function ($query) {
+                    $query->whereNull('deleted_at');
+                })
+                    ->whereNull('deleted_at')
+                    ->where('package_id', $id)->count();
+
+                $packageSold = OrderPackage::whereHas('order', function ($query) {
+                    $query->where('status', 100)
+                        ->whereNull('deleted_at');
+                })
+                    ->whereNull('deleted_at')
+                    ->where('package_id', $id)->count();
+
+                $classOpen = ClassPackage::where('package_id', $id)->whereNull('deleted_at')->count();
+
+                return view('master.package_payment.detail', compact('package', 'orderPackage', 'packageSold', 'classOpen'));
+            }
+        } catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with(['failed' => $e->getMessage()]);
+        }
+    }
 
     public function destroy(string $id)
     {
