@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PackageExport;
 use App\Models\ClassPackage;
 use App\Models\DateClass;
 use App\Models\OrderPackage;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PackageController extends Controller
 {
@@ -484,5 +486,16 @@ class PackageController extends Controller
                 ->with(['failed', $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    public function exportData(Request $request)
+    {
+        $month = $request->query('month'); // Ambil parameter 'month' dari query string
+
+        if (!$month) {
+            return redirect()->back()->with('error', 'Silakan pilih bulan terlebih dahulu.');
+        }
+
+        return Excel::download(new PackageExport($month), "Data_Paket_Bulan_{$month}.xlsx");
     }
 }

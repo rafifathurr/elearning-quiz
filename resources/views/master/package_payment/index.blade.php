@@ -56,6 +56,10 @@
                                             <i class="fas fa-plus mr-1"></i>
                                             Tambah Paket Test
                                         </a>
+                                        <button onclick="exportPackage()" class="btn btn-success btn-sm m-2">
+                                            <i class="fas fa-file-export mr-1"></i>
+                                            Export Informasi Paket
+                                        </button>
                                     </div>
                                 @endhasanyrole
                                 <div class="table-responsive mt-3">

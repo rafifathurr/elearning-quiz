@@ -127,6 +127,52 @@
 
     }
 
+    function exportPackage() {
+        Swal.fire({
+            title: 'Pilih Bulan',
+            html: `
+        <select id="selected_month" class="form-control">
+            <option value="" disabled selected>Pilih Bulan</option>
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
+            <option value="04">April</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
+            <option value="09">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
+        </select>
+        `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Export',
+            cancelButtonText: 'Batal',
+            didOpen: () => {
+                document.getElementById('selected_month').focus(); // Fokus langsung ke dropdown
+            },
+            preConfirm: () => {
+                const selectedMonth = document.getElementById('selected_month').value;
+                if (!selectedMonth) {
+                    Swal.showValidationMessage('Silakan pilih bulan terlebih dahulu!');
+                    return false;
+                }
+                return selectedMonth;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Arahkan langsung ke URL ekspor untuk memicu download
+                window.location.href = `{{ url('master/package/exportData') }}?month=${result.value}`;
+            }
+        });
+    }
+
+
+
+
     function destroyRecord(id) {
         let token = $('meta[name="csrf-token"]').attr('content');
 
