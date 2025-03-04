@@ -630,7 +630,8 @@
 
                                 $('#selected_user').select2({
                                     placeholder: 'Cari Pengguna...',
-                                    allowClear: true
+                                    allowClear: true,
+                                    dropdownParent: $('.swal2-popup')
                                 });
                             },
                             preConfirm: () => {
