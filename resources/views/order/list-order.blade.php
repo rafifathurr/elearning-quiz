@@ -32,6 +32,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Order ID</th>
+                                                <th>Tanggal Order</th>
                                                 <th>Nama Pengguna</th>
                                                 <th>Total Harga</th>
                                                 <th>Metode Pembayaran</th>

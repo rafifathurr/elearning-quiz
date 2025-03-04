@@ -129,6 +129,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'updated_at',
+                    defaultContent: '-'
+                },
+                {
                     data: 'user',
                     defaultContent: '-'
                 },

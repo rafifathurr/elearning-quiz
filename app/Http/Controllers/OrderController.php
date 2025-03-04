@@ -124,7 +124,7 @@ class OrderController extends Controller
         }
 
         if (!$statusFilter) {
-            $data->orderByDesc('created_at');
+            $data->orderByDesc('updated_at');
         }
         $order = $data->get();
 
@@ -135,6 +135,9 @@ class OrderController extends Controller
             })
             ->addColumn('total_price', function ($data) {
                 return 'Rp. ' . number_format($data->total_price, 0, ',', '.');
+            })
+            ->addColumn('updated_at', function ($data) {
+                return \Carbon\Carbon::parse($data->updated_at)->translatedFormat('l, d F Y');
             })
             ->addColumn('proof_payment', function ($data) {
                 if (!is_null($data->proof_payment)) {
@@ -169,8 +172,8 @@ class OrderController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['user', 'total_price', 'payment_method', 'order_id', 'action', 'status_payment'])
-            ->rawColumns(['total_price', 'action', 'status_payment'])
+            ->only(['user', 'total_price', 'payment_method', 'order_id', 'action', 'status_payment', 'updated_at'])
+            ->rawColumns(['total_price', 'action', 'status_payment', 'updated_at'])
             ->make(true);
     }
 
