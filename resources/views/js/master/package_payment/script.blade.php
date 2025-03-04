@@ -128,11 +128,18 @@
     }
 
     function exportPackage() {
+        const currentYear = new Date().getFullYear();
+        let yearOptions = '<option value="all">Semua Tahun</option>';
+
+        for (let i = currentYear; i >= currentYear - 5; i--) {
+            yearOptions += `<option value="${i}">${i}</option>`;
+        }
+
         Swal.fire({
-            title: 'Pilih Bulan',
+            title: 'Pilih Bulan & Tahun',
             html: `
         <select id="selected_month" class="form-control">
-            <option value="" disabled selected>Pilih Bulan</option>
+           <option value="all">Semua Bulan</option>
             <option value="01">Januari</option>
             <option value="02">Februari</option>
             <option value="03">Maret</option>
@@ -146,29 +153,41 @@
             <option value="11">November</option>
             <option value="12">Desember</option>
         </select>
+        <br>
+        <select id="selected_year" class="form-control">
+            ${yearOptions}
+        </select>
         `,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Export',
             cancelButtonText: 'Batal',
             didOpen: () => {
-                document.getElementById('selected_month').focus(); // Fokus langsung ke dropdown
+                document.getElementById('selected_month').focus();
             },
             preConfirm: () => {
                 const selectedMonth = document.getElementById('selected_month').value;
-                if (!selectedMonth) {
-                    Swal.showValidationMessage('Silakan pilih bulan terlebih dahulu!');
+                const selectedYear = document.getElementById('selected_year').value;
+
+                if (!selectedMonth || !selectedYear) {
+                    Swal.showValidationMessage('Silakan pilih bulan dan tahun!');
                     return false;
                 }
-                return selectedMonth;
+                return {
+                    month: selectedMonth,
+                    year: selectedYear
+                };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Arahkan langsung ke URL ekspor untuk memicu download
-                window.location.href = `{{ url('master/package/exportData') }}?month=${result.value}`;
+                // Arahkan ke route export dengan parameter bulan & tahun
+                window.location.href =
+                    `{{ url('master/package/exportData') }}?month=${result.value.month}&year=${result.value.year}`
+
             }
         });
     }
+
 
 
 

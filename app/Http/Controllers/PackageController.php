@@ -490,12 +490,41 @@ class PackageController extends Controller
 
     public function exportData(Request $request)
     {
-        $month = $request->query('month'); // Ambil parameter 'month' dari query string
+        $month = $request->query('month');
+        $year = $request->query('year');
 
-        if (!$month) {
-            return redirect()->back()->with('error', 'Silakan pilih bulan terlebih dahulu.');
+        if (!$month || !$year) {
+            return redirect()->back()->with('error', 'Silakan pilih bulan dan tahun terlebih dahulu.');
         }
 
-        return Excel::download(new PackageExport($month), "Data_Paket_Bulan_{$month}.xlsx");
+        // Konversi angka bulan ke teks
+        $bulanNama = [
+            "01" => "Januari",
+            "02" => "Februari",
+            "03" => "Maret",
+            "04" => "April",
+            "05" => "Mei",
+            "06" => "Juni",
+            "07" => "Juli",
+            "08" => "Agustus",
+            "09" => "September",
+            "10" => "Oktober",
+            "11" => "November",
+            "12" => "Desember"
+        ];
+
+        if ($month === 'all' && $year === 'all') {
+            $filename = "Data_Paket_Semua_Bulan_Semua_Tahun.xlsx";
+        } elseif ($month === 'all') {
+            $filename = "Data_Paket_Semua_Bulan_$year.xlsx";
+        } elseif ($year === 'all') {
+            $bulanTeks = $bulanNama[$month] ?? $month;
+            $filename = "Data_Paket_{$bulanTeks}_Semua_Tahun.xlsx";
+        } else {
+            $bulanTeks = $bulanNama[$month] ?? $month;
+            $filename = "Data_Paket_{$bulanTeks}_{$year}.xlsx";
+        }
+
+        return Excel::download(new PackageExport($month, $year, $bulanTeks), $filename);
     }
 }
