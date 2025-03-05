@@ -16,10 +16,16 @@
                             </div>
                             <div class="card-body">
                                 @hasrole('class-operator')
-                                    <a href="{{ route('class.create') }}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        Tambah Kelas
-                                    </a>
+                                    <div class="d-flex">
+                                        <a href="{{ route('class.create') }}" class="btn btn-primary btn-sm m-2">
+                                            <i class="fas fa-plus mr-1"></i>
+                                            Tambah Kelas
+                                        </a>
+                                        <button onclick="exportClass()" class="btn btn-success btn-sm m-2">
+                                            <i class="fas fa-file-export mr-1"></i>
+                                            Export Informasi Kelas
+                                        </button>
+                                    </div>
                                 @endhasrole
                                 <div class="table-responsive mt-3">
                                     <input type="hidden" id="url_dt" value="{{ $datatable_route }}">

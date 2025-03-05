@@ -380,4 +380,64 @@
             }
         })
     }
+
+    function exportClass() {
+        // Ambil daftar paket dari backend
+        $.ajax({
+            url: "{{ url('class/getPackages') }}", // Endpoint untuk mendapatkan daftar paket
+            method: "GET",
+            success: function(packageResponse) {
+                console.log(packageResponse);
+                let packageOptions = '<option value="" disabled selected>Pilih Paket</option>';
+
+                packageResponse.packages.forEach(pkg => {
+                    packageOptions +=
+                        `<option value="${pkg.id}">${pkg.name} </option>`;
+                });
+
+                Swal.fire({
+                    title: 'Pilih Paket, Bulan & Tahun',
+                    html: `
+                <select id="selected_package" class="form-control">
+                    ${packageOptions}
+                </select>
+                `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Export',
+                    cancelButtonText: 'Batal',
+                    didOpen: () => {
+                        $('#selected_package').select2({
+                            placeholder: 'Cari Paket...',
+                            allowClear: true,
+                            dropdownParent: $('.swal2-popup')
+                        });
+                        document.getElementById('selected_package').focus();
+                    },
+                    preConfirm: () => {
+                        const selectedPackage = document.getElementById('selected_package')
+                            .value;
+
+                        if (!selectedPackage) {
+                            Swal.showValidationMessage(
+                                'Silakan pilih paket');
+                            return false;
+                        }
+                        return {
+                            package: selectedPackage,
+                        };
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Arahkan ke route export dengan parameter bulan, tahun, dan paket
+                        window.location.href =
+                            `{{ url('class/exportData') }}?package=${result.value.package}`;
+                    }
+                });
+            },
+            error: function() {
+                Swal.fire("Error", "Gagal mengambil daftar paket", "error");
+            }
+        });
+    }
 </script>

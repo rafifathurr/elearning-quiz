@@ -19,4 +19,9 @@ class ClassPackage extends Model
     {
         return $this->belongsTo(Package::class, 'package_id');
     }
+
+    public function classAttendances()
+    {
+        return $this->hasMany(ClassAttendance::class, 'class_id', 'id');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ClassReportExport;
 use App\Models\ClassAttendance;
 use App\Models\ClassCounselor;
 use App\Models\ClassPackage;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class myClassAdminController extends Controller
@@ -452,6 +454,21 @@ class myClassAdminController extends Controller
             session()->flash('failed', $e->getMessage());
         }
     }
+
+    public function getPackages()
+    {
+        $packages = Package::whereNull('deleted_at')->where('class', '>', 0)->get();
+        return response()->json(['packages' => $packages]);
+    }
+
+    public function exportData(Request $request)
+    {
+        $packageId = $request->package;
+        $package = Package::find($packageId);
+
+        return Excel::download(new ClassReportExport($packageId), "Laporan-Kegiatan-Kelas-{$package->name}.xlsx");
+    }
+
 
 
     //Kondisi kalau current = class maka muncul lagi namanya
