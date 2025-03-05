@@ -1,7 +1,7 @@
 <table>
     <thead>
         <tr>
-            <th colspan="3"> <strong>Laporan Kegiatan Kelas Paket-{{ $classes->first()->package->name }}</strong></th>
+            <th colspan="3"> <strong>Laporan Kegiatan Kelas Paket-{{ $package->name }}</strong></th>
         </tr>
     </thead>
     <tbody>

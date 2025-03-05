@@ -457,7 +457,7 @@ class myClassAdminController extends Controller
 
     public function getPackages()
     {
-        $packages = Package::whereNull('deleted_at')->where('class', '>', 0)->get();
+        $packages = Package::with('typePackage')->whereNull('deleted_at')->where('class', '>', 0)->get();
         return response()->json(['packages' => $packages]);
     }
 

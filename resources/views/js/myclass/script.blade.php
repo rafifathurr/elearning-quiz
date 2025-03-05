@@ -391,9 +391,11 @@
                 let packageOptions = '<option value="" disabled selected>Pilih Paket</option>';
 
                 packageResponse.packages.forEach(pkg => {
+                    let typeName = pkg.type_package ? pkg.type_package.name : 'Tidak Ada Tipe';
                     packageOptions +=
-                        `<option value="${pkg.id}">${pkg.name} </option>`;
+                        `<option value="${pkg.id}">${pkg.name} | ${typeName}</option>`;
                 });
+
 
                 Swal.fire({
                     title: 'Pilih Paket, Bulan & Tahun',
