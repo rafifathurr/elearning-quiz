@@ -16,6 +16,16 @@ use Illuminate\Support\Facades\Log;
 
 class BrivaController extends Controller
 {
+    public function getToken()
+    {
+        try {
+            $response = BrivaServices::getToken();
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function inquiry(Request $request)
     {
         // Validasi Input

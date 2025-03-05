@@ -2,13 +2,47 @@
 
 namespace App\Services;
 
+use App\Helpers\BrivaHelper;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BrivaServices
 {
+    public static function getToken()
+    {
+        $clientId = env('BRI_CLIENT_ID');
+        $baseUrl = env('BRI_BASE_URL');
 
-    
+        // Generate Digital Signature
+        $signatureData = BrivaHelper::generateSignature($clientId);
+
+        // Set Headers
+        $headers = [
+            'X-SIGNATURE' => $signatureData['signature'],
+            'X-CLIENT-KEY' => $clientId,
+            'X-TIMESTAMP' => $signatureData['timestamp'],
+            'Content-Type' => 'application/json'
+        ];
+
+        // Log untuk debug
+        Log::info('Headers:', $headers);
+
+        // Request Body
+        $body = [
+            'grantType' => 'client_credentials'
+        ];
+
+        // Kirim Request ke BRI API
+        $response = Http::withHeaders($headers)->post("$baseUrl/snap/v1.0/access-token/b2b", $body);
+
+        // Debugging jika masih error
+        Log::info('Response:', $response->json());
+
+        return $response->json();
+    }
+
+
+
     // private $clientId;
     // private $clientSecret;
     // private $baseUrl;
