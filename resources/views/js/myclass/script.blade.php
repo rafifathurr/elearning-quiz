@@ -234,51 +234,65 @@
         let token = $('meta[name="csrf-token"]').attr('content');
         console.log('Class ID:', id);
 
-        // Map packageTests ke format opsi Swal
-        const options = packageTests.reduce((acc, test) => {
+        // Map selectedTests ke format opsi Swal
+        const options = selectedTests.reduce((acc, test) => {
             acc[test.id] = test.name;
             return acc;
         }, {});
 
-        // Menampilkan Swal dengan input select dan input datetime-local untuk waktu buka/tutup
         Swal.fire({
             title: 'Tambah Test',
             html: `
-    <style>
-        @media (max-width: 768px) {
-            .responsive-label,
-            .responsive-input {
-                width: 100% !important;
-                margin-right: 0 !important; /* Menghapus margin agar label/input tidak tumpang tindih */
-            }
-            .responsive-label {
-                text-align: left !important; /* Pastikan label rata kiri */
-            }
-            .responsive-container {
-                flex-direction: column; /* Atur container agar elemen vertikal */
-                align-items: flex-start; /* Pastikan elemen berada di kiri */
-            }
-        }
-    </style>
-    <div class="responsive-container" style="display: flex; align-items: center; margin-bottom: 10px;">
-        <label for="test" class="responsive-label" style="width: 30%; margin-right: 10px;">Pilih Test</label>
-        <select id="test" class="swal2-select responsive-input" style="width: 70%; padding: 8px;">
-            ${Object.entries(options).map(([id, name]) => `
-                <option value="${id}">${name}</option>
-            `).join('')}
-        </select>
-    </div>
+            <style>
+                .responsive-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 10px;
+                    width: 100%;
+                }
+                .responsive-label {
+                    min-width: 150px; /* Ukuran seragam untuk label */
+                    text-align: left;
+                    font-weight: bold;
+                }
+                .responsive-input {
+                    flex: 1; /* Menyesuaikan ukuran input agar sejajar */
+                    padding: 8px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+                @media (max-width: 768px) {
+                    .responsive-container {
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                    .responsive-label,
+                    .responsive-input {
+                        width: 100% !important;
+                    }
+                }
+            </style>
+            <div class="responsive-container">
+                <label for="test" class="responsive-label">Pilih Test</label>
+                <select id="test" class="responsive-input">
+                    <option value="">-- Pilih Test --</option>
+                    ${Object.entries(options).map(([id, name]) => `
+                        <option value="${id}">${name}</option>
+                    `).join('')}
+                </select>
+            </div>
 
-    <div class="responsive-container" style="display: flex; align-items: center; margin-bottom: 10px;">
-        <label for="open_quiz" class="responsive-label" style="width: 30%; margin-right: 10px;">Tanggal Mulai</label>
-        <input id="open_quiz" type="datetime-local" class="swal2-input responsive-input" style="width: 70%; padding: 8px;" required>
-    </div>
+            <div class="responsive-container">
+                <label for="open_quiz" class="responsive-label">Tanggal Mulai</label>
+                <input id="open_quiz" type="datetime-local" class="responsive-input" required>
+            </div>
 
-    <div class="responsive-container" style="display: flex; align-items: center;">
-        <label for="close_quiz" class="responsive-label" style="width: 30%; margin-right: 10px;">Tanggal Tutup</label>
-        <input id="close_quiz" type="datetime-local" class="swal2-input responsive-input" style="width: 70%; padding: 8px;" required>
-    </div>
-`,
+            <div class="responsive-container">
+                <label for="close_quiz" class="responsive-label">Tanggal Tutup</label>
+                <input id="close_quiz" type="datetime-local" class="responsive-input" required>
+            </div>
+        `,
 
             showCancelButton: true,
             allowOutsideClick: false,
@@ -290,16 +304,13 @@
             confirmButtonText: 'Ya',
             cancelButtonText: 'Batal',
             preConfirm: () => {
-                console.log('PreConfirm triggered');
                 const testId = document.getElementById('test').value;
                 const openQuiz = document.getElementById('open_quiz').value;
                 const closeQuiz = document.getElementById('close_quiz').value;
 
-                console.log('Test ID:', testId, 'Open Quiz:', openQuiz, 'Close Quiz:', closeQuiz);
-
-                // Validasi input
                 if (!testId || !openQuiz || !closeQuiz) {
                     Swal.showValidationMessage('Semua bidang harus diisi');
+                    return false;
                 }
 
                 return {
@@ -310,13 +321,19 @@
                 };
             },
             willOpen: () => {
-                // Memberikan CSS tambahan agar lebih responsif dan mencegah scroll horizontal
-                const swalContent = document.querySelector('.swal2-html-container');
-
-                // Mengatur lebar maksimal dan menyembunyikan scroll horizontal
-                swalContent.style.overflowX = 'hidden';
-                swalContent.style.maxWidth = '100%'; // Mencegah lebar lebih dari 100%
-            }
+                $('.swal2-html-container').css({
+                    'overflow-x': 'hidden',
+                    'max-width': '100%'
+                });
+            },
+            didOpen: () => {
+                $('#test').select2({
+                    placeholder: 'Cari Test...',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('.swal2-popup')
+                });
+            },
         }).then(result => {
             if (result.isConfirmed) {
                 swalProcess(); // Menampilkan proses loading
@@ -344,6 +361,8 @@
             }
         });
     }
+
+
 
     function removeMember(index) {
         let token = $('meta[name="csrf-token"]').attr('content');

@@ -151,7 +151,7 @@
                                 @else
                                     @hasanyrole('counselor')
                                         @if ($isCounselor)
-                                            <button onclick="addTest({{ $class->id }})" class="btn btn-primary mb-3"
+                                            <button onclick="addTest({{ $class->id }})" class="btn btn-danger mb-3"
                                                 {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
                                                 Test</button>
                                         @endif
@@ -247,10 +247,20 @@
 
             $('#order_package_id').val('').trigger('change');
 
+            // Ambil semua test dari database (untuk kondisi jika paket tidak memiliki test)
+            const allTests = @json(
+                \App\Models\Quiz\Quiz::all()->map(function ($quiz) {
+                    return ['id' => $quiz->id, 'name' => $quiz->name];
+                }));
+
+            // Ambil test dari paket jika ada
             const packageTests = @json(
                 $class->package->packageTest->map(function ($package) {
                     return ['id' => $package->quiz->id, 'name' => $package->quiz->name];
                 }));
+
+            // Jika paket memiliki test, gunakan packageTests, jika tidak gunakan allTests
+            const selectedTests = packageTests.length > 0 ? packageTests : allTests;
         </script>
     @endpush
 @endsection
