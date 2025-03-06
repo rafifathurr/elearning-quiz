@@ -16,15 +16,30 @@ use Illuminate\Support\Facades\Log;
 
 class BrivaController extends Controller
 {
-    public function getToken()
+
+    public function simulateSignature(Request $request)
     {
-        try {
-            $response = BrivaServices::getToken();
-            return response()->json($response);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+
+        $clientId = env('BRI_CLIENT_ID');
+
+        // Generate timestamp otomatis
+        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+
+        // Buat signature menggunakan private key
+        $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+        // Verifikasi signature menggunakan public key
+        $isValid = SignatureHelper::verifySignature($clientId, $timestamp, $signature);
+
+        // Response JSON
+        return response()->json([
+            'client_id' => env('BRI_CLIENT_ID'),
+            'timestamp' => $timestamp,
+            'signature' => $signature,
+            'is_valid' => $isValid
+        ], 200, ['Content-Type' => 'application/json']);
     }
+
 
     public function inquiry(Request $request)
     {
@@ -222,6 +237,15 @@ class BrivaController extends Controller
 
 
 
+    // public function getToken()
+    // {
+    //     try {
+    //         $response = BrivaServices::getToken();
+    //         return response()->json($response);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
 
 
     // public function getAccessToken()

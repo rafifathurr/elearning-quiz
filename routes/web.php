@@ -49,7 +49,11 @@ Route::prefix('snap/v1.0')->group(function () {
     Route::post('/transfer-va/payment', [BrivaController::class, 'payment']);
     Route::post('/access-token/b2b', [BrivaController::class, 'getToken']);
 });
-Route::get('/generate-signature', [BrivaController::class, 'generateSignature']);
+
+
+Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
+
+
 
 
 //Google Login
