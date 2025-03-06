@@ -428,25 +428,36 @@ class myClassAdminController extends Controller
                 session()->flash('success', 'Belum ada anggota kelas, Test disimpan di session');
             }
 
-            $class_attendances = ClassAttendance::where('class_id', $request->class_id)->get();
+            $class_users = ClassUser::where('class_id', $request->class_id)->get();
 
-            foreach ($class_attendances as $attendance) {
-                $user_order = OrderDetail::where('order_id', $attendance->orderPackage->order_id)
-                    ->where('package_id', $attendance->orderPackage->package_id)
+            foreach ($class_users as $data_user) {
+                $user_orders = OrderDetail::where('order_id', $data_user->orderPackage->order_id)
+                    ->where('package_id', $data_user->orderPackage->package_id)
                     ->where('quiz_id', $request->quiz_id)
-                    ->update([
+                    ->get();
+
+                if ($user_orders->isNotEmpty()) {
+                    // Jika ada data, update semuanya
+                    foreach ($user_orders as $user_order) {
+                        $add_test = $user_order->update([
+                            'open_quiz' => $request->open_quiz,
+                            'close_quiz' => $request->close_quiz,
+                        ]);
+                    }
+                } else {
+                    // Jika tidak ada data, buat data baru
+                    $add_test = OrderDetail::create([
+                        'order_id' => $data_user->orderPackage->order_id,
+                        'package_id' => $data_user->orderPackage->package_id,
+                        'quiz_id' => $request->quiz_id,
                         'open_quiz' => $request->open_quiz,
                         'close_quiz' => $request->close_quiz,
                     ]);
-
-                if ($user_order) {
-                    DB::commit();
-                    session()->flash('success', 'Berhasil Menambahkan Test');
                 }
 
-                if (!$user_order) {
-                    DB::rollBack();
-                    session()->flash('failed', 'Gagal Menambahkan Test');
+                if ($add_test) {
+                    DB::commit();
+                    session()->flash('success', 'Berhasil Menambahkan Test');
                 }
             }
         } catch (Exception $e) {

@@ -18,4 +18,8 @@ class ClassUser extends Model
     {
         return $this->belongsTo(ClassPackage::class, 'class_id');
     }
+    public function orderPackage()
+    {
+        return $this->belongsTo(OrderPackage::class, 'order_package_id');
+    }
 }
