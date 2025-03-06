@@ -67,11 +67,17 @@ class PackageMemberController extends Controller
             ->addColumn('user', function ($data) {
                 return $data->order ? $data->order->user->name : '-';
             })
+            ->addColumn('email', function ($data) {
+                return $data->order ? $data->order->user->email : '-';
+            })
+            ->addColumn('phone', function ($data) {
+                return $data->order ? $data->order->user->phone : '-';
+            })
             ->addColumn('date', function ($data) {
                 return $data->dateClass ? $data->dateClass->name : '-';
             })
             ->rawColumns(['package']) // Pastikan kolom package dirender sebagai HTML
-            ->only(['package', 'created_at', 'user', 'date'])
+            ->only(['package', 'created_at', 'user', 'date', 'email', 'phone'])
             ->make(true);
     }
 

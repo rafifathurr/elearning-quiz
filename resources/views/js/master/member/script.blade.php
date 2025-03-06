@@ -35,6 +35,14 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'email',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'phone',
+                    defaultContent: '-'
+                },
+                {
                     data: 'date',
                     defaultContent: '-'
                 },
