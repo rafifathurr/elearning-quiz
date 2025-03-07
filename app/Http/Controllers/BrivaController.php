@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BrivaController extends Controller
 {
@@ -48,6 +49,14 @@ class BrivaController extends Controller
             "grantType" => "client_credentials"
         ]);
 
+        $data = $response->json();
+
+        // Tambahkan waktu expired token
+        $data['expiresAt'] = now()->addSeconds($data['expiresIn'])->timestamp;
+
+        // Simpan ke file
+        Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
+
         return response()->json($response->json(), 200);
     }
 
@@ -66,6 +75,37 @@ class BrivaController extends Controller
 
     public function inquiry(Request $request)
     {
+
+        // Ambil token dari storage
+        if (!Storage::exists('token.json')) {
+            return response()->json([
+                'responseCode'    => '4012401',
+                'responseMessage' => 'Invalid Token'
+            ], 401);
+        }
+
+        $tokenData = json_decode(Storage::get('token.json'), true);
+        $storedToken = $tokenData['accessToken'] ?? null;
+        $expiresAt = $tokenData['expiresAt'] ?? 0;
+
+        // Ambil token dari header
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || $authHeader !== "Bearer $storedToken") {
+            return response()->json([
+                'responseCode'    => '4012401',
+                'responseMessage' => 'Invalid Token'
+            ], 401);
+        }
+
+        // Cek apakah token sudah expired
+        if (now()->timestamp > $expiresAt) {
+            return response()->json([
+                'responseCode'    => '4012402',
+                'responseMessage' => 'Token Expired'
+            ], 401);
+        }
+
         // Validasi Input
         $request->validate([
             'virtualAccountNo' => 'required'
@@ -130,6 +170,36 @@ class BrivaController extends Controller
 
     public function payment(Request $request)
     {
+        // Ambil token dari storage
+        if (!Storage::exists('token.json')) {
+            return response()->json([
+                'responseCode'    => '4012501',
+                'responseMessage' => 'Invalid Token'
+            ], 401);
+        }
+
+        $tokenData = json_decode(Storage::get('token.json'), true);
+        $storedToken = $tokenData['accessToken'] ?? null;
+        $expiresAt = $tokenData['expiresAt'] ?? 0;
+
+        // Ambil token dari header
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || $authHeader !== "Bearer $storedToken") {
+            return response()->json([
+                'responseCode'    => '4012501',
+                'responseMessage' => 'Invalid Token'
+            ], 401);
+        }
+
+        // Cek apakah token sudah expired
+        if (now()->timestamp > $expiresAt) {
+            return response()->json([
+                'responseCode'    => '4012502',
+                'responseMessage' => 'Token Expired'
+            ], 401);
+        }
+
         // Validasi Input
         $request->validate([
             'virtualAccountNo' => 'required',
