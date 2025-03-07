@@ -80,6 +80,31 @@ class BrivaController extends Controller
         ], 200);
     }
 
+    public function generateSignatureV2(Request $request)
+    {
+        // Validasi request
+        $validated = $request->validate([
+            'method'      => 'required|string',
+            'endpoint'    => 'required|string',
+            'accessToken' => 'required|string',
+            'body'        => 'nullable|string',
+            'timestamp'   => 'required|string',
+        ]);
+
+        // Generate Signature v2
+        $signature = SignatureHelper::generateSignatureV2(
+            $validated['method'],
+            $validated['endpoint'],
+            $validated['accessToken'],
+            $validated['body'] ?? '',
+            $validated['timestamp']
+        );
+
+        return response()->json([
+            'signature' => $signature
+        ]);
+    }
+
 
     public function inquiry(Request $request)
     {

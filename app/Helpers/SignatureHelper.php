@@ -79,6 +79,42 @@ class SignatureHelper
         return $result === 1;
     }
 
+    public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
+    {
+        $clientSecret = env('BRI_SECRET_KEY'); //CLIENT SECRET BELUM ADA
+        if (!$clientSecret) {
+            throw new Exception("Client Secret tidak ditemukan.");
+        }
+
+        // 1. Minify JSON Body & Hash SHA-256
+        $hashedBody = self::hashRequestBody($body);
+
+        // 2. Format StringToSign
+        $stringToSign = strtoupper($method) . ":" . $endpoint . ":" . $accessToken . ":" . $hashedBody . ":" . $timestamp;
+
+        Log::info("String to Sign: " . $stringToSign);
+
+        // 3. Hash dengan HMAC-SHA512
+        $signature = hash_hmac('sha512', $stringToSign, $clientSecret);
+
+        Log::info("Generated Signature: " . $signature);
+
+        return $signature;
+    }
+
+    private static function hashRequestBody($body)
+    {
+        if (empty($body)) {
+            return "";
+        }
+
+        // Minify JSON (hapus spasi & newline)
+        $minifiedBody = json_encode(json_decode($body, true), JSON_UNESCAPED_SLASHES);
+
+        // Hash dengan SHA-256 lalu ubah ke lowercase hex
+        return strtolower(hash('sha256', $minifiedBody));
+    }
+
 
 
 
