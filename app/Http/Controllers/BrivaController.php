@@ -11,33 +11,43 @@ use App\Services\BrivaServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
 class BrivaController extends Controller
 {
 
-    public function simulateSignature(Request $request)
+    public function simulateSignature()
     {
+        // Simulasi response untuk menghindari timeout
+        Http::fake([
+            url('/snap/v1.0/access-token/b2b') => Http::response([
+                "accessToken" => "jwy7GgloLqfqbZ9OnxGxmYOuGu85",
+                "tokenType"   => "BearerToken",
+                "expiresIn"   => "899"
+            ], 200),
+        ]);
 
         $clientId = env('BRI_CLIENT_ID');
 
-        // Generate timestamp otomatis
+        // Generate timestamp otomatis sesuai format BRI
         $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
 
         // Buat signature menggunakan private key
         $signature = SignatureHelper::generateSignature($clientId, $timestamp);
 
-        // Verifikasi signature menggunakan public key
-        $isValid = SignatureHelper::verifySignature($clientId, $timestamp, $signature);
+        // Simulasi HTTP POST ke /snap/v1.0/access-token/b2b
+        $response = Http::withHeaders([
+            'X-CLIENT-KEY' => $clientId,
+            'X-TIMESTAMP'  => $timestamp,
+            'X-SIGNATURE'  => $signature,
+            'Content-Type' => 'application/json',
+        ])->post(url('/snap/v1.0/access-token/b2b'), [
+            "grantType" => "client_credentials"
+        ]);
 
-        // Response JSON
-        return response()->json([
-            'client_id' => env('BRI_CLIENT_ID'),
-            'timestamp' => $timestamp,
-            'signature' => $signature,
-            'is_valid' => $isValid
-        ], 200, ['Content-Type' => 'application/json']);
+        return response()->json($response->json(), 200);
     }
 
 
@@ -235,7 +245,29 @@ class BrivaController extends Controller
         return response()->json($response, 200);
     }
 
+    // Encrypt Decrypt signature
+    // public function simulateSignature(Request $request)
+    // {
 
+    //     $clientId = env('BRI_CLIENT_ID');
+
+    //     // Generate timestamp otomatis
+    //     $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+
+    //     // Buat signature menggunakan private key
+    //     $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+    //     // Verifikasi signature menggunakan public key
+    //     $isValid = SignatureHelper::verifySignature($clientId, $timestamp, $signature);
+
+    //     // Response JSON
+    //     return response()->json([
+    //         'client_id' => env('BRI_CLIENT_ID'),
+    //         'timestamp' => $timestamp,
+    //         'signature' => $signature,
+    //         'is_valid' => $isValid
+    //     ], 200, ['Content-Type' => 'application/json']);
+    // }
 
     // public function getToken()
     // {

@@ -50,8 +50,19 @@ Route::prefix('snap/v1.0')->group(function () {
     Route::post('/access-token/b2b', [BrivaController::class, 'getToken']);
 });
 
+Route::post('/simulate-signature', [BrivaController::class, 'simulateSignature']);
+Route::post('/snap/v1.0/access-token/b2b', function () {
+    return response()->json([
+        "accessToken" => "jwy7GgloLqfqbZ9OnxGxmYOuGu85",
+        "tokenType"   => "BearerToken",
+        "expiresIn"   => "899"
+    ], 200);
+})->name('bri.access_token');
 
-Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
+
+
+//simulasi encrypt decrypt signature
+//Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
 
 
 

@@ -16,6 +16,8 @@ class VerifyCsrfToken extends Middleware
         'snap/v1.0/transfer-va/payment',
         'snap/v1.0/access-token/b2b',
         'simulate-signature',
+        // '/simulate-signature',
+        // '/snap/v1.0/access-token/b2b'
 
     ];
 }
