@@ -54,6 +54,14 @@ class BrivaController extends Controller
         // Tambahkan waktu expired token
         $data['expiresAt'] = now()->addSeconds($data['expiresIn'])->timestamp;
 
+        //verifikasi signature
+        if (!SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+            return response()->json([
+                'responseCode' => '4010003',
+                'responseMessage' => 'Invalid Signature'
+            ], 401);
+        }
+
         // Simpan ke file
         Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
 
