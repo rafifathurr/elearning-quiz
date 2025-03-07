@@ -75,6 +75,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'class_counselor',
+                    defaultContent: '-'
+                },
+                {
                     data: 'class',
                     defaultContent: '-'
                 },

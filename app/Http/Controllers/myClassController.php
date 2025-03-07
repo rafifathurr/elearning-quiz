@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
+use App\Models\ClassUser;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
@@ -24,7 +25,7 @@ class myClassController extends Controller
             ->where('status', 100)
             ->pluck('id');
 
-        $orderPackageIdsInClass = ClassAttendance::pluck('order_package_id')->toArray();
+        $orderPackageIdsInClass = ClassUser::pluck('order_package_id')->toArray();
 
         $myClass = OrderPackage::whereIn('order_id', $orderIds)
             ->whereNotIn('id', $orderPackageIdsInClass) // filter
@@ -43,10 +44,10 @@ class myClassController extends Controller
             ->where('status', 100)
             ->pluck('id');
 
-        // Ambil semua `order_package_id` yang ada di `ClassAttendance`
-        $orderPackageIdsInClass = ClassAttendance::pluck('order_package_id')->toArray();
+        // Ambil semua `order_package_id` yang ada di `ClassUser`
+        $orderPackageIdsInClass = ClassUser::pluck('order_package_id')->toArray();
 
-        // Filter `OrderPackage` berdasarkan `order_id` dan `order_package_id` yang ada di `ClassAttendance`
+        // Filter `OrderPackage` berdasarkan `order_id` dan `order_package_id` yang ada di `ClassUser`
         $myClass = OrderPackage::whereIn('order_id', $orderIds)
             ->whereIn('id', $orderPackageIdsInClass) // filter
             ->whereNull('deleted_at')
@@ -69,6 +70,20 @@ class myClassController extends Controller
                     return '-';
                 }
             })
+            ->addColumn('class_counselor', function ($data) {
+
+                // Memeriksa apakah ada data classPackage
+                if ($data->classPackage) {
+                    $list_view = '<div class="text-justify ">';
+                    foreach ($data->classPackage->classCounselor as $item) {
+                        $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . $item->counselor->name . '</span>';
+                    }
+                    $list_view .= '</div>';
+                    return $list_view;
+                } else {
+                    return '-';
+                }
+            })
             ->addColumn('action', function ($data) {
                 $encryptedOrderId = encrypt($data->order_id);
                 $encryptedPackageId = encrypt($data->package_id);
@@ -80,8 +95,8 @@ class myClassController extends Controller
                 $btn_action .= '</div>';
                 return $btn_action;
             })
-            ->only(['package', 'class', 'class_name', 'action'])
-            ->rawColumns(['action'])
+            ->only(['package', 'class', 'class_name', 'action', 'class_counselor'])
+            ->rawColumns(['action', 'class_counselor'])
             ->make(true);
     }
 
@@ -112,7 +127,7 @@ class myClassController extends Controller
         }
         $decryptedOrderPackageId = decrypt($orderPackageId);
         // Mengambil class_id pertama kali ditemukan
-        $classId = ClassAttendance::where('order_package_id', $decryptedOrderPackageId)
+        $classId = ClassUser::where('order_package_id', $decryptedOrderPackageId)
             ->value('class_id');
         $class = ClassPackage::find($classId);
         return view('myclass.attendance', compact('class'));

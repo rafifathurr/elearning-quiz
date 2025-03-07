@@ -44,6 +44,7 @@
                                                 <th>No</th>
                                                 <th>Nama Paket</th>
                                                 <th>Nama Kelas</th>
+                                                <th>Konselor Kelas</th>
                                                 <th>Jumlah Pertemuan</th>
                                                 <th>Action</th>
                                             </tr>
