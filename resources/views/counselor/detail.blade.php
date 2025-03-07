@@ -88,6 +88,16 @@
                                     </div>
                                 </div>
 
+                                @hasanyrole('counselor')
+                                    @if ($isCounselor)
+                                        <button onclick="addTest({{ $class->id }})" class="btn btn-danger mb-3"
+                                            {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}> <i
+                                                class="fas fa-book-medical mr-1"></i> Aktivasi
+                                            Test</button>
+                                    @endif
+                                @endhasanyrole
+
+
                                 @if ($listClass->isEmpty())
                                     <!-- Form Daftar Peserta -->
                                     <div class="card">
@@ -149,17 +159,6 @@
                                         </form>
                                     </div>
                                 @else
-                                    @hasanyrole('counselor')
-                                        @if ($isCounselor)
-                                            <button onclick="addTest({{ $class->id }})" class="btn btn-danger mb-3"
-                                                {{ $class->current_meeting == $class->total_meeting ? 'disabled' : '' }}>Aktivasi
-                                                Test</button>
-                                        @endif
-                                    @endhasanyrole
-
-
-
-
                                     @if ($latestAttendance)
                                         <form method="post" id="form-daftar-peserta"
                                             action="{{ route('class.updateAttendance') }}">

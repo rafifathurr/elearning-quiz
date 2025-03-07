@@ -202,6 +202,7 @@ class myClassAdminController extends Controller
         try {
             $class = ClassPackage::find($id);
 
+
             // Cek apakah user yang login adalah counselor dari kelas ini
             $isCounselor = ClassCounselor::where('class_id', $id)
                 ->where('counselor_id', Auth::id())
@@ -416,17 +417,17 @@ class myClassAdminController extends Controller
                 'close_quiz' => 'required|date|after:open_quiz',
             ]);
 
-            $exist_class_attendance = ClassAttendance::where('class_id', $request->class_id)->exists();
+            // $exist_class_attendance = ClassAttendance::where('class_id', $request->class_id)->exists();
 
-            if (!$exist_class_attendance) {
-                $data = [
-                    'open_quiz' => $request->open_quiz,
-                    'close_quiz' => $request->close_quiz,
-                    'quiz_id' => $request->quiz_id,
-                ];
-                Session::put('test', $data);
-                session()->flash('success', 'Belum ada anggota kelas, Test disimpan di session');
-            }
+            // if (!$exist_class_attendance) {
+            //     $data = [
+            //         'open_quiz' => $request->open_quiz,
+            //         'close_quiz' => $request->close_quiz,
+            //         'quiz_id' => $request->quiz_id,
+            //     ];
+            //     Session::put('test', $data);
+            //     session()->flash('success', 'Belum ada anggota kelas, Test disimpan di session');
+            // }
 
             $class_users = ClassUser::where('class_id', $request->class_id)->get();
 
