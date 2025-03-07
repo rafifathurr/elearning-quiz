@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SignatureHelper
 {
@@ -20,7 +21,7 @@ class SignatureHelper
     }
 
 
-    public static function generateSignature($clientId, $timestamp)
+    public static function generateSignature($clientId, $timestamp, $generateToken = false)
     {
         $privateKey = self::getPrivateKey();
         if (!$privateKey) {
@@ -39,7 +40,14 @@ class SignatureHelper
         // Log hasil signature sebelum encode
         Log::info("Signature (raw): " . bin2hex($signature));
 
-        return base64_encode($signature);
+        $encodedSignature = base64_encode($signature);
+
+        // Jika butuh access token, buat dari signature + string random
+        if ($generateToken) {
+            return hash('sha256', $encodedSignature . Str::random(10));
+        }
+
+        return $encodedSignature;
     }
 
     public static function verifySignature($clientId, $timestamp, $signature)

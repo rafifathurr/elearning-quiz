@@ -9,6 +9,7 @@ use App\Models\OrderPackage;
 use App\Models\SupportBriva;
 use App\Services\BrivaServices;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -21,33 +22,45 @@ class BrivaController extends Controller
     public function simulateSignature()
     {
         // Simulasi response untuk menghindari timeout
-        Http::fake([
-            url('/snap/v1.0/access-token/b2b') => Http::response([
-                "accessToken" => "jwy7GgloLqfqbZ9OnxGxmYOuGu85",
-                "tokenType"   => "BearerToken",
-                "expiresIn"   => "899"
-            ], 200),
-        ]);
-
         $clientId = env('BRI_CLIENT_ID');
 
         // Generate timestamp otomatis sesuai format BRI
         $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
 
+        Http::fake([
+            route('bri.access_token') => Http::response([
+                "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
+                "tokenType"   => "Bearer",
+                "expiresIn"   => "900"
+            ], 200),
+        ]);
+
         // Buat signature menggunakan private key
         $signature = SignatureHelper::generateSignature($clientId, $timestamp);
 
-        // Simulasi HTTP POST ke /snap/v1.0/access-token/b2b
+        // Request langsung ke endpoint yang kita buat di web.php
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP'  => $timestamp,
             'X-SIGNATURE'  => $signature,
             'Content-Type' => 'application/json',
-        ])->post(url('/snap/v1.0/access-token/b2b'), [
+        ])->post(route('bri.access_token'), [
             "grantType" => "client_credentials"
         ]);
 
         return response()->json($response->json(), 200);
+    }
+
+    public function getAccessToken(): JsonResponse
+    {
+        $clientId  = env('BRI_CLIENT_ID');
+        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+
+        return response()->json([
+            "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
+            "tokenType"   => "Bearer",
+            "expiresIn"   => "900"
+        ], 200);
     }
 
 
