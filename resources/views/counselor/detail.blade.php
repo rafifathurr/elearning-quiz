@@ -65,6 +65,7 @@
 
                             </div>
                             <div class="card-body">
+                                <!--Daftar Konselor -->
                                 <div class="card shadow-sm border-0">
                                     <div class="card-header bg-info text-white">
                                         <h5 class="m-0 font-weight-bold">
@@ -96,6 +97,32 @@
                                             Test</button>
                                     @endif
                                 @endhasanyrole
+
+                                <!--Daftar Test -->
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="m-0 font-weight-bold">
+                                            <i class="fas fa-book-open mr-2"></i> TEST YANG SUDAH DIBERIKAN
+                                        </h5>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        @if ($givenTests->isEmpty())
+                                            <p class="text-muted">Belum ada test yang diberikan.</p>
+                                        @else
+                                            <ul class="list-group">
+                                                @foreach ($givenTests as $test)
+                                                    <li class="list-group-item">
+                                                        <strong>{{ $test->quiz->name }}</strong> <br>
+                                                        <small>🕒 Dibuka:
+                                                            {{ \Carbon\Carbon::parse($test->open_quiz)->translatedFormat('d F Y H:i') }}
+                                                            - Ditutup:
+                                                            {{ \Carbon\Carbon::parse($test->close_quiz)->translatedFormat('d F Y H:i') }}</small>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </div>
+                                </div>
 
 
                                 @if ($listClass->isEmpty())

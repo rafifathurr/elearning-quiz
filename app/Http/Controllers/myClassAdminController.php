@@ -202,6 +202,22 @@ class myClassAdminController extends Controller
         try {
             $class = ClassPackage::find($id);
 
+            // Test yang diberikan
+            $givenTests = OrderDetail::whereIn('order_id', function ($query) use ($id) {
+                $query->select('order_id')
+                    ->from('order_packages')
+                    ->whereIn('id', function ($subQuery) use ($id) {
+                        $subQuery->select('order_package_id')
+                            ->from('class_users')
+                            ->where('class_id', $id);
+                    });
+            })
+                ->whereNotNull('quiz_id')
+                ->whereNotNull('open_quiz')
+                ->with('quiz')
+                ->get()
+                ->unique('quiz_id');
+
 
             // Cek apakah user yang login adalah counselor dari kelas ini
             $isCounselor = ClassCounselor::where('class_id', $id)
@@ -256,7 +272,7 @@ class myClassAdminController extends Controller
             $listMember = ClassUser::where('class_id', $id)->get();
 
 
-            return view('counselor.detail', compact('class', 'listClass', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance', 'isCounselor'));
+            return view('counselor.detail', compact('class', 'listClass', 'filterDate', 'listMember', 'selectedDate', 'latestAttendance', 'isCounselor', 'givenTests'));
         } catch (Exception $e) {
             return redirect()
                 ->back()
