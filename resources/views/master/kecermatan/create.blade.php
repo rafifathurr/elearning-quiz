@@ -103,8 +103,10 @@
                                         </div>
                                     </div>
 
-                                    <button type="button" id="add-question" class="btn btn-success mb-3">Tambah
-                                        Pertanyaan</button>
+                                    <button type="button" id="add-question" class="btn btn-success mb-3"><i
+                                            class="fas fa-plus mr-1"></i>
+                                        Tambah
+                                        Kolom</button>
 
                                     <div class="pt-3 d-flex">
                                         <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Back</a>

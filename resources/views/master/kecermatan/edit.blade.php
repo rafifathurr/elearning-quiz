@@ -57,7 +57,8 @@
                                                 <div class="card-body">
                                                     <input type="hidden" name="nama_kombinasi[]"
                                                         value="{{ $nama_kombinasi }}">
-                                                    <h4>Pertanyaan</h4>
+                                                    <h4>Kolom {{ $loop->iteration }}</h4>
+                                                    <hr>
                                                     <div class="form-group row">
                                                         <label class="col-md-4 control-label text-left">Tipe Random
                                                             Pertanyaan
@@ -113,8 +114,10 @@
 
 
 
-                                    <button type="button" id="add-question" class="btn btn-success mb-3">Tambah
-                                        Pertanyaan</button>
+                                    <button type="button" id="add-question" class="btn btn-success mb-3">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        Tambah
+                                        Kolom </button>
 
                                     <div class="pt-3 d-flex">
                                         <a href="{{ url()->previous() }}" class="btn btn-danger mr-2">Back</a>
@@ -125,7 +128,7 @@
                             </form>
 
                             <script>
-                                let questionCount = 1; // Untuk memberikan nomor pada nama_kombinasi
+                                let questionCount = document.querySelectorAll('.question-item').length;
 
                                 document.getElementById('add-question').addEventListener('click', function() {
                                     const container = document.getElementById('questions-container');
@@ -134,7 +137,7 @@
                                     <div class="card mb-3 question-item">
                                         <div class="card-body">
                                             <input type="hidden" name="nama_kombinasi[]" value="kombinasi_${questionCount}">
-                                            <h4>Pertanyaan</h4>
+                                            <h4>Kolom ${questionCount}</h4>
                                             <div class="form-group row">
                                                 <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
                                                     <span class="text-danger ml-1">*</span>

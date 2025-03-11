@@ -137,39 +137,41 @@
                     icon: 'warning',
                     allowOutsideClick: false,
                     allowEscapeKey: false,
+                    showConfirmButton: false, // Menghilangkan tombol konfirmasi
+                    timer: 2000, // Tampilkan selama 2 detik lalu lanjutkan
+                    timerProgressBar: true, // Menampilkan progress bar
                     customClass: {
-                        confirmButton: 'btn btn-primary',
+                        popup: 'swal-no-button',
                     },
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let token = $('meta[name="csrf-token"]').attr('content');
-                        let resultId = $('#result_id').val();
+                });
+                let token = $('meta[name="csrf-token"]').attr('content');
+                let resultId = $('#result_id').val();
 
 
-                        // Kirim data terakhir ke server
-                        $.ajax({
-                            url: '{{ url('kecermatan/finish') }}',
-                            type: 'POST',
-                            cache: false,
-                            data: {
-                                _token: token,
-                                resultId: resultId,
-                                q: $('#active_question').data('question-number') || 0,
-                            },
-                            success: function() {
-                                const resultUrl =
-                                    `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
-                                    .replace('__RESULT_ID__', resultId);
-                                window.location.href = resultUrl;
-                            },
-                            error: function(xhr) {
-                                console.error("Error AJAX:", xhr);
-                                swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
-                            },
-                        });
-                    }
+                // Kirim data terakhir ke server
+                $.ajax({
+                    url: '{{ url('kecermatan/finish') }}',
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        _token: token,
+                        resultId: resultId,
+                        q: $('#active_question').data('question-number') || 0,
+                    },
+                    success: function() {
+                        const resultUrl =
+                            `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
+                            .replace('__RESULT_ID__', resultId);
+                        window.location.href = resultUrl;
+                    },
+                    error: function(xhr) {
+                        console.error("Error AJAX:", xhr);
+                        swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
+                    },
                 });
             }
+
+
 
 
 
