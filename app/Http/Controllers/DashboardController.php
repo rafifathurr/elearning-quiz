@@ -19,7 +19,7 @@ class DashboardController extends Controller
     {
         if (User::find(Auth::user()->id)->hasRole('user')) {
             $resultData = Result::where('user_id', Auth::user()->id)->whereNotNull('finish_time')
-                ->where('status', 0)->first();
+                ->whereNotNull('order_detail_id')->where('status', 0)->first();
 
             if ($resultData) {
                 $data = [

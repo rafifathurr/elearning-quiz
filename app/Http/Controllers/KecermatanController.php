@@ -60,8 +60,13 @@ class KecermatanController extends Controller
                     }
                 } elseif ($type === 'simbol') {
                     $symbol_pool = ['±', '∞', '=', '≠', '~', '×', '÷', '!', '∝', '<', '≪', '>', '≫', '≤', '≥', '∓', '≅', '≈', '≡', '∀', '∁', '∂', '∅', '%', '∆', '∇', '∃', '∄', '∈', '∋', 'α', 'β', 'γ', 'δ', 'ε', 'ϑ', 'μ', 'π', 'φ', 'ω', 'ℵ', 'β', 'γ', 'δ', 'η', 'θ', 'π', 'ϖ', 'ϕ', 'χ', 'ψ'];
-                    shuffle($symbol_pool);
-                    $unique_answers = array_slice($symbol_pool, 0, 5);
+                    $unique_answers = [];
+                    while (count($unique_answers) < 5) {
+                        $random_symbol = $symbol_pool[array_rand($symbol_pool)]; // Ambil simbol random
+                        if (!in_array($random_symbol, $unique_answers)) {
+                            $unique_answers[] = $random_symbol; // Masukkan hanya jika belum ada
+                        }
+                    }
                 } else {
                     throw new Exception("Invalid question type");
                 }

@@ -48,7 +48,8 @@
                                         <div class="card mb-3 question-item">
                                             <div class="card-body">
                                                 <input type="hidden" name="nama_kombinasi[]" value="kombinasi_1">
-                                                <h4>Pertanyaan</h4>
+                                                <h4>Kolom 1</h4>
+                                                <hr>
                                                 <div class="form-group row">
                                                     <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
                                                         <span class="text-danger ml-1">*</span>
@@ -123,7 +124,8 @@
                                     <div class="card mb-3 question-item">
                                         <div class="card-body">
                                             <input type="hidden" name="nama_kombinasi[]" value="kombinasi_${questionCount}">
-                                            <h4>Pertanyaan</h4>
+                                            <h4>Kolom ${questionCount}</h4>
+                                             <hr>
                                             <div class="form-group row">
                                                 <label class="col-md-4 control-label text-left">Tipe Random Pertanyaan
                                                     <span class="text-danger ml-1">*</span>
