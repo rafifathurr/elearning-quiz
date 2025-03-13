@@ -202,14 +202,20 @@ class BrivaController extends Controller
                 'responseMessage' => 'Paid Bill'
             ], 404);
         }
+        if ($request->customerNo != $briva->customer_no) {
+            return response()->json([
+                'responseCode' => '4042401',
+                'responseMessage' => 'Invalid Customer No'
+            ], 404);
+        }
 
         // Data Response Simulasi menggunakan VA yang sudah dibuat
         $response = [
             "responseCode" => "2002400",
             "responseMessage" => "Successful",
             "virtualAccountData" => [
-                "partnerServiceId" => "77777",
-                "customerNo" => str_pad($order->user_id, 13, '0', STR_PAD_LEFT),
+                "partnerServiceId" => "19114",
+                "customerNo" => $briva->customer_no,
                 "virtualAccountNo" => $briva->va,
                 "virtualAccountName" => $order->user->name,
                 "inquiryRequestId" => (string) Str::uuid(),
@@ -298,6 +304,12 @@ class BrivaController extends Controller
                 'responseMessage' => 'Paid Bill'
             ], 404);
         }
+        if ($request->customerNo != $briva->customer_no) {
+            return response()->json([
+                'responseCode' => '4042401',
+                'responseMessage' => 'Invalid Customer No'
+            ], 404);
+        }
 
         // Cek apakah nominal yang dibayar sesuai dengan total harga order
         if ($request->paidAmount['value'] != $order->total_price) {
@@ -367,8 +379,8 @@ class BrivaController extends Controller
             "responseCode" => "2002500",
             "responseMessage" => "Successful",
             "virtualAccountData" => [
-                "partnerServiceId" => "77777",
-                "customerNo" => str_pad($order->user_id, 13, '0', STR_PAD_LEFT),
+                "partnerServiceId" => "19114",
+                "customerNo" => $briva->customer_no,
                 "virtualAccountNo" => $briva->va,
                 "virtualAccountName" => $order->user->name,
                 "paymentRequestId" => (string) Str::uuid(),

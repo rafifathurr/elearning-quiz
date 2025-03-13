@@ -489,12 +489,13 @@ class OrderController extends Controller
                         $digitOrderId = $year . $id;
 
                         // Cek apakah panjangnya sudah 13 digit, jika belum tambahkan 0 di depan
-                        $va = str_pad($digitOrderId, 13, '0', STR_PAD_LEFT);
+                        $customerNo = str_pad($digitOrderId, 13, '0', STR_PAD_LEFT);
                         // Tambahkan prefix "19114" di depan VA
-                        $prefixVa = '19114' . $va;
+                        $prefixVa = '19114' . $customerNo;
 
                         $insert_briva = SupportBriva::create([
                             'order_id' => $id,
+                            'customer_no' => $customerNo,
                             'va' => $prefixVa,
                             'source' => 'BRI',
                             'latest_inquiry' => null,
