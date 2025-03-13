@@ -87,18 +87,27 @@ class BrivaController extends Controller
         // Generate Token
         $accessToken = SignatureHelper::generateSignature($clientId, $timestamp, true);
         $expiresIn   = 900; // 15 menit
+        $expiresAt   = now()->addSeconds($expiresIn)->timestamp;
 
-        $data = [
+        // Data yang disimpan di file
+        $dataToSave = [
             "accessToken" => $accessToken,
             "tokenType"   => "Bearer",
             "expiresIn"   => $expiresIn,
-            "expiresAt"   => now()->addSeconds($expiresIn)->timestamp
+            "expiresAt"   => $expiresAt // Hanya disimpan di file
         ];
 
         // Simpan ke file storage/token.json
-        Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
+        Storage::put('token.json', json_encode($dataToSave, JSON_PRETTY_PRINT));
 
-        return response()->json($data, 200);
+        // Data yang dikembalikan ke response (tanpa expiresAt)
+        $responseData = [
+            "accessToken" => $accessToken,
+            "tokenType"   => "Bearer",
+            "expiresIn"   => $expiresIn
+        ];
+
+        return response()->json($responseData, 200);
     }
 
 
