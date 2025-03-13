@@ -84,11 +84,21 @@ class BrivaController extends Controller
             ], 401);
         }
 
-        return response()->json([
-            "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
+        // Generate Token
+        $accessToken = SignatureHelper::generateSignature($clientId, $timestamp, true);
+        $expiresIn   = 900; // 15 menit
+
+        $data = [
+            "accessToken" => $accessToken,
             "tokenType"   => "Bearer",
-            "expiresIn"   => "900"
-        ], 200);
+            "expiresIn"   => $expiresIn,
+            "expiresAt"   => now()->addSeconds($expiresIn)->timestamp
+        ];
+
+        // Simpan ke file storage/token.json
+        Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
+
+        return response()->json($data, 200);
     }
 
 
