@@ -16,7 +16,7 @@ class SignatureHelper
 
     private static function getPublicKey()
     {
-        $publicKeyPath = storage_path('keys/fixed_public.pem');
+        $publicKeyPath = storage_path('keys/publickey.pem');
         return openssl_pkey_get_public(file_get_contents($publicKeyPath));
     }
 
