@@ -71,7 +71,18 @@ class BrivaController extends Controller
     public function getAccessToken(): JsonResponse
     {
         $clientId  = env('BRI_CLIENT_ID');
+        // Generate timestamp otomatis sesuai format BRI
         $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+        // Buat signature menggunakan private key
+        $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+        // Validasi Signature
+        if (!$timestamp || !$signature || !SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+            return response()->json([
+                'responseCode'    => '4010003',
+                'responseMessage' => 'Invalid Signature'
+            ], 401);
+        }
 
         return response()->json([
             "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
@@ -79,6 +90,7 @@ class BrivaController extends Controller
             "expiresIn"   => "900"
         ], 200);
     }
+
 
     public function generateSignatureV2(Request $request)
     {
