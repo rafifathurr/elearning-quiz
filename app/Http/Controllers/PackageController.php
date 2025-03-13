@@ -515,8 +515,10 @@ class PackageController extends Controller
 
         if ($month === 'all' && $year === 'all') {
             $filename = "Data_Paket_Semua_Bulan_Semua_Tahun.xlsx";
+            $bulanTeks = null;
         } elseif ($month === 'all') {
             $filename = "Data_Paket_Semua_Bulan_$year.xlsx";
+            $bulanTeks = null;
         } elseif ($year === 'all') {
             $bulanTeks = $bulanNama[$month] ?? $month;
             $filename = "Data_Paket_{$bulanTeks}_Semua_Tahun.xlsx";
