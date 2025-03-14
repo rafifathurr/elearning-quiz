@@ -152,15 +152,6 @@ class BrivaController extends Controller
         $storedToken = $tokenData['accessToken'] ?? null;
         $expiresAt = $tokenData['expiresAt'] ?? 0;
 
-        // Ambil token dari header
-        $authHeader = $request->header('Authorization');
-
-        if (!$authHeader || $authHeader !== "Bearer $storedToken") {
-            return response()->json([
-                'responseCode'    => '4012401',
-                'responseMessage' => 'Invalid Token'
-            ], 401);
-        }
 
         // Cek apakah token sudah expired
         if (now()->timestamp > $expiresAt) {
@@ -174,6 +165,48 @@ class BrivaController extends Controller
         $request->validate([
             'virtualAccountNo' => 'required'
         ]);
+
+        // Generate header otomatis
+        $clientId = env('BRI_CLIENT_ID');
+        $partnerId = '19114';
+        $channelId = '00009'; // API channel
+        $externalId = (string) Str::uuid(); // ID unik
+
+
+
+        // Generate X-SIGNATURE menggunakan HMAC_SHA512
+        // Endpoint Path (harus sesuai dengan URL setelah hostname tanpa query param)
+        $httpMethod = "POST";
+        $endpoint   = "/snap/v1.0/inquiry"; // Sesuaikan dengan path API BRI yang benar
+        $timestamp  = now()->format('Y-m-d\TH:i:s.v\Z'); // ISO8601
+
+        // Simulasi body request (harus sesuai dengan yang dikirim ke API BRI)
+        $body = [
+            'virtualAccountNo' => $request->virtualAccountNo,
+            'customerNo'       => $request->customerNo ?? '',
+        ];
+        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
+
+        // SHA-256 Hash dari body request (jika ada, jika GET kosong)
+        $hashedBody = hash('sha256', $jsonBody);
+
+        // String yang akan ditandatangani
+        $stringToSign = "$httpMethod:$endpoint:$storedToken:" . strtolower($hashedBody) . ":$timestamp";
+
+        // Buat X-SIGNATURE menggunakan HMAC_SHA512
+        $signature = hash_hmac('sha512', $stringToSign, $clientId);
+
+
+        // Buat request header
+        $headers = [
+            'Authorization'  => "Bearer $storedToken",
+            'X-TIMESTAMP'    => $timestamp,
+            'X-SIGNATURE'    => $signature,
+            'Content-Type'   => 'application/json',
+            'X-PARTNER-ID'   => $partnerId,
+            'CHANNEL-ID'     => $channelId,
+            'X-EXTERNAL-ID'  => $externalId,
+        ];
 
         // Cari VA yang sudah dibuat di function payment
         $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
@@ -235,7 +268,7 @@ class BrivaController extends Controller
             ]
         ];
 
-        return response()->json($response, 200);
+        return response()->json($response, 200, $headers);
     }
 
     public function payment(Request $request)
@@ -252,15 +285,6 @@ class BrivaController extends Controller
         $storedToken = $tokenData['accessToken'] ?? null;
         $expiresAt = $tokenData['expiresAt'] ?? 0;
 
-        // Ambil token dari header
-        $authHeader = $request->header('Authorization');
-
-        if (!$authHeader || $authHeader !== "Bearer $storedToken") {
-            return response()->json([
-                'responseCode'    => '4012501',
-                'responseMessage' => 'Invalid Token'
-            ], 401);
-        }
 
         // Cek apakah token sudah expired
         if (now()->timestamp > $expiresAt) {
@@ -276,6 +300,48 @@ class BrivaController extends Controller
             'paidAmount.value' => 'required|numeric',
             'paidAmount.currency' => 'required|string'
         ]);
+
+        // Generate header otomatis
+        $clientId = env('BRI_CLIENT_ID');
+        $partnerId = '19114';
+        $channelId = '00009'; // API channel
+        $externalId = (string) Str::uuid(); // ID unik
+
+
+
+        // Generate X-SIGNATURE menggunakan HMAC_SHA512
+        // Endpoint Path (harus sesuai dengan URL setelah hostname tanpa query param)
+        $httpMethod = "POST";
+        $endpoint   = "/snap/v1.0/inquiry"; // Sesuaikan dengan path API BRI yang benar
+        $timestamp  = now()->format('Y-m-d\TH:i:s.v\Z'); // ISO8601
+
+        // Simulasi body request (harus sesuai dengan yang dikirim ke API BRI)
+        $body = [
+            'virtualAccountNo' => $request->virtualAccountNo,
+            'customerNo'       => $request->customerNo ?? '',
+        ];
+        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
+
+        // SHA-256 Hash dari body request (jika ada, jika GET kosong)
+        $hashedBody = hash('sha256', $jsonBody);
+
+        // String yang akan ditandatangani
+        $stringToSign = "$httpMethod:$endpoint:$storedToken:" . strtolower($hashedBody) . ":$timestamp";
+
+        // Buat X-SIGNATURE menggunakan HMAC_SHA512
+        $signature = hash_hmac('sha512', $stringToSign, $clientId);
+
+
+        // Buat request header
+        $headers = [
+            'Authorization'  => "Bearer $storedToken",
+            'X-TIMESTAMP'    => $timestamp,
+            'X-SIGNATURE'    => $signature,
+            'Content-Type'   => 'application/json',
+            'X-PARTNER-ID'   => $partnerId,
+            'CHANNEL-ID'     => $channelId,
+            'X-EXTERNAL-ID'  => $externalId,
+        ];
 
         // Cari VA yang sudah dibuat di function payment
         $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
@@ -401,7 +467,7 @@ class BrivaController extends Controller
             ]
         ];
 
-        return response()->json($response, 200);
+        return response()->json($response, 200, $headers);
     }
 
     // Encrypt Decrypt signature
