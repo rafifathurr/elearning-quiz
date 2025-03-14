@@ -76,8 +76,15 @@ class BrivaController extends Controller
         // Buat signature menggunakan private key
         $signature = SignatureHelper::generateSignature($clientId, $timestamp);
 
+        Log::info("Generating Access Token", [
+            'clientId'   => $clientId,
+            'timestamp'  => $timestamp,
+            'signature'  => $signature
+        ]);
+
         // Validasi Signature
         if (!$timestamp || !$signature || !SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+            Log::warning("Invalid Signature during Access Token request");
             return response()->json([
                 'responseCode'    => '4010003',
                 'responseMessage' => 'Invalid Signature'
@@ -99,6 +106,11 @@ class BrivaController extends Controller
 
         // Simpan ke file storage/token.json
         Storage::put('token.json', json_encode($dataToSave, JSON_PRETTY_PRINT));
+
+        Log::info("Access Token Generated Successfully", [
+            'accessToken' => $accessToken,
+            'expiresIn'   => $expiresIn
+        ]);
 
         // Data yang dikembalikan ke response (tanpa expiresAt)
         $responseData = [
@@ -139,9 +151,12 @@ class BrivaController extends Controller
 
     public function inquiry(Request $request)
     {
+        Log::info("Inquiry Request Received", ['request' => $request->all()]);
+        Log::info("Inquiry Request Headers", ['headers' => $request->headers->all()]); // Logging header request
 
         // Ambil token dari storage
         if (!Storage::exists('token.json')) {
+            Log::error("Token not found");
             return response()->json([
                 'responseCode'    => '4012401',
                 'responseMessage' => 'Invalid Token'
@@ -155,6 +170,7 @@ class BrivaController extends Controller
 
         // Cek apakah token sudah expired
         if (now()->timestamp > $expiresAt) {
+            Log::warning("Token Expired", ['tokenExpiresAt' => $expiresAt]);
             return response()->json([
                 'responseCode'    => '4012402',
                 'responseMessage' => 'Token Expired'
@@ -196,6 +212,10 @@ class BrivaController extends Controller
         // Buat X-SIGNATURE menggunakan HMAC_SHA512
         $signature = hash_hmac('sha512', $stringToSign, $clientId);
 
+        Log::info("Signature Generated for Inquiry", [
+            'stringToSign' => $stringToSign,
+            'signature'    => $signature
+        ]);
 
         // Buat request header
         $headers = [
@@ -207,6 +227,7 @@ class BrivaController extends Controller
             'CHANNEL-ID'     => $channelId,
             'X-EXTERNAL-ID'  => $externalId,
         ];
+        Log::info("Headers Sent to API", ['headers' => $headers]);
 
         // Cari VA yang sudah dibuat di function payment
         $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
