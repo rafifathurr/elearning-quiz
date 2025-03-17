@@ -172,50 +172,10 @@ class BrivaController extends Controller
             'virtualAccountNo' => 'required'
         ]);
 
-        // Generate header otomatis
-        $clientId = env('BRI_CLIENT_ID');
-        $partnerId = '19114';
-        $channelId = '00009'; // API channel
-        $externalId = (string) Str::uuid(); // ID unik
-
-
-
-        // Generate X-SIGNATURE menggunakan HMAC_SHA512
-        // Endpoint Path (harus sesuai dengan URL setelah hostname tanpa query param)
-        $httpMethod = "POST";
-        $endpoint   = "/snap/v1.0/inquiry"; // Sesuaikan dengan path API BRI yang benar
-        $timestamp  = now()->format('Y-m-d\TH:i:s.v\Z'); // ISO8601
-
-        // Simulasi body request (harus sesuai dengan yang dikirim ke API BRI)
-        $body = [
-            'virtualAccountNo' => $request->virtualAccountNo,
-            'customerNo'       => $request->customerNo ?? '',
-        ];
-        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
-
-        // SHA-256 Hash dari body request (jika ada, jika GET kosong)
-        $hashedBody = hash('sha256', $jsonBody);
-
-        // String yang akan ditandatangani
-        $stringToSign = "$httpMethod:$endpoint:$storedToken:" . strtolower($hashedBody) . ":$timestamp";
-
-        // Buat X-SIGNATURE menggunakan HMAC_SHA512
-        $signature = hash_hmac('sha512', $stringToSign, $clientId);
-
-        Log::info("Signature Generated for Inquiry", [
-            'stringToSign' => $stringToSign,
-            'signature'    => $signature
-        ]);
-
         // Buat request header
         $headers = [
             'Authorization'  => "Bearer $storedToken",
-            'X-TIMESTAMP'    => $timestamp,
-            'X-SIGNATURE'    => $signature,
             'Content-Type'   => 'application/json',
-            'X-PARTNER-ID'   => $partnerId,
-            'CHANNEL-ID'     => $channelId,
-            'X-EXTERNAL-ID'  => $externalId,
         ];
         Log::info("Headers Sent to API", ['headers' => $headers]);
 
@@ -481,6 +441,149 @@ class BrivaController extends Controller
         return response()->json($response, 200, $headers);
     }
 
+    // Inquiry otomatis header juga make SHA yg payload
+    // public function inquiry(Request $request)
+    // {
+    //     Log::info("Inquiry Request Received", ['request' => $request->all()]);
+    //     Log::info("Inquiry Request Headers", ['headers' => $request->headers->all()]); // Logging header request
+
+    //     // Ambil token dari storage
+    //     if (!Storage::exists('token.json')) {
+    //         Log::error("Token not found");
+    //         return response()->json([
+    //             'responseCode'    => '4012401',
+    //             'responseMessage' => 'Invalid Token'
+    //         ], 401);
+    //     }
+
+    //     $tokenData = json_decode(Storage::get('token.json'), true);
+    //     $storedToken = $tokenData['accessToken'] ?? null;
+    //     $expiresAt = $tokenData['expiresAt'] ?? 0;
+
+
+    //     // Cek apakah token sudah expired
+    //     if (now()->timestamp > $expiresAt) {
+    //         Log::warning("Token Expired", ['tokenExpiresAt' => $expiresAt]);
+    //         return response()->json([
+    //             'responseCode'    => '4012402',
+    //             'responseMessage' => 'Token Expired'
+    //         ], 401);
+    //     }
+
+    //     // Validasi Input
+    //     $request->validate([
+    //         'virtualAccountNo' => 'required'
+    //     ]);
+
+    //     // Generate header otomatis
+    //     $clientId = env('BRI_CLIENT_ID');
+    //     $partnerId = '19114';
+    //     $channelId = '00009'; // API channel
+    //     $externalId = (string) Str::uuid(); // ID unik
+
+
+
+    //     // Generate X-SIGNATURE menggunakan HMAC_SHA512
+    //     // Endpoint Path (harus sesuai dengan URL setelah hostname tanpa query param)
+    //     $httpMethod = "POST";
+    //     $endpoint   = "/snap/v1.0/inquiry"; // Sesuaikan dengan path API BRI yang benar
+    //     $timestamp  = now()->format('Y-m-d\TH:i:s.v\Z'); // ISO8601
+
+    //     // Simulasi body request (harus sesuai dengan yang dikirim ke API BRI)
+    //     $body = [
+    //         'virtualAccountNo' => $request->virtualAccountNo,
+    //         'customerNo'       => $request->customerNo ?? '',
+    //     ];
+    //     $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
+
+    //     // SHA-256 Hash dari body request (jika ada, jika GET kosong)
+    //     $hashedBody = hash('sha256', $jsonBody);
+
+    //     // String yang akan ditandatangani
+    //     $stringToSign = "$httpMethod:$endpoint:$storedToken:" . strtolower($hashedBody) . ":$timestamp";
+
+    //     // Buat X-SIGNATURE menggunakan HMAC_SHA512
+    //     $signature = hash_hmac('sha512', $stringToSign, $clientId);
+
+    //     Log::info("Signature Generated for Inquiry", [
+    //         'stringToSign' => $stringToSign,
+    //         'signature'    => $signature
+    //     ]);
+
+    //     // Buat request header
+    //     $headers = [
+    //         'Authorization'  => "Bearer $storedToken",
+    //         'X-TIMESTAMP'    => $timestamp,
+    //         'X-SIGNATURE'    => $signature,
+    //         'Content-Type'   => 'application/json',
+    //         'X-PARTNER-ID'   => $partnerId,
+    //         'CHANNEL-ID'     => $channelId,
+    //         'X-EXTERNAL-ID'  => $externalId,
+    //     ];
+    //     Log::info("Headers Sent to API", ['headers' => $headers]);
+
+    //     // Cari VA yang sudah dibuat di function payment
+    //     $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
+
+    //     // Jika VA tidak ditemukan
+    //     if (!$briva) {
+    //         return response()->json([
+    //             'responseCode' => '4042419',
+    //             'responseMessage' => 'Invalid Bill/Virtual Account'
+    //         ], 404);
+    //     }
+
+    //     // Cari Order Berdasarkan order_id dari VA
+    //     $order = Order::find($briva->order_id);
+
+    //     if (!$order) {
+    //         return response()->json([
+    //             'responseCode' => '4042414',
+    //             'responseMessage' => 'Order Not Found'
+    //         ], 404);
+    //     }
+
+    //     if ($order->status == 100) {
+    //         return response()->json([
+    //             'responseCode' => '4042414',
+    //             'responseMessage' => 'Paid Bill'
+    //         ], 404);
+    //     }
+    //     if ($request->customerNo != $briva->customer_no) {
+    //         return response()->json([
+    //             'responseCode' => '4042401',
+    //             'responseMessage' => 'Invalid Customer No'
+    //         ], 404);
+    //     }
+
+    //     // Data Response Simulasi menggunakan VA yang sudah dibuat
+    //     $response = [
+    //         "responseCode" => "2002400",
+    //         "responseMessage" => "Successful",
+    //         "virtualAccountData" => [
+    //             "partnerServiceId" => "19114",
+    //             "customerNo" => $briva->customer_no,
+    //             "virtualAccountNo" => $briva->va,
+    //             "virtualAccountName" => $order->user->name,
+    //             "inquiryRequestId" => (string) Str::uuid(),
+    //             "totalAmount" => [
+    //                 "value" => number_format($order->total_price, 2, '.', ''),
+    //                 "currency" => "IDR"
+    //             ],
+    //             "inquiryStatus" => "00",
+    //             "inquiryReason" => [
+    //                 "english" => "Success",
+    //                 "indonesia" => "Sukses"
+    //             ],
+    //             "additionalInfo" => [
+    //                 "idApp" => "TEST",
+    //                 "info1" => "info 1 harus diisi"
+    //             ]
+    //         ]
+    //     ];
+
+    //     return response()->json($response, 200, $headers);
+    // }
 
     // public function simulateSignature()
     // {
