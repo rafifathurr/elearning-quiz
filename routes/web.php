@@ -53,6 +53,8 @@ Route::prefix('snap/v1.0')->group(function () {
 Route::post('/simulate-signature', [BrivaController::class, 'simulateSignature']);
 Route::post('/snap/v1.0/access-token/b2b', [BrivaController::class, 'getAccessToken'])
     ->name('bri.access_token');
+Route::post('/snap/v1.0/generate-signature', [BrivaController::class, 'generateSignature'])
+    ->name('bri.generate_signature');
 Route::post('/test-signature', [BrivaController::class, 'generateSignatureV2']);
 
 

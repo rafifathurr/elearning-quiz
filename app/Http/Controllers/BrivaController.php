@@ -20,71 +20,61 @@ use Illuminate\Support\Facades\Storage;
 class BrivaController extends Controller
 {
 
-    public function simulateSignature()
+
+    public function generateSignature(Request $request): JsonResponse
     {
-        // Simulasi response untuk menghindari timeout
-        $clientId = env('BRI_CLIENT_ID');
+        // Ambil data dari request atau gunakan default untuk testing
+        $clientId  = $request->input('clientId', env('BRI_CLIENT_ID'));
+        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z'); // Timestamp sesuai format BRI
 
-        // Generate timestamp otomatis sesuai format BRI
-        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+        try {
+            // Generate signature dengan fungsi yang sudah dibuat
+            $signature = SignatureHelper::generateSignature($clientId, $timestamp);
 
-        Http::fake([
-            route('bri.access_token') => Http::response([
-                "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
-                "tokenType"   => "Bearer",
-                "expiresIn"   => "900"
-            ], 200),
-        ]);
-
-        // Buat signature menggunakan private key
-        $signature = SignatureHelper::generateSignature($clientId, $timestamp);
-
-        // Request langsung ke endpoint yang kita buat di web.php
-        $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientId,
-            'X-TIMESTAMP'  => $timestamp,
-            'X-SIGNATURE'  => $signature,
-            'Content-Type' => 'application/json',
-        ])->post(route('bri.access_token'), [
-            "grantType" => "client_credentials"
-        ]);
-
-        $data = $response->json();
-
-        // Tambahkan waktu expired token
-        $data['expiresAt'] = now()->addSeconds($data['expiresIn'])->timestamp;
-
-        //verifikasi signature
-        if (!SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
             return response()->json([
-                'responseCode' => '4010003',
-                'responseMessage' => 'Invalid Signature'
-            ], 401);
+                'clientId'  => $clientId,
+                'timestamp' => $timestamp,
+                'signature' => $signature
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'responseCode'    => '5001001',
+                'responseMessage' => 'Signature Generation Failed',
+                'error'           => $e->getMessage()
+            ], 500);
         }
-
-        // Simpan ke file
-        Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
-
-        return response()->json($response->json(), 200);
     }
 
-    public function getAccessToken(): JsonResponse
+
+    public function getAccessToken(Request $request): JsonResponse
     {
-        $clientId  = env('BRI_CLIENT_ID');
-        // Generate timestamp otomatis sesuai format BRI
-        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
-        // Buat signature menggunakan private key
-        $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+        // Ambil data dari request header
+        $clientId  = $request->header('X-CLIENT-KEY');
+        $timestamp = $request->header('X-TIMESTAMP');
+        $signature = $request->header('X-SIGNATURE');
 
-        Log::info("Generating Access Token", [
-            'clientId'   => $clientId,
-            'timestamp'  => $timestamp,
-            'signature'  => $signature
+        // Log request header yang diterima
+        Log::info("Received Access Token Request", [
+            'clientId'  => $clientId,
+            'timestamp' => $timestamp,
+            'signature' => $signature
         ]);
+        // Validasi jika header tidak ada
+        if (!$clientId || !$timestamp || !$signature) {
+            Log::warning("Missing required headers in Access Token request");
+            return response()->json([
+                'responseCode'    => '4001001',
+                'responseMessage' => 'Missing required headers'
+            ], 400);
+        }
 
-        // Validasi Signature
-        if (!$timestamp || !$signature || !SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
-            Log::warning("Invalid Signature during Access Token request");
+        // Validasi Signature dengan SHA256withRSA
+        if (!SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+            Log::warning("Invalid Signature during Access Token request", [
+                'clientId'  => $clientId,
+                'timestamp' => $timestamp,
+                'signature' => $signature
+            ]);
             return response()->json([
                 'responseCode'    => '4010003',
                 'responseMessage' => 'Invalid Signature'
@@ -92,7 +82,7 @@ class BrivaController extends Controller
         }
 
         // Generate Token
-        $accessToken = SignatureHelper::generateSignature($clientId, $timestamp, true);
+        $accessToken = hash('sha256', Str::random(40));
         $expiresIn   = 900; // 15 menit
         $expiresAt   = now()->addSeconds($expiresIn)->timestamp;
 
@@ -490,6 +480,133 @@ class BrivaController extends Controller
 
         return response()->json($response, 200, $headers);
     }
+
+
+    // public function simulateSignature()
+    // {
+    //     $clientId = env('BRI_CLIENT_ID');
+    //     $baseUrl = env('BRI_BASE_URL');
+
+    //     // Perbaiki format timestamp sesuai BRI API
+    //     $timestamp = now()->format('Y-m-d\TH:i:s.vP');
+
+    //     // Generate signature
+    //     $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+    //     // Request ke endpoint yang benar
+    //     $response = Http::withHeaders([
+    //         'X-CLIENT-KEY' => $clientId,
+    //         'X-TIMESTAMP'  => $timestamp,
+    //         'X-SIGNATURE'  => $signature,
+    //         'Content-Type' => 'application/json',
+    //     ])->post("{$baseUrl}/snap/v1.0/access-token/b2b", [
+    //         'grantType' => 'client_credentials'
+    //     ]);
+
+    //     return $response->json();
+    // }
+
+    // public function getAccessToken(): JsonResponse
+    // {
+    //     $clientId  = env('BRI_CLIENT_ID');
+    //     // Generate timestamp otomatis sesuai format BRI
+    //     $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+    //     // Buat signature menggunakan private key
+    //     $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+    //     Log::info("Generating Access Token", [
+    //         'clientId'   => $clientId,
+    //         'timestamp'  => $timestamp,
+    //         'signature'  => $signature
+    //     ]);
+
+    //     // Validasi Signature
+    //     if (!$timestamp || !$signature || !SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+    //         Log::warning("Invalid Signature during Access Token request");
+    //         return response()->json([
+    //             'responseCode'    => '4010003',
+    //             'responseMessage' => 'Invalid Signature'
+    //         ], 401);
+    //     }
+
+    //     // Generate Token
+    //     $accessToken = SignatureHelper::generateSignature($clientId, $timestamp, true);
+    //     $expiresIn   = 900; // 15 menit
+    //     $expiresAt   = now()->addSeconds($expiresIn)->timestamp;
+
+    //     // Data yang disimpan di file
+    //     $dataToSave = [
+    //         "accessToken" => $accessToken,
+    //         "tokenType"   => "Bearer",
+    //         "expiresIn"   => $expiresIn,
+    //         "expiresAt"   => $expiresAt // Hanya disimpan di file
+    //     ];
+
+    //     // Simpan ke file storage/token.json
+    //     Storage::put('token.json', json_encode($dataToSave, JSON_PRETTY_PRINT));
+
+    //     Log::info("Access Token Generated Successfully", [
+    //         'accessToken' => $accessToken,
+    //         'expiresIn'   => $expiresIn
+    //     ]);
+
+    //     // Data yang dikembalikan ke response (tanpa expiresAt)
+    //     $responseData = [
+    //         "accessToken" => $accessToken,
+    //         "tokenType"   => "Bearer",
+    //         "expiresIn"   => $expiresIn
+    //     ];
+
+    //     return response()->json($responseData, 200);
+    // }
+
+    // public function simulateSignature()
+    // {
+    //     // Simulasi response untuk menghindari timeout
+    //     $clientId = env('BRI_CLIENT_ID');
+
+    //     // Generate timestamp otomatis sesuai format BRI
+    //     $timestamp = now()->format('Y-m-d\TH:i:s.v\Z');
+
+    //     Http::fake([
+    //         route('bri.access_token') => Http::response([
+    //             "accessToken" => SignatureHelper::generateSignature($clientId, $timestamp, true),
+    //             "tokenType"   => "Bearer",
+    //             "expiresIn"   => "900"
+    //         ], 200),
+    //     ]);
+
+    //     // Buat signature menggunakan private key
+    //     $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+    //     // Request langsung ke endpoint yang kita buat di web.php
+    //     $response = Http::withHeaders([
+    //         'X-CLIENT-KEY' => $clientId,
+    //         'X-TIMESTAMP'  => $timestamp,
+    //         'X-SIGNATURE'  => $signature,
+    //         'Content-Type' => 'application/json',
+    //     ])->post(route('bri.access_token'), [
+    //         "grantType" => "client_credentials"
+    //     ]);
+
+    //     $data = $response->json();
+
+    //     // Tambahkan waktu expired token
+    //     $data['expiresAt'] = now()->addSeconds($data['expiresIn'])->timestamp;
+
+    //     //verifikasi signature
+    //     if (!SignatureHelper::verifySignature($clientId, $timestamp, $signature)) {
+    //         return response()->json([
+    //             'responseCode' => '4010003',
+    //             'responseMessage' => 'Invalid Signature'
+    //         ], 401);
+    //     }
+
+    //     // Simpan ke file
+    //     Storage::put('token.json', json_encode($data, JSON_PRETTY_PRINT));
+
+    //     return response()->json($response->json(), 200);
+    // }
 
     // Encrypt Decrypt signature
     // public function simulateSignature(Request $request)

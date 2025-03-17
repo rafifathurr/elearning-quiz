@@ -21,7 +21,7 @@ class SignatureHelper
     }
 
 
-    public static function generateSignature($clientId, $timestamp, $generateToken = false)
+    public static function generateSignature($clientId, $timestamp)
     {
         $privateKey = self::getPrivateKey();
         if (!$privateKey) {
@@ -41,11 +41,6 @@ class SignatureHelper
         Log::info("Signature (raw): " . bin2hex($signature));
 
         $encodedSignature = base64_encode($signature);
-
-        // Jika butuh access token, buat dari signature + string random
-        if ($generateToken) {
-            return hash('sha256', $encodedSignature . Str::random(10));
-        }
 
         return $encodedSignature;
     }
@@ -117,6 +112,34 @@ class SignatureHelper
 
 
 
+    // public static function generateSignature($clientId, $timestamp, $generateToken = false)
+    // {
+    //     $privateKey = self::getPrivateKey();
+    //     if (!$privateKey) {
+    //         throw new Exception("Private Key tidak valid.");
+    //     }
+
+    //     // Pastikan format stringToSign benar
+    //     $stringToSign = trim($clientId . "|" . $timestamp);
+    //     Log::info("String to Sign (Generate): " . $stringToSign);
+
+    //     // Sign dengan SHA256withRSA
+    //     if (!openssl_sign($stringToSign, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
+    //         throw new Exception("Gagal menandatangani string.");
+    //     }
+
+    //     // Log hasil signature sebelum encode
+    //     Log::info("Signature (raw): " . bin2hex($signature));
+
+    //     $encodedSignature = base64_encode($signature);
+
+    //     // Jika butuh access token, buat dari signature + string random
+    //     if ($generateToken) {
+    //         return hash('sha256', $encodedSignature . Str::random(10));
+    //     }
+
+    //     return $encodedSignature;
+    // }
 
 
     // public static function generateSignature($clientId, $privateKey)
