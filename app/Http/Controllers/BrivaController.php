@@ -196,25 +196,44 @@ class BrivaController extends Controller
 
         // Validasi Input
         $validator = Validator::make($request->all(), [
-            'partnerServiceId'   => 'required|string',
-            'customerNo'         => 'required|string|size:13',
-            'virtualAccountNo'   => 'required|string',
-            'trxDateInit'        => 'required|date_format:Y-m-d\TH:i:sP',
+            'partnerServiceId'   => 'required|string|regex:/^\d+$/', // Harus angka
+            'customerNo'         => 'required|string|regex:/^\d+$/',
+            'virtualAccountNo'   => 'required|string|regex:/^\d+$/', // Harus angka
+            'trxDateInit'        => 'required|date_format:Y-m-d\TH:i:sP', // ISO 8601 format
             'channelCode'        => 'required|integer',
-            'sourceBankCode'     => 'required|string|size:3',
+            'sourceBankCode'     => 'required|string|digits:3', // Harus 3 digit angka
             'passApp'            => 'required|string',
-            'inquiryRequestId'   => 'required|string|uuid',
+            'inquiryRequestId'   => 'required|string|uuid', // Harus UUID format
         ]);
 
         if ($validator->fails()) {
-            $missingFields = implode(', ', array_keys($validator->failed()));
+            $errors = $validator->failed();
 
-            return response()->json([
-                'responseCode'    => '4002402',
-                'responseMessage' => "Missing Mandatory Field {$missingFields}"
-            ], 400);
+            $missingFields = [];
+            $invalidFields = [];
+
+            foreach ($errors as $field => $rules) {
+                if (isset($rules['Required'])) {
+                    $missingFields[] = $field;
+                } else {
+                    $invalidFields[] = $field;
+                }
+            }
+
+            if (!empty($missingFields)) {
+                return response()->json([
+                    'responseCode'    => '400xx02',
+                    'responseMessage' => "Missing Mandatory Field {" . implode(', ', $missingFields) . "}"
+                ], 400);
+            }
+
+            if (!empty($invalidFields)) {
+                return response()->json([
+                    'responseCode'    => '400xx01',
+                    'responseMessage' => "Invalid Field Format {" . implode(', ', $invalidFields) . "}"
+                ], 400);
+            }
         }
-
 
         // Buat request header
         $headers = [
