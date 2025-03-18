@@ -402,6 +402,13 @@ class BrivaController extends Controller
         // Cari Order Berdasarkan order_id dari VA
         $order = Order::find($briva->order_id);
 
+        if ($briva->latest_inquiry != $request->paymentRequestId) {
+            return response()->json([
+                'responseCode' => '4042514',
+                'responseMessage' => 'Invalid Payment Request Id'
+            ], 404);
+        }
+
         if (!$order) {
             return response()->json([
                 'responseCode' => '4042514',
@@ -435,7 +442,8 @@ class BrivaController extends Controller
         try {
             // Update Payment Status
             $briva_update = $briva->update([
-                'payment_time' => now()
+                'payment_time' => now(),
+                'trx_id' => $request->trxId
             ]);
 
             if ($briva_update) {
