@@ -388,6 +388,15 @@ class BrivaController extends Controller
             'Content-Type'   => 'application/json',
         ];
 
+        // Cek apakah trxId sudah pernah digunakan dalam transaksi sukses (Inconsistent Request)
+        $existingTransaction = SupportBriva::where('trx_id', $request->trxId)->whereNotNull('payment_time')->first();
+        if ($existingTransaction) {
+            return response()->json([
+                'responseCode' => '4042518',
+                'responseMessage' => 'Inconsistent Request'
+            ], 404);
+        }
+
         // Cari VA yang sudah dibuat di function payment
         $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
 
@@ -396,6 +405,20 @@ class BrivaController extends Controller
             return response()->json([
                 'responseCode' => '4042519',
                 'responseMessage' => 'Invalid Bill/Virtual Account'
+            ], 404);
+        }
+
+
+        // Cek apakah trxId sudah digunakan untuk transaksi sukses dengan VA lain (Reversal)
+        $existingReversal = SupportBriva::where('trx_id', $request->trxId)
+            ->where('va', '!=', $request->virtualAccountNo)
+            ->whereNotNull('payment_time')
+            ->first();
+
+        if ($existingReversal) {
+            return response()->json([
+                'responseCode' => '4042514',
+                'responseMessage' => 'Paid Bill'
             ], 404);
         }
 
