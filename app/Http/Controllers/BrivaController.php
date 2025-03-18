@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BrivaController extends Controller
 {
@@ -193,48 +194,34 @@ class BrivaController extends Controller
             ], 401);
         }
 
-        // **Ambil Header Signature**
-        $xSignature = $request->header('x-signature');
-        $xTimestamp = $request->header('x-timestamp');
-        $payloadSignature = $request->header('payload-signature');
-
-        if (!$xSignature || !$xTimestamp || !$payloadSignature) {
-            return response()->json([
-                'responseCode'    => '4012403',
-                'responseMessage' => 'Missing Signature Headers'
-            ], 401);
-        }
-
-        // **Ambil clientSecret dari konfigurasi atau database**
-        $clientSecretBase64 = env('BRI_SECRET_KEY');
-        $clientSecret = base64_decode($clientSecretBase64); // Decode dari Base64 ke string biasa
-
-        // **Hitung ulang Signature**
-        $expectedSignature = hash_hmac('sha512', $payloadSignature, $clientSecret, true);
-        $expectedSignatureBase64 = base64_encode($expectedSignature); // Encode ke Base64 agar sesuai format
-
-        Log::info('ExpectedSignature ' . $expectedSignatureBase64);
-        Log::info('SignatreHeader ' . $xSignature);
-
-        // **Bandingkan Signature**
-        if (!hash_equals($xSignature, $expectedSignatureBase64)) {
-            return response()->json([
-                'responseCode'    => '4012404',
-                'responseMessage' => 'Invalid Signature'
-            ], 401);
-        }
-
         // Validasi Input
-        $request->validate([
-            'virtualAccountNo' => 'required'
+        $validator = Validator::make($request->all(), [
+            'partnerServiceId'   => 'required|string',
+            'customerNo'         => 'required|string|size:13',
+            'virtualAccountNo'   => 'required|string',
+            'trxDateInit'        => 'required|date_format:Y-m-d\TH:i:sP',
+            'channelCode'        => 'required|integer',
+            'sourceBankCode'     => 'required|string|size:3',
+            'passApp'            => 'required|string',
+            'inquiryRequestId'   => 'required|string|uuid',
         ]);
+
+        if ($validator->fails()) {
+            $missingFields = implode(', ', array_keys($validator->failed()));
+
+            return response()->json([
+                'responseCode'    => '4002402',
+                'responseMessage' => "Missing Mandatory Field {$missingFields}"
+            ], 400);
+        }
+
 
         // Buat request header
         $headers = [
             'Authorization'  => "Bearer $storedToken",
             'Content-Type'   => 'application/json',
         ];
-        Log::info("Headers Sent to API", ['headers' => $headers]);
+
 
         // Cari VA yang sudah dibuat di function payment
         $briva = SupportBriva::where('va', $request->virtualAccountNo)->first();
@@ -301,6 +288,9 @@ class BrivaController extends Controller
 
     public function payment(Request $request)
     {
+        Log::info("Payment Request Received", ['request' => $request->all()]);
+        Log::info("Payment Request Headers", ['headers' => $request->headers->all()]); // Logging header request
+
         // Ambil token dari storage
         if (!Storage::exists('token.json')) {
             return response()->json([
@@ -329,46 +319,11 @@ class BrivaController extends Controller
             'paidAmount.currency' => 'required|string'
         ]);
 
-        // Generate header otomatis
-        $clientId = env('BRI_CLIENT_ID');
-        $partnerId = '19114';
-        $channelId = '00009'; // API channel
-        $externalId = (string) Str::uuid(); // ID unik
-
-
-
-        // Generate X-SIGNATURE menggunakan HMAC_SHA512
-        // Endpoint Path (harus sesuai dengan URL setelah hostname tanpa query param)
-        $httpMethod = "POST";
-        $endpoint   = "/snap/v1.0/inquiry"; // Sesuaikan dengan path API BRI yang benar
-        $timestamp  = now()->format('Y-m-d\TH:i:s.v\Z'); // ISO8601
-
-        // Simulasi body request (harus sesuai dengan yang dikirim ke API BRI)
-        $body = [
-            'virtualAccountNo' => $request->virtualAccountNo,
-            'customerNo'       => $request->customerNo ?? '',
-        ];
-        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
-
-        // SHA-256 Hash dari body request (jika ada, jika GET kosong)
-        $hashedBody = hash('sha256', $jsonBody);
-
-        // String yang akan ditandatangani
-        $stringToSign = "$httpMethod:$endpoint:$storedToken:" . strtolower($hashedBody) . ":$timestamp";
-
-        // Buat X-SIGNATURE menggunakan HMAC_SHA512
-        $signature = hash_hmac('sha512', $stringToSign, $clientId);
-
 
         // Buat request header
         $headers = [
             'Authorization'  => "Bearer $storedToken",
-            'X-TIMESTAMP'    => $timestamp,
-            'X-SIGNATURE'    => $signature,
             'Content-Type'   => 'application/json',
-            'X-PARTNER-ID'   => $partnerId,
-            'CHANNEL-ID'     => $channelId,
-            'X-EXTERNAL-ID'  => $externalId,
         ];
 
         // Cari VA yang sudah dibuat di function payment
