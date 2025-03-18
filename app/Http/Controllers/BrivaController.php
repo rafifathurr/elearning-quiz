@@ -115,28 +115,54 @@ class BrivaController extends Controller
 
     public function generateSignatureV2(Request $request)
     {
-        // Validasi request
-        $validated = $request->validate([
-            'method'      => 'required|string',
-            'endpoint'    => 'required|string',
-            'accessToken' => 'required|string',
-            'body'        => 'nullable|string',
-            'timestamp'   => 'required|string',
-        ]);
+        if (!Storage::exists('token.json')) {
+            Log::error("Token not found");
+            return response()->json([
+                'responseCode'    => '4012401',
+                'responseMessage' => 'Invalid Token'
+            ], 401);
+        }
 
-        // Generate Signature v2
-        $signature = SignatureHelper::generateSignatureV2(
-            $validated['method'],
-            $validated['endpoint'],
-            $validated['accessToken'],
-            $validated['body'] ?? '',
-            $validated['timestamp']
-        );
+        $tokenData = json_decode(Storage::get('token.json'), true);
+        $storedToken = $tokenData['accessToken'] ?? null;
 
-        return response()->json([
-            'signature' => $signature
-        ]);
+        $httpMethod = "POST";
+        $endpointUrl = "/snap/v1.0/transfer-va/inquiry";
+        $accessToken = $storedToken; // Sesuai header Authorization
+        $timestamp = now()->format('Y-m-d\TH:i:sP');
+
+        $requestBody = json_encode([
+            "partnerServiceId" => "19114",
+            "customerNo" => "0000000025144",
+            "virtualAccountNo" => "191140000000025144",
+            "trxDateInit" => "2025-03-17T14:15:07+07:00",
+            "channelCode" => 1,
+            "sourceBankCode" => "002",
+            "passApp" => "b7aee423dc7489dfa868426e5c950c677925f3b9",
+            "inquiryRequestId" => "4c7d1402-6217-48a9-b31c-c8a84e8f90b2",
+            "additionalInfo" => [
+                "idApp" => "TEST"
+            ]
+        ], JSON_UNESCAPED_SLASHES);
+
+        try {
+            // **Menghasilkan signature dan payload signature**
+            $signatureData = SignatureHelper::generateSignatureV2($httpMethod, $endpointUrl, $accessToken, $requestBody, $timestamp);
+
+            return response()->json([
+                'xtimestamp' => $timestamp,
+                'signature' => $signatureData['xSignature'], // Mengambil dari array hasil function
+                'payload-signature' => $signatureData['xPayload'],
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'responseCode'    => '5001001',
+                'responseMessage' => 'Signature Generation Failed',
+                'error'           => $e->getMessage()
+            ], 500);
+        }
     }
+
 
 
     public function inquiry(Request $request)
@@ -164,6 +190,37 @@ class BrivaController extends Controller
             return response()->json([
                 'responseCode'    => '4012402',
                 'responseMessage' => 'Token Expired'
+            ], 401);
+        }
+
+        // **Ambil Header Signature**
+        $xSignature = $request->header('x-signature');
+        $xTimestamp = $request->header('x-timestamp');
+        $payloadSignature = $request->header('payload-signature');
+
+        if (!$xSignature || !$xTimestamp || !$payloadSignature) {
+            return response()->json([
+                'responseCode'    => '4012403',
+                'responseMessage' => 'Missing Signature Headers'
+            ], 401);
+        }
+
+        // **Ambil clientSecret dari konfigurasi atau database**
+        $clientSecretBase64 = env('BRI_SECRET_KEY');
+        $clientSecret = base64_decode($clientSecretBase64); // Decode dari Base64 ke string biasa
+
+        // **Hitung ulang Signature**
+        $expectedSignature = hash_hmac('sha512', $payloadSignature, $clientSecret, true);
+        $expectedSignatureBase64 = base64_encode($expectedSignature); // Encode ke Base64 agar sesuai format
+
+        Log::info('ExpectedSignature ' . $expectedSignatureBase64);
+        Log::info('SignatreHeader ' . $xSignature);
+
+        // **Bandingkan Signature**
+        if (!hash_equals($xSignature, $expectedSignatureBase64)) {
+            return response()->json([
+                'responseCode'    => '4012404',
+                'responseMessage' => 'Invalid Signature'
             ], 401);
         }
 

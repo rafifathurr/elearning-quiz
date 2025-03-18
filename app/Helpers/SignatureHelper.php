@@ -80,6 +80,7 @@ class SignatureHelper
         if (!$clientSecret) {
             throw new Exception("Client Secret tidak ditemukan.");
         }
+        $clientSecretBinary = base64_decode($clientSecret);
 
         // 1. Minify JSON Body & Hash SHA-256
         $hashedBody = self::hashRequestBody($body);
@@ -90,13 +91,19 @@ class SignatureHelper
         Log::info("String to Sign: " . $stringToSign);
 
         // 3. Hash dengan HMAC-SHA512
-        $signature = hash_hmac('sha512', $stringToSign, $clientSecret);
+        $signature = hash_hmac('sha512', $stringToSign, $clientSecretBinary, true);
 
-        Log::info("Generated Signature: " . $signature);
+        $signatureBase64 = base64_encode($signature);
 
-        return $signature;
+        Log::info("Generated Signature: " . $signatureBase64);
+
+        $data = [
+            'xSignature' => $signatureBase64,
+            'xPayload' => $stringToSign,
+        ];
+
+        return $data;
     }
-
     private static function hashRequestBody($body)
     {
         if (empty($body)) {
@@ -159,5 +166,28 @@ class SignatureHelper
     //         'signature' => $xSignature,
     //         'timestamp' => $xTimestamp
     //     ];
+    // }
+
+    // public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
+    // {
+    //     $clientSecret = env('BRI_SECRET_KEY'); //CLIENT SECRET BELUM ADA
+    //     if (!$clientSecret) {
+    //         throw new Exception("Client Secret tidak ditemukan.");
+    //     }
+
+    //     // 1. Minify JSON Body & Hash SHA-256
+    //     $hashedBody = self::hashRequestBody($body);
+
+    //     // 2. Format StringToSign
+    //     $stringToSign = strtoupper($method) . ":" . $endpoint . ":" . $accessToken . ":" . $hashedBody . ":" . $timestamp;
+
+    //     Log::info("String to Sign: " . $stringToSign);
+
+    //     // 3. Hash dengan HMAC-SHA512
+    //     $signature = hash_hmac('sha512', $stringToSign, $clientSecret);
+
+    //     Log::info("Generated Signature: " . $signature);
+
+    //     return $signature;
     // }
 }
