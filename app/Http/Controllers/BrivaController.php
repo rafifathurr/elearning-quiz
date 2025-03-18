@@ -196,11 +196,11 @@ class BrivaController extends Controller
 
         // Validasi Input
         $validator = Validator::make($request->all(), [
-            'partnerServiceId'   => 'required|string|regex:/^\d+$/', // Harus angka
+            'partnerServiceId'   => 'required|string',
             'customerNo'         => 'required|string|regex:/^\d+$/',
             'virtualAccountNo'   => 'required|string|regex:/^\d+$/', // Harus angka
             'trxDateInit'        => 'required|date_format:Y-m-d\TH:i:sP', // ISO 8601 format
-            'channelCode'        => 'required|integer',
+            'channelCode'             => 'nullable|integer|min:1|max:9', // Channel harus sesuai daftar (1-9)
             'sourceBankCode'     => 'required|string|digits:3', // Harus 3 digit angka
             'passApp'            => 'required|string',
             'inquiryRequestId'   => 'required|string|uuid', // Harus UUID format
@@ -331,12 +331,52 @@ class BrivaController extends Controller
             ], 401);
         }
 
-        // Validasi Input
-        $request->validate([
-            'virtualAccountNo' => 'required',
-            'paidAmount.value' => 'required|numeric',
-            'paidAmount.currency' => 'required|string'
+        $validator = Validator::make($request->all(), [
+            'partnerServiceId'        => 'required|string',
+            'customerNo'              => 'required|string|regex:/^\d+$/',
+            'virtualAccountNo'        => 'required|string',
+            'virtualAccountName'      => 'nullable|string|max:255', // Opsional, maksimal 255 karakter
+            'paidAmount.value'        => 'required|numeric|regex:/^\d{1,14}(\.\d{1,2})?$/',
+            'paidAmount.currency'     => 'required|string|size:3', // 3 huruf (IDR)
+            'trxDateTime'             => 'nullable|date_format:Y-m-d\TH:i:sP', // ISO 8601
+            'channelCode'             => 'nullable|integer|min:1|max:9', // Channel harus sesuai daftar (1-9)
+            'sourceBankCode'          => 'nullable|string|size:3', // Harus 3 karakter
+            'trxId'                   => 'nullable|string|max:64', // Maksimal 64 karakter
+            'paymentRequestId'        => 'required|string|uuid', // Wajib diisi, format UUID
+            'hashedSourceAccountNo'   => 'nullable|string|max:32', // Maksimal 32 karakter
+            'additionalInfo.passApp'  => 'nullable|string|max:64', // Maksimal 64 karakter
+            'additionalInfo.idApp'    => 'nullable|string|max:8', // Maksimal 8 karakter
+            'additionalInfo.hashedSourceAccountName' => 'nullable|string', // Bebas
         ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->failed();
+
+            $missingFields = [];
+            $invalidFields = [];
+
+            foreach ($errors as $field => $rules) {
+                if (isset($rules['Required'])) {
+                    $missingFields[] = $field;
+                } else {
+                    $invalidFields[] = $field;
+                }
+            }
+
+            if (!empty($missingFields)) {
+                return response()->json([
+                    'responseCode'    => '400xx02',
+                    'responseMessage' => "Missing Mandatory Field {" . implode(', ', $missingFields) . "}"
+                ], 400);
+            }
+
+            if (!empty($invalidFields)) {
+                return response()->json([
+                    'responseCode'    => '400xx01',
+                    'responseMessage' => "Invalid Field Format {" . implode(', ', $invalidFields) . "}"
+                ], 400);
+            }
+        }
 
 
         // Buat request header
