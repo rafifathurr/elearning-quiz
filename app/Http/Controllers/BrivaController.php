@@ -275,6 +275,9 @@ class BrivaController extends Controller
                 'responseMessage' => 'Invalid Customer No'
             ], 404);
         }
+        $briva->update([
+            'latest_inquiry' => $request->inquiryRequestId,
+        ]);
 
         // Data Response Simulasi menggunakan VA yang sudah dibuat
         $response = [
@@ -285,7 +288,7 @@ class BrivaController extends Controller
                 "customerNo" => $briva->customer_no,
                 "virtualAccountNo" => $briva->va,
                 "virtualAccountName" => $order->user->name,
-                "inquiryRequestId" => (string) Str::uuid(),
+                "inquiryRequestId" => $request->inquiryRequestId,
                 "totalAmount" => [
                     "value" => number_format($order->total_price, 2, '.', ''),
                     "currency" => "IDR"
@@ -432,8 +435,7 @@ class BrivaController extends Controller
         try {
             // Update Payment Status
             $briva_update = $briva->update([
-                'payment_time' => now(),
-                'latest_inquiry' => now()
+                'payment_time' => now()
             ]);
 
             if ($briva_update) {
@@ -491,7 +493,7 @@ class BrivaController extends Controller
                 "customerNo" => $briva->customer_no,
                 "virtualAccountNo" => $briva->va,
                 "virtualAccountName" => $order->user->name,
-                "paymentRequestId" => (string) Str::uuid(),
+                "paymentRequestId" => $request->paymentRequestId,
                 "paidAmount" => [
                     "value" => number_format($order->total_price, 2, '.', ''),
                     "currency" => $request->paidAmount['currency']
