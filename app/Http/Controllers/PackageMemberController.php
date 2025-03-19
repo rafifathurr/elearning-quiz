@@ -138,7 +138,9 @@ class PackageMemberController extends Controller
             ->get();
 
         // Mengambil semua test berdasarkan order_detail_id
-        $tests = Result::whereIn('order_detail_id', $orderDetails->pluck('id'))->get();
+        $tests = Result::whereIn('order_detail_id', $orderDetails->pluck('id'))
+            ->with('orderDetail') // Pastikan orderDetail dimuat
+            ->get();
 
         $pdf = Pdf::loadView('master.member.member_report', compact('orderPackage', 'classUsers', 'tests'));
         return $pdf->download('Report Peserta ' . $orderPackage->order->user->name . ' .pdf');

@@ -178,22 +178,25 @@
                     @if ($tests->isEmpty())
                         <p>Belum ada hasil tes untuk kelas ini.</p>
                     @else
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Test</th>
-                                    <th>Total Skor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($tests as $test)
+                        @foreach ($tests->groupBy('orderDetail.on_meeting') as $meeting => $testsGroup)
+                            <h5>{{ empty($meeting) ? 'Test Sebelum Kelas Dimulai' : 'Pertemuan Ke-' . $meeting }}</h5>
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td>{{ $test->quiz->name }}</td>
-                                        <td>{{ $test->total_score }}</td>
+                                        <th>Nama Test</th>
+                                        <th>Total Skor</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($testsGroup as $test)
+                                        <tr>
+                                            <td>{{ $test->quiz->name ?? 'Tidak ada data' }}</td>
+                                            <td>{{ $test->total_score }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endforeach
                     @endif
                 </div>
             </div>
