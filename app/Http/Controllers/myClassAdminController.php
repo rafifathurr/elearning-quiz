@@ -429,53 +429,35 @@ class myClassAdminController extends Controller
         DB::beginTransaction();
         try {
             $request->validate([
-                'open_quiz' => 'required|date',
-                'close_quiz' => 'required|date|after:open_quiz',
+                'open_quiz' => 'nullable|date',
+                'close_quiz' => 'nullable|date|after:open_quiz',
             ]);
 
-            // $exist_class_attendance = ClassAttendance::where('class_id', $request->class_id)->exists();
+            if ($request->filled('close_quiz') && !$request->filled('open_quiz')) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "Waktu test dibuka harus diisi."
+                ], 422);
+            }
 
-            // if (!$exist_class_attendance) {
-            //     $data = [
-            //         'open_quiz' => $request->open_quiz,
-            //         'close_quiz' => $request->close_quiz,
-            //         'quiz_id' => $request->quiz_id,
-            //     ];
-            //     Session::put('test', $data);
-            //     session()->flash('success', 'Belum ada anggota kelas, Test disimpan di session');
-            // }
 
             $class_users = ClassUser::where('class_id', $request->class_id)->get();
 
             foreach ($class_users as $data_user) {
-                $user_orders = OrderDetail::where('order_id', $data_user->orderPackage->order_id)
-                    ->where('package_id', $data_user->orderPackage->package_id)
-                    ->where('quiz_id', $request->quiz_id)
-                    ->get();
 
-                if ($user_orders->isNotEmpty()) {
-                    // Jika ada data, update semuanya
-                    foreach ($user_orders as $user_order) {
-                        $add_test = $user_order->update([
-                            'open_quiz' => $request->open_quiz,
-                            'close_quiz' => $request->close_quiz,
-                        ]);
-                    }
-                } else {
-                    // Jika tidak ada data, buat data baru
-                    $add_test = OrderDetail::create([
-                        'order_id' => $data_user->orderPackage->order_id,
-                        'package_id' => $data_user->orderPackage->package_id,
-                        'quiz_id' => $request->quiz_id,
-                        'open_quiz' => $request->open_quiz,
-                        'close_quiz' => $request->close_quiz,
-                    ]);
-                }
-
-                if ($add_test) {
-                    DB::commit();
-                    session()->flash('success', 'Berhasil Menambahkan Test');
-                }
+                $add_test = OrderDetail::create([
+                    'order_id' => $data_user->orderPackage->order_id,
+                    'package_id' => $data_user->orderPackage->package_id,
+                    'quiz_id' => $request->quiz_id,
+                    'open_quiz' => $request->open_quiz,
+                    'close_quiz' => $request->close_quiz,
+                    'class_id' => $data_user->class_id,
+                    'on_meeting' => $data_user->class->current_meeting,
+                ]);
+            }
+            if ($add_test) {
+                DB::commit();
+                session()->flash('success', 'Berhasil Menambahkan Test');
             }
         } catch (Exception $e) {
             DB::rollBack();
@@ -497,6 +479,67 @@ class myClassAdminController extends Controller
         return Excel::download(new ClassReportExport($packageId), "Laporan-Kegiatan-Kelas-{$package->name}.xlsx");
     }
 
+
+    // Store Test lama
+    // public function storeTest(Request $request)
+    // {
+
+    //     DB::beginTransaction();
+    //     try {
+    //         $request->validate([
+    //             'open_quiz' => 'required|date',
+    //             'close_quiz' => 'required|date|after:open_quiz',
+    //         ]);
+
+    //         // $exist_class_attendance = ClassAttendance::where('class_id', $request->class_id)->exists();
+
+    //         // if (!$exist_class_attendance) {
+    //         //     $data = [
+    //         //         'open_quiz' => $request->open_quiz,
+    //         //         'close_quiz' => $request->close_quiz,
+    //         //         'quiz_id' => $request->quiz_id,
+    //         //     ];
+    //         //     Session::put('test', $data);
+    //         //     session()->flash('success', 'Belum ada anggota kelas, Test disimpan di session');
+    //         // }
+
+    //         $class_users = ClassUser::where('class_id', $request->class_id)->get();
+
+    //         foreach ($class_users as $data_user) {
+    //             $user_orders = OrderDetail::where('order_id', $data_user->orderPackage->order_id)
+    //                 ->where('package_id', $data_user->orderPackage->package_id)
+    //                 ->where('quiz_id', $request->quiz_id)
+    //                 ->get();
+
+    //             if ($user_orders->isNotEmpty()) {
+    //                 // Jika ada data, update semuanya
+    //                 foreach ($user_orders as $user_order) {
+    //                     $add_test = $user_order->update([
+    //                         'open_quiz' => $request->open_quiz,
+    //                         'close_quiz' => $request->close_quiz,
+    //                     ]);
+    //                 }
+    //             } else {
+    //                 // Jika tidak ada data, buat data baru
+    //                 $add_test = OrderDetail::create([
+    //                     'order_id' => $data_user->orderPackage->order_id,
+    //                     'package_id' => $data_user->orderPackage->package_id,
+    //                     'quiz_id' => $request->quiz_id,
+    //                     'open_quiz' => $request->open_quiz,
+    //                     'close_quiz' => $request->close_quiz,
+    //                 ]);
+    //             }
+
+    //             if ($add_test) {
+    //                 DB::commit();
+    //                 session()->flash('success', 'Berhasil Menambahkan Test');
+    //             }
+    //         }
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         session()->flash('failed', $e->getMessage());
+    //     }
+    // }
 
 
     //Kondisi kalau current = class maka muncul lagi namanya

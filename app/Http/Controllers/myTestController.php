@@ -30,17 +30,11 @@ class myTestController extends Controller
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->pluck('id');
-        $orderPackageIds = OrderPackage::whereIn('order_id', $orderIds)
-            ->whereNull('deleted_at')
-            ->where(function ($query) {
-                $query->whereNull('class')
-                    ->orWhere('class', 0);
-            })
-            ->pluck('package_id');
+
 
         $myTest = OrderDetail::whereIn('order_id', $orderIds)
-            ->whereIn('package_id', $orderPackageIds)
             ->whereNull('deleted_at')
+            ->whereNull('class_id')
             ->whereNotNull('quiz_id')
             ->get();
 

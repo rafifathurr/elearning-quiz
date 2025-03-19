@@ -44,53 +44,44 @@ class myClassController extends Controller
             ->where('status', 100)
             ->pluck('id');
 
-        // Ambil semua `order_package_id` yang ada di `ClassUser`
-        $orderPackageIdsInClass = ClassUser::pluck('order_package_id')->toArray();
-
-        // Filter `OrderPackage` berdasarkan `order_id` dan `order_package_id` yang ada di `ClassUser`
-        $myClass = OrderPackage::whereIn('order_id', $orderIds)
-            ->whereIn('id', $orderPackageIdsInClass) // filter
-            ->whereNull('deleted_at')
-            ->where('class', '>', 0)
+        // Ambil data dari `ClassUser` berdasarkan `order_id`
+        $classUsers = ClassUser::whereHas('orderPackage', function ($query) use ($orderIds) {
+            $query->whereIn('order_id', $orderIds)
+                ->whereNull('deleted_at')
+                ->where('class', '>', 0);
+        })
             ->get();
 
-        return DataTables::of($myClass)
+        return DataTables::of($classUsers)
             ->addIndexColumn()
             ->addColumn('package', function ($data) {
-                return $data->package->name;
+                return optional($data->orderPackage->package)->name ?? '-';
             })
             ->addColumn('class', function ($data) {
-                return (!is_null($data->class) ? $data->class . 'x Pertemuan' : '-');
+                return (!is_null($data->orderPackage->class) ? $data->orderPackage->class . 'x Pertemuan' : '-');
             })
             ->addColumn('class_name', function ($data) {
-                // Memeriksa apakah ada data classPackage
-                if ($data->classPackage) {
-                    return $data->classPackage->name; // Asumsikan 'name' adalah kolom nama kelas
-                } else {
-                    return '-';
-                }
+                return optional($data->class)->name ?? '-';
             })
             ->addColumn('class_counselor', function ($data) {
-
-                // Memeriksa apakah ada data classPackage
-                if ($data->classPackage) {
-                    $list_view = '<div class="text-justify ">';
-                    foreach ($data->classPackage->classCounselor as $item) {
+                if ($data->orderPackage->classPackage) {
+                    $list_view = '<div class="text-justify">';
+                    foreach ($data->orderPackage->classPackage->classCounselor as $item) {
                         $list_view .= '<span class="badge bg-primary p-2 m-2" style="font-size: 0.9rem; font-weight: bold;">' . $item->counselor->name . '</span>';
                     }
                     $list_view .= '</div>';
                     return $list_view;
-                } else {
-                    return '-';
                 }
+                return '-';
             })
             ->addColumn('action', function ($data) {
-                $encryptedOrderId = encrypt($data->order_id);
-                $encryptedPackageId = encrypt($data->package_id);
-                $encryptedOrderPackageId = encrypt($data->id);
+                $encryptedOrderId = encrypt($data->orderPackage->order_id);
+                $encryptedPackageId = encrypt($data->orderPackage->package_id);
+                $encryptedOrderPackageId = encrypt($data->order_package_id);
+                $encryptedClassId = encrypt($data->class->id);
 
                 $btn_action = '<div align="center">';
-                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $encryptedOrderId, 'packageId' => $encryptedPackageId]) . '" class="btn btn-sm btn-success m-1">Test</a>';
+                $btn_action .= '<a href="' . route('myclass.detail', ['orderId' => $encryptedOrderId, 'packageId' => $encryptedPackageId, 'classId' => $encryptedClassId]) . '" class="btn btn-sm btn-success m-1">Test</a>';
                 $btn_action .= '<a href="' . route('myclass.dataTableAttendance', ['orderPackageId' => $encryptedOrderPackageId]) . '" class="btn btn-sm btn-primary m-1">Absensi</a>';
                 $btn_action .= '</div>';
                 return $btn_action;
@@ -99,6 +90,7 @@ class myClassController extends Controller
             ->rawColumns(['action', 'class_counselor'])
             ->make(true);
     }
+
 
     public function dataTableAttendance(Request $request, $orderPackageId)
     {
@@ -133,16 +125,18 @@ class myClassController extends Controller
         return view('myclass.attendance', compact('class'));
     }
 
-    public function detail($orderId, $packageId)
+    public function detail($orderId, $packageId, $classId)
     {
         try {
             $decryptedOrderId = decrypt($orderId);
             $decryptedPackageId = decrypt($packageId);
+            $decryptedClassId = decrypt($classId);
 
-            $datatable_route = route('myclass.dataTableDetail', ['orderId' => $orderId, 'packageId' => $packageId]);
+            $datatable_route = route('myclass.dataTableDetail', ['orderId' => $orderId, 'packageId' => $packageId, 'classId' => $classId]);
 
             $detailPackage = OrderDetail::where('order_id', $decryptedOrderId)
                 ->where('package_id', $decryptedPackageId)
+                ->where('class_id', $decryptedClassId)
                 ->whereNull('deleted_at')
                 ->first();
             $className = OrderPackage::where('order_id', $decryptedOrderId)
@@ -158,17 +152,17 @@ class myClassController extends Controller
     }
 
 
-    public function dataTableDetail($orderId, $packageId)
+    public function dataTableDetail($orderId, $packageId, $classId)
     {
         try {
             $decryptedOrderId = decrypt($orderId);
             $decryptedPackageId = decrypt($packageId);
+            $decryptedClassId = decrypt($classId);
 
             $detailPackage = OrderDetail::where('order_id', $decryptedOrderId)
                 ->where('package_id', $decryptedPackageId)
+                ->where('class_id', $decryptedClassId)
                 ->whereNull('deleted_at')
-                ->whereNotNull('open_quiz')
-                ->whereNotNull('close_quiz')
                 ->get();
 
             return DataTables::of($detailPackage)
@@ -180,30 +174,31 @@ class myClassController extends Controller
                     return $data->quiz->type_aspect;
                 })
                 ->addColumn('open_quiz', function ($data) {
-                    return \Carbon\Carbon::parse($data->open_quiz)->translatedFormat('d F Y H:i');
+                    return $data->open_quiz
+                        ? \Carbon\Carbon::parse($data->open_quiz)->translatedFormat('d F Y H:i')
+                        : '-';
                 })
                 ->addColumn('close_quiz', function ($data) {
-                    return \Carbon\Carbon::parse($data->close_quiz)->translatedFormat('d F Y H:i');
+                    return $data->close_quiz
+                        ? \Carbon\Carbon::parse($data->close_quiz)->translatedFormat('d F Y H:i')
+                        : '-';
                 })
                 ->addColumn('status', function ($data) {
                     $currentDateTime = \Carbon\Carbon::now();
-                    $openQuizDateTime = $data->open_quiz
-                        ? \Carbon\Carbon::parse($data->open_quiz)
-                        : null;
-                    $closeQuizDateTime = $data->close_quiz
-                        ? \Carbon\Carbon::parse($data->close_quiz)
-                        : null;
+                    $openQuizDateTime = $data->open_quiz ? \Carbon\Carbon::parse($data->open_quiz) : null;
+                    $closeQuizDateTime = $data->close_quiz ? \Carbon\Carbon::parse($data->close_quiz) : null;
 
-                    if (
-                        $openQuizDateTime && $closeQuizDateTime &&
-                        $currentDateTime->gte($openQuizDateTime) &&
-                        $currentDateTime->lte($closeQuizDateTime)
-                    ) {
+                    if ($openQuizDateTime === null || ($openQuizDateTime !== null && $closeQuizDateTime === null)) {
                         return '<div class="text-success">Buka</div>';
-                    } else {
-                        return '<div class="text-danger">Tutup</div>';
                     }
+
+                    if ($currentDateTime->gte($openQuizDateTime) && $currentDateTime->lte($closeQuizDateTime)) {
+                        return '<div class="text-success">Buka</div>';
+                    }
+
+                    return '<div class="text-danger">Tutup</div>';
                 })
+
                 ->addColumn('action', function ($data) {
                     $btn_action = '<div align="center">';
 
@@ -217,9 +212,10 @@ class myClassController extends Controller
                         : null;
 
                     if (
-                        $openQuizDateTime && $closeQuizDateTime &&
-                        $currentDateTime->gte($openQuizDateTime) &&
-                        $currentDateTime->lt($closeQuizDateTime)
+                        ($openQuizDateTime === null && $closeQuizDateTime === null) ||
+                        ($openQuizDateTime !== null && $closeQuizDateTime === null) ||
+                        ($openQuizDateTime !== null && $closeQuizDateTime !== null &&
+                            $currentDateTime->gte($openQuizDateTime) && $currentDateTime->lt($closeQuizDateTime))
                     ) {
 
                         $result = Result::where('quiz_id', $data->quiz->id)

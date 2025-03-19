@@ -239,7 +239,7 @@
         console.log('Class ID:', id);
 
         // Map selectedTests ke format opsi Swal
-        const options = selectedTests.reduce((acc, test) => {
+        const options = allTests.reduce((acc, test) => {
             acc[test.id] = test.name;
             return acc;
         }, {});
@@ -312,8 +312,8 @@
                 const openQuiz = document.getElementById('open_quiz').value;
                 const closeQuiz = document.getElementById('close_quiz').value;
 
-                if (!testId || !openQuiz || !closeQuiz) {
-                    Swal.showValidationMessage('Semua bidang harus diisi');
+                if (!testId) {
+                    Swal.showValidationMessage('Test harus dipilih');
                     return false;
                 }
 
@@ -358,8 +358,18 @@
                         location.reload();
                     },
                     error: function(xhr, error, code) {
-                        console.log('Error:', xhr, error, code);
-                        swalError(error);
+                        console.log('Error Response:', xhr);
+
+                        let errorMessage = 'Terjadi kesalahan!';
+                        if (xhr.status === 422) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: errorMessage,
+                        });
                     }
                 });
             }

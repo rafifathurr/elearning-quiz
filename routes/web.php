@@ -163,8 +163,8 @@ Route::group(['middleware' => ['role:user']], function () {
     Route::group(['controller' => myClassController::class, 'prefix' => 'myclass', 'as' => 'myclass.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
-        Route::get('detail/{orderId}/{packageId}', 'detail')->name('detail');
-        Route::get('datatable2/{orderId}/{packageId}', 'dataTableDetail')->name('dataTableDetail');
+        Route::get('detail/{orderId}/{packageId}/{classId}', 'detail')->name('detail');
+        Route::get('datatable2/{orderId}/{packageId}/{classId}', 'dataTableDetail')->name('dataTableDetail');
         Route::get('attendance/{orderPackageId}', 'dataTableAttendance')->name('dataTableAttendance');
     });
 });
