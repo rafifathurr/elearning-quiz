@@ -46,6 +46,13 @@
                     data: 'date',
                     defaultContent: '-'
                 },
+                {
+                    data: 'action',
+                    width: '20%',
+                    defaultContent: '-',
+                    orderable: false,
+                    searchable: false
+                },
             ]
         });
 

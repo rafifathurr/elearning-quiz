@@ -50,6 +50,7 @@
                                                 <th>Email</th>
                                                 <th>Nomor Handphone</th>
                                                 <th>Jadwal Kelas</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                     </table>

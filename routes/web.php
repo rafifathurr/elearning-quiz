@@ -268,6 +268,7 @@ Route::group(['middleware' => ['role:counselor|class-operator|manager']], functi
             Route::get('datatable', 'dataTable')->name('dataTable');
             Route::get('index', 'index')->name('index');
             Route::get('export', 'export')->name('export');
+            Route::get('pdf/{id}', 'exportPdf')->name('pdf');
             Route::get('get-date', 'getDateClass')->name('getDateClass');
         });
     });
