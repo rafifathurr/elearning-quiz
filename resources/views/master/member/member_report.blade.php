@@ -25,8 +25,7 @@
         /* Header Styling */
         .header {
             text-align: center;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             border-bottom: 4px solid black;
         }
 
@@ -86,7 +85,7 @@
 
         .attendance-list,
         .test-results {
-            margin-top: 15px;
+            margin-top: 5px;
         }
 
         .attendance-item {
@@ -174,28 +173,34 @@
                 </div>
 
                 <div class="test-results">
-                    <h4>Hasil Tes</h4>
+                    <h4>Hasil Test</h4>
                     @if ($tests->isEmpty())
                         <p>Belum ada hasil tes untuk kelas ini.</p>
                     @else
                         @foreach ($tests->groupBy('orderDetail.on_meeting') as $meeting => $testsGroup)
-                            <h5>{{ empty($meeting) ? 'Test Sebelum Kelas Dimulai' : 'Pertemuan Ke-' . $meeting }}</h5>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nama Test</th>
-                                        <th>Total Skor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($testsGroup as $test)
+                            <div class="class-card">
+                                <h5>{{ empty($meeting) ? 'Test Sebelum Kelas Dimulai' : 'Pertemuan Ke-' . $meeting }}
+                                </h5>
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td>{{ $test->quiz->name ?? 'Tidak ada data' }}</td>
-                                            <td>{{ $test->total_score }}</td>
+                                            <th>Waktu Test</th>
+                                            <th>Nama Test</th>
+                                            <th>Total Skor</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($testsGroup as $test)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($test->start_time)->translatedFormat('d F Y, H:i') }}
+                                                </td>
+                                                <td>{{ $test->quiz->name ?? 'Tidak ada data' }}</td>
+                                                <td>{{ $test->total_score }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         @endforeach
                     @endif
                 </div>
