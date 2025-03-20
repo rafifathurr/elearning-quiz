@@ -10,16 +10,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            width: 90%;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
         }
 
         /* Header Styling */
@@ -179,8 +170,14 @@
                     @else
                         @foreach ($tests->groupBy('orderDetail.on_meeting') as $meeting => $testsGroup)
                             <div class="class-card">
-                                <h5>{{ empty($meeting) ? 'Test Sebelum Kelas Dimulai' : 'Pertemuan Ke-' . $meeting }}
-                                </h5>
+                                @if ($meeting === null || $meeting === '')
+                                    <h5>Test Sebelum Kelas Dimulai</h5>
+                                @elseif ($meeting == 0)
+                                    <h5>Belum Ada Pertemuan</h5>
+                                @else
+                                    <h5>Pertemuan Ke-{{ $meeting }}</h5>
+                                @endif
+
                                 <table>
                                     <thead>
                                         <tr>
