@@ -213,10 +213,10 @@ class myClassAdminController extends Controller
                     });
             })
                 ->whereNotNull('quiz_id')
-                ->whereNotNull('open_quiz')
+                ->where('class_id', $id)
                 ->with('quiz')
                 ->get()
-                ->unique('quiz_id');
+                ->unique('updated_at');
 
 
             // Cek apakah user yang login adalah counselor dari kelas ini

@@ -21,30 +21,65 @@ use Illuminate\Support\Facades\Validator;
 class BrivaController extends Controller
 {
 
-
-    public function generateSignature(Request $request): JsonResponse
+    public function generateSignature()
     {
-        // Ambil data dari request atau gunakan default untuk testing
-        $clientId  = $request->input('clientId', env('BRI_CLIENT_ID'));
-        $timestamp = now()->format('Y-m-d\TH:i:s.v\Z'); // Timestamp sesuai format BRI
+        $clientId = env('BRI_CLIENT_ID');
+        $baseUrl = env('BRI_BASE_URL');
 
-        try {
-            // Generate signature dengan fungsi yang sudah dibuat
-            $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+        // Format timestamp sesuai BRI API
+        $timestamp = now()->format('Y-m-d\TH:i:sP');
 
-            return response()->json([
-                'clientId'  => $clientId,
-                'timestamp' => $timestamp,
-                'signature' => $signature
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'responseCode'    => '5001001',
-                'responseMessage' => 'Signature Generation Failed',
-                'error'           => $e->getMessage()
-            ], 500);
-        }
+        // Logging timestamp yang digunakan
+        Log::info("Current Server Timestamp: " . $timestamp);
+
+        // Generate signature
+        $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+        $headers = [
+            'X-CLIENT-KEY' => $clientId,
+            'X-TIMESTAMP'  => $timestamp,
+            'X-SIGNATURE'  => $signature,
+            'Content-Type' => 'application/json',
+        ];
+
+        Log::info("Headers yang dikirim: " . json_encode($headers));
+
+        $body = ['grantType' => 'client_credentials'];
+        Log::info("Body request: " . json_encode($body));
+
+        // Kirim request
+        $response = Http::withHeaders($headers)->post("{$baseUrl}/snap/v1.0/access-token/b2b", $body);
+
+        // Log response dari BRI API
+        Log::info("Response dari BRI API: " . $response->body());
+
+        return $response->json();
     }
+
+
+    // public function generateSignature(Request $request): JsonResponse
+    // {
+    //     // Ambil data dari request atau gunakan default untuk testing
+    //     $clientId  = $request->input('clientId', env('BRI_CLIENT_ID'));
+    //     $timestamp = now()->format('Y-m-d\TH:i:s.v\Z'); // Timestamp sesuai format BRI
+
+    //     try {
+    //         // Generate signature dengan fungsi yang sudah dibuat
+    //         $signature = SignatureHelper::generateSignature($clientId, $timestamp);
+
+    //         return response()->json([
+    //             'clientId'  => $clientId,
+    //             'timestamp' => $timestamp,
+    //             'signature' => $signature
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'responseCode'    => '5001001',
+    //             'responseMessage' => 'Signature Generation Failed',
+    //             'error'           => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
 
     public function getAccessToken(Request $request): JsonResponse

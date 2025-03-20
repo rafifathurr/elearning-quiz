@@ -109,14 +109,14 @@
                                         @if ($givenTests->isEmpty())
                                             <p class="text-muted">Belum ada test yang diberikan.</p>
                                         @else
-                                            <ul class="list-group">
+                                            <ul class="list-group" style="overflow: auto; max-height: 300px;">
                                                 @foreach ($givenTests as $test)
                                                     <li class="list-group-item">
                                                         <strong>{{ $test->quiz->name }}</strong> <br>
                                                         <small>🕒 Dibuka:
-                                                            {{ \Carbon\Carbon::parse($test->open_quiz)->translatedFormat('d F Y H:i') }}
+                                                            {{ $test->open_quiz ? \Carbon\Carbon::parse($test->open_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}
                                                             - Ditutup:
-                                                            {{ \Carbon\Carbon::parse($test->close_quiz)->translatedFormat('d F Y H:i') }}</small>
+                                                            {{ $test->close_quiz ? \Carbon\Carbon::parse($test->close_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}</small>
                                                     </li>
                                                 @endforeach
                                             </ul>
