@@ -134,6 +134,8 @@ class QuizController extends Controller
                 'description' => $request->description,
                 'type_aspect' => $request->type_aspect,
                 'time_duration' => $request->time_duration,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id
             ]);
 
 
@@ -224,6 +226,7 @@ class QuizController extends Controller
                 'description' => $request->description,
                 'type_aspect' => $request->type_aspect,
                 'time_duration' => $request->time_duration,
+                'updated_by' => Auth::user()->id
             ]);
 
             /**
@@ -316,7 +319,10 @@ class QuizController extends Controller
             DB::beginTransaction();
 
             // Destroy with Softdelete
-            $quiz_destroy = $quiz->update(['deleted_at' => date('Y-m-d H:i:s')]);
+            $quiz_destroy = $quiz->update([
+                'deleted_at' => date('Y-m-d H:i:s'),
+                'deleted_by' => Auth::user()->id
+            ]);
             $deleted_package_test = PackageTest::where('quiz_id', $quiz->id)->delete();
 
             // Validation Destroy Quiz

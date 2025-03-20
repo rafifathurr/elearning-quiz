@@ -234,7 +234,9 @@ class PackageController extends Controller
                 'class' => $request->class,
                 'max_member' => $request->max_member,
                 'id_type_package' => $request->id_type_package,
-                'description' => $request->description
+                'description' => $request->description,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id
             ]);
 
             // Cek apakah ada quiz yang dipilih
@@ -362,7 +364,8 @@ class PackageController extends Controller
                         'class' => $request->class,
                         'max_member' => $request->max_member,
                         'id_type_package' => $request->id_type_package,
-                        'description' => $request->description
+                        'description' => $request->description,
+                        'updated_by' => Auth::user()->id
                     ]);
 
                 // Hapus package_test lama
@@ -469,7 +472,8 @@ class PackageController extends Controller
 
             if (!is_null($package)) {
                 $package_deleted = Package::where('id', $id)->update([
-                    'deleted_at' => date('Y-m-d H:i:s')
+                    'deleted_at' => date('Y-m-d H:i:s'),
+                    'deleted_by' => Auth::user()->id
                 ]);
 
                 if ($package_deleted) {

@@ -100,6 +100,8 @@ class KecermatanController extends Controller
                 'type_aspect' => 'kecermatan',
                 'time_duration' => $request->time_duration,
                 'question_kecermatan' => json_encode($questions), // Simpan dalam format JSON
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id
             ]);
 
             DB::commit();
@@ -225,6 +227,7 @@ class KecermatanController extends Controller
                 'type_aspect' => 'kecermatan',
                 'time_duration' => $request->time_duration,
                 'question_kecermatan' => json_encode($questions),
+                'updated_by' => Auth::user()->id
             ]);
             DB::commit();
             return redirect()

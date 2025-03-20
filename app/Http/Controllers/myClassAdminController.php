@@ -310,7 +310,8 @@ class myClassAdminController extends Controller
                         'order_package_id' => $new_attendance->order_package_id,
                         'class_id' => $request->class_id,
                         'attendance' => isset($attendances[$new_attendance->order_package_id]) ? 1 : 0,
-                        'attendance_date' => now()
+                        'attendance_date' => now(),
+                        'counselor_id' => Auth::user()->id
                     ];
                 }
             } else {
@@ -325,6 +326,7 @@ class myClassAdminController extends Controller
                         'class_id' => $attendance->class_id,
                         'attendance' => isset($attendances[$attendance->order_package_id]) ? 1 : 0,
                         'attendance_date' => now(),
+                        'counselor_id' => Auth::user()->id
                     ];
                 }
             }
@@ -411,6 +413,7 @@ class myClassAdminController extends Controller
             foreach ($class_order_packages as $attendance) {
                 $attendance->update([
                     'attendance' => isset($attendances[$attendance->order_package_id]) ? 1 : 0,
+                    'counselor_id' => Auth::user()->id
                 ]);
             }
 
