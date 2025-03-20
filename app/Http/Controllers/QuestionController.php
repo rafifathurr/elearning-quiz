@@ -221,7 +221,9 @@ class QuestionController extends Controller
                 'description' => $request->description,
                 'time_duration' => $request->time_duration,
                 'level' => $level,
-                'aspect' => $aspect
+                'aspect' => $aspect,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id
             ]);
 
             if ($quiz_question) {
@@ -376,6 +378,7 @@ class QuestionController extends Controller
                 'time_duration' => $request->time_duration,
                 'level' => $level,
                 'aspect' => $aspect,
+                'updated_by' => Auth::user()->id
             ]);
 
 
@@ -513,7 +516,8 @@ class QuestionController extends Controller
             if (!is_null($question)) {
 
                 $question_deleted = QuizQuestion::where('id', $id)->update([
-                    'deleted_at' => date('Y-m-d H:i:s')
+                    'deleted_at' => date('Y-m-d H:i:s'),
+                    'deleted_by' => Auth::user()->id
                 ]);
                 if ($question_deleted) {
                     DB::commit();
