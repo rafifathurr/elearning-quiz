@@ -25,6 +25,7 @@
                                                 <th>No</th>
                                                 <th>Waktu Absensi</th>
                                                 <th>Status</th>
+                                                <th>Diabsenkan Oleh</th>
                                             </tr>
                                         </thead>
                                     </table>

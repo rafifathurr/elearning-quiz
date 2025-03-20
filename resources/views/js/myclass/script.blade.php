@@ -121,6 +121,10 @@
                     data: 'status',
                     defaultContent: '-'
                 },
+                {
+                    data: 'counselor',
+                    defaultContent: '-'
+                },
             ]
 
         });

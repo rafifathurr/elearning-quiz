@@ -103,6 +103,9 @@ class myClassController extends Controller
                 ->addColumn('attendance_date', function ($data) {
                     return \Carbon\Carbon::parse($data->attendance_date)->translatedFormat('l, d F Y');
                 })
+                ->addColumn('counselor', function ($data) {
+                    return $data->counselor ? $data->counselor->name : '';
+                })
                 ->addColumn('status', function ($data) {
                     $status = null;
                     if ($data->attendance == 0) {
@@ -113,7 +116,7 @@ class myClassController extends Controller
                     return $status;
                 })
 
-                ->only(['attendance_date', 'status'])
+                ->only(['attendance_date', 'counselor', 'status'])
                 ->rawColumns(['status'])
                 ->make(true);
         }

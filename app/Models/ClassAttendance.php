@@ -19,4 +19,8 @@ class ClassAttendance extends Model
     {
         return $this->belongsTo(ClassPackage::class, 'class_id');
     }
+    public function counselor()
+    {
+        return $this->belongsTo(User::class, 'counselor_id');
+    }
 }
