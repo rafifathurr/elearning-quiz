@@ -112,11 +112,19 @@
                                             <ul class="list-group" style="overflow: auto; max-height: 300px;">
                                                 @foreach ($givenTests as $test)
                                                     <li class="list-group-item">
-                                                        <strong>{{ $test->quiz->name }}</strong> <br>
-                                                        <small>🕒 Dibuka:
-                                                            {{ $test->open_quiz ? \Carbon\Carbon::parse($test->open_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}
-                                                            - Ditutup:
-                                                            {{ $test->close_quiz ? \Carbon\Carbon::parse($test->close_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}</small>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <strong>{{ $test->quiz->name }}</strong> <br>
+                                                                <small>🕒 Dibuka:
+                                                                    {{ $test->open_quiz ? \Carbon\Carbon::parse($test->open_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}
+                                                                    - Ditutup:
+                                                                    {{ $test->close_quiz ? \Carbon\Carbon::parse($test->close_quiz)->translatedFormat('d F Y H:i') : 'jadwal tidak dipilih' }}</small>
+                                                            </div>
+                                                            <button class="btn btn-outline-info  btn-sm"
+                                                                onclick="updateTest({{ $test->id }})"><i
+                                                                    class="fas fa-edit"></i></button>
+                                                        </div>
+
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -142,9 +150,10 @@
                                                 @endif
                                             </div>
                                             <div class="card-body">
-                                                <span class="font-weight-bold badge bg-lightblue p-2"
-                                                    style="font-size: 1rem">Jadwal Kelas:
-                                                    {{ $class->class_date }}</span>
+                                                <span class="font-weight-bold badge bg-lightblue p-2 flex-wrap text-wrap"
+                                                    style="font-size: 1rem; white-space: normal; word-wrap: break-word;">
+                                                    Jadwal Kelas: {{ $class->class_date }}
+                                                </span>
                                                 <div class="table-responsive py-3">
                                                     <table id="table-member"
                                                         class="table table-bordered table-hover text-center">
@@ -205,9 +214,10 @@
                                             @endif
                                         </div>
                                         <div class="card-body">
-                                            <span class="font-weight-bold badge bg-lightblue p-2"
-                                                style="font-size: 1rem">Jadwal Kelas:
-                                                {{ $class->class_date }}</span>
+                                            <span class="font-weight-bold badge bg-lightblue p-2 flex-wrap text-wrap"
+                                                style="font-size: 1rem; white-space: normal; word-wrap: break-word;">
+                                                Jadwal Kelas: {{ $class->class_date }}
+                                            </span>
                                             <div class="table-responsive py-3">
                                                 <table id="table-member"
                                                     class="table table-bordered table-hover text-center">

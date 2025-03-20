@@ -376,6 +376,147 @@
         });
     }
 
+    function updateTest(id) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        $.ajax({
+            url: `/class/get-test/${id}`,
+            type: 'GET',
+            success: function(data) {
+                let selectedQuizId = data.quiz_id || '';
+                let selectedOpenQuiz = data.open_quiz || '';
+                let selectedCloseQuiz = data.close_quiz || '';
+
+                // Map semua opsi test ke dropdown
+                const options = allTests.reduce((acc, test) => {
+                    acc[test.id] = test.name;
+                    return acc;
+                }, {});
+
+                Swal.fire({
+                    title: 'Ubah Test',
+                    html: `
+                     <style>
+            .responsive-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            .responsive-label {
+                min-width: 150px;
+                text-align: left;
+                font-weight: bold;
+            }
+            .responsive-input {
+                flex: 1;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            @media (max-width: 768px) {
+                .responsive-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .responsive-label,
+                .responsive-input {
+                    width: 100% !important;
+                }
+            }
+        </style>
+                <div class="responsive-container">
+                    <label for="test" class="responsive-label">Pilih Test</label>
+                    <select id="test" class="responsive-input">
+                        <option value="">-- Pilih Test --</option>
+                        ${Object.entries(options).map(([id, name]) => `
+                            <option value="${id}" ${id == selectedQuizId ? 'selected' : ''}>${name}</option>
+                        `).join('')}
+                    </select>
+                </div>
+                <div class="responsive-container">
+                    <label for="open_quiz" class="responsive-label">Tanggal Mulai</label>
+                    <input id="open_quiz" type="datetime-local" class="responsive-input" value="${selectedOpenQuiz}" required>
+                </div>
+                <div class="responsive-container">
+                    <label for="close_quiz" class="responsive-label">Tanggal Tutup</label>
+                    <input id="close_quiz" type="datetime-local" class="responsive-input" value="${selectedCloseQuiz}" required>
+                </div>
+                `,
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                    preConfirm: () => {
+                        const testId = $('#test').val();
+                        const openQuiz = $('#open_quiz').val();
+                        const closeQuiz = $('#close_quiz').val();
+
+                        if (!testId) {
+                            Swal.showValidationMessage('Test harus dipilih');
+                            return false;
+                        }
+
+                        return {
+                            quiz_id: testId,
+                            open_quiz: openQuiz,
+                            close_quiz: closeQuiz,
+                            order_detail_id: id
+                        };
+                    },
+                    willOpen: () => {
+                        $('.swal2-html-container').css({
+                            'overflow-x': 'hidden',
+                            'max-width': '100%'
+                        });
+                    },
+                    didOpen: () => {
+                        $('#test').select2({
+                            placeholder: 'Cari Test...',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $('.swal2-popup')
+                        });
+                    },
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ url('class/update-test') }}',
+                            type: 'POST',
+                            data: {
+                                _token: token,
+                                order_detail_id: id,
+                                quiz_id: result.value.quiz_id,
+                                open_quiz: result.value.open_quiz,
+                                close_quiz: result.value.close_quiz
+                            },
+                            success: function() {
+                                location.reload();
+                            },
+                            error: function(xhr) {
+                                let errorMessage = xhr.status === 422 ? xhr.responseJSON
+                                    .message : 'Terjadi kesalahan!';
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: errorMessage
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal mengambil data test!'
+                });
+            }
+        });
+    }
+
 
 
     function removeMember(index) {

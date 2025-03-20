@@ -255,11 +255,17 @@ Route::group(['middleware' => ['role:counselor|class-operator|manager']], functi
         Route::post('store-attendance', 'storeAttendance')->name('storeAttendance');
         Route::post('update-attendance', 'updateAttendance')->name('updateAttendance');
         Route::post('store-test', 'storeTest')->name('storeTest');
+        Route::post('update-test', 'updateTest')->name('updateTest');
         Route::post('store-member', 'storeMember')->name('storeMember');
         Route::delete('remove-member/{index}', 'removeMember')->name('removeMember');
         Route::get('getPackages', 'getPackages')->name('getPackages');
         Route::get('exportData', 'exportData')->name('exportData');
     });
+
+    Route::get('/class/get-test/{id}', function ($id) {
+        return \App\Models\OrderDetail::find($id);
+    });
+
     Route::resource('class', myClassAdminController::class)->parameters(['class' => 'id']);
 
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {

@@ -13,6 +13,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
 use App\Models\PackageDate;
+use App\Models\Result;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -464,6 +465,68 @@ class myClassAdminController extends Controller
             session()->flash('failed', $e->getMessage());
         }
     }
+
+    public function updateTest(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'open_quiz' => 'nullable|date',
+                'close_quiz' => 'nullable|date|after:open_quiz',
+            ]);
+
+            if ($request->filled('close_quiz') && !$request->filled('open_quiz')) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "Waktu test dibuka harus diisi."
+                ], 422);
+            }
+
+            $first_order_detail = OrderDetail::find($request->order_detail_id);
+            if (!$first_order_detail) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "Data test tidak ditemukan."
+                ], 404);
+            }
+
+            $all_order_detail = OrderDetail::where('created_at', $first_order_detail->created_at)
+                ->where('quiz_id', $first_order_detail->quiz_id)
+                ->where('class_id', $first_order_detail->class_id)
+                ->get();
+
+            // Cek apakah salah satu ID sudah ada di tabel Result
+            $exists_result = Result::whereIn('order_detail_id', $all_order_detail->pluck('id'))->exists();
+
+            foreach ($all_order_detail as $data_user) {
+                if ($exists_result) {
+                    // Jika sudah ada di Result, hanya update waktu
+                    $data_user->update([
+                        'open_quiz' => $request->open_quiz,
+                        'close_quiz' => $request->close_quiz,
+                    ]);
+                } else {
+                    // Jika belum ada di Result, bisa update semua
+                    $data_user->update([
+                        'quiz_id' => $request->quiz_id,
+                        'open_quiz' => $request->open_quiz,
+                        'close_quiz' => $request->close_quiz,
+                        'class_id' => $data_user->class_id,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            session()->flash('success', $exists_result
+                ? 'Berhasil mengubah waktu buka dan tutup test. Quiz tidak dapat diubah karena sudah ada peserta yang mengerjakan.'
+                : 'Berhasil mengubah test.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            session()->flash('failed', $e->getMessage());
+        }
+    }
+
 
     public function getPackages()
     {
