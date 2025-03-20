@@ -216,7 +216,7 @@ class myClassAdminController extends Controller
                 ->where('class_id', $id)
                 ->with('quiz')
                 ->get()
-                ->unique('updated_at');
+                ->unique('created_at');
 
 
             // Cek apakah user yang login adalah counselor dari kelas ini
