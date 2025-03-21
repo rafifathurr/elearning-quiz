@@ -1,59 +1,68 @@
 @extends('layouts.section')
 @section('content')
+    <style>
+        .order .small-box {
+            border-radius: 0.7rem;
+
+
+        }
+    </style>
     <div class="px-3 py-4">
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
-                <div class="row justify-content-center" style="margin-top: 1.2rem; margin-bottom: 0.8rem">
-                    <!-- Total Pesanan -->
-                    <div class="col-lg-3 col-6 my-1">
-                        <div class="small-box bg-gradient-cyan py-2 h-100 align-content-center ">
-                            <div class="inner">
-                                <h3>{{ $all_order }}</h3>
-                                <p><b>Total Pesanan</b></p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-clipboard"></i> <!-- Ikon daftar pesanan -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pesanan Diambil -->
-                    <div class="col-lg-3 col-6 my-1">
-                        <div class="small-box bg-gradient-orange text-white py-2 h-100 align-content-center">
-                            <div class="inner">
-                                <h3>{{ $check_out }}</h3>
-                                <p><b>Pesanan Diambil</b></p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-ios-cart"></i> <!-- Ikon keranjang -->
+                <div class="order">
+                    <div class="row justify-content-center" style="margin-top: 1.2rem; margin-bottom: 0.8rem">
+                        <!-- Total Pesanan -->
+                        <div class="col-lg-3 col-6 my-1">
+                            <div class="small-box bg-gradient-cyan py-2 h-100 align-content-center ">
+                                <div class="inner">
+                                    <h3>{{ $all_order }}</h3>
+                                    <p><b>Total Pesanan</b></p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-clipboard"></i> <!-- Ikon daftar pesanan -->
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Pesanan Belum Dibayar -->
-                    <div class="col-lg-3 col-6 my-1">
-                        <div class="small-box bg-gradient-danger py-2 h-100 align-content-center">
-                            <div class="inner">
-                                <h3>{{ $not_payment }}</h3>
-                                <p><b>Pesanan Belum Dibayar</b></p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-card"></i> <!-- Ikon kartu pembayaran -->
+                        <!-- Pesanan Diambil -->
+                        <div class="col-lg-3 col-6 my-1">
+                            <div class="small-box bg-gradient-orange text-white py-2 h-100 align-content-center">
+                                <div class="inner">
+                                    <h3>{{ $check_out }}</h3>
+                                    <p><b>Pesanan Diambil</b></p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-ios-cart"></i> <!-- Ikon keranjang -->
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Pesanan Berhasil -->
-                    <div class="col-lg-3 col-6 my-1">
-                        <div class="small-box bg-gradient-success py-2 h-100 align-content-center">
-                            <div class="inner">
-                                <h3>{{ $success_order }}</h3>
-                                <p><b>Pesanan Berhasil</b></p>
+                        <!-- Pesanan Belum Dibayar -->
+                        <div class="col-lg-3 col-6 my-1">
+                            <div class="small-box bg-gradient-danger py-2 h-100 align-content-center">
+                                <div class="inner">
+                                    <h3>{{ $not_payment }}</h3>
+                                    <p><b>Pesanan Belum Dibayar</b></p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-card"></i> <!-- Ikon kartu pembayaran -->
+                                </div>
                             </div>
-                            <div class="icon">
-                                <i class="ion ion-checkmark-circled"></i> <!-- Ikon centang dalam lingkaran -->
+                        </div>
+
+                        <!-- Pesanan Berhasil -->
+                        <div class="col-lg-3 col-6 my-1">
+                            <div class="small-box bg-gradient-success py-2 h-100 align-content-center">
+                                <div class="inner">
+                                    <h3>{{ $success_order }}</h3>
+                                    <p><b>Pesanan Berhasil</b></p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-checkmark-circled"></i> <!-- Ikon centang dalam lingkaran -->
+                                </div>
                             </div>
                         </div>
                     </div>
