@@ -545,7 +545,10 @@
 
         Swal.fire({
             title: 'Apakah Anda Yakin Ingin Menolak Order Ini?',
+            text: 'Silakan berikan alasan penolakan:',
             icon: 'question',
+            input: 'text',
+            inputPlaceholder: 'Masukkan alasan penolakan',
             showCancelButton: true,
             allowOutsideClick: false,
             customClass: {
@@ -554,16 +557,23 @@
             },
             buttonsStyling: false,
             confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel'
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Alasan penolakan tidak boleh kosong!';
+                }
+            }
         }).then(result => {
             if (result.isConfirmed) {
+                let reason = result.value;
                 swalProcess();
                 $.ajax({
                     url: '{{ url('order/reject') }}/' + id,
                     type: 'POST',
                     cache: false,
                     data: {
-                        _token: token
+                        _token: token,
+                        reason: reason
                     },
                     success: function(data) {
                         location.reload();

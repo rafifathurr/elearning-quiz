@@ -708,14 +708,15 @@ class OrderController extends Controller
         }
     }
 
-    public function reject(string $id)
+    public function reject(Request $request, string $id)
     {
         DB::beginTransaction();
         try {
             $order = Order::findOrFail($id);
 
             $reject_order = $order->update([
-                'status' => 2
+                'status' => 2,
+                'reason' => $request->reason,
             ]);
 
             if ($reject_order) {
@@ -797,10 +798,10 @@ class OrderController extends Controller
                         $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
                     } elseif ($data->status == 10) {
                         $list_view .= '<span class="badge bg-maroon  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
-                    } elseif ($data->status == 2) {
-                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Pembayaran</span>';
-                    } else {
+                    } elseif ($data->status == 2 && !is_null($data->proof_payment)) {
                         $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
+                    } else {
+                        $list_view .= '<span class="badge bg-warning text-dark p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Pembayaran</span>';
                     }
                     $list_view .= '</div>';
                     return $list_view;

@@ -17,6 +17,38 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            @if ($order->status == 2 && !is_null($order->proof_payment))
+                                <div class="alert alert-default-danger" role="alert">
+                                    <h5 class="font-weight-bold"><i class="fas fa-times-circle text-danger mr-2"></i>Pesanan
+                                        Ditolak !
+                                    </h5>
+                                    <hr>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 font-weight-bolder">Alasan Penolakan</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span
+                                                class="font-weight-bold">{{ $order->reason ? $order->reason : '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <h6 class="col-md-2 font-weight-bolder">Bukti Pembayaran</h6>
+                                        <h6 class="col-md-8">
+                                            @if (!is_null($order->proof_payment))
+                                                <img src="{{ route('order.viewPayment', $order->id) }}"
+                                                    alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm mt-2"
+                                                    style="max-width: 25%; height: auto; cursor: pointer;"
+                                                    data-toggle="modal" data-target="#paymentModal"
+                                                    onclick="showImageModal(this)">
+                                            @else
+                                                <span>-</span>
+                                            @endif
+                                        </h6>
+                                    </div>
+                                    <hr>
+                                    <p>Silahkan upload ulang bukti pembayaran anda !</p>
+                                </div>
+                            @endif
                             {{-- Detail Pemesan --}}
                             <h5 class="font-weight-bold">Detail Pemesan</h5>
                             <div class="alert bg-lightblue" role="alert">
