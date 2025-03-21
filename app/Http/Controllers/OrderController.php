@@ -103,9 +103,13 @@ class OrderController extends Controller
 
     public function listOrder()
     {
-        $datatable_route = route('order.dataTableListOrder');
+        $data['all_order'] = Order::whereNull('deleted_at')->count();
+        $data['check_out'] = Order::whereNull('deleted_at')->where('status', 1)->count();
+        $data['not_payment'] = Order::whereNull('deleted_at')->where('status', 2)->count();
+        $data['success_order'] = Order::whereNull('deleted_at')->where('status', 100)->count();
+        $data['datatable_route'] = route('order.dataTableListOrder');
 
-        return view('order.list-order', compact('datatable_route'));
+        return view('order.list-order', $data);
     }
 
     public function dataTableListOrder()
