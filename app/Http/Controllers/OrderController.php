@@ -103,14 +103,23 @@ class OrderController extends Controller
 
     public function listOrder()
     {
-        $data['all_order'] = Order::whereNull('deleted_at')->count();
+        $orderQuery = Order::whereNull('deleted_at')
+            ->whereIn('payment_method', ['transfer', 'briva']);
+
+        $data['all_order'] = Order::whereNull('deleted_at')
+            ->where(function ($query) {
+                $query->whereNull('payment_method')
+                    ->orWhereIn('payment_method', ['transfer', 'briva']);
+            })->count();
         $data['check_out'] = Order::whereNull('deleted_at')->where('status', 1)->count();
-        $data['not_payment'] = Order::whereNull('deleted_at')->where('status', 2)->count();
-        $data['success_order'] = Order::whereNull('deleted_at')->where('status', 100)->count();
+        $data['not_payment'] = (clone $orderQuery)->where('status', 2)->count();
+        $data['success_order'] = (clone $orderQuery)->where('status', 100)->count();
+        $data['total_revenue'] = (clone $orderQuery)->where('status', 100)->sum('total_price');
         $data['datatable_route'] = route('order.dataTableListOrder');
 
         return view('order.list-order', $data);
     }
+
 
     public function dataTableListOrder()
     {

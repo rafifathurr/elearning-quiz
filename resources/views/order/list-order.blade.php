@@ -3,8 +3,41 @@
     <style>
         .order .small-box {
             border-radius: 0.7rem;
+        }
 
 
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9) !important;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            text-align: center;
+            z-index: 10;
+            /* Pastikan overlay ada di atas */
+        }
+
+        .revenue-box {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .revenue-box:hover .overlay {
+            opacity: 1;
+        }
+
+        .revenue-box .inner {
+            background-color: transparent !important;
         }
     </style>
     <div class="px-3 py-4">
@@ -52,16 +85,22 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Pesanan Berhasil -->
                         <div class="col-lg-3 col-6 my-1">
-                            <div class="small-box bg-gradient-success py-2 h-100 align-content-center">
+                            <div
+                                class="small-box bg-gradient-success py-2 h-100 align-content-center position-relative revenue-box">
                                 <div class="inner">
                                     <h3>{{ $success_order }}</h3>
                                     <p><b>Pesanan Berhasil</b></p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-checkmark-circled"></i> <!-- Ikon centang dalam lingkaran -->
+                                    <i class="ion ion-checkmark-circled"></i>
+                                </div>
+
+                                <!-- Overlay total pendapatan (muncul saat hover) -->
+                                <div class="overlay">
+                                    <p><b>Total Pendapatan</b></p>
+                                    <h4>Rp {{ number_format($total_revenue, 0, ',', '.') }}</h4>
                                 </div>
                             </div>
                         </div>
