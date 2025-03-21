@@ -112,7 +112,8 @@ class OrderController extends Controller
                     ->orWhereIn('payment_method', ['transfer', 'briva']);
             })->count();
         $data['check_out'] = Order::whereNull('deleted_at')->whereNull('payment_method')->where('status', 1)->count();
-        $data['not_payment'] = (clone $orderQuery)->where('status', 2)->count();
+        $data['not_payment'] = (clone $orderQuery)->where('status', 2)->whereNull('proof_payment')->count();
+        $data['order_reject'] = (clone $orderQuery)->where('status', 2)->whereNotNull('proof_payment')->count();
         $data['success_order'] = (clone $orderQuery)->where('status', 100)->count();
         $data['total_revenue'] = (clone $orderQuery)->where('status', 100)->sum('total_price');
         $data['datatable_route'] = route('order.dataTableListOrder');

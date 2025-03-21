@@ -77,7 +77,8 @@
                         <div class="col-lg-3 col-6 my-1">
                             <div class="small-box bg-gradient-danger py-2 h-100 align-content-center">
                                 <div class="inner">
-                                    <h3>{{ $not_payment }}</h3>
+                                    <h3>{{ $not_payment }}<sup style="font-size: 15px"> +{{ $order_reject }} ditolak</sup>
+                                    </h3>
                                     <p><b>Pesanan Belum Dibayar</b></p>
                                 </div>
                                 <div class="icon">
