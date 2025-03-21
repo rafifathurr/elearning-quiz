@@ -16,6 +16,34 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            @if ($order->status == 2 && !is_null($order->proof_payment))
+                                <div class="alert alert-default-danger" role="alert">
+                                    <h5 class="font-weight-bold"><i class="fas fa-times-circle text-danger mr-2"></i>Pesanan
+                                        Ditolak !
+                                    </h5>
+                                    <hr>
+                                    <div class="row mt-1">
+                                        <div class="col-md-2 font-weight-bolder">Alasan Penolakan</div>
+                                        <div class="col-md-8">
+                                            <span class="d-none d-md-inline">:</span>
+                                            <span
+                                                class="font-weight-bold">{{ $order->reason ? $order->reason : '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <h6 class="col-md-2 font-weight-bold">Bukti Pembayaran</h6>
+                                        <h6 class="col-md-8 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            @if (!is_null($order->proof_payment))
+                                                <a href="{{ route('order.downloadPayment', $order->id) }}" target="_blank"
+                                                    class="text-dark text-decoration-none"><i
+                                                        class="fas fa-download mr-1"></i> Lihat Bukti</a>
+                                            @else
+                                                -
+                                            @endif
+                                        </h6>
+                                    </div>
+                                </div>
+                            @endif
                             {{-- Detail Pemesan --}}
                             <h5 class="font-weight-bold">Detail Pemesan</h5>
                             <div class="alert bg-lightblue" role="alert">
