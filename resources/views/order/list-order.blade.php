@@ -105,6 +105,16 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Metode Pembayran -->
+                        {{-- <div class="col-lg-3 col-6 my-1">
+                            <div class="small-box py-2 h-100 align-content-center " style="background-color: #1976D2;">
+                                <div style="height: 120px; width: 100%;">
+                                    <canvas id="paymentChart"></canvas>
+                                </div>
+                            </div>
+                        </div> --}}
+
                     </div>
                 </div>
 
@@ -158,6 +168,82 @@
         @include('js.order.script')
         <script>
             dataTableAdmin();
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+        <!-- Load ChartDataLabels Plugin -->
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var ctx = document.getElementById('paymentChart').getContext('2d');
+                Chart.register(ChartDataLabels);
+
+                function getLegendPosition() {
+                    return window.innerWidth < 768 ? 'bottom' : 'left'; // Ubah posisi legend
+                }
+
+                var paymentChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Transfer', 'BRIVA'],
+                        datasets: [{
+                            data: [{{ $payment_method_count['transfer'] ?? 0 }},
+                                {{ $payment_method_count['briva'] ?? 0 }}
+                            ],
+                            backgroundColor: [
+                                'rgba(255, 206, 86, 0.8)', // Kuning terang
+                                'rgba(255, 99, 132, 0.8)' // Merah terang
+                            ],
+                            borderColor: [
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(255, 99, 132, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: getLegendPosition(),
+                                labels: {
+                                    color: 'white',
+                                    font: {
+                                        size: window.innerWidth < 768 ? 12 : 14
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                color: 'white',
+                                font: {
+                                    size: 14
+                                },
+                                anchor: 'center',
+                                align: 'center',
+                                formatter: (value, context) => {
+                                    const dataset = context.chart.data.datasets[0];
+                                    const total = dataset.data.reduce((acc, curr) => acc + curr, 0);
+                                    const percentage = ((value / total) * 100).toFixed(
+                                        1); // Hitung persentase
+                                    return `${percentage}%`; // Tampilkan persentase di dalam chart
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+
+                // Update posisi legend saat layar di-resize
+                window.addEventListener('resize', function() {
+                    paymentChart.options.plugins.legend.position = getLegendPosition();
+                    paymentChart.options.plugins.legend.labels.font.size = window.innerWidth < 768 ? 12 : 14;
+                    paymentChart.update();
+                });
+            });
         </script>
     @endpush
 @endsection

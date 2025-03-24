@@ -172,10 +172,8 @@
                             <div class="class-card">
                                 @if ($meeting === null || $meeting === '')
                                     <h5>Test Sebelum Kelas Dimulai</h5>
-                                @elseif ($meeting == 0)
-                                    <h5>Belum Ada Pertemuan</h5>
                                 @else
-                                    <h5>Pertemuan Ke-{{ $meeting }}</h5>
+                                    <h5>Pertemuan Ke-{{ $meeting + 1 }}</h5>
                                 @endif
 
                                 <table>

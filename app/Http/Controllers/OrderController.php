@@ -116,6 +116,13 @@ class OrderController extends Controller
         $data['order_reject'] = (clone $orderQuery)->where('status', 2)->whereNotNull('proof_payment')->count();
         $data['success_order'] = (clone $orderQuery)->where('status', 100)->count();
         $data['total_revenue'] = (clone $orderQuery)->where('status', 100)->sum('total_price');
+        $data['payment_method_count'] = Order::whereNull('deleted_at')
+            ->whereIn('payment_method', ['transfer', 'briva'])
+            ->where('status', 100)
+            ->selectRaw('payment_method, COUNT(*) as total')
+            ->groupBy('payment_method')
+            ->pluck('total', 'payment_method')
+            ->toArray();
         $data['datatable_route'] = route('order.dataTableListOrder');
 
         return view('order.list-order', $data);
