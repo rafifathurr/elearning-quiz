@@ -180,7 +180,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Hasil Jawaban Per Kecermatan', // Judul Chart
+                                text: 'Grafik Jawaban Per Kolom', // Judul Chart
                             },
                         },
                         scales: {
@@ -201,6 +201,22 @@
                         },
                     },
                 });
+
+                // Setelah chart selesai di-render, ambil base64
+                setTimeout(() => {
+                    const chartImageBase64 = combinationChart.toBase64Image();
+                    // Kirim ke server, contoh pakai Ajax
+                    fetch('/save-chart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            chartImage: chartImageBase64
+                        })
+                    });
+                }, 1000); // Delay biar chartnya udah pasti render
             </script>
         @endif
     @endpush

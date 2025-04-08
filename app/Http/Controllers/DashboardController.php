@@ -95,7 +95,9 @@ class DashboardController extends Controller
 
                     // Pemanggilan PDF yang benar
                     // Generate PDF dari hasil
-                    $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'speed', 'accuracyLabel'));
+                    $chartPath = storage_path('app/public/kecermatan/chart_' . Auth::user()->id . '.png');
+
+                    $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'speed', 'accuracyLabel', 'chartPath'));
                 }
 
                 // Dapatkan nama quiz dan nama peserta
@@ -142,6 +144,23 @@ class DashboardController extends Controller
 
         return view('home', $data);
     }
+
+    public function saveChart(Request $request)
+    {
+        $data = $request->chartImage;
+
+        // Hapus header data:image/png;base64,
+        $data = str_replace('data:image/png;base64,', '', $data);
+        $data = str_replace(' ', '+', $data);
+
+        $fileName = 'chart_' . Auth::user()->id . '.png';
+        $filePath = storage_path('app/public/kecermatan/' . $fileName);
+
+        file_put_contents($filePath, base64_decode($data));
+
+        return response()->json(['success' => true]);
+    }
+
 
     public function landingPage()
     {

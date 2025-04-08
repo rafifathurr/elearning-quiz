@@ -199,8 +199,16 @@
                             offline.</strong></p>
                 @endif
             </div>
+        @else
+            @if (file_exists($chartPath))
+                <div style="text-align: center;">
+                    <img src="{{ $chartPath }}" style="width: 100%; max-width: 600px;" alt="Chart">
+                </div>
+            @endif
         @endif
     </div>
+
+
 </body>
 
 </html>

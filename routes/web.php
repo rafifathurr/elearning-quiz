@@ -62,6 +62,7 @@ Route::post('/test-signature', [BrivaController::class, 'generateSignatureV2']);
 //simulasi encrypt decrypt signature
 //Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
 
+Route::post('/save-chart', [DashboardController::class, 'saveChart']);
 
 
 
