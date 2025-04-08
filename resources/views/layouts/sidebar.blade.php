@@ -262,7 +262,37 @@
 
                 @endhasanyrole
 
+                @hasanyrole('admin|manager')
+                    <?php
+                    $laporanActive = request()->routeIs('laporan.index') ? 'menu-open' : ''; ?>
+                    <li class="nav-item {{ $laporanActive }}">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-newspaper"></i>
+                            <p>
+                                Laporan
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item {{ $display }}">
+                                <a href="{{ route('laporan.index') }}"
+                                    class="nav-link {{ request()->routeIs('laporan.index') ? 'bg-primary' : '' }}">
+                                    <i class="nav-icon fas fa-coins"></i>
 
+                                    <p>
+                                        Laporan Pendapatan
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../index3.html" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Laporan Hasil</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endhasanyrole
 
                 @hasanyrole('admin|manager')
                     <li class="nav-item {{ $display }}">

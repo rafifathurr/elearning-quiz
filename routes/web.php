@@ -16,6 +16,7 @@ use App\Http\Controllers\myTestController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PackageMemberController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TypePackageController;
 use App\Http\Controllers\UserController;
 
@@ -62,7 +63,7 @@ Route::post('/test-signature', [BrivaController::class, 'generateSignatureV2']);
 //simulasi encrypt decrypt signature
 //Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
 
-Route::post('/save-chart', [DashboardController::class, 'saveChart']);
+
 
 
 
@@ -91,6 +92,9 @@ Route::post('authenticate', [AuthController::class, 'authenticate'])->name('auth
 
 //Halaman Utama
 Route::get('/', [DashboardController::class, 'landingPage'])->name('landingPage');
+
+//Save Chart
+Route::post('/save-chart', [DashboardController::class, 'saveChart']);
 
 
 //Kirim OTP
@@ -298,6 +302,10 @@ Route::group(['middleware' => ['role:admin|manager']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
+    });
+
+    Route::group(['controller' => ReportController::class, 'prefix' => 'laporan', 'as' => 'laporan.'], function () {
+        Route::get('index', 'index')->name('index');
     });
 });
 
