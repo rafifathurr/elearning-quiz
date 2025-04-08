@@ -306,6 +306,7 @@ Route::group(['middleware' => ['role:admin|manager']], function () {
 
     Route::group(['controller' => ReportController::class, 'prefix' => 'laporan', 'as' => 'laporan.'], function () {
         Route::get('index', 'index')->name('index');
+        Route::get('export', 'export')->name('export');
     });
 });
 

@@ -17,7 +17,21 @@
                                 </h3>
                             </div>
                             <div class="card-body">
+                                <form action="{{ route('laporan.export') }}" method="GET">
+                                    <div class="row d-flex justify-content-center">
+                                        <div class="col-md-4 my-1">
+                                            <input type="date" class="form-control" name="start_date" id="start_date">
+                                        </div>
+                                        <div class="col-md-4 my-1">
+                                            <input type="date" class="form-control" name="end_date" id="end_date">
+                                        </div>
+                                        <div class="col-md-2 my-1 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-success w-100"><i
+                                                    class="fa fa-file-excel mr-2"></i>Export Excel</button>
+                                        </div>
+                                    </div>
 
+                                </form>
                             </div>
                         </div>
                     </div>
