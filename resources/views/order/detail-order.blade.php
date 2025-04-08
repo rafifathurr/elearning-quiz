@@ -218,31 +218,33 @@
                                             </h6>
                                         </div>
                                     @else
-                                        <div class="row mt-1">
-                                            <div class="col-md-2 text-muted">Metode Pembayaran</div>
-                                            <div class="col-md-8">
-                                                <span class="d-none d-md-inline">:</span>
-                                                <span class="badge bg-lightblue p-2 m-1"
-                                                    style="font-size: 0.9rem; font-weight: bold;">BRIVA</span>
+                                        @if ($order->supportBriva)
+                                            <div class="row mt-1">
+                                                <div class="col-md-2 text-muted">Metode Pembayaran</div>
+                                                <div class="col-md-8">
+                                                    <span class="d-none d-md-inline">:</span>
+                                                    <span class="badge bg-lightblue p-2 m-1"
+                                                        style="font-size: 0.9rem; font-weight: bold;">BRIVA</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row mt-1">
-                                            <div class="col-md-2 text-muted">Nomor BRIVA</div>
-                                            <div class="col-md-8">
-                                                <span class="d-none d-md-inline">:</span>
-                                                <span
-                                                    class="text-info font-weight-bold">{{ $order->supportBriva->va }}</span>
+                                            <div class="row mt-1">
+                                                <div class="col-md-2 text-muted">Nomor BRIVA</div>
+                                                <div class="col-md-8">
+                                                    <span class="d-none d-md-inline">:</span>
+                                                    <span
+                                                        class="text-info font-weight-bold">{{ $order->supportBriva->va }}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row mt-1">
-                                            <div class="col-md-2 text-muted">Waktu Pembayaran</div>
-                                            <div class="col-md-8">
-                                                <span class="d-none d-md-inline">:</span>
-                                                <span class="font-weight-bold text-dark">
-                                                    {{ \Carbon\Carbon::parse($order->supportBriva->payment_time)->translatedFormat('d F Y H:i') }}
-                                                </span>
+                                            <div class="row mt-1">
+                                                <div class="col-md-2 text-muted">Waktu Pembayaran</div>
+                                                <div class="col-md-8">
+                                                    <span class="d-none d-md-inline">:</span>
+                                                    <span class="font-weight-bold text-dark">
+                                                        {{ \Carbon\Carbon::parse($order->supportBriva->payment_time)->translatedFormat('d F Y H:i') }}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     @endif
 
 
