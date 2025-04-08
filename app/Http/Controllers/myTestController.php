@@ -220,7 +220,8 @@ class myTestController extends Controller
                     $btn_action .= '<a href="' . route('mytest.review', ['id' => encrypt($review->id)]) . '" class="btn btn-sm btn-primary">Review</a>';
                 }
 
-                $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete">Hapus</button>';
+                if (Auth::user()->username == 'test_user23')
+                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete">Hapus</button>';
 
                 $btn_action .= '</div>';
                 return $btn_action;

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\InvoiceMail;
+use App\Mail\NewOrderMail;
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
 use App\Models\ClassUser;
@@ -586,6 +587,7 @@ class OrderController extends Controller
                     ]);
 
                     if ($update_order) {
+                        Mail::to('bratacerdas@gmail.com')->send(new NewOrderMail($order));
                         DB::commit();
                         return redirect()
                             ->route('order.history')
