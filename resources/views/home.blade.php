@@ -55,7 +55,7 @@
             font-size: 28px;
             font-weight: bold;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out forwards;
+            animation: tampilMasuk 1s ease-in-out forwards;
         }
 
         /* Gradient text */
@@ -74,10 +74,10 @@
         /* Animasi fade-in */
         .fade-in {
             opacity: 0;
-            animation: fadeIn 1.5s ease-in-out forwards 0.5s;
+            animation: tampilMasuk 1.5s ease-in-out forwards 0.5s;
         }
 
-        @keyframes fadeIn {
+        @keyframes tampilMasuk {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
