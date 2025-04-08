@@ -25,7 +25,13 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
 
     public function collection()
     {
-        $orders = Order::with(['user', 'orderPackages.package'])
+        $orders = Order::with([
+            'user',
+            'orderPackages' => function ($query) {
+                $query->whereNull('deleted_at');
+            },
+            'orderPackages.package'
+        ])
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->whereBetween('updated_at', [$this->startDate, $this->endDate])
