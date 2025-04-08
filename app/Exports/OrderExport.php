@@ -81,7 +81,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
 
                 // Tambahkan total label dan total price
                 $sheet->setCellValue('F' . $rowCount, 'Total:');
-                $sheet->setCellValue('G' . $rowCount, $this->totalPrice);
+                $sheet->setCellValue('G' . $rowCount, '=SUM(G3:G' . ($rowCount - 2) . ')');
 
                 // Styling total
                 $sheet->getStyle('F' . $rowCount . ':G' . $rowCount)->getFont()->setBold(true);
