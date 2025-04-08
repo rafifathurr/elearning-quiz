@@ -20,10 +20,14 @@
                                 <form action="{{ route('laporan.export') }}" method="GET">
                                     <div class="row d-flex justify-content-center">
                                         <div class="col-md-4 my-1">
-                                            <input type="date" class="form-control" name="start_date" id="start_date">
+                                            <label for="start_date">Tanggal Awal:</label>
+                                            <input type="date" class="form-control" name="start_date" id="start_date"
+                                                required>
                                         </div>
                                         <div class="col-md-4 my-1">
-                                            <input type="date" class="form-control" name="end_date" id="end_date">
+                                            <label for="end_date">Tanggal Akhir:</label>
+                                            <input type="date" class="form-control" name="end_date" id="end_date"
+                                                required>
                                         </div>
                                         <div class="col-md-2 my-1 d-flex align-items-end">
                                             <button type="submit" class="btn btn-success w-100"><i
