@@ -41,13 +41,14 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             })->implode("\n");
 
             return [
-                'tanggal_order' => \Carbon\Carbon::parse($order->created_at)->translatedFormat('d F Y'),
+                'tanggal_order' => \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->created_at),
                 'order_id' => $order->id,
                 'nama' => $order->user->name ?? '-',
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'nominal' => $order->total_price
+                'nominal' => $order->total_price,
+                'tanggal_settle' => $order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null,
 
             ];
         });
@@ -59,7 +60,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
     {
         return [
             ['Daftar order dari periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
-            ['tanggal_order', 'order_id', 'nama', 'email', 'paket', 'pembayaran', 'nominal'],
+            ['Tanggal Order', 'Order No', 'Nama', 'Email', 'Paket', 'Pembayaran', 'Nominal', 'Tanggal Settle'],
         ];
     }
 
@@ -80,9 +81,9 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $sheet->getStyle('F' . $rowCount . ':G' . $rowCount)->getFont()->setBold(true);
 
                 // Header styling
-                $sheet->mergeCells('A1:G1');
+                $sheet->mergeCells('A1:H1');
                 $sheet->getStyle('A1')->getFont()->setBold(true);
-                $sheet->getStyle('A2:G2')->getFont()->setBold(true);
+                $sheet->getStyle('A2:H2')->getFont()->setBold(true);
 
                 // Wrap text untuk paket
                 $sheet->getStyle('E')->getAlignment()->setWrapText(true);
@@ -95,6 +96,16 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $sheet->getStyle('G3:G' . ($rowCount - 1))
                     ->getNumberFormat()
                     ->setFormatCode('"Rp" #,##0');
+
+                // Format tanggal_order (kolom A)
+                $sheet->getStyle('A3:A' . $rowCount)
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH); // hasilnya jadi: 18/03/2025
+
+                // Format tanggal_settle (kolom H)
+                $sheet->getStyle('H3:H' . $rowCount)
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH);
             },
         ];
     }
