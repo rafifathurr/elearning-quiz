@@ -58,7 +58,7 @@
         </table>
         <!-- Informasi Pembayaran -->
 
-        <p>Silakan login ke website Brata Cerdas untuk mengerjakan test-test yang ada 💪</p>
+        <p>Silakan kunjungi website Brata Cerdas untuk mengerjakan test-test yang ada 💪</p>
 
         <p style="text-align: center">
             <a href="{{ route('login') }}"

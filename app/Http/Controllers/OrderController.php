@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\ApproveOrderMail;
 use App\Mail\InvoiceMail;
 use App\Mail\NewOrderMail;
+use App\Mail\RejectOrderMail;
 use App\Models\ClassAttendance;
 use App\Models\ClassPackage;
 use App\Models\ClassUser;
@@ -745,6 +746,7 @@ class OrderController extends Controller
             ]);
 
             if ($reject_order) {
+                Mail::to($order->user->email)->send(new RejectOrderMail($order));
                 DB::commit();
                 session()->flash('success', 'Berhasil Menolak Order');
             } else {
