@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApproveOrderMail;
 use App\Mail\InvoiceMail;
 use App\Mail\NewOrderMail;
 use App\Models\ClassAttendance;
@@ -713,6 +714,7 @@ class OrderController extends Controller
                     $add_order_detail = OrderDetail::insert($order_detail);
 
                     if ($add_order_detail) {
+                        Mail::to($order->user->email)->send(new ApproveOrderMail($order, $order_package));
                         DB::commit();
                         session()->flash('success', 'Berhasil Menerima Order');
                     } else {
