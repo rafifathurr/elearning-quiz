@@ -73,21 +73,23 @@
 
 <!-- FireBase -->
 @auth
-    <script type="module">
-        getToken(messaging, {
-            vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
-        }).then((currentToken) => {
-            if (currentToken) {
-                // Send the token to your server and update the UI if necessary
-                // ...
-            } else {
-                // Show permission request UI
-                console.log('No registration token available. Request permission to generate one.');
-                // ...
-            }
-        }).catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-            // ...
+    <script>
+        $(document).ready(function() {
+            getToken(messaging, {
+                vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
+            }).then((currentToken) => {
+                if (currentToken) {
+                    // Send the token to your server and update the UI if necessary
+                    // ...
+                } else {
+                    // Show permission request UI
+                    console.log('No registration token available. Request permission to generate one.');
+                    // ...
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                // ...
+            });
         });
     </script>
 @endauth
