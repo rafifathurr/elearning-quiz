@@ -165,7 +165,7 @@
                         <!-- Embed Video -->
                         <video id="videoFrame" width="100%" height="400px" controls autoplay muted
                             style="border-radius: 8px;">
-                            <source src="{{ asset('img/videoBrata.mp4') }}" type="video/mp4">
+                            <source src="{{ asset('img/videoBrata2.mp4') }}" type="video/mp4">
                             Browser Anda tidak mendukung tag video.
                         </video>
                     </div>
