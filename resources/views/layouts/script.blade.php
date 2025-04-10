@@ -1,3 +1,34 @@
+<!-- FireBase -->
+@auth
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import {
+            getAnalytics
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxX4jUdibL9n8rJqEeEnxqPKu3S1uAQ9k",
+            authDomain: "brata-cerdas-1.firebaseapp.com",
+            projectId: "brata-cerdas-1",
+            storageBucket: "brata-cerdas-1.firebasestorage.app",
+            messagingSenderId: "319745808387",
+            appId: "1:319745808387:web:de0c26d961571816af1636",
+            measurementId: "G-XE79X5SH5R"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+@endauth
+
 <!-- jQuery -->
 <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
 <!-- jQuery UI 1.11.4 -->
@@ -37,6 +68,7 @@
 
 <!-- Select2 -->
 <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+
 
 @include('js.swal')
 @stack('javascript-bottom')
