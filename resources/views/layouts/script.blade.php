@@ -8,6 +8,10 @@
         import {
             getAnalytics
         } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+        import {
+            getMessaging
+        } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
+
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -26,6 +30,7 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
+        const messaging = getMessaging(app);
     </script>
 @endauth
 
