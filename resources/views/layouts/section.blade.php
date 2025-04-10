@@ -62,11 +62,6 @@
                     appId: "1:319745808387:web:de0c26d961571816af1636",
                     measurementId: "G-XE79X5SH5R"
                 };
-
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                const analytics = getAnalytics(app);
-                const messaging = getMessaging(app);
             </script>
         @endauth
     </body>

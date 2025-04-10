@@ -75,6 +75,10 @@
 @auth
     <script>
         $(document).ready(function() {
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const messaging = getMessaging(app);
             getToken(messaging, {
                 vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
             }).then((currentToken) => {
