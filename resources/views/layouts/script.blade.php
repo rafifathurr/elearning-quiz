@@ -73,7 +73,7 @@
 
 <!-- FireBase -->
 @auth
-    <script>
+    <script type="module">
         $(document).ready(function() {
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
