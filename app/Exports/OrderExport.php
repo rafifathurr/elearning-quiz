@@ -103,11 +103,19 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                         // Insert baris baru sebelum subtotal supaya data bulan baru tidak nabrak subtotal
                         $sheet->insertNewRowBefore($row, 1);
                         $subtotalRow = $row;
-                        $sheet->setCellValue('I' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                        $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
+                        $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
                         $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
 
-                        // Styling subtotal
-                        $sheet->getStyle('I' . $subtotalRow . ':J' . $subtotalRow)->getFont()->setBold(true);
+                        $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                        $sheet->getStyle('A' . $subtotalRow . ':J' . $subtotalRow)->applyFromArray([
+                            'font' => ['bold' => true],
+                            'fill' => [
+                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                'startColor' => ['rgb' => 'FFFF00'], // Kuning
+                            ],
+                        ]);
+
                         $sheet->getStyle('J' . $subtotalRow)
                             ->getNumberFormat()
                             ->setFormatCode('"Rp" #,##0');
@@ -120,11 +128,19 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 // Subtotal terakhir untuk bulan terakhir
                 if ($startRow <= $highestRow) {
                     $subtotalRow = $highestRow + 1;
-                    $sheet->setCellValue('I' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
-                    $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . $highestRow . ')');
+                    $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
+                    $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                    $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
 
-                    // Styling subtotal terakhir
-                    $sheet->getStyle('I' . $subtotalRow . ':J' . $subtotalRow)->getFont()->setBold(true);
+                    $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                    $sheet->getStyle('A' . $subtotalRow . ':J' . $subtotalRow)->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => 'FFFF00'], // Kuning
+                        ],
+                    ]);
+
                     $sheet->getStyle('J' . $subtotalRow)
                         ->getNumberFormat()
                         ->setFormatCode('"Rp" #,##0"');
@@ -132,12 +148,21 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                     $rowCount = $subtotalRow + 1;
                 }
 
+                $sheet->mergeCells('A' . $rowCount . ':I' . $rowCount);
+                $sheet->setCellValue('A' . $rowCount, 'Total:');
+                $sheet->setCellValue('J' . $rowCount, '=SUMIF(A4:A' . ($rowCount - 1) . ',"Sub Total *",J4:J' . ($rowCount - 1) . ')');
 
-                $sheet->setCellValue('I' . $rowCount, 'Total:');
-                $sheet->setCellValue('J' . $rowCount, '=SUMIF(I4:I' . ($rowCount - 1) . ',"Sub Total *",J4:J' . ($rowCount - 1) . ')');
+                $sheet->getStyle('A' . $rowCount . ':J' . $rowCount)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                $sheet->getStyle('A' . $rowCount . ':J' . $rowCount)->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'D9EDF7'], // Kuning
+                    ],
+                ]);
 
+                // End Total Sub Total
 
-                $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)->getFont()->setBold(true);
 
                 // Header styling
                 $sheet->mergeCells('A1:J1');
