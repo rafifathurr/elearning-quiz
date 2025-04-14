@@ -35,7 +35,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->whereBetween('updated_at', [$this->startDate, $this->endDate])
-            ->orderBy('updated_at', 'asc')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // Hitung total nominal
@@ -91,7 +91,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
 
                 for ($row = $startDataRow; $row <= $highestRow; $row++) {
                     // Ambil nilai tanggal dari kolom B
-                    $cellValue = $sheet->getCell('H' . $row)->getValue();
+                    $cellValue = $sheet->getCell('B' . $row)->getValue();
                     if (!$cellValue) continue;
 
                     // Convert Excel date ke PHP timestamp
