@@ -35,38 +35,39 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->whereBetween('updated_at', [$this->startDate, $this->endDate])
-            ->orderByDesc('updated_at')
+            ->orderBy('updated_at', 'asc')
             ->get();
 
         // Hitung total nominal
         $this->totalPrice = $orders->sum('total_price');
 
-        return $orders->map(function ($order) {
+        return $orders->map(function ($order, $index) {
             $packageList = $order->orderPackages->map(function ($orderPackage) {
                 return '• ' . ($orderPackage->package->name ?? '-');
             })->implode("\n");
 
             return [
+                'no' => $index + 1,
                 'tanggal_order' => \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->created_at),
                 'order_id' => $order->id,
                 'nama' => $order->user->name ?? '-',
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'nominal' => $order->total_price,
+                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'tanggal_settle' => $order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null,
+                'nominal' => $order->total_price,
 
             ];
         });
     }
 
-
-
     public function headings(): array
     {
         return [
             ['Daftar order dari periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
-            ['Tanggal Order', 'Order No', 'Nama', 'Email', 'Paket', 'Pembayaran', 'Nominal', 'Tanggal Settle'],
+            [''], // <--- baris kosong
+            ['No', 'Tanggal Order', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran', 'Tanggal Approval', 'Tanggal Mutasi Rekening', 'Nominal'],
         ];
     }
 
@@ -80,44 +81,76 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $rowCount = $sheet->getHighestRow() + 1;
 
                 // Tambahkan total label dan total price
-                $sheet->setCellValue('F' . $rowCount, 'Total:');
-                $sheet->setCellValue('G' . $rowCount, '=SUM(G3:G' . ($rowCount - 1) . ')');
+                $sheet->setCellValue('I' . $rowCount, 'Total:');
+                $sheet->setCellValue('J' . $rowCount, '=SUM(J4:J' . ($rowCount - 1) . ')');
 
                 // Styling total
-                $sheet->getStyle('F' . $rowCount . ':G' . $rowCount)->getFont()->setBold(true);
+                $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)->getFont()->setBold(true);
 
                 // Header styling
-                $sheet->mergeCells('A1:H1');
+                $sheet->mergeCells('A1:J1');
                 $sheet->getStyle('A1')->getFont()->setBold(true);
-                $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+                $sheet->getStyle('A3:J3')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        'wrapText' => true,
+                    ],
+                ]);
 
                 // Wrap text untuk paket
-                $sheet->getStyle('E')->getAlignment()->setWrapText(true);
+                $sheet->getStyle('F')->getAlignment()->setWrapText(true);
 
                 //Number Format
-                $sheet->getStyle('F' . $rowCount . ':G' . $rowCount)
+                $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)
                     ->getNumberFormat()
                     ->setFormatCode('"Rp" #,##0');
 
-                $sheet->getStyle('G3:G' . ($rowCount - 1))
+                //Nominal
+                $sheet->getStyle('J4:J' . ($rowCount - 1))
                     ->getNumberFormat()
                     ->setFormatCode('"Rp" #,##0');
 
                 // Format tanggal_order (kolom A)
-                $sheet->getStyle('A3:A' . $rowCount)
+                $sheet->getStyle('B4:B' . $rowCount)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH); // hasilnya jadi: 18/03/2025
+                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH); // hasilnya jadi: 18/04/2025
 
-                // Format tanggal_settle (kolom H)
-                $sheet->getStyle('H3:H' . $rowCount)
+                // Format tanggal aproval (kolom G)
+                $sheet->getStyle('H4:H' . $rowCount)
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH);
+
+                // Format tanggal_settle (kolom H)
+                $sheet->getStyle('I4:I' . $rowCount)
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH);
+
+
+                // Atur lebar kolom manual supaya lebih lebar
+                $sheet->getColumnDimension('A')->setWidth(5);    // No
+                $sheet->getColumnDimension('B')->setWidth(15);   // Tanggal Order
+                $sheet->getColumnDimension('C')->setWidth(5);   // Order No
+                $sheet->getColumnDimension('D')->setWidth(20);   // Nama Pengguna
+                $sheet->getColumnDimension('E')->setWidth(25);   // Email Pengguna
+                $sheet->getColumnDimension('F')->setWidth(30);   // Paket Yang Diambil
+                $sheet->getColumnDimension('G')->setWidth(18);   // Jenis Pembayaran
+                $sheet->getColumnDimension('H')->setWidth(18);   // Tanggal Approval
+                $sheet->getColumnDimension('I')->setWidth(18);   // Tanggal Mutasi Rekening
+                $sheet->getColumnDimension('J')->setWidth(18);   // Nominal
+
+                // BORDER semua data (A3 sampai J + rowCount)
+                $sheet->getStyle('A3:J' . $rowCount)
+                    ->getBorders()
+                    ->getAllBorders()
+                    ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             },
         ];
     }
 
     public function startRow(): int
     {
-        return 3; // Mulai dari baris ke-3 setelah judul dan header
+        return 4; // Mulai dari baris ke-4 setelah judul dan header
     }
 }
