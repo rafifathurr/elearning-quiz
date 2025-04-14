@@ -35,7 +35,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->whereBetween('updated_at', [$this->startDate, $this->endDate])
-            ->orderBy('created_at', 'asc')
+            ->orderBy('updated_at', 'asc')
             ->get();
 
         // Hitung total nominal
