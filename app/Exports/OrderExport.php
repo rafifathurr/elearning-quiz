@@ -54,7 +54,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
+                'tanggal_aproval' => $order->updated_at ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->updated_at) : null,
                 'tanggal_settle' => $order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null,
                 'nominal' => $order->total_price,
 
