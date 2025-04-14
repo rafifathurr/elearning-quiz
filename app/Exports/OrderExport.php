@@ -192,17 +192,18 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 // Format tanggal_order (kolom A)
                 $sheet->getStyle('B4:B' . $rowCount)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH); // hasilnya jadi: 18/04/2025
+                    ->setFormatCode('dd/mm/yyyy'); // hasilnya jadi: 18/04/2025
 
                 // Format tanggal aproval (kolom G)
                 $sheet->getStyle('H4:H' . $rowCount)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH);
+                    ->setFormatCode('dd/mm/yyyy');
 
                 // Format tanggal_settle (kolom H)
                 $sheet->getStyle('I4:I' . $rowCount)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_DATE_DMYSLASH);
+                    ->setFormatCode('dd/mm/yyyy');
+
 
 
                 // Atur lebar kolom manual supaya lebih lebar
