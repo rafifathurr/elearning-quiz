@@ -92,6 +92,12 @@
                                     <div class="row">
                                         <h6 class="col-md-3 font-weight-bold">Waktu Pemesanan</h6>
                                         <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
+                                            {{ \Carbon\Carbon::parse($order->created_at)->translatedFormat('d F Y H:i') }}
+                                        </h6>
+                                    </div>
+                                    <div class="row">
+                                        <h6 class="col-md-3 font-weight-bold">Waktu Kirim Bukti Pembayaran</h6>
+                                        <h6 class="col-md-3 font-weight-bold"> <span class="d-none d-md-inline">:</span>
                                             {{ \Carbon\Carbon::parse($order->payment_date)->translatedFormat('d F Y H:i') }}
                                         </h6>
                                     </div>
