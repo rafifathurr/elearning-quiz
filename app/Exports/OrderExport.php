@@ -46,6 +46,10 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 return '• ' . ($orderPackage->package->name ?? '-');
             })->implode("\n");
 
+            // Cek metode pembayaran
+            $isCashOrNonCash = in_array($order->payment_method, ['tunai', 'non_tunai']);
+
+
             return [
                 'no' => $index + 1,
                 'tanggal_order' => \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->created_at),
@@ -55,8 +59,8 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
                 'tanggal_aproval' => $order->updated_at ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->updated_at) : null,
-                'tanggal_settle' => $order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null,
-                'nominal' => $order->total_price,
+                'tanggal_settle' => $isCashOrNonCash ? null : ($order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null),
+                'nominal' => $isCashOrNonCash ? null : $order->total_price,
 
             ];
         });
