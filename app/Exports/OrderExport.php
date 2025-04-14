@@ -91,7 +91,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
 
                 for ($row = $startDataRow; $row <= $highestRow; $row++) {
                     // Ambil nilai tanggal dari kolom B
-                    $cellValue = $sheet->getCell('B' . $row)->getValue();
+                    $cellValue = $sheet->getCell('H' . $row)->getValue();
                     if (!$cellValue) continue;
 
                     // Convert Excel date ke PHP timestamp
