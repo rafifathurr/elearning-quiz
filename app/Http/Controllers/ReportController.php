@@ -24,7 +24,7 @@ class ReportController extends Controller
         ]);
         $startDate = Carbon::parse(request('start_date'))->startOfDay();
         $endDate = Carbon::parse(request('end_date'))->endOfDay();
-        $fileName = 'Order ' . \Carbon\Carbon::parse($startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($endDate)->translatedFormat('d F Y') . '.xlsx';
+        $fileName = 'bc.' . \Carbon\Carbon::parse($startDate)->translatedFormat('ymd') . '-' . \Carbon\Carbon::parse($endDate)->translatedFormat('ymd') . '.xlsx';
 
         return Excel::download(new OrderExport($startDate, $endDate), $fileName);
     }

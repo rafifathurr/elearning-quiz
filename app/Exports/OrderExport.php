@@ -65,7 +65,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
     public function headings(): array
     {
         return [
-            ['Daftar order dari periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
+            ['Daftar order periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
             [''], // <--- baris kosong
             ['No', 'Tanggal Order', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran', 'Tanggal Approval', 'Tanggal Mutasi Rekening', 'Nominal'],
         ];
