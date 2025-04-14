@@ -78,13 +78,65 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $sheet = $event->sheet->getDelegate();
 
                 // Hitung total row data + 2 baris header
-                $rowCount = $sheet->getHighestRow() + 1;
+                $highestRow = $sheet->getHighestRow();
+                $startDataRow = 4; // Data mulai dari baris 4 (setelah header)
 
-                // Tambahkan total label dan total price
+                $bulanSebelumnya = null;
+                $startRow = $startDataRow;
+                $rowCount = $highestRow + 1; // +1 untuk keperluan total akhir
+
+                for ($row = $startDataRow; $row <= $highestRow; $row++) {
+                    // Ambil nilai tanggal dari kolom B
+                    $cellValue = $sheet->getCell('B' . $row)->getValue();
+                    if (!$cellValue) continue;
+
+                    // Convert Excel date ke PHP timestamp
+                    $tanggalOrder = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cellValue);
+                    $bulanSekarang = $tanggalOrder->format('Y-m');
+
+                    if ($bulanSebelumnya === null) {
+                        $bulanSebelumnya = $bulanSekarang;
+                    }
+
+                    if ($bulanSekarang !== $bulanSebelumnya) {
+                        // Waktu ganti bulan, masukkan subtotal untuk bulan sebelumnya
+                        // Insert baris baru sebelum subtotal supaya data bulan baru tidak nabrak subtotal
+                        $sheet->insertNewRowBefore($row, 1);
+                        $subtotalRow = $row;
+                        $sheet->setCellValue('I' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                        $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
+
+                        // Styling subtotal
+                        $sheet->getStyle('I' . $subtotalRow . ':J' . $subtotalRow)->getFont()->setBold(true);
+                        $sheet->getStyle('J' . $subtotalRow)
+                            ->getNumberFormat()
+                            ->setFormatCode('"Rp" #,##0');
+
+                        $startRow = $subtotalRow + 1;
+                        $bulanSebelumnya = $bulanSekarang;
+                    }
+                }
+
+                // Subtotal terakhir untuk bulan terakhir
+                if ($startRow <= $highestRow) {
+                    $subtotalRow = $highestRow + 1;
+                    $sheet->setCellValue('I' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                    $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . $highestRow . ')');
+
+                    // Styling subtotal terakhir
+                    $sheet->getStyle('I' . $subtotalRow . ':J' . $subtotalRow)->getFont()->setBold(true);
+                    $sheet->getStyle('J' . $subtotalRow)
+                        ->getNumberFormat()
+                        ->setFormatCode('"Rp" #,##0"');
+
+                    $rowCount = $subtotalRow + 1;
+                }
+
+
                 $sheet->setCellValue('I' . $rowCount, 'Total:');
-                $sheet->setCellValue('J' . $rowCount, '=SUM(J4:J' . ($rowCount - 1) . ')');
+                $sheet->setCellValue('J' . $rowCount, '=SUMIF(I4:I' . ($rowCount - 1) . ',"Sub Total *",J4:J' . ($rowCount - 1) . ')');
 
-                // Styling total
+
                 $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)->getFont()->setBold(true);
 
                 // Header styling
@@ -131,7 +183,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 // Atur lebar kolom manual supaya lebih lebar
                 $sheet->getColumnDimension('A')->setWidth(5);    // No
                 $sheet->getColumnDimension('B')->setWidth(15);   // Tanggal Order
-                $sheet->getColumnDimension('C')->setWidth(5);   // Order No
+                $sheet->getColumnDimension('C')->setWidth(12);   // Order No
                 $sheet->getColumnDimension('D')->setWidth(20);   // Nama Pengguna
                 $sheet->getColumnDimension('E')->setWidth(25);   // Email Pengguna
                 $sheet->getColumnDimension('F')->setWidth(30);   // Paket Yang Diambil
