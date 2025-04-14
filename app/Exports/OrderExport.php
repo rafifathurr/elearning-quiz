@@ -35,7 +35,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             ->whereNull('deleted_at')
             ->where('status', 100)
             ->whereBetween('updated_at', [$this->startDate, $this->endDate])
-            ->orderBy('updated_at', 'asc')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // Hitung total nominal
@@ -106,6 +106,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                         // Waktu ganti bulan, masukkan subtotal untuk bulan sebelumnya
                         // Insert baris baru sebelum subtotal supaya data bulan baru tidak nabrak subtotal
                         $sheet->insertNewRowBefore($row, 1);
+                        $highestRow++;
                         $subtotalRow = $row;
                         $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
                         $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));

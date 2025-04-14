@@ -161,7 +161,7 @@ class OrderController extends Controller
                 return 'Rp. ' . number_format($data->total_price, 0, ',', '.');
             })
             ->addColumn('updated_at', function ($data) {
-                return \Carbon\Carbon::parse($data->updated_at)->translatedFormat('l, d F Y');
+                return \Carbon\Carbon::parse($data->created_at)->translatedFormat('l, d F Y');
             })
             ->addColumn('proof_payment', function ($data) {
                 if (!is_null($data->proof_payment)) {
