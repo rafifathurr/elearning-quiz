@@ -148,7 +148,7 @@ class OrderController extends Controller
         }
 
         if (!$statusFilter) {
-            $data->orderByDesc('updated_at');
+            $data->orderByDesc('payment_date');
         }
         $order = $data->get();
 
