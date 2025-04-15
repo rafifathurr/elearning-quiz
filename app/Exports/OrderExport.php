@@ -34,7 +34,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
         ])
             ->whereNull('deleted_at')
             ->where('status', 100)
-            ->whereBetween('updated_at', [$this->startDate, $this->endDate])
+            ->whereBetween('approval_date', [$this->startDate, $this->endDate])
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -58,7 +58,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'tanggal_aproval' => $order->updated_at ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->updated_at) : null,
+                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'tanggal_settle' => $isCashOrNonCash ? null : ($order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null),
                 'nominal' => $isCashOrNonCash ? null : $order->total_price,
 
