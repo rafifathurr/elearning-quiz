@@ -25,7 +25,7 @@ class BrivaController extends Controller
     {
         $clientId = env('SANDBOX_CLIENT_ID');
         $baseUrl = env('BRI_BASE_URL');
-        Log::info("Base URL BRI: " . $baseUrl);
+
 
 
         // Format timestamp sesuai BRI API
@@ -54,6 +54,9 @@ class BrivaController extends Controller
 
         // Log response dari BRI API
         Log::info("Response dari BRI API: " . $response->body());
+
+        // Simpan ke file storage/token.json
+        Storage::put('settle_token.json', $response->body());
 
         return $response->json();
     }
