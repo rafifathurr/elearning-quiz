@@ -74,48 +74,88 @@ class SignatureHelper
         return $result === 1;
     }
 
+
+
+
+
+    // Start Test Signature HMAC
     public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
     {
-        $clientSecret = env('BRI_SECRET_KEY'); //CLIENT SECRET BELUM ADA
+        $clientSecret = env('SANDBOX_CLIENT_SECRET');
+
         if (!$clientSecret) {
             throw new Exception("Client Secret tidak ditemukan.");
         }
-        $clientSecretBinary = base64_decode($clientSecret);
 
-        // 1. Minify JSON Body & Hash SHA-256
         $hashedBody = self::hashRequestBody($body);
 
-        // 2. Format StringToSign
-        $stringToSign = strtoupper($method) . ":" . $endpoint . ":" . $accessToken . ":" . $hashedBody . ":" . $timestamp;
+        $stringToSign = strtoupper($method) . ':' . $endpoint . ':' . $accessToken . ':' . $hashedBody . ':' . $timestamp;
 
-        Log::info("String to Sign: " . $stringToSign);
+        Log::info("String to Sign: $stringToSign");
 
-        // 3. Hash dengan HMAC-SHA512
-        $signature = hash_hmac('sha512', $stringToSign, $clientSecretBinary, true);
-
+        $signature = hash_hmac('sha512', $stringToSign, $clientSecret, true);
         $signatureBase64 = base64_encode($signature);
 
-        Log::info("Generated Signature: " . $signatureBase64);
-
-        $data = [
+        return [
             'xSignature' => $signatureBase64,
             'xPayload' => $stringToSign,
         ];
-
-        return $data;
     }
+
     private static function hashRequestBody($body)
     {
         if (empty($body)) {
-            return "";
+            return '';
         }
 
-        // Minify JSON (hapus spasi & newline)
         $minifiedBody = json_encode(json_decode($body, true), JSON_UNESCAPED_SLASHES);
-
-        // Hash dengan SHA-256 lalu ubah ke lowercase hex
         return strtolower(hash('sha256', $minifiedBody));
     }
+
+
+    // public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
+    // {
+    //     $clientSecret = env('BRI_SECRET_KEY'); //CLIENT SECRET BELUM ADA
+    //     if (!$clientSecret) {
+    //         throw new Exception("Client Secret tidak ditemukan.");
+    //     }
+    //     $clientSecretBinary = base64_decode($clientSecret);
+
+    //     // 1. Minify JSON Body & Hash SHA-256
+    //     $hashedBody = self::hashRequestBody($body);
+
+    //     // 2. Format StringToSign
+    //     $stringToSign = strtoupper($method) . ":" . $endpoint . ":" . $accessToken . ":" . $hashedBody . ":" . $timestamp;
+
+    //     Log::info("String to Sign: " . $stringToSign);
+
+    //     // 3. Hash dengan HMAC-SHA512
+    //     $signature = hash_hmac('sha512', $stringToSign, $clientSecretBinary, true);
+
+    //     $signatureBase64 = base64_encode($signature);
+
+    //     Log::info("Generated Signature: " . $signatureBase64);
+
+    //     $data = [
+    //         'xSignature' => $signatureBase64,
+    //         'xPayload' => $stringToSign,
+    //     ];
+
+    //     return $data;
+    // }
+    // private static function hashRequestBody($body)
+    // {
+    //     if (empty($body)) {
+    //         return "";
+    //     }
+
+    //     // Minify JSON (hapus spasi & newline)
+    //     $minifiedBody = json_encode(json_decode($body, true), JSON_UNESCAPED_SLASHES);
+
+    //     // Hash dengan SHA-256 lalu ubah ke lowercase hex
+    //     return strtolower(hash('sha256', $minifiedBody));
+    // }
+    // End Test Signature HMAC
 
 
 

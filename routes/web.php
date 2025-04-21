@@ -56,6 +56,8 @@ Route::post('/snap/v1.0/access-token/b2b', [BrivaController::class, 'getAccessTo
     ->name('bri.access_token');
 Route::post('/snap/v1.0/generate-signature', [BrivaController::class, 'generateSignature'])
     ->name('bri.generate_signature');
+Route::post('/snap/v2.0/get-statement', [BrivaController::class, 'getStatement'])
+    ->name('bri.getStatement');
 Route::post('/test-signature', [BrivaController::class, 'generateSignatureV2']);
 
 

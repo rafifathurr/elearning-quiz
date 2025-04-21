@@ -8,6 +8,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\SupportBriva;
 use App\Services\BrivaServices;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,6 +60,51 @@ class BrivaController extends Controller
         Storage::put('settle_token.json', $response->body());
 
         return $response->json();
+    }
+
+    public function getStatement()
+    {
+        $url = '/snap/v2.0/bank-statement';
+        $method = 'POST';
+        $fullUrl = env('BRI_BASE_URL') . $url;
+
+        // Token access dari file json
+        $tokenData = json_decode(Storage::get('settle_token.json'), true);
+        $accessToken = $tokenData['accessToken'];
+
+        // Timestamp ISO8601 UTC
+        $timestamp = Carbon::now('UTC')->format("Y-m-d\TH:i:s.v\Z");
+        
+
+        // Body request
+        $bodyArray = [
+            "accountNo" => "234567891012348",
+            "fromDateTime" => "2021-11-08T12:07:56-07:00",
+            "toDateTime" => "2021-11-11T12:09:57-07:00"
+        ];
+        $bodyJson = json_encode($bodyArray);
+
+        // Signature
+        $signatureData = SignatureHelper::generateSignatureV2($method, $url, $accessToken, $bodyJson, $timestamp);
+
+        // Request
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'X-TIMESTAMP' => $timestamp,
+            'X-SIGNATURE' => $signatureData['xSignature'],
+            'Content-Type' => 'application/json',
+            'X-PARTNER-ID' => env('SANDBOX_CLIENT_ID'),
+            'CHANNEL-ID' => '00001',
+            'X-EXTERNAL-ID' => rand(100000000, 999999999), // 9 digit unik
+            'Content-Type' => 'application/json',
+        ];
+        $response = Http::withHeaders($headers)->post($fullUrl, $bodyArray);
+
+        Log::info("Headers yang dikirim bank statement: " . json_encode($headers));
+
+        Log::info('Bank statement response:', $response->json());
+
+        return response()->json($response->json(), $response->status());
     }
 
 
