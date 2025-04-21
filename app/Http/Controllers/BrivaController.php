@@ -23,8 +23,10 @@ class BrivaController extends Controller
 
     public function generateSignature()
     {
-        $clientId = env('BRI_CLIENT_ID');
+        $clientId = env('SANDBOX_CLIENT_ID');
         $baseUrl = env('BRI_BASE_URL');
+        Log::info("Base URL BRI: " . $baseUrl);
+
 
         // Format timestamp sesuai BRI API
         $timestamp = now()->format('Y-m-d\TH:i:sP');

@@ -10,7 +10,7 @@ class SignatureHelper
 {
     private static function getPrivateKey()
     {
-        $privateKeyPath = storage_path('keys/bc.priv');
+        $privateKeyPath = storage_path('keys/private_key.txt');
         return openssl_pkey_get_private(file_get_contents($privateKeyPath));
     }
 
