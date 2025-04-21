@@ -585,7 +585,8 @@ class OrderController extends Controller
                     $update_order = Order::where('id', $id)->update([
                         'status' => 10,
                         'rekening_number' => '038501001542300 (ATLAS KAPITAL PERKASA)',
-                        'proof_payment' => $attachment
+                        'proof_payment' => $attachment,
+                        'payment_date' => now(),
                     ]);
 
                     if ($update_order) {

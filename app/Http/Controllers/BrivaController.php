@@ -620,6 +620,7 @@ class BrivaController extends Controller
                 $order_update = $order->update([
                     'status' => 100,
                     'approval_date' => now(),
+                    'payment_date' => now(),
                 ]);
 
                 //insert order detail
