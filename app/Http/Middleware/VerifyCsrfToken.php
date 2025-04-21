@@ -15,7 +15,7 @@ class VerifyCsrfToken extends Middleware
         'snap/v1.0/transfer-va/inquiry',
         'snap/v1.0/transfer-va/payment',
         'snap/v1.0/access-token/b2b',
-        'snap/v1.0/generate-signature',
+        'snap/v1.0/get-token-sandbox',
         'snap/v2.0/get-statement',
         'simulate-signature',
         '/test-signature',

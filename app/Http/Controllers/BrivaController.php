@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Validator;
 class BrivaController extends Controller
 {
 
-    public function generateSignature()
+    public function getTokenSandbox()
     {
         $clientId = env('SANDBOX_CLIENT_ID');
         $baseUrl = env('BRI_BASE_URL');
@@ -74,7 +74,7 @@ class BrivaController extends Controller
 
         // Timestamp ISO8601 UTC
         $timestamp = Carbon::now('UTC')->format("Y-m-d\TH:i:s.v\Z");
-        
+
 
         // Body request
         $bodyArray = [
