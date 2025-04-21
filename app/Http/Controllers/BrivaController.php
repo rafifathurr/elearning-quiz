@@ -51,7 +51,7 @@ class BrivaController extends Controller
         Log::info("Body request: " . json_encode($body));
 
         // Kirim request
-        $response = Http::withHeaders($headers)->post("https://sandbox.partner.api.bri.co.id/snap/v1.0/access-token/b2b", $body);
+        $response = Http::withHeaders($headers)->post("{$baseUrl}/snap/v1.0/access-token/b2b", $body);
 
         // Log response dari BRI API
         Log::info("Response dari BRI API: " . $response->body());
