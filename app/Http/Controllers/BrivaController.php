@@ -64,48 +64,108 @@ class BrivaController extends Controller
 
     public function getStatement()
     {
-        $url = '/snap/v2.0/bank-statement';
-        $method = 'POST';
-        $fullUrl = env('BRI_BASE_URL') . $url;
+        $clientId = env('SANDBOX_CLIENT_ID');
+        $baseUrl = env('BRI_BASE_URL');
 
         // Token access dari file json
         $tokenData = json_decode(Storage::get('settle_token.json'), true);
         $accessToken = $tokenData['accessToken'];
 
-        // Timestamp ISO8601 UTC
-        $timestamp = Carbon::now('UTC')->format("Y-m-d\TH:i:s.v\Z");
 
+        $endpoint = '/snap/v2.0/bank-statement';
+        $method = 'POST';
+        $timestamp = now()->format('Y-m-d\TH:i:sP');
 
-        // Body request
-        $bodyArray = [
-            "accountNo" => "234567891012348",
-            "fromDateTime" => "2021-11-08T12:07:56-07:00",
-            "toDateTime" => "2021-11-11T12:09:57-07:00"
+        $bodyRequest = [
+            "accountNo"     => "234567891012348",
+            "fromDateTime"  => "2025-01-14T09:41:45+07:00",
+            "toDateTime"    => "2025-01-14T10:41:45+07:00"
         ];
-        $bodyJson = json_encode($bodyArray);
 
-        // Signature
-        $signatureData = SignatureHelper::generateSignatureV2($method, $url, $accessToken, $bodyJson, $timestamp);
+        $signature = SignatureHelper::generateSignatureV2($method, $endpoint, $accessToken, json_encode($bodyRequest), $timestamp);
 
-        // Request
         $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => $signatureData['xSignature'],
-            'Content-Type' => 'application/json',
-            'X-PARTNER-ID' => env('SANDBOX_CLIENT_ID'),
-            'CHANNEL-ID' => '00001',
-            'X-EXTERNAL-ID' => rand(100000000, 999999999), // 9 digit unik
-            'Content-Type' => 'application/json',
+            'Authorization'   => 'Bearer ' . $accessToken,
+            'X-TIMESTAMP'     => $timestamp,
+            'X-SIGNATURE'     => $signature['xSignature'],
+            'Content-Type'    => 'application/json',
+            'X-PARTNER-ID'    => $clientId,
+            'CHANNEL-ID'      => '00001',
+            'X-EXTERNAL-ID'   => (string) rand(1000000000, 9999999999),
         ];
-        $response = Http::withHeaders($headers)->post($fullUrl, $bodyArray);
 
-        Log::info("Headers yang dikirim bank statement: " . json_encode($headers));
+        Log::info("Headers bank-statement: " . json_encode($headers));
+        Log::info("Body bank-statement: " . json_encode($bodyRequest));
 
-        Log::info('Bank statement response:', $response->json());
+
+        $response = Http::withHeaders($headers)->post("{$baseUrl}{$endpoint}", $bodyRequest);
+
+        Log::info("Bank statement response:", $response->json());
 
         return response()->json($response->json(), $response->status());
     }
+
+    // Get token dan get statement sekaligus
+    // public function getStatement()
+    // {
+    //     $clientId = env('SANDBOX_CLIENT_ID');
+    //     $baseUrl = env('BRI_BASE_URL');
+
+    //     // === 1. Ambil Access Token Sekali Pakai ===
+    //     $timestampToken = now()->format('Y-m-d\TH:i:sP');
+    //     Log::info("Token Timestamp: " . $timestampToken);
+
+    //     $signatureToken = SignatureHelper::generateSignature($clientId, $timestampToken);
+
+    //     $headersToken = [
+    //         'X-CLIENT-KEY' => $clientId,
+    //         'X-TIMESTAMP'  => $timestampToken,
+    //         'X-SIGNATURE'  => $signatureToken,
+    //         'Content-Type' => 'application/json',
+    //     ];
+
+    //     $bodyToken = ['grantType' => 'client_credentials'];
+
+    //     $tokenResponse = Http::withHeaders($headersToken)->post("{$baseUrl}/snap/v1.0/access-token/b2b", $bodyToken);
+    //     Log::info("Token response: " . $tokenResponse->body());
+
+    //     if (!$tokenResponse->ok()) {
+    //         return response()->json(['error' => 'Gagal ambil token', 'detail' => $tokenResponse->json()], 500);
+    //     }
+
+    //     $accessToken = $tokenResponse['accessToken'];
+
+    //     // === 2. Request ke Endpoint Bank Statement ===
+    //     // Step 2: Hit Endpoint Bank Statement
+    //     $endpoint = '/snap/v2.0/bank-statement';
+    //     $method = 'POST';
+    //     $timestamp = now()->format('Y-m-d\TH:i:sP');
+
+    //     $bodyRequest = [
+    //         "accountNo"     => "234567891012348",
+    //         "fromDateTime"  => "2025-01-14T09:41:45+07:00",
+    //         "toDateTime"    => "2025-01-14T10:41:45+07:00"
+    //     ];
+
+    //     $signature = SignatureHelper::generateSignatureV2($method, $endpoint, $accessToken, json_encode($bodyRequest), $timestamp);
+
+    //     $headers = [
+    //         'Authorization'   => 'Bearer ' . $accessToken,
+    //         'X-TIMESTAMP'     => $timestamp,
+    //         'X-SIGNATURE'     => $signature['xSignature'],
+    //         'Content-Type'    => 'application/json',
+    //         'X-PARTNER-ID'    => $clientId,
+    //         'CHANNEL-ID'      => '00001',
+    //         'X-EXTERNAL-ID'   => (string) rand(1000000000, 9999999999),
+    //     ];
+
+    //     $response = Http::withHeaders($headers)->post("{$baseUrl}{$endpoint}", $bodyRequest);
+
+    //     return response()->json([
+    //         'status' => $response->ok(),
+    //         'data' => $response->json()
+    //     ], $response->status());
+    // }
 
 
     // public function generateSignature(Request $request): JsonResponse
