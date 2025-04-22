@@ -423,6 +423,19 @@ class BrivaController extends Controller
             ], 401);
         }
 
+        //verifikasi signature
+        $receivedSignature = $request->header('X-Signature');
+        $payloadSignature = $request->header('payload-signature');
+
+        $result = SignatureHelper::verifySignatureV2($payloadSignature, $receivedSignature);
+        if ($result['verified'] ==  false) {
+            return response()->json([
+                'responseCode'    => '4011400',
+                'responseMessage' => 'Unauthorized. Signature'
+            ], 401);
+        }
+
+
         // Validasi Input
         $validator = Validator::make($request->all(), [
             'partnerServiceId'   => 'required|string',
@@ -562,6 +575,19 @@ class BrivaController extends Controller
                 'responseMessage' => 'Token Expired'
             ], 401);
         }
+
+        //verifikasi signature
+        $receivedSignature = $request->header('X-Signature');
+        $payloadSignature = $request->header('payload-signature');
+
+        $result = SignatureHelper::verifySignatureV2($payloadSignature, $receivedSignature);
+        if ($result['verified'] ==  false) {
+            return response()->json([
+                'responseCode'    => '4011400',
+                'responseMessage' => 'Unauthorized. Signature'
+            ], 401);
+        }
+
 
         $validator = Validator::make($request->all(), [
             'partnerServiceId'        => 'required|string',
