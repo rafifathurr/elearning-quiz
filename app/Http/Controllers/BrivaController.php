@@ -150,7 +150,7 @@ class BrivaController extends Controller
     public function verifySignatureV2(Request $request)
     {
         $httpMethod = 'POST';
-        $endpoint = '/snap/v2.0/bank-statement';
+        $endpoint = '/snap/v2.1/bank-statement';
         $accessToken = $request->header('Authorization'); // Pastikan ini 'Bearer xxxxx'
         $accessToken = str_replace('Bearer ', '', $accessToken);
         $timestamp = $request->header('X-Timestamp');
