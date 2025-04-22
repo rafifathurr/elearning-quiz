@@ -225,6 +225,10 @@ class BrivaController extends Controller
 
         $response = Http::withHeaders($headers)->post("{$baseUrl}{$endpoint}", $bodyRequest);
 
+        Log::info("Headers bank-statement: " . json_encode($headers));
+        Log::info("Body bank-statement: " . json_encode($bodyRequest));
+        Log::info("Bank statement response:", $response->json());
+
         return response()->json([
             'status' => $response->ok(),
             'data' => $response->json()
