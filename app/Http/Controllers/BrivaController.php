@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\SupportBriva;
+use App\Models\Wallet;
 use App\Services\BrivaServices;
 use Carbon\Carbon;
 use Exception;
@@ -229,6 +230,20 @@ class BrivaController extends Controller
         Log::info("Headers bank-statement: " . json_encode($headers));
         Log::info("Body bank-statement: " . json_encode($bodyRequest));
         Log::info("Bank statement response:", $response->json());
+
+        if ($response->ok()) {
+            $result = $response->json();
+            $type = $result['detailData'][0]['type'] ?? 'Unknown';
+            Log::info('Bank statement parsed result:', $result);
+            Log::info('Transaction type:', [$result['data']['detailData'][0]['type'] ?? 'NOT FOUND']);
+
+            Wallet::create([
+                'account_number' => $bodyRequest['accountNo'],
+                'type' => $type,
+                'periode' => $bodyRequest['fromDateTime'] . ' s.d ' . $bodyRequest['toDateTime'],
+                'data' => json_encode($result),
+            ]);
+        }
 
         return response()->json([
             'status' => $response->ok(),
