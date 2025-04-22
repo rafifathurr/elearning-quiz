@@ -59,6 +59,7 @@ Route::post('/snap/v1.0/get-token-sandbox', [BrivaController::class, 'getTokenSa
 Route::post('/snap/v2.0/get-statement', [BrivaController::class, 'getStatement'])
     ->name('bri.getStatement');
 Route::post('/test-signature', [BrivaController::class, 'generateSignatureV2']);
+Route::post('/verif-signature', [BrivaController::class, 'verifySignatureV2']);
 
 
 

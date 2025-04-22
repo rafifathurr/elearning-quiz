@@ -112,6 +112,41 @@ class SignatureHelper
         return strtolower(hash('sha256', $minifiedBody));
     }
 
+    public static function verifySignatureV2($method, $endpoint, $accessToken, $body, $timestamp, $receivedSignature)
+    {
+        $clientSecret = env('SANDBOX_CLIENT_SECRET');
+
+        if (!$clientSecret) {
+            throw new Exception("Client Secret tidak ditemukan.");
+        }
+
+        // Generate ulang signature dengan data yang sama
+        $hashedBody = self::hashRequestBody($body);
+        $stringToSign = strtoupper($method) . ':' . $endpoint . ':' . $accessToken . ':' . $hashedBody . ':' . $timestamp;
+
+        Log::info("String to Verify: $stringToSign");
+
+        // Hasil signature yang seharusnya
+        $expectedSignature = base64_encode(hash_hmac('sha512', $stringToSign, $clientSecret, true));
+
+        // Bandingkan
+        if (hash_equals($expectedSignature, $receivedSignature)) {
+            return [
+                'verified' => true,
+                'expected_signature' => $expectedSignature,
+                'payload' => $stringToSign,
+            ];
+        } else {
+            return [
+                'verified' => false,
+                'expected_signature' => $expectedSignature,
+                'received_signature' => $receivedSignature,
+                'payload' => $stringToSign,
+            ];
+        }
+    }
+
+
 
     // public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
     // {
