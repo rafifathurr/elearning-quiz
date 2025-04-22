@@ -208,19 +208,20 @@ class BrivaController extends Controller
         $bodyRequest = [
             "accountNo"     => "234567891012348",
             "fromDateTime"  => "2025-01-14T09:41:45+07:00",
-            "toDateTime"    => "2025-01-14T10:41:45+07:00"
+            "toDateTime"    => "2025-01-18T10:41:45+07:00"
         ];
 
         $signature = SignatureHelper::generateSignatureV2($method, $endpoint, $accessToken, json_encode($bodyRequest), $timestamp);
 
+        $xExternalId = substr(time(), -8) . rand(0, 9); // total tetap 9 digit
         $headers = [
             'Authorization'   => 'Bearer ' . $accessToken,
             'X-TIMESTAMP'     => $timestamp,
             'X-SIGNATURE'     => $signature['xSignature'],
             'Content-Type'    => 'application/json',
             'X-PARTNER-ID'    => 'ATLAS',
-            'CHANNEL-ID'      => '00001',
-            'X-EXTERNAL-ID' => (string) rand(100000000, 999999999),
+            'CHANNEL-ID'      => '00000',
+            'X-EXTERNAL-ID'   => $xExternalId,
         ];
 
         $response = Http::withHeaders($headers)->post("{$baseUrl}{$endpoint}", $bodyRequest);
