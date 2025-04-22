@@ -234,8 +234,6 @@ class BrivaController extends Controller
         if ($response->ok()) {
             $result = $response->json();
             $type = $result['detailData'][0]['type'] ?? 'Unknown';
-            Log::info('Bank statement parsed result:', $result);
-            Log::info('Transaction type:', [$result['data']['detailData'][0]['type'] ?? 'NOT FOUND']);
 
             Wallet::create([
                 'account_number' => $bodyRequest['accountNo'],
