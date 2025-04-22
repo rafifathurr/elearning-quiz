@@ -148,27 +148,28 @@ class BrivaController extends Controller
         }
     }
 
-    public function verifySignatureV2(Request $request)
-    {
-        $httpMethod = 'POST';
-        $endpoint = '/snap/v2.1/bank-statement';
-        $accessToken = $request->header('Authorization'); // Pastikan ini 'Bearer xxxxx'
-        $accessToken = str_replace('Bearer ', '', $accessToken);
-        $timestamp = $request->header('X-Timestamp');
-        $receivedSignature = $request->header('X-Signature');
-        $body = $request->getContent(); // Ambil raw body request
+    // Verify bank statement
+    // public function verifySignatureV2(Request $request)
+    // {
+    //     $httpMethod = 'POST';
+    //     $endpoint = '/snap/v2.1/bank-statement';
+    //     $accessToken = $request->header('Authorization'); // Pastikan ini 'Bearer xxxxx'
+    //     $accessToken = str_replace('Bearer ', '', $accessToken);
+    //     $timestamp = $request->header('X-Timestamp');
+    //     $receivedSignature = $request->header('X-Signature');
+    //     $body = $request->getContent(); // Ambil raw body request
 
-        try {
-            $result = SignatureHelper::verifySignatureV2($httpMethod, $endpoint, $accessToken, $body, $timestamp, $receivedSignature);
+    //     try {
+    //         $result = SignatureHelper::verifySignatureV2($httpMethod, $endpoint, $accessToken, $body, $timestamp, $receivedSignature);
 
-            return response()->json($result, $result['verified'] ? 200 : 401);
-        } catch (Exception $e) {
-            return response()->json([
-                'verified' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json($result, $result['verified'] ? 200 : 401);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'verified' => false,
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     // Get token dan get statement sekaligus
     public function getStatement()
@@ -772,6 +773,25 @@ class BrivaController extends Controller
         ];
 
         return response()->json($response, 200, $headers);
+    }
+
+    // Verify signature inquiry & payment
+    public function verifySignatureV2(Request $request)
+    {
+        $receivedSignature = $request->header('X-Signature');
+        $payloadSignature = $request->header('payload-signature');
+
+
+        try {
+            $result = SignatureHelper::verifySignatureV2($payloadSignature, $receivedSignature);
+
+            return response()->json($result, $result['verified'] ? 200 : 401);
+        } catch (Exception $e) {
+            return response()->json([
+                'verified' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // Inquiry otomatis header juga make SHA yg payload

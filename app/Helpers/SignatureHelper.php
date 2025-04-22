@@ -112,40 +112,70 @@ class SignatureHelper
         return strtolower(hash('sha256', $minifiedBody));
     }
 
-    public static function verifySignatureV2($method, $endpoint, $accessToken, $body, $timestamp, $receivedSignature)
+    // Verify signature inquiry & payment
+    public static function verifySignatureV2($payloadSignature, $receivedSignature)
     {
-        $clientSecret = env('SANDBOX_CLIENT_SECRET');
+        $clientSecret = env('BRI_SECRET_KEY');
 
         if (!$clientSecret) {
             throw new Exception("Client Secret tidak ditemukan.");
         }
 
-        // Generate ulang signature dengan data yang sama
-        $hashedBody = self::hashRequestBody($body);
-        $stringToSign = strtoupper($method) . ':' . $endpoint . ':' . $accessToken . ':' . $hashedBody . ':' . $timestamp;
-
-        Log::info("String to Verify: $stringToSign");
 
         // Hasil signature yang seharusnya
-        $expectedSignature = base64_encode(hash_hmac('sha512', $stringToSign, $clientSecret, true));
+        $expectedSignature = base64_encode(hash_hmac('sha512', $payloadSignature, $clientSecret, true));
 
         // Bandingkan
         if (hash_equals($expectedSignature, $receivedSignature)) {
             return [
                 'verified' => true,
                 'expected_signature' => $expectedSignature,
-                'payload' => $stringToSign,
+                'payload' => $payloadSignature,
             ];
         } else {
             return [
                 'verified' => false,
                 'expected_signature' => $expectedSignature,
                 'received_signature' => $receivedSignature,
-                'payload' => $stringToSign,
+                'payload' => $payloadSignature,
             ];
         }
     }
 
+    // Verify signature bank statement
+    // public static function verifySignatureV2($method, $endpoint, $accessToken, $body, $timestamp, $receivedSignature)
+    // {
+    //     $clientSecret = env('SANDBOX_CLIENT_SECRET');
+
+    //     if (!$clientSecret) {
+    //         throw new Exception("Client Secret tidak ditemukan.");
+    //     }
+
+    //     // Generate ulang signature dengan data yang sama
+    //     $hashedBody = self::hashRequestBody($body);
+    //     $stringToSign = strtoupper($method) . ':' . $endpoint . ':' . $accessToken . ':' . $hashedBody . ':' . $timestamp;
+
+    //     Log::info("String to Verify: $stringToSign");
+
+    //     // Hasil signature yang seharusnya
+    //     $expectedSignature = base64_encode(hash_hmac('sha512', $stringToSign, $clientSecret, true));
+
+    //     // Bandingkan
+    //     if (hash_equals($expectedSignature, $receivedSignature)) {
+    //         return [
+    //             'verified' => true,
+    //             'expected_signature' => $expectedSignature,
+    //             'payload' => $stringToSign,
+    //         ];
+    //     } else {
+    //         return [
+    //             'verified' => false,
+    //             'expected_signature' => $expectedSignature,
+    //             'received_signature' => $receivedSignature,
+    //             'payload' => $stringToSign,
+    //         ];
+    //     }
+    // }
 
 
     // public static function generateSignatureV2($method, $endpoint, $accessToken, $body, $timestamp)
