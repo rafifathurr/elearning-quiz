@@ -634,7 +634,7 @@ class BrivaController extends Controller
             'channelCode'             => 'nullable|integer|min:1|max:9', // Channel harus sesuai daftar (1-9)
             'sourceBankCode'          => 'nullable|string|size:3', // Harus 3 karakter
             'trxId'                   => 'nullable|string|max:64', // Maksimal 64 karakter
-            'paymentRequestId'        => 'required|string|uuid', // Wajib diisi, format UUID
+            'paymentRequestId'        => 'required|string', // Wajib diisi, format UUID
             'hashedSourceAccountNo'   => 'nullable|string|max:32', // Maksimal 32 karakter
             'additionalInfo.passApp'  => 'nullable|string|max:64', // Maksimal 64 karakter
             'additionalInfo.idApp'    => 'nullable|string|max:8', // Maksimal 8 karakter
