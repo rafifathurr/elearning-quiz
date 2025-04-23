@@ -62,6 +62,27 @@
                     appId: "1:319745808387:web:de0c26d961571816af1636",
                     measurementId: "G-XE79X5SH5R"
                 };
+                $(document).ready(function() {
+                    // Initialize Firebase
+                    const app = initializeApp(firebaseConfig);
+                    const analytics = getAnalytics(app);
+                    const messaging = getMessaging(app);
+                    getToken(messaging, {
+                        vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
+                    }).then((currentToken) => {
+                        if (currentToken) {
+                            // Send the token to your server and update the UI if necessary
+                            // ...
+                        } else {
+                            // Show permission request UI
+                            console.log('No registration token available. Request permission to generate one.');
+                            // ...
+                        }
+                    }).catch((err) => {
+                        console.log('An error occurred while retrieving token. ', err);
+                        // ...
+                    });
+                });
             </script>
         @endauth
     </body>
