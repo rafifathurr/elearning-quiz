@@ -45,7 +45,8 @@
                     getAnalytics
                 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
                 import {
-                    getMessaging
+                    getMessaging,
+                    getToken
                 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
 
                 // TODO: Add SDKs for Firebase products that you want to use
