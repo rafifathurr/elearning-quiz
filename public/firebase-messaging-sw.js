@@ -3,7 +3,6 @@
 // are not available in the service worker.
 // Replace 10.13.2 with latest version of the Firebase JS SDK.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
 import {
     getMessaging,
     getToken,
