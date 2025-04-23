@@ -1,12 +1,9 @@
-// Give the service worker access to Firebase Messaging.
-// Note that you can only use Firebase Messaging here. Other Firebase libraries
-// are not available in the service worker.
-// Replace 10.13.2 with latest version of the Firebase JS SDK.
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import {
-    getMessaging,
-    getToken,
-} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
+importScripts(
+    "https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"
+);
+importScripts(
+    "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging-compat.js"
+);
 
 const firebaseConfig = {
     apiKey: "AIzaSyAxX4jUdibL9n8rJqEeEnxqPKu3S1uAQ9k",
