@@ -26,7 +26,7 @@
 <!-- AdminLTE App -->
 <script src="{{ asset('dist/adminlte/js/adminlte.js') }}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{ asset('dist/adminlte/js/pages/dashboard.js') }}"></script>
+{{-- <script src="{{ asset('dist/adminlte/js/pages/dashboard.js') }}"></script> --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- DataTables  & Plugins -->
