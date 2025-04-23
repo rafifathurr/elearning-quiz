@@ -409,10 +409,30 @@ class BrivaController extends Controller
             ], 401);
         }
 
+        // Ambil token dari header
+        $clientToken = $request->header('Authorization');
+
         $tokenData = json_decode(Storage::get('token.json'), true);
         $storedToken = $tokenData['accessToken'] ?? null;
         $expiresAt = $tokenData['expiresAt'] ?? 0;
 
+        // Jika token dikirim dalam format "Bearer <token>", ambil token-nya saja
+        if (Str::startsWith($clientToken, 'Bearer ')) {
+            $clientToken = Str::replaceFirst('Bearer ', '', $clientToken);
+        }
+
+        // Cek token apakah cocok
+        if ($clientToken !== $storedToken) {
+            Log::warning("Token mismatch", [
+                'clientToken' => $clientToken,
+                'expectedToken' => $storedToken
+            ]);
+
+            return response()->json([
+                'responseCode'    => '4012403',
+                'responseMessage' => 'Unauthorized. Token mismatch'
+            ], 401);
+        }
 
         // Cek apakah token sudah expired
         if (now()->timestamp > $expiresAt) {
@@ -476,12 +496,6 @@ class BrivaController extends Controller
                 ], 400);
             }
         }
-
-        // Buat request header
-        $headers = [
-            'Authorization'  => "Bearer $storedToken",
-            'Content-Type'   => 'application/json',
-        ];
 
 
         // Cari VA yang sudah dibuat di function payment
@@ -547,7 +561,7 @@ class BrivaController extends Controller
             ]
         ];
 
-        return response()->json($response, 200, $headers);
+        return response()->json($response, 200);
     }
 
     public function payment(Request $request)
@@ -563,10 +577,30 @@ class BrivaController extends Controller
             ], 401);
         }
 
+        // Ambil token dari header
+        $clientToken = $request->header('Authorization');
+
         $tokenData = json_decode(Storage::get('token.json'), true);
         $storedToken = $tokenData['accessToken'] ?? null;
         $expiresAt = $tokenData['expiresAt'] ?? 0;
 
+        // Jika token dikirim dalam format "Bearer <token>", ambil token-nya saja
+        if (Str::startsWith($clientToken, 'Bearer ')) {
+            $clientToken = Str::replaceFirst('Bearer ', '', $clientToken);
+        }
+
+        // Cek token apakah cocok
+        if ($clientToken !== $storedToken) {
+            Log::warning("Token mismatch", [
+                'clientToken' => $clientToken,
+                'expectedToken' => $storedToken
+            ]);
+
+            return response()->json([
+                'responseCode'    => '4012403',
+                'responseMessage' => 'Unauthorized. Token mismatch'
+            ], 401);
+        }
 
         // Cek apakah token sudah expired
         if (now()->timestamp > $expiresAt) {
@@ -636,12 +670,6 @@ class BrivaController extends Controller
             }
         }
 
-
-        // Buat request header
-        $headers = [
-            'Authorization'  => "Bearer $storedToken",
-            'Content-Type'   => 'application/json',
-        ];
 
         // Cek apakah trxId sudah pernah digunakan dalam transaksi sukses (Inconsistent Request)
         $existingTransaction = SupportBriva::where('trx_id', $request->trxId)->whereNotNull('payment_time')->first();
@@ -798,7 +826,7 @@ class BrivaController extends Controller
             ]
         ];
 
-        return response()->json($response, 200, $headers);
+        return response()->json($response, 200);
     }
 
     // Verify signature inquiry & payment
