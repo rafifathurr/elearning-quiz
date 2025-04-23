@@ -2,10 +2,12 @@
 // Note that you can only use Firebase Messaging here. Other Firebase libraries
 // are not available in the service worker.
 // Replace 10.13.2 with latest version of the Firebase JS SDK.
-importScripts("https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js");
-importScripts(
-    "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js"
-);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+import {
+    getMessaging,
+    getToken,
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAxX4jUdibL9n8rJqEeEnxqPKu3S1uAQ9k",
