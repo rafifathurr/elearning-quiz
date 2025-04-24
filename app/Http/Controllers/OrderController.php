@@ -626,25 +626,48 @@ class OrderController extends Controller
 
     private function sendFcmNotificationToAllDevices($title, $body)
     {
-        // Ambil semua token yang dimiliki oleh user dengan role 'admin'
         $tokens = TokenData::whereHas('user.roles', function ($query) {
             $query->where('name', 'admin');
-        })->pluck('token')->toArray();
+        })->with('user')->get();
 
         $accessToken = $this->getGoogleAccessToken();
 
-        foreach ($tokens as $token) {
-            Http::withToken($accessToken)->post("https://fcm.googleapis.com/v1/projects/brata-cerdas-1/messages:send", [
-                'message' => [
-                    'token' => $token,
-                    'notification' => [
-                        'title' => $title,
-                        'body' => $body
+        foreach ($tokens as $tokenData) {
+            $token = $tokenData->token;
+            $user = $tokenData->user;
+
+            try {
+                $response = Http::withToken($accessToken)->post("https://fcm.googleapis.com/v1/projects/brata-cerdas-1/messages:send", [
+                    'message' => [
+                        'token' => $token,
+                        'notification' => [
+                            'title' => $title,
+                            'body' => $body
+                        ]
                     ]
-                ]
-            ]);
+                ]);
+
+                // Logging
+                Log::info('FCM Notification sent', [
+                    'user_id' => $user->id ?? null,
+                    'name' => $user->name ?? null,
+                    'email' => $user->email ?? null,
+                    'token' => $token,
+                    'response_status' => $response->status(),
+                    'response_body' => $response->body(),
+                ]);
+            } catch (\Exception $e) {
+                // Logging error
+                Log::error('Failed to send FCM notification', [
+                    'user_id' => $user->id ?? null,
+                    'name' => $user->name ?? null,
+                    'token' => $token,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
+
 
     private function getGoogleAccessToken()
     {
