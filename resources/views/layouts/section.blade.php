@@ -36,6 +36,7 @@
 
         <!-- FireBase -->
         @auth
+            <!-- Get TOken Login -->
             <script type="module">
                 // Import the functions you need from the SDKs you need
                 import {
@@ -72,6 +73,7 @@
                         vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
                     }).then((currentToken) => {
                         if (currentToken) {
+                            localStorage.setItem('fcm_token', currentToken);
                             let csrfToken = $('meta[name="csrf-token"]').attr('content');
                             fetch("/fcm-token", {
                                     method: "POST",
@@ -96,6 +98,33 @@
                     });
                 });
             </script>
+
+            <!-- Hapus Token Logout -->
+            <script>
+                function logoutAndRemoveToken() {
+                    const fcmToken = localStorage.getItem('fcm_token');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    if (fcmToken) {
+                        fetch("/hapus-token", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken
+                            },
+                            body: JSON.stringify({
+                                token: fcmToken
+                            })
+                        }).finally(() => {
+                            // Setelah selesai, redirect ke logout
+                            window.location.href = "/logout";
+                        });
+                    } else {
+                        window.location.href = "/logout";
+                    }
+                }
+            </script>
+
         @endauth
     </body>
 @endsection

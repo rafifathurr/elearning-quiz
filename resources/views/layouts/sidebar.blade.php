@@ -331,7 +331,7 @@
                 {{-- @endunless --}}
 
                 <li class="nav-item mb-3">
-                    <a href="{{ route('logout') }}" class="nav-link ">
+                    <a href="javascript:void(0)" onclick="logoutAndRemoveToken()" class="nav-link ">
                         <i class="nav-icon fas fa-power-off"></i>
                         <p>
                             Log Out

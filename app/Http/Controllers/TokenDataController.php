@@ -23,9 +23,6 @@ class TokenDataController extends Controller
                 $existingToken->user_id = $user->id;
                 $existingToken->touch(); // update updated_at
                 $existingToken->save();
-            } else {
-                $existingToken->touch(); // update updated_at
-                $existingToken->save();
             }
         } else {
             // Token belum ada, simpan baru

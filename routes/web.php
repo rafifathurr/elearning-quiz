@@ -127,6 +127,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
     Route::post('/fcm-token', [TokenDataController::class, 'store'])->name('fcmToken');
+    Route::post('/hapus-token', [AuthController::class, 'hapusToken'])->name('hapusToken');
+
 
     // Edit Akun
     Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {

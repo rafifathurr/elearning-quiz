@@ -212,7 +212,7 @@
                                 <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a href="{{ route('logout') }}" class="dropdown-item"><i
+                                <a href="javascript:void(0)" onclick="logoutAndRemoveToken()" class="dropdown-item"><i
                                         class="fas fa-sign-out-alt mr-2"></i>
                                     Logout</a>
                             </div>
@@ -423,6 +423,33 @@
             <i class="fas fa-chevron-up"></i>
         </a>
 
+        @auth
+            <!-- Hapus Token Logout -->
+            <script>
+                function logoutAndRemoveToken() {
+                    const fcmToken = localStorage.getItem('fcm_token');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    if (fcmToken) {
+                        fetch("/hapus-token", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken
+                            },
+                            body: JSON.stringify({
+                                token: fcmToken
+                            })
+                        }).finally(() => {
+                            // Setelah selesai, redirect ke logout
+                            window.location.href = "/logout";
+                        });
+                    } else {
+                        window.location.href = "/logout";
+                    }
+                }
+            </script>
+        @endauth
 
         @push('javascript-bottom')
             @include('js.order.script')

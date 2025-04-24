@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrderDetail;
 use App\Models\Result;
 use App\Models\ResultDetail;
+use App\Models\TokenData;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -248,6 +249,18 @@ class AuthController extends Controller
         Auth::logout();
         return redirect()->route('landingPage')->with(['success' => 'Logout Berhasil']);
     }
+
+    public function hapusToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+
+        TokenData::where('token', $request->token)->delete();
+
+        return response()->json(['status' => 'success']);
+    }
+
 
     public function showForgotPasswordForm()
     {
