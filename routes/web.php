@@ -17,6 +17,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PackageMemberController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TokenDataController;
 use App\Http\Controllers\TypePackageController;
 use App\Http\Controllers\UserController;
 
@@ -65,7 +66,6 @@ Route::post('/verif-signature', [BrivaController::class, 'verifySignatureV2']);
 
 //simulasi encrypt decrypt signature
 //Route::get('/simulate-signature', [BrivaController::class, 'simulateSignature'])->middleware('api');
-
 
 
 
@@ -126,6 +126,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [DashboardController::class, 'index'])->name('home');
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('contact', [DashboardController::class, 'contact'])->name('contact');
+    Route::post('/fcm-token', [TokenDataController::class, 'store'])->name('fcmToken');
 
     // Edit Akun
     Route::group(['prefix' => 'my-account', 'as' => 'my-account.'], function () {

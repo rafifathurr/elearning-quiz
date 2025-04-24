@@ -72,8 +72,19 @@
                         vapidKey: "BKCYJjmPhEQ9LKpeyxSy7Ui1FhhGcC5Rz6W6L08he9rr6ZEShmx_U8d9HcIC7qzbzM-Hwl-uQzgnY24ij18U-xs"
                     }).then((currentToken) => {
                         if (currentToken) {
-                            // Send the token to your server and update the UI if necessary
-                            // ...
+                            let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                            fetch("/fcm-token", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": csrfToken
+                                    },
+                                    body: JSON.stringify({
+                                        token: currentToken
+                                    }),
+                                }).then(response => response.json())
+                                .then(data => console.log("Token saved:", data))
+                                .catch(err => console.error("Token save failed:", err));
                         } else {
                             // Show permission request UI
                             console.log('No registration token available. Request permission to generate one.');
