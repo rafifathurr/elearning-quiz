@@ -51,13 +51,6 @@ class Handler extends ExceptionHandler
                 }
             }
 
-            // Handle 404 Not Found error (URL not found)
-            if ($exception->getStatusCode() == 404) {
-                return redirect()
-                    ->back()
-                    ->with(['failed' => 'URL Tidak Ditemukan']);
-            }
-
             // Handle 419 Page Expired error (session expired)
             if ($exception->getStatusCode() == 419) {
                 return redirect()->route('login')->with(['error' => 'Session Anda telah kedaluwarsa, silakan login kembali']);
