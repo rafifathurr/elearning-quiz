@@ -47,7 +47,8 @@
                 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
                 import {
                     getMessaging,
-                    getToken
+                    getToken,
+                    onMessage
                 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
 
                 // TODO: Add SDKs for Firebase products that you want to use
@@ -96,6 +97,20 @@
                         console.log('An error occurred while retrieving token. ', err);
                         // ...
                     });
+
+                    //  Tampilkan notifikasi jika browser sedang aktif
+                    onMessage(messaging, (payload) => {
+                        const notificationTitle = payload.data.title;
+                        const notificationOptions = {
+                            body: payload.data.body,
+                            icon: '/icon.png'
+                        };
+
+                        if (Notification.permission === "granted") {
+                            new Notification(notificationTitle, notificationOptions);
+                        }
+                    });
+
                 });
             </script>
 

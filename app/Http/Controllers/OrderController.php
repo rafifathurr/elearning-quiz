@@ -640,7 +640,7 @@ class OrderController extends Controller
                 $response = Http::withToken($accessToken)->post("https://fcm.googleapis.com/v1/projects/brata-cerdas-1/messages:send", [
                     'message' => [
                         'token' => $token,
-                        'notification' => [
+                        'data' => [
                             'title' => $title,
                             'body' => $body
                         ]
