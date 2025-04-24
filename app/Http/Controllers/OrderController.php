@@ -15,8 +15,10 @@ use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Package;
 use App\Models\SupportBriva;
+use App\Models\TokenData;
 use App\Models\User;
 use Exception;
+use Google_Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -590,7 +593,7 @@ class OrderController extends Controller
                     ]);
 
                     if ($update_order) {
-                        Mail::to('bratacerdas@gmail.com')->send(new NewOrderMail($order));
+                        $this->sendFcmNotificationToAllDevices("Ada Order Baru!", "Silakan cek sistem untuk melihat detailnya.");
                         DB::commit();
                         return redirect()
                             ->route('order.history')
@@ -620,6 +623,39 @@ class OrderController extends Controller
                 ->withInput();
         }
     }
+
+    private function sendFcmNotificationToAllDevices($title, $body)
+    {
+        // Ambil semua token yang dimiliki oleh user dengan role 'admin'
+        $tokens = TokenData::whereHas('user.roles', function ($query) {
+            $query->where('name', 'admin');
+        })->pluck('token')->toArray();
+
+        $accessToken = $this->getGoogleAccessToken();
+
+        foreach ($tokens as $token) {
+            Http::withToken($accessToken)->post("https://fcm.googleapis.com/v1/projects/brata-cerdas-1/messages:send", [
+                'message' => [
+                    'token' => $token,
+                    'notification' => [
+                        'title' => $title,
+                        'body' => $body
+                    ]
+                ]
+            ]);
+        }
+    }
+
+    private function getGoogleAccessToken()
+    {
+        $client = new Google_Client();
+        $client->setAuthConfig(storage_path('app/firebase/firebase-credentials.json'));
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->fetchAccessTokenWithAssertion();
+        return $client->getAccessToken()['access_token'];
+    }
+
+
 
     public function downloadProof($id)
     {
