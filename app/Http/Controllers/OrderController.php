@@ -49,7 +49,6 @@ class OrderController extends Controller
             $order_ids = Order::whereNull('deleted_at')
                 ->where('user_id', Auth::user()->id)
                 ->where('status', 1)
-                ->whereNull('order_by')
                 ->pluck('id');
         } elseif (User::find(Auth::user()->id)->hasAllRoles(['counselor', 'user'])) {
             $order_ids = Order::whereNull('deleted_at')
@@ -420,7 +419,20 @@ class OrderController extends Controller
             }
 
 
-            $exist_order = Order::where('user_id',  $user_id)->where('order_by',  $counselor_id)->where('status', 1)->first();
+            $order_with_other_couns = Order::where('user_id',  $user_id)
+                ->where('order_by', '!=', $counselor_id)
+                ->where('status', 1)->first();
+            if ($order_with_other_couns) {
+                DB::rollBack();
+                session()->flash('failed', 'Peserta ini sudah dipesankan oleh konselor lain');
+                return;
+            }
+
+            $exist_order = Order::where('user_id',  $user_id)->where(function ($query) {
+                $query->whereNull('order_by')
+                    ->orWhere('order_by', Auth::user()->id);
+            })
+                ->where('status', 1)->first();
             if ($exist_order) {
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
                     ->where('package_id', $id)
@@ -433,6 +445,12 @@ class OrderController extends Controller
                     DB::rollBack();
                     session()->flash('failed', 'Paket Kelas Sudah Ada, Silahkan Lihat Di MyOrder.');
                     return;
+                }
+                // Update order_by kalau order_by nya null (awalnya di co oleh user)
+                if ($exist_order->order_by == null) {
+                    $exist_order->update([
+                        'order_by' => $counselor_id
+                    ]);
                 }
                 $add_order_package = OrderPackage::lockforUpdate()->create([
                     'package_id' => $id,
