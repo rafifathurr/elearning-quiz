@@ -22,6 +22,10 @@
                     defaultContent: '-'
                 },
                 {
+                    data: 'package',
+                    defaultContent: '-'
+                },
+                {
                     data: 'name',
                     defaultContent: '-'
                 },

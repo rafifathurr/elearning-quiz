@@ -24,6 +24,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Kode</th>
+                                                <th>Nama Paket</th>
                                                 <th>Nama Voucher</th>
                                                 <th>Tipe Voucher</th>
                                                 <th>Harga</th>

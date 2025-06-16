@@ -39,6 +39,9 @@ class myVoucherController extends Controller
                 </div>';
             })
 
+            ->addColumn('package', function ($data) {
+                return $data->package->name;
+            })
             ->addColumn('name', function ($data) {
                 return $data->voucher->name;
             })
@@ -58,7 +61,7 @@ class myVoucherController extends Controller
             })
 
 
-            ->only(['voucher_code', 'name', 'price', 'type_voucher', 'status'])
+            ->only(['voucher_code', 'package', 'name', 'price', 'type_voucher', 'status'])
             ->rawColumns(['status', 'voucher_code'])
             ->make(true);
     }
