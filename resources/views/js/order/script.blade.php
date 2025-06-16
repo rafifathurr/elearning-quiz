@@ -351,28 +351,104 @@
                     `,
                     showConfirmButton: false,
                     showCancelButton: false,
+                    showCloseButton: true,
                     didOpen: () => {
+                        const showConfirmation = (metode) => {
+                            Swal.fire({
+                                title: 'Konfirmasi Pembayaran',
+                                text: `Apakah Anda yakin memilih metode pembayaran "${metode.toUpperCase()}"?`,
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, lanjutkan',
+                                cancelButtonText: 'Batal',
+                                reverseButtons: true,
+                                customClass: {
+                                    confirmButton: 'btn btn-primary mr-2',
+                                    cancelButton: 'btn btn-outline-secondary'
+                                },
+                                buttonsStyling: false
+                            }).then(result => {
+                                if (result.isConfirmed) {
+                                    kirimDataCheckout(id, jumlah, harga, metode);
+                                } else {
+                                    // Tampilkan ulang pilihan metode pembayaran
+                                    checkOutMetodePembayaran(id, jumlah, harga);
+                                }
+                            });
+                        };
+
                         document.getElementById('btn-transfer').addEventListener('click',
                             function() {
-                                kirimDataCheckout(id, jumlah, harga, 'transfer');
+                                showConfirmation('transfer');
                             });
 
                         document.getElementById('btn-briva').addEventListener('click', function() {
-                            kirimDataCheckout(id, jumlah, harga, 'briva');
+                            showConfirmation('briva');
                         });
 
-
-                        // Disable BRIVA kalau bukan test_user23
                         @if (!(Auth::check() && Auth::user()->username === 'test_user23'))
                             document.getElementById('btn-briva').disabled = true;
                         @endif
                     }
+
                 });
 
 
             }
         });
     }
+
+    function checkOutMetodePembayaran(id, jumlah, harga) {
+        Swal.fire({
+            title: 'Pilih Metode Pembayaran',
+            html: `
+            <div class="text-center">
+                <button id="btn-transfer" class="btn btn-success mr-3 mb-3" style="width: 120px;">Transfer</button>
+                <button id="btn-briva" class="btn btn-secondary mb-3" style="width: 120px;">BRIVA</button>
+            </div>
+        `,
+            showConfirmButton: false,
+            showCancelButton: false,
+            showCloseButton: true,
+            didOpen: () => {
+                const showConfirmation = (metode) => {
+                    Swal.fire({
+                        title: 'Konfirmasi Pembayaran',
+                        text: `Apakah Anda yakin memilih metode pembayaran "${metode.toUpperCase()}"?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, lanjutkan',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                        customClass: {
+                            confirmButton: 'btn btn-primary  mb-3',
+                            cancelButton: 'btn btn-danger mr-2 mb-3',
+                        },
+                        buttonsStyling: false
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            kirimDataCheckout(id, jumlah, harga, metode);
+                        } else {
+                            checkOutMetodePembayaran(id, jumlah, harga);
+                        }
+                    });
+                };
+
+                document.getElementById('btn-transfer').addEventListener('click', function() {
+                    showConfirmation('transfer');
+                });
+
+                document.getElementById('btn-briva').addEventListener('click', function() {
+                    showConfirmation('briva');
+                });
+
+                @if (!(Auth::check() && Auth::user()->username === 'test_user23'))
+                    document.getElementById('btn-briva').disabled = true;
+                @endif
+            }
+        });
+    }
+
 
     function kirimDataCheckout(id, jumlah, harga, metode) {
         let token = $('meta[name="csrf-token"]').attr('content');
