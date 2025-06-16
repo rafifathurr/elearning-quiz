@@ -139,8 +139,12 @@ class DashboardController extends Controller
             };
         }
 
+        $data['packages'] = Package::whereNull('deleted_at')
+            ->where('status', 1)
+            ->whereHas('voucher') // hanya ambil paket yang punya voucher
+            ->get();
 
-        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();;
+        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
 
         return view('home', $data);
     }

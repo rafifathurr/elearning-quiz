@@ -66,7 +66,7 @@
                     ->count();
                 
                 // Cek apakah salah satu menu order sedang aktif
-                $orderActive = request()->routeIs('order.index') || request()->routeIs('order.history') || request()->routeIs('order.listOrder') || request()->routeIs('mytest.index') || request()->routeIs('myclass.index') || request()->routeIs('master.dateclass.index') || request()->routeIs('class.index') || request()->routeIs('master.member.index') ? 'menu-open' : '';
+                $orderActive = request()->routeIs('order.index') || request()->routeIs('order.history') || request()->routeIs('order.listOrder') || request()->routeIs('mytest.index') || request()->routeIs('myvoucher.index') || request()->routeIs('myclass.index') || request()->routeIs('master.voucher.index') || request()->routeIs('master.dateclass.index') || request()->routeIs('class.index') || request()->routeIs('master.member.index') ? 'menu-open' : '';
                 
                 ?>
 
@@ -125,6 +125,16 @@
                         @endhasanyrole
                         @hasrole('user')
                             <li class="nav-item {{ $display }}">
+                                <a href="{{ route('myvoucher.index') }}"
+                                    class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
+                                    <i class="nav-icon fas fa-book"></i>
+                                    <p>
+                                        My Voucher
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item {{ $display }}">
                                 <a href="{{ route('mytest.index') }}"
                                     class="nav-link {{ request()->routeIs('mytest.index') ? 'bg-primary' : '' }}">
                                     <i class="nav-icon fas fa-book"></i>
@@ -151,6 +161,15 @@
                                     <i class="nav-icon fas fa-calendar-alt"></i>
                                     <p>
                                         Jadwal Kelas
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item {{ $display }}">
+                                <a href="{{ route('master.voucher.index') }}"
+                                    class="nav-link {{ request()->routeIs('master.voucher.index') ? 'bg-primary' : '' }}">
+                                    <i class="nav-icon fas fa-tags"></i>
+                                    <p>
+                                        Voucher Paket
                                     </p>
                                 </a>
                             </li>

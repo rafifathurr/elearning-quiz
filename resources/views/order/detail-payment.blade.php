@@ -91,50 +91,93 @@
                                 </div>
                             @endif
 
-
-                            {{-- Detail Pesanan --}}
                             <h5 class="font-weight-bold">Detail Pesanan</h5>
-                            <div class="table-responsive py-1">
-                                <table id="table-detail" class="table table-bordered table-hover text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Paket</th>
-                                            <th>Kelas</th>
-                                            <th>Jadwal Kelas</th>
-                                            <th>Harga Paket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($order_package as $item)
+                            {{-- Detail Pesanan Paket --}}
+                            @if ($order_package->isNotEmpty())
+                                <div class="table-responsive py-1">
+                                    <table id="table-detail" class="table table-bordered table-hover text-center">
+                                        <thead>
                                             <tr>
-                                                <td>
-                                                    {{ $loop->iteration }}
-                                                </td>
-                                                <td>
-                                                    {{ $item->package->name }}
-                                                </td>
-                                                <td>
-                                                    {{ !is_null($item->class) && $item->class > 0 ? $item->class . 'x Pertemuan' : '-' }}
-                                                </td>
-                                                <td>
-                                                    {{ $item->dateClass ? $item->dateClass->name : '-' }}
-                                                </td>
-                                                <td>
-                                                    {{ 'Rp. ' . number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
-                                                </td>
-
+                                                <th>No</th>
+                                                <th>Nama Paket</th>
+                                                <th>Kelas</th>
+                                                <th>Jadwal Kelas</th>
+                                                <th>Harga Paket</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot class="table-primary">
-                                        <tr>
-                                            <td colspan="4" class="text-right">Total:</td>
-                                            <td>{{ 'Rp. ' . number_format($order->total_price, 0, ',', '.') }}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($order_package as $item)
+                                                <tr>
+                                                    <td>
+                                                        {{ $loop->iteration }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $item->package->name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ !is_null($item->class) && $item->class > 0 ? $item->class . 'x Pertemuan' : '-' }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $item->dateClass ? $item->dateClass->name : '-' }}
+                                                    </td>
+                                                    <td>
+                                                        {{ 'Rp. ' . number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
+                                                    </td>
+
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot class="table-primary">
+                                            <tr>
+                                                <td colspan="4" class="text-right">Total:</td>
+                                                <td>{{ 'Rp. ' . number_format($order->total_price, 0, ',', '.') }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            @endif
+
+                            {{-- Detail Pesanan Voucher --}}
+                            @if ($order_voucher->isNotEmpty())
+                                <div class="table-responsive py-1">
+                                    <table id="table-detail" class="table table-bordered table-hover text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Nama Voucher</th>
+                                                <th>Tipe Voucher</th>
+                                                <th>Harga Voucher</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($order_voucher as $item)
+                                                <tr>
+                                                    <td>
+                                                        {{ $loop->iteration }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $item->voucher->name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $item->voucher->type_voucher }}
+                                                    </td>
+                                                    <td>
+                                                        {{ 'Rp. ' . number_format($item->price, 0, ',', '.') }}
+                                                    </td>
+
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot class="table-primary">
+                                            <tr>
+                                                <td colspan="3" class="text-right">Total:</td>
+                                                <td>{{ 'Rp. ' . number_format($order->total_price, 0, ',', '.') }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            @endif
+
                             <a href="{{ route('order.history') }}" class="btn btn-success btn-sm mr-2"><i
                                     class="fas fa-arrow-left mr-1"></i>Kembali</a>
                         </div>

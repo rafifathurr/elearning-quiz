@@ -27,4 +27,9 @@ class Package extends Model
     {
         return $this->belongsTo(TypePackage::class, 'id_type_package');
     }
+
+    public function voucher()
+    {
+        return $this->hasMany(Voucher::class, 'package_id', 'id')->whereNull('deleted_at');
+    }
 }

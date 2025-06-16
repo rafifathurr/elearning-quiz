@@ -13,6 +13,7 @@ use App\Http\Controllers\KecermatanController;
 use App\Http\Controllers\myClassAdminController;
 use App\Http\Controllers\myClassController;
 use App\Http\Controllers\myTestController;
+use App\Http\Controllers\myVoucherController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PackageMemberController;
@@ -20,7 +21,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TokenDataController;
 use App\Http\Controllers\TypePackageController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\VoucherController;
 use App\Models\Quiz\Quiz;
 use App\Models\Quiz\QuizQuestion;
 use App\Models\Result;
@@ -150,6 +151,7 @@ Route::group(['middleware' => ['role:user|counselor']], function () {
         Route::get('detail-pembayaran/{id}', 'detailPayment')->name('detailPayment');
         Route::match(['put', 'patch'], 'upload-payment/{id}', 'uploadPayment')->name('uploadPayment');
         Route::post('checkout/{id}', 'checkout')->name('checkout');
+        Route::post('checkout-voucher/{id}', 'checkOutVoucher')->name('checkOutVoucher');
         Route::post('payment/{id}', 'payment')->name('payment');
         Route::delete('delete/{id}', 'destroy')->name('destroy');
 
@@ -166,6 +168,12 @@ Route::group(['middleware' => ['role:user']], function () {
 
     //Daftar Test User
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
+    });
+
+    //Daftar Voucher User
+    Route::group(['controller' => myVoucherController::class, 'prefix' => 'myvoucher', 'as' => 'myvoucher.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
     });
@@ -308,6 +316,13 @@ Route::group(['middleware' => ['role:admin|manager']], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
         });
         Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
+
+        //Pengguna
+        Route::group(['controller' => VoucherController::class, 'prefix' => 'voucher', 'as' => 'voucher.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::post('update-status/{id}', 'updateStatus')->name('updateStatus');
+        });
+        Route::resource('voucher', VoucherController::class)->parameters(['voucher' => 'id']);
     });
 
     Route::group(['controller' => ReportController::class, 'prefix' => 'laporan', 'as' => 'laporan.'], function () {

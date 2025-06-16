@@ -13,10 +13,12 @@ use App\Models\DateClass;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderPackage;
+use App\Models\OrderVoucher;
 use App\Models\Package;
 use App\Models\SupportBriva;
 use App\Models\TokenData;
 use App\Models\User;
+use App\Models\Voucher;
 use Exception;
 use Google_Client;
 use Illuminate\Http\Request;
@@ -68,7 +70,7 @@ class OrderController extends Controller
             ->get();
 
         $totalPrice = $order_package->sum(function ($data) {
-            return $data->package->price;
+            return $data->price ?? $data->package->price;
         });
 
         $order_id = null;
@@ -85,8 +87,10 @@ class OrderController extends Controller
                 return (!is_null($data->class) && $data->class > 0 ? $data->class . 'x Pertemuan' : '-');
             })
             ->addColumn('price', function ($data) {
-                return 'Rp. ' . number_format($data->package->price, 0, ',', '.');
+                $price = $data->price ?? $data->package->price;
+                return 'Rp. ' . number_format($price, 0, ',', '.');
             })
+
 
             ->addColumn('date', function ($data) {
                 return $data->dateClass ? $data->dateClass->name : '-';
@@ -219,11 +223,16 @@ class OrderController extends Controller
             $order_package = OrderPackage::whereNull('deleted_at')
                 ->where('order_id', $id)
                 ->get();
+
+            $order_voucher = OrderVoucher::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
+
             $totalPrice = $order_package->sum(function ($data) {
                 return $data->package->price;
             });
 
-            return view('order.detail-order', compact('order', 'order_package', 'totalPrice'));
+            return view('order.detail-order', compact('order', 'order_package', 'order_voucher', 'totalPrice'));
         } catch (Exception $e) {
             return redirect()
                 ->back()
@@ -267,6 +276,7 @@ class OrderController extends Controller
             $package  = Package::find($id);
             $schedule_id = $request->input('schedule_id');
             $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
+            $kode_voucher = trim($request->input('kode_voucher'));
 
             $date_class = null;
             if (!is_null($schedule_id)) {
@@ -310,6 +320,40 @@ class OrderController extends Controller
 
 
             $exist_order = Order::where('user_id',  $user_id)->where('status', 1)->first();
+            $voucher = null;
+            $discount_amount = 0;
+
+            //Kalau ada Voucher
+            if (!empty($kode_voucher)) {
+                $voucher = OrderVoucher::where('voucher_code', $kode_voucher)
+                    ->where('status', 1)
+                    ->whereHas('order', function ($q) {
+                        $q->where('status', 100); // hanya order yang sudah approved
+                    })
+                    ->first();
+
+                if (!$voucher) {
+                    DB::rollBack();
+                    session()->flash('failed', 'Kode voucher tidak valid atau sudah digunakan.');
+                    return;
+                }
+
+                if ($voucher->package_id != $package->id) {
+                    DB::rollBack();
+                    session()->flash('failed', 'Kode voucher tidak berlaku untuk paket ini.');
+                    return;
+                }
+
+                // Hitung potongan harga
+                if ($voucher->type_voucher == 'discount') {
+                    $discount_amount = ($package->price * $voucher->voucher_value) / 100;
+                } elseif ($voucher->type_voucher == 'fixed_price') {
+                    $discount_amount = $voucher->voucher_value;
+                }
+            }
+
+            $final_price = max(0, $package->price - $discount_amount); // Hindari minus
+
             if ($exist_order) {
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
                     ->where('package_id', $id)
@@ -331,6 +375,8 @@ class OrderController extends Controller
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
+                    'price' => $final_price,
+                    'voucher_code' => $voucher->voucher_code ?? null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -344,7 +390,15 @@ class OrderController extends Controller
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
+                    'price' => $final_price,
+                    'voucher_code' => $voucher->voucher_code ?? null,
+
                 ]);
+            }
+
+            // Update status voucher menjadi "sudah digunakan" jika berhasil
+            if ($voucher) {
+                $voucher->update(['status' => 10]);
             }
 
             if ($add_order_package) {
@@ -456,6 +510,7 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
+                    'price' => $package->price,
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
@@ -470,6 +525,7 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $new_order->id,
                     'class' => $package->class,
+                    'price' => $package->price,
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
@@ -498,13 +554,6 @@ class OrderController extends Controller
                 ->get();
             if ($order) {
                 $totalPrice =  (int) $request->totalPrice;
-                foreach ($order_package as $item) {
-                    if ($item->package) {
-                        $item->update([
-                            'price' => $item->package->price
-                        ]);
-                    }
-                }
                 $update_order = Order::where('id', $id)->update([
                     'status' => 2,
                     'total_price' => $totalPrice,
@@ -574,6 +623,84 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    function encodeAlpha($number)
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $base = strlen($characters);
+        $result = '';
+
+        while ($number > 0) {
+            $result = $characters[$number % $base] . $result;
+            $number = intdiv($number, $base);
+        }
+
+        return $result;
+    }
+
+
+    public function checkoutVoucher(Request $request, String $id)
+    {
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'voucher_id' => 'required|exists:vouchers,id',
+                'jumlah' => 'required|integer|min:1',
+                'metode' => 'required|in:transfer,briva',
+                'harga' => 'required|numeric|min:0',
+            ]);
+
+            $totalPrice = $request->jumlah * $request->harga;
+
+            $order = Order::create([
+                'status' => 2,
+                'user_id' => Auth::id(),
+                'total_price' => $totalPrice,
+                'payment_method' => $request->metode,
+                'payment_date' => now()
+            ]);
+
+            $voucher = Voucher::find($request->voucher_id);
+            $userId = Auth::id();
+            $timestamp = now()->timestamp;
+
+            for ($i = 0; $i < $request->jumlah; $i++) {
+                do {
+                    $raw = (int)($order->id . $userId . $request->voucher_id . $timestamp . $i);
+                    $alphaCode = $this->encodeAlpha($raw);
+                    $kodeVoucher = 'VC-' . str_pad($alphaCode, 12, 'X', STR_PAD_RIGHT);
+                } while (OrderVoucher::where('voucher_code', $kodeVoucher)->exists());
+
+                OrderVoucher::create([
+                    'order_id' => $order->id,
+                    'voucher_id' => $request->voucher_id,
+                    'package_id' => $voucher->package_id,
+                    'price' => $request->harga,
+                    'status' => 1,
+                    'voucher_code' => $kodeVoucher,
+                    'type_voucher' => $voucher->type_voucher,
+                    'voucher_value' => $voucher->type_voucher === 'discount'
+                        ? $voucher->discount
+                        : $voucher->fixed_price,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('order.detailPayment', ['id' => $order->id])
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 
 
     public function uploadPayment(Request $request, string $id)
@@ -761,56 +888,63 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::findOrFail($id);
-            if ($order) {
-                $approve_order = $order->update([
-                    'status' => 100,
-                    'approval_date' => now(),
-                    'approval_by' => Auth::user()->id,
-                ]);
-                if ($approve_order) {
-                    $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
-                    $order_detail = [];
 
-                    foreach ($order_package as $item) {
-                        if ($item->package) {
-                            if ($item->package->packageTest->isNotEmpty()) {
-                                foreach ($item->package->packageTest as $packageTest) {
-                                    $order_detail[] = [
-                                        'order_id' => $id,
-                                        'package_id' => $item->package_id,
-                                        'quiz_id' => $packageTest->quiz->id ?? null
-                                    ];
-                                }
-                            } else {
+            // Update status order ke approved
+            $approve_order = $order->update([
+                'status' => 100,
+                'approval_date' => now(),
+                'approval_by' => Auth::user()->id,
+            ]);
+
+            if (!$approve_order) {
+                DB::rollBack();
+                session()->flash('failed', 'Gagal Menerima Order');
+                return;
+            }
+
+            // Ambil data order package (jika ada)
+            $order_package = OrderPackage::where('order_id', $id)->whereNull('deleted_at')->get();
+
+            if ($order_package->isNotEmpty()) {
+                $order_detail = [];
+
+                foreach ($order_package as $item) {
+                    if ($item->package) {
+                        if ($item->package->packageTest->isNotEmpty()) {
+                            foreach ($item->package->packageTest as $packageTest) {
                                 $order_detail[] = [
                                     'order_id' => $id,
                                     'package_id' => $item->package_id,
-                                    'quiz_id' => null
+                                    'quiz_id' => $packageTest->quiz->id ?? null
                                 ];
                             }
+                        } else {
+                            $order_detail[] = [
+                                'order_id' => $id,
+                                'package_id' => $item->package_id,
+                                'quiz_id' => null
+                            ];
                         }
                     }
-                    $add_order_detail = OrderDetail::insert($order_detail);
-
-                    if ($add_order_detail) {
-                        Mail::to($order->user->email)->send(new ApproveOrderMail($order, $order_package));
-                        DB::commit();
-                        session()->flash('success', 'Berhasil Menerima Order');
-                    } else {
-                        DB::rollBack();
-                        session()->flash('failed', 'Gagal Menerima Order');
-                    }
-                } else {
-                    DB::rollBack();
-                    session()->flash('failed', 'Gagal Menerima Order');
                 }
-            } else {
-                session()->flash('failed', 'Data Tidak Ditemukan');
+
+                // Simpan detail jika ada
+                if (!empty($order_detail)) {
+                    OrderDetail::insert($order_detail);
+                }
             }
-        } catch (Exception $e) {
-            session()->flash('failed', $e->getMessage());
+
+            // Kirim email tetap dikirim, baik ada paket atau tidak
+            Mail::to($order->user->email)->send(new ApproveOrderMail($order, $order_package));
+
+            DB::commit();
+            session()->flash('success', 'Berhasil Menerima Order');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('failed', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function reject(Request $request, string $id)
     {
@@ -845,10 +979,18 @@ class OrderController extends Controller
 
             if (!is_null($order_package)) {
 
+                // Ambil voucher jika ada
+                $voucher = null;
+                if (!empty($order_package->voucher_code)) {
+                    $voucher = OrderVoucher::where('voucher_code', $order_package->voucher_code)->first();
+                }
+
                 $order_cancel = OrderPackage::where('id', $id)->update([
-                    'deleted_at' => date('Y-m-d H:i:s')
+                    'deleted_at' => date('Y-m-d H:i:s'),
+                    'voucher_code' => null,
                 ]);
 
+                // Cek apakah masih ada paket aktif di order yang sama
                 $exists_order_package = OrderPackage::where('order_id', $order_package->order_id)
                     ->whereNull('deleted_at')
                     ->exists();
@@ -860,6 +1002,9 @@ class OrderController extends Controller
                 }
 
                 if ($order_cancel) {
+                    if ($voucher) {
+                        $voucher->update(['status' => 1]);
+                    }
                     DB::commit();
                     session()->flash('success', 'Berhasil Menghapus Paket');
                 } else {
@@ -964,11 +1109,16 @@ class OrderController extends Controller
             $order_package = OrderPackage::whereNull('deleted_at')
                 ->where('order_id', $id)
                 ->get();
+
+            $order_voucher = OrderVoucher::whereNull('deleted_at')
+                ->where('order_id', $id)
+                ->get();
+
             $totalPrice = $order_package->sum(function ($data) {
                 return $data->package->price;
             });
 
-            return view('order.detail-payment', compact('order', 'order_package', 'totalPrice'));
+            return view('order.detail-payment', compact('order', 'order_package', 'order_voucher', 'totalPrice'));
         } catch (Exception $e) {
             return redirect()
                 ->back()

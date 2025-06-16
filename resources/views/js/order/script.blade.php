@@ -233,9 +233,14 @@
                     scheduleOptions += '</select>';
                 }
 
+                // Tambahkan input kode voucher di bawah select
+                const voucherInput = `
+                <input type="text" id="kode_voucher" class="form-control" placeholder="Masukkan kode voucher (opsional)">
+            `;
+
                 Swal.fire({
                     title: `Ambil Paket: ${name}`,
-                    html: scheduleOptions, // Tampilkan select jadwal jika ada
+                    html: scheduleOptions + voucherInput,
                     icon: 'question',
                     showCancelButton: true,
                     allowOutsideClick: false,
@@ -246,38 +251,29 @@
                     buttonsStyling: false,
                     confirmButtonText: 'Ambil Paket',
                     cancelButtonText: 'Batal',
-                    didOpen: () => {
-                        // Pastikan dropdown sudah ter-render
-                        console.log('Dropdown Loaded:', $('#selected_schedule').length);
-                    },
                     preConfirm: () => {
                         const selectedSchedule = $('#selected_schedule').val();
-                        console.log('Selected Schedule:',
-                            selectedSchedule); // Debugging tambahan
+                        const kodeVoucher = $('#kode_voucher').val();
+
                         if (response.schedules.length > 0 && !selectedSchedule) {
                             Swal.showValidationMessage('Pilih jadwal terlebih dahulu!');
                             return false;
                         }
-                        return selectedSchedule ? parseInt(selectedSchedule) : null;
+
+                        return {
+                            schedule_id: selectedSchedule ? parseInt(selectedSchedule) : null,
+                            kode_voucher: kodeVoucher ? kodeVoucher.trim() : null
+                        };
                     }
                 }).then(result => {
                     if (result.isConfirmed) {
-                        console.log('Schedule ID sebelum parse:', result.value);
-                        console.log('Schedule ID setelah parse:', (result.value !== undefined &&
-                                result.value !== null && result.value !== '0') ?
-                            parseInt(result.value) :
-                            null);
-
                         $.ajax({
                             url: '{{ url('order/checkout') }}/' + id,
                             type: 'POST',
                             data: {
                                 _token: token,
-                                schedule_id: (result.value !== undefined && result.value !==
-                                        null && result.value !== '0') ?
-                                    parseInt(result.value) : null
-
-
+                                schedule_id: result.value.schedule_id,
+                                kode_voucher: result.value.kode_voucher
                             },
                             success: function(data) {
                                 console.log('Success Response:', data);
@@ -296,6 +292,90 @@
             }
         });
     }
+
+
+    function checkOutVoucher(id, name, harga) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        // Pop-up 1: Pilih jumlah voucher
+        Swal.fire({
+            title: `Ambil Voucher: ${name}`,
+            html: `
+            <p>Beli voucher untuk saya dan teman saya</p>
+            <input type="number" id="jumlah-voucher" class="swal2-input" min="1" value="1" placeholder="Jumlah voucher">`,
+            icon: 'question',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn btn-primary mr-2 mb-3',
+                cancelButton: 'btn btn-danger mb-3',
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Lanjutkan',
+            cancelButtonText: 'Batal',
+            preConfirm: () => {
+                const jumlah = document.getElementById('jumlah-voucher').value;
+                if (!jumlah || jumlah < 1) {
+                    Swal.showValidationMessage('Masukkan jumlah yang valid');
+                }
+                return jumlah;
+            }
+        }).then(firstResult => {
+            if (firstResult.isConfirmed) {
+                const jumlah = firstResult.value;
+
+                // Pop-up 2: Pilih metode pembayaran
+                Swal.fire({
+                    title: 'Pilih Metode Pembayaran',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Transfer',
+                    cancelButtonText: 'BRIVA',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-success mr-2 mb-3',
+                        cancelButton: 'btn btn-secondary mb-3',
+                    },
+                    buttonsStyling: false,
+                }).then(secondResult => {
+                    let metode = '';
+                    if (secondResult.isConfirmed) {
+                        metode = 'transfer';
+                    } else if (secondResult.dismiss === Swal.DismissReason.cancel) {
+                        metode = 'briva';
+                    } else {
+                        return;
+                    }
+
+                    // Kirim data via AJAX
+                    $.ajax({
+                        url: '{{ route('order.checkOutVoucher', ':id') }}'.replace(':id', id),
+                        type: 'POST',
+                        data: {
+                            _token: token,
+                            voucher_id: id,
+                            jumlah: jumlah,
+                            metode: metode,
+                            harga: harga
+                        },
+                        success: function(data) {
+                            console.log('Success Response:', data);
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            } else {
+                                location.reload();
+                            }
+                        },
+                        error: function(xhr, error, code) {
+                            console.log('Error:', xhr, error, code);
+                            swalError(error);
+                        }
+                    });
+                });
+            }
+        });
+    }
+
 
 
     function cancelOrder(id) {
@@ -600,7 +680,8 @@
                     success: function(scheduleResponse) {
                         let userOptions =
                             '<select class="form-control mb-3" id="selected_user" required>';
-                        userOptions += '<option value="" disabled selected>Pilih User</option>';
+                        userOptions +=
+                            '<option value="" disabled selected>Pilih User</option>';
                         usersResponse.users.forEach(user => {
                             userOptions +=
                                 `<option value="${user.id}">${user.name} | ${user.email}</option>`;
@@ -635,7 +716,8 @@
                             confirmButtonText: 'Ambil Paket',
                             cancelButtonText: 'Batal',
                             didOpen: () => {
-                                console.log('Dropdown Loaded:', $('#selected_user')
+                                console.log('Dropdown Loaded:', $(
+                                        '#selected_user')
                                     .length, $('#selected_schedule').length);
 
                                 $('#selected_user').select2({
@@ -684,7 +766,8 @@
                                         location.reload();
                                     },
                                     error: function(xhr, error, code) {
-                                        console.log('Error:', xhr, error,
+                                        console.log('Error:', xhr,
+                                            error,
                                             code);
                                         swalError(error);
                                     }
