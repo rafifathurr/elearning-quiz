@@ -668,7 +668,7 @@ class OrderController extends Controller
                 do {
                     $raw = (int)($order->id . $userId . $request->voucher_id . $timestamp . $i);
                     $alphaCode = $this->encodeAlpha($raw);
-                    $kodeVoucher = 'VC-' . str_pad($alphaCode, 12, 'X', STR_PAD_RIGHT);
+                    $kodeVoucher = 'BC-' . str_pad($alphaCode, 12, 'X', STR_PAD_RIGHT);
                 } while (OrderVoucher::where('voucher_code', $kodeVoucher)->exists());
 
                 OrderVoucher::create([
