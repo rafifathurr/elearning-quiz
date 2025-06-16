@@ -185,15 +185,14 @@
                             </div>
                         @endforeach
                     </div>
-                @else
-                    <h3 class="text-center font-weight-bold my-3">Belum Ada Voucher</h3>
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <img src="{{ asset('img/breadcrumb-line.png') }}" class="img-fluid">
+                        </div>
+                    </div>
                 @endif
 
-                <div class="row text-center">
-                    <div class="col-12">
-                        <img src="{{ asset('img/breadcrumb-line.png') }}" class="img-fluid">
-                    </div>
-                </div>
+
 
 
                 {{-- Paket --}}
