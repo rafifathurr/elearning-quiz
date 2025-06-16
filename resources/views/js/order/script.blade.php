@@ -301,8 +301,14 @@
         Swal.fire({
             title: `Ambil Voucher: ${name}`,
             html: `
-            <p>Beli voucher untuk saya dan teman saya</p>
-            <input type="number" id="jumlah-voucher" class="swal2-input" min="1" value="1" placeholder="Jumlah voucher">`,
+                <p>Beli voucher untuk saya dan teman saya</p>
+                <div style="display:flex; align-items:center; justify-content:center; gap: 5px;">
+                    <button type="button" id="btn-minus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">−</button>
+                    <input type="number" id="jumlah-voucher" class="swal2-input" 
+                        style="width:80px; height:45px; text-align:center; font-size:18px; margin:0;" min="1" value="1">
+                    <button type="button" id="btn-plus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">+</button>
+                </div>
+            `,
             icon: 'question',
             showCancelButton: true,
             allowOutsideClick: false,
@@ -313,6 +319,17 @@
             buttonsStyling: false,
             confirmButtonText: 'Lanjutkan',
             cancelButtonText: 'Batal',
+            didOpen: () => {
+                const input = document.getElementById('jumlah-voucher');
+                document.getElementById('btn-plus').addEventListener('click', () => {
+                    input.value = parseInt(input.value || 1) + 1;
+                });
+                document.getElementById('btn-minus').addEventListener('click', () => {
+                    if (parseInt(input.value) > 1) {
+                        input.value = parseInt(input.value) - 1;
+                    }
+                });
+            },
             preConfirm: () => {
                 const jumlah = document.getElementById('jumlah-voucher').value;
                 if (!jumlah || jumlah < 1) {
@@ -324,57 +341,67 @@
             if (firstResult.isConfirmed) {
                 const jumlah = firstResult.value;
 
-                // Pop-up 2: Pilih metode pembayaran
                 Swal.fire({
                     title: 'Pilih Metode Pembayaran',
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: 'Transfer',
-                    cancelButtonText: 'BRIVA',
-                    reverseButtons: true,
-                    customClass: {
-                        confirmButton: 'btn btn-success mr-2 mb-3',
-                        cancelButton: 'btn btn-secondary mb-3',
-                    },
-                    buttonsStyling: false,
-                }).then(secondResult => {
-                    let metode = '';
-                    if (secondResult.isConfirmed) {
-                        metode = 'transfer';
-                    } else if (secondResult.dismiss === Swal.DismissReason.cancel) {
-                        metode = 'briva';
-                    } else {
-                        return;
-                    }
+                    html: `
+                        <div class="text-center">
+                            <button id="btn-transfer" class="btn btn-success mr-3 mb-3" style="width: 120px;">Transfer</button>
+                            <button id="btn-briva" class="btn btn-secondary mb-3" style="width: 120px;">BRIVA</button>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    didOpen: () => {
+                        document.getElementById('btn-transfer').addEventListener('click',
+                            function() {
+                                kirimDataCheckout(id, jumlah, harga, 'transfer');
+                            });
 
-                    // Kirim data via AJAX
-                    $.ajax({
-                        url: '{{ route('order.checkOutVoucher', ':id') }}'.replace(':id', id),
-                        type: 'POST',
-                        data: {
-                            _token: token,
-                            voucher_id: id,
-                            jumlah: jumlah,
-                            metode: metode,
-                            harga: harga
-                        },
-                        success: function(data) {
-                            console.log('Success Response:', data);
-                            if (data.redirect_url) {
-                                window.location.href = data.redirect_url;
-                            } else {
-                                location.reload();
-                            }
-                        },
-                        error: function(xhr, error, code) {
-                            console.log('Error:', xhr, error, code);
-                            swalError(error);
-                        }
-                    });
+                        document.getElementById('btn-briva').addEventListener('click', function() {
+                            kirimDataCheckout(id, jumlah, harga, 'briva');
+                        });
+
+
+                        // Disable BRIVA kalau bukan test_user23
+                        @if (!(Auth::check() && Auth::user()->username === 'test_user23'))
+                            document.getElementById('btn-briva').disabled = true;
+                        @endif
+                    }
                 });
+
+
             }
         });
     }
+
+    function kirimDataCheckout(id, jumlah, harga, metode) {
+        let token = $('meta[name="csrf-token"]').attr('content');
+
+        $.ajax({
+            url: '{{ route('order.checkOutVoucher', ':id') }}'.replace(':id', id),
+            type: 'POST',
+            data: {
+                _token: token,
+                voucher_id: id,
+                jumlah: jumlah,
+                metode: metode,
+                harga: harga
+            },
+            success: function(data) {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    location.reload();
+                }
+            },
+            error: function(xhr, error, code) {
+                console.log('Error:', xhr, error, code);
+                swalError(error);
+            }
+        });
+    }
+
+
 
 
 
