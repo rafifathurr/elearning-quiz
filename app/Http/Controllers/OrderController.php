@@ -424,6 +424,7 @@ class OrderController extends Controller
             $user_id = $request->input('user_id');
             $schedule_id = (!empty($schedule_id) && $schedule_id != '0') ? intval($schedule_id) : null;
             $user_id = (!empty($user_id) && $user_id != '0') ? intval($user_id) : null;
+            $kode_voucher = trim($request->input('kode_voucher'));
 
             $date_class = null;
             if (!is_null($schedule_id)) {
@@ -487,6 +488,41 @@ class OrderController extends Controller
                     ->orWhere('order_by', Auth::user()->id);
             })
                 ->where('status', 1)->first();
+
+            $voucher = null;
+            $discount_amount = 0;
+
+            //Kalau ada Voucher
+            if (!empty($kode_voucher)) {
+                $voucher = OrderVoucher::where('voucher_code', $kode_voucher)
+                    ->where('status', 1)
+                    ->whereHas('order', function ($q) {
+                        $q->where('status', 100); // hanya order yang sudah approved
+                    })
+                    ->first();
+
+                if (!$voucher) {
+                    DB::rollBack();
+                    session()->flash('failed', 'Kode voucher tidak valid atau sudah digunakan.');
+                    return;
+                }
+
+                if ($voucher->package_id != $package->id) {
+                    DB::rollBack();
+                    session()->flash('failed', 'Kode voucher tidak berlaku untuk paket ini.');
+                    return;
+                }
+
+                // Hitung potongan harga
+                if ($voucher->type_voucher == 'discount') {
+                    $discount_amount = ($package->price * $voucher->voucher_value) / 100;
+                } elseif ($voucher->type_voucher == 'fixed_price') {
+                    $discount_amount = $voucher->voucher_value;
+                }
+            }
+
+            $final_price = max(0, $package->price - $discount_amount); // Hindari minus
+
             if ($exist_order) {
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
                     ->where('package_id', $id)
@@ -510,10 +546,11 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $exist_order->id,
                     'class' => $package->class,
-                    'price' => $package->price,
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
+                    'price' => $final_price,
+                    'voucher_code' => $voucher->voucher_code ?? null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -525,10 +562,11 @@ class OrderController extends Controller
                     'package_id' => $id,
                     'order_id' => $new_order->id,
                     'class' => $package->class,
-                    'price' => $package->price,
                     'current_class' => 0,
                     'date_class_id' => $schedule_id,
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
+                    'price' => $final_price,
+                    'voucher_code' => $voucher->voucher_code ?? null,
                 ]);
             }
 

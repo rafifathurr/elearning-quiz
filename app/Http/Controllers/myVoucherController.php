@@ -46,7 +46,12 @@ class myVoucherController extends Controller
                 return $data->voucher->name;
             })
             ->addColumn('type_voucher', function ($data) {
-                return $data->type_voucher;
+                if ($data->type_voucher == 'discount') {
+                    $value = 'Diskon ' . $data->voucher_value . '%';
+                } else {
+                    $value = 'Fixed Price Rp. ' . number_format($data->voucher_value, 0, ',', '.');
+                }
+                return $value;
             })
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->price, 0, ',', '.');

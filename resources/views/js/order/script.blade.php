@@ -236,7 +236,7 @@
                 // Tambahkan input kode voucher di bawah select
                 const voucherInput = `
                 <input type="text" id="kode_voucher" class="form-control" placeholder="Masukkan kode voucher (opsional)">
-            `;
+                `;
 
                 Swal.fire({
                     title: `Ambil Paket: ${name}`,
@@ -804,10 +804,17 @@
                             scheduleOptions += '</select>';
                         }
 
+                        // Tambahkan input kode voucher di bawah select
+                        const voucherInput = `
+                        <input type="text" id="kode_voucher" class="form-control" placeholder="Masukkan kode voucher (opsional)">
+                        `;
+
+
                         Swal.fire({
                             title: `Ambil Paket: ${name}`,
                             html: userOptions +
-                                scheduleOptions, // Tambahkan pilihan user dan jadwal
+                                scheduleOptions +
+                                voucherInput, // Tambahkan pilihan user dan jadwal
                             icon: 'question',
                             showCancelButton: true,
                             allowOutsideClick: false,
@@ -833,6 +840,7 @@
                                 const selectedUser = $('#selected_user').val();
                                 const selectedSchedule = $('#selected_schedule')
                                     .val();
+                                const kodeVoucher = $('#kode_voucher').val();
 
                                 if (!selectedUser) {
                                     Swal.showValidationMessage(
@@ -849,7 +857,9 @@
                                 return {
                                     userId: parseInt(selectedUser),
                                     scheduleId: selectedSchedule ? parseInt(
-                                        selectedSchedule) : null
+                                        selectedSchedule) : null,
+                                    kode_voucher: kodeVoucher ? kodeVoucher.trim() :
+                                        null
                                 };
                             }
                         }).then(result => {
@@ -861,7 +871,8 @@
                                     data: {
                                         _token: token,
                                         user_id: result.value.userId,
-                                        schedule_id: result.value.scheduleId
+                                        schedule_id: result.value.scheduleId,
+                                        kode_voucher: result.value.kode_voucher
                                     },
                                     success: function(data) {
                                         console.log('Success Response:',

@@ -91,6 +91,16 @@
                                     </p>
                                 </a>
                             </li>
+
+                            <li class="nav-item {{ $display }}">
+                                <a href="{{ route('myvoucher.index') }}"
+                                    class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
+                                    <i class="nav-icon fas fa-tag"></i>
+                                    <p>
+                                        My Voucher
+                                    </p>
+                                </a>
+                            </li>
                             <li class="nav-item {{ $display }}">
                                 <a href="{{ route('order.history') }}"
                                     class="nav-link {{ request()->routeIs('order.history') ? 'bg-primary' : '' }}">
@@ -124,16 +134,6 @@
                             </li>
                         @endhasanyrole
                         @hasrole('user')
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('myvoucher.index') }}"
-                                    class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-book"></i>
-                                    <p>
-                                        My Voucher
-                                    </p>
-                                </a>
-                            </li>
-
                             <li class="nav-item {{ $display }}">
                                 <a href="{{ route('mytest.index') }}"
                                     class="nav-link {{ request()->routeIs('mytest.index') ? 'bg-primary' : '' }}">
