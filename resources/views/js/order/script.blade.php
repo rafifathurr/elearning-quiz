@@ -363,8 +363,8 @@
                                 cancelButtonText: 'Batal',
                                 reverseButtons: true,
                                 customClass: {
-                                    confirmButton: 'btn btn-primary mr-2',
-                                    cancelButton: 'btn btn-outline-secondary'
+                                    confirmButton: 'btn btn-primary ',
+                                    cancelButton: 'btn mr-2 btn-outline-secondary'
                                 },
                                 buttonsStyling: false
                             }).then(result => {
