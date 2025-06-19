@@ -570,6 +570,10 @@ class OrderController extends Controller
                 ]);
             }
 
+            // Update status voucher menjadi "sudah digunakan" jika berhasil
+            if ($voucher) {
+                $voucher->update(['status' => 10]);
+            }
             if ($add_order_package) {
                 DB::commit();
                 session()->flash('berhasil', 'Berhasil Ambil Paket');
