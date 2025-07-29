@@ -144,7 +144,7 @@ class DashboardController extends Controller
             ->whereHas('voucher') // hanya ambil paket yang punya voucher
             ->get();
 
-        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->orderBy('created_at', 'DESC')->get();
 
         return view('home', $data);
     }
@@ -180,7 +180,7 @@ class DashboardController extends Controller
             }
         }
 
-        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->get();
+        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->orderBy('created_at', 'DESC')->get();
 
         return view('landingPage', $data);
     }
