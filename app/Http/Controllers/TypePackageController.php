@@ -153,6 +153,7 @@ class TypePackageController extends Controller
      */
     public function update(Request $request, String $id)
     {
+        DB::beginTransaction();
         try {
             $type_package = TypePackage::Find($id);
             if (!is_null($type_package)) {
@@ -161,14 +162,22 @@ class TypePackageController extends Controller
                     'description' => 'nullable'
                 ]);
 
+                if (!empty($request->id_parent) && $request->id_parent == $id) {
+                    DB::rollBack();
+                    return redirect()->back()->with(['failed' => 'Anda tidak boleh memilih kategori paket ini sebagai parent']);
+                }
+
+                // Update data
                 $update_type_package = TypePackage::where('id', $id)->update([
                     'name' => $request->name,
                     'description' => $request->description,
                     'id_parent' => isset($request->id_parent) ? $request->id_parent : 0,
                 ]);
 
+                // Hapus akses sebelumnya
                 PackageAccess::where('type_package_id', $type_package->id)->delete();
 
+                // Tambahkan akses baru jika ada user_id
                 if ($request->has('user_id') && !empty($request->user_id)) {
                     $packages_test = [];
                     foreach ($request->user_id as $user) {
