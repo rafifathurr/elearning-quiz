@@ -322,6 +322,8 @@ class OrderController extends Controller
             $exist_order = Order::where('user_id',  $user_id)->where('status', 1)->first();
             $voucher = null;
             $discount_amount = 0;
+            $final_price = $package->price; // default tanpa voucher
+
 
             //Kalau ada Voucher
             if (!empty($kode_voucher)) {
@@ -347,12 +349,12 @@ class OrderController extends Controller
                 // Hitung potongan harga
                 if ($voucher->type_voucher == 'discount') {
                     $discount_amount = ($package->price * $voucher->voucher_value) / 100;
+                    $final_price = max(0, $package->price - $discount_amount); // Hindari minus
                 } elseif ($voucher->type_voucher == 'fixed_price') {
-                    $discount_amount = $voucher->voucher_value;
+                    $final_price = $voucher->voucher_value;
                 }
             }
 
-            $final_price = max(0, $package->price - $discount_amount); // Hindari minus
 
             if ($exist_order) {
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)
@@ -491,6 +493,8 @@ class OrderController extends Controller
 
             $voucher = null;
             $discount_amount = 0;
+            $final_price = $package->price; // default tanpa voucher
+
 
             //Kalau ada Voucher
             if (!empty($kode_voucher)) {
@@ -516,12 +520,11 @@ class OrderController extends Controller
                 // Hitung potongan harga
                 if ($voucher->type_voucher == 'discount') {
                     $discount_amount = ($package->price * $voucher->voucher_value) / 100;
+                    $final_price = max(0, $package->price - $discount_amount); // Hindari minus
                 } elseif ($voucher->type_voucher == 'fixed_price') {
-                    $discount_amount = $voucher->voucher_value;
+                    $final_price = $voucher->voucher_value;
                 }
             }
-
-            $final_price = max(0, $package->price - $discount_amount); // Hindari minus
 
             if ($exist_order) {
                 $duplicate_package = OrderPackage::where('order_id', $exist_order->id)

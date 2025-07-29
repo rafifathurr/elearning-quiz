@@ -154,7 +154,7 @@
                                                             @if (isset($voucher->fixed_price))
                                                                 <span class="badge bg-warning text-dark mb-2"
                                                                     style="font-size: 1rem">
-                                                                    Potongan
+                                                                    Fixed Price
                                                                     {{ 'Rp. ' . number_format($voucher->fixed_price, 0, ',', '.') }}
                                                                 </span>
                                                             @endif
