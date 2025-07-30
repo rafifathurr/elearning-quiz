@@ -109,7 +109,9 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                         $highestRow++;
                         $subtotalRow = $row;
                         $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
-                        $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                        $carbonBulan = \Carbon\Carbon::createFromFormat('Y-m-d', $bulanSebelumnya . '-01');
+                        $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . $carbonBulan->translatedFormat('F Y'));
+
                         $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
 
                         $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
@@ -134,7 +136,8 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 if ($startRow <= $highestRow) {
                     $subtotalRow = $highestRow + 1;
                     $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
-                    $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . \Carbon\Carbon::createFromFormat('Y-m', $bulanSebelumnya)->translatedFormat('F Y'));
+                    $carbonBulan = \Carbon\Carbon::createFromFormat('Y-m-d', $bulanSebelumnya . '-01');
+                    $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . $carbonBulan->translatedFormat('F Y'));
                     $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
 
                     $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
