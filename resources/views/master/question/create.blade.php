@@ -340,6 +340,19 @@
 
             // Tambahkan event listener untuk validasi sebelum form disubmit
             document.querySelector('form').addEventListener('submit', validateForm);
+
+            // Validasi jumlah jawaban benar (min & max 1)
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const checked = document.querySelectorAll('input[type="checkbox"][name*="[is_answer]"]:checked').length;
+                if (checked !== 1) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Peringatan',
+                        text: 'Harus memilih tepat satu jawaban benar!',
+                    });
+                }
+            });
         </script>
     @endpush
 @endsection
