@@ -30,9 +30,9 @@ messaging.onBackgroundMessage((payload) => {
         payload
     );
     // Customize notification here
-    const notificationTitle = "Background Message Title";
+    const notificationTitle = payload.data?.title || "Ada Order Baru!";
     const notificationOptions = {
-        body: "Background Message body.",
+        body: payload.data?.body || "Cek sistem untuk melihatnya.",
         icon: "/firebase-logo.png",
     };
 

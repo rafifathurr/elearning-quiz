@@ -783,7 +783,7 @@ class OrderController extends Controller
                     ]);
 
                     if ($update_order) {
-                        $this->sendFcmNotificationToAllDevices("Ada Order Baru!", "Silakan cek sistem untuk melihat detailnya.");
+                        $this->sendFcmNotificationToAllDevices("Ada Order Baru!", "Order dengan id " . $id . " telah melakukan pembayaran");
                         DB::commit();
                         return redirect()
                             ->route('order.history')
