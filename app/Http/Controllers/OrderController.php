@@ -783,7 +783,8 @@ class OrderController extends Controller
                     ]);
 
                     if ($update_order) {
-                        $this->sendFcmNotificationToAllDevices("Ada Order Baru!", "Order dengan id " . $id . " telah melakukan pembayaran");
+                        $year = \Carbon\Carbon::parse($order->created_at)->format('y');
+                        $this->sendFcmNotificationToAllDevices("Ada Order Baru!", "Order dengan id BC" . $year . $id . " telah melakukan pembayaran");
                         DB::commit();
                         return redirect()
                             ->route('order.history')
