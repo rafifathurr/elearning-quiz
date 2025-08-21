@@ -121,17 +121,21 @@ class PackageController extends Controller
                 return $data->typePackage ? $data->typePackage->name : '-';
             })
             ->addColumn('status', function ($data) {
-                // Cek apakah status aktif (1) atau tidak (0)
-                $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
+                $options = [
+                    1 => 'Aktif',
+                    0 => 'Tidak Aktif',
+                    2 => 'Hidden',
+                ];
 
-                $toggle_status = '<div class="custom-control custom-switch">';
-                $toggle_status .= '<input type="checkbox" class="custom-control-input" id="status' . $data->id . '" ' . $checked . '>';
-                $toggle_status .= '<label class="custom-control-label" for="status' . $data->id . '">' . ($data->status == 1 ? 'Aktif' : 'Tidak Aktif') . '</label>';
-                $toggle_status .= '</div>';
+                $select = '<select class="form-control form-control-sm status-dropdown" data-id="' . $data->id . '">';
+                foreach ($options as $key => $label) {
+                    $selected = $data->status == $key ? 'selected' : '';
+                    $select .= "<option value='$key' $selected>$label</option>";
+                }
+                $select .= '</select>';
 
-                return $toggle_status;
+                return $select;
             })
-
             ->addColumn('quiz', function ($data) {
                 $list_view = '<div align="center">';
                 foreach ($data->packageTest as $package) {
@@ -166,8 +170,19 @@ class PackageController extends Controller
         $package->status = $request->status;
         $package->save();
 
-        return response()->json(['success' => true, 'status' => $package->status ? 'Aktif' : 'Tidak Aktif']);
+        $statusLabel = match ((int) $package->status) {
+            1 => 'Aktif',
+            0 => 'Tidak Aktif',
+            2 => 'Hidden',
+            default => 'Unknown'
+        };
+
+        return response()->json([
+            'success' => true,
+            'status' => $statusLabel
+        ]);
     }
+
 
 
     public function create()
