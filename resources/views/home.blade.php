@@ -193,8 +193,6 @@
                 @endif
 
 
-
-
                 {{-- Paket --}}
                 @if ($type_package->isNotEmpty())
                     <h3 class="text-center font-weight-bold my-3 w-100">
@@ -214,10 +212,11 @@
                                         {{-- Paket dari parent --}}
                                         @include('master.package_payment.package_list', [
                                             'packages' => $type->package,
+                                            'showEmpty' => false,
                                         ])
 
                                         {{-- Paket dari children --}}
-                                        @foreach ($type->children as $child)
+                                        @forelse ($type->children as $child)
                                             <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
                                                 <h4 class="text-center font-weight-bold text-primary">
                                                     {{ $child->name }}
@@ -225,9 +224,12 @@
                                                 <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
                                                 @include('master.package_payment.package_list', [
                                                     'packages' => $child->package,
+                                                    'showEmpty' => true,
                                                 ])
                                             </div>
-                                        @endforeach
+                                        @empty
+                                            <p class="font-weight-bolder text-danger text-center">-- Belum Ada Paket --</p>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>

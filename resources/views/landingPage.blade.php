@@ -369,6 +369,7 @@
             </div>
         </div>
 
+
         {{-- Contact Us --}}
         <div class="contact-us p-4 justify-content-center" id="contact">
             <div class="row justify-content-center align-items-center">
@@ -508,11 +509,11 @@
                     var shouldShowModal = @json(!Auth::check());
 
                     // Jika user belum login, tampilkan modal setelah 2 detik
-                    if (shouldShowModal) {
-                        setTimeout(function() {
-                            $('#videoModal').modal('show');
-                        }, 2000);
-                    }
+                    // if (shouldShowModal) {
+                    // setTimeout(function() {
+                    // $('#videoModal').modal('show');
+                    // }, 2000);
+                    // }
 
                     // Mulai video saat modal dibuka
                     $('#videoModal').on('shown.bs.modal', function() {
