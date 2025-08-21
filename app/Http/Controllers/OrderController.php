@@ -1069,6 +1069,19 @@ class OrderController extends Controller
     public function history(Request $request)
     {
 
+        // Cari order status = 2, lebih dari 1 bulan
+        $expiredOrders = Order::where('status', 2)
+            ->where('created_at', '<', now()->subMonth())
+            ->whereNull('deleted_at')
+            ->with('orderPackages') // ikut ambil relasi
+            ->get();
+
+        foreach ($expiredOrders as $order) {
+            // Hapus order
+            $order->update([
+                'deleted_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
         if ($request->ajax()) {
 
             $order = Order::where(function ($query) {
