@@ -154,7 +154,12 @@
                         @endif
                     </div>
 
-                    <span class="price-badge">
+                    @if (isset($package->description))
+                        <span class="package-description">
+                            {!! nl2br(e($package->description)) !!}
+                        </span>
+                    @endif
+                    <span class="price-badge mt-2">
                         @if ($package->price > 0)
                             Rp. {{ number_format($package->price, 0, ',', '.') }} <span class="per-peserta">/
                                 Peserta</span>
