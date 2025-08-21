@@ -11,10 +11,19 @@
 
         }
 
+        .g-recaptcha {
+            transform: scale(0.9);
+            transform-origin: left;
+        }
+
         @media (max-width: 576px) {
             .register-box {
                 margin-top: .5rem;
                 width: 80%;
+            }
+
+            .g-recaptcha {
+                transform: scale(0.7);
             }
         }
     </style>
@@ -55,6 +64,16 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group text-center">
+                                {!! NoCaptcha::display() !!}
+                                @error('g-recaptcha-response')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="row pt-3">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-block font-weight-bold">Submit</button>

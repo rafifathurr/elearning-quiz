@@ -139,6 +139,7 @@ class UserController extends Controller
                     'id_payment_package' => 'nullable',
                     'password' => 'required',
                     're_password' => 'required|same:password',
+                    'g-recaptcha-response' => 'required|captcha'
                 ]);
             }
 

@@ -105,6 +105,7 @@ class AuthController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'google_id' => 'required',
+            'g-recaptcha-response' => 'required|captcha'
         ]);
 
         try {

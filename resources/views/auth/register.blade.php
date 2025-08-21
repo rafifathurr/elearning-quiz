@@ -1,27 +1,44 @@
 @extends('layouts.main')
 @section('section')
     <style>
+        .register-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
         .register-box {
             width: 760px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
+            max-width: 95%;
+            margin: 2rem auto;
+        }
 
+
+        body.hold-transition.register-page {
+            min-height: 100vh;
+        }
+
+        .g-recaptcha {
+            transform: scale(0.9);
+            transform-origin: left;
         }
 
         @media (max-width: 576px) {
             .register-box {
-                margin-top: .5rem;
                 width: 80%;
+            }
+
+            .g-recaptcha {
+                transform: scale(0.7);
             }
         }
     </style>
 
     <body class="hold-transition register-page" style="background-color: #f4f6f9;">
         <div class="register-box">
-            <div class="card card-outline card-primary">
+            <div class="card card-outline card-primary my-2">
                 <div class="card-body text-center">
                     <h4 class="font-weight-bold text-primary">
                         <i class="fas fa-user-plus mr-2"></i>Daftar Akun
@@ -152,6 +169,13 @@
                             </div>
                         </div>
 
+                        <div class="form-group text-center">
+                            {!! NoCaptcha::display() !!}
+                            @error('g-recaptcha-response')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="row pt-3">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-block font-weight-bold"
@@ -161,7 +185,7 @@
                             </div>
                         </div>
 
-                        <div class="row justify-content-center mt-4">
+                        <div class="row justify-content-center mt-2">
                             <div class="col-12 text-center">
                                 <p>Sudah punya akun? <a href="{{ route('login') }}"
                                         class="text-primary font-weight-bold">Login di sini</a></p>
