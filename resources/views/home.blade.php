@@ -224,6 +224,7 @@
                                         @else
                                             @include('master.package_payment.package_list', [
                                                 'packages' => $type->package,
+                                                'showEmpty' => false,
                                             ])
                                         @endif
 

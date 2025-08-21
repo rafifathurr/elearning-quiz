@@ -350,6 +350,7 @@
                                         @else
                                             @include('master.package_payment.package_list', [
                                                 'packages' => $type->package,
+                                                'showEmpty' => false,
                                             ])
                                         @endif
 
@@ -363,6 +364,7 @@
                                                 </p>
                                                 @include('master.package_payment.package_list', [
                                                     'packages' => $child->package,
+                                                    'showEmpty' => true,
                                                 ])
                                             </div>
                                         @endforeach
