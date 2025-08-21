@@ -228,7 +228,7 @@
                                         @endif
 
                                         {{-- Paket dari children --}}
-                                        @forelse ($type->children as $child)
+                                        @foreach ($type->children as $child)
                                             <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
                                                 <h4 class="text-center font-weight-bold text-primary">
                                                     {{ $child->name }}
@@ -239,9 +239,7 @@
                                                     'showEmpty' => true,
                                                 ])
                                             </div>
-                                        @empty
-                                            <p class="font-weight-bolder text-danger text-center">-- Belum Ada Paket --</p>
-                                        @endforelse
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
