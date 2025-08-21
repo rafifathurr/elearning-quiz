@@ -327,7 +327,8 @@
                     </h3>
                     <div class="row mx-3 justify-content-center">
                         @foreach ($type_package as $type)
-                            <div class="col-md-5 col-sm-6 col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
+                            <div class="{{ $type->name == 'TRY OUT' ? 'col-12' : 'col-md-5 col-sm-6' }} mx-1 my-3">
+                                {{-- Responsif di layar kecil --}}
                                 <div class="card h-100 rounded-lg shadow-sm border-0">
                                     <div class="card-header bg-gradient-lightblue text-center">
                                         <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
@@ -336,9 +337,21 @@
                                         <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
 
                                         {{-- Paket dari parent --}}
-                                        @include('master.package_payment.package_list', [
-                                            'packages' => $type->package,
-                                        ])
+                                        @if ($type->name == 'TRY OUT')
+                                            <div class="row justify-content-center">
+                                                @foreach ($type->package as $package)
+                                                    <div class="col-md-5 col-sm-6 col-12 my-2">
+                                                        @include('master.package_payment.package_list', [
+                                                            'packages' => [$package],
+                                                        ])
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            @include('master.package_payment.package_list', [
+                                                'packages' => $type->package,
+                                            ])
+                                        @endif
 
                                         {{-- Paket dari children --}}
                                         @foreach ($type->children as $child)
