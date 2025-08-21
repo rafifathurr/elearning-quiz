@@ -27,7 +27,7 @@ class AuthController extends Controller
     // Callback dari Google
     public function callback()
     {
-        $googleUser = Socialite::driver('google')->user();
+        $googleUser = Socialite::driver('google')->stateless()->user();
 
         // Cek apakah user sudah ada di database
         $user = User::where('email', $googleUser->getEmail())->first();
@@ -79,11 +79,13 @@ class AuthController extends Controller
             }
         } else {
             // Jika belum terdaftar, arahkan ke halaman register
-            return redirect()->route('auth.create')->with([
+            session([
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
             ]);
+
+            return redirect()->route('auth.create');
         }
     }
 
@@ -99,7 +101,6 @@ class AuthController extends Controller
     public function storeDataGoogle(Request $request)
     {
         $request->validate([
-            'username' => 'required|unique:users,username',
             'phone' => 'required',
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -109,7 +110,7 @@ class AuthController extends Controller
         try {
             $user = User::create([
                 'name' => strtoupper($request->name),
-                'username' => $request->username,
+                'username' => strstr($request->email, '@', true),
                 'phone' => $request->phone,
                 'email' => $request->email,
                 'password' => bcrypt(Str::random(16)),
@@ -117,6 +118,7 @@ class AuthController extends Controller
             ]);
 
             $user->assignRole('user');
+            session()->forget(['name', 'email', 'google_id']);
 
             Auth::login($user);
             return redirect('/home')->with('success', 'Registrasi berhasil!');

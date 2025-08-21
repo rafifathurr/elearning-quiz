@@ -2,7 +2,7 @@
 @section('section')
     <style>
         .register-box {
-            width: 760px;
+
             position: fixed;
             top: 50%;
             left: 50%;
@@ -23,32 +23,18 @@
         <div class="register-box">
             <div class="card card-outline card-primary">
                 <div class="card-body">
-                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Register Akun</label>
+                    <label class="h5 pb-3"><i class="fas fa-list mr-2"></i>Registrasi Akun</label>
+                    <h5 class="font-weight-bold text-center text-muted"><i class="fas fa-hand-peace mr-2"></i>Halo
+                        {{ session('name') }}
+                    </h5>
+                    <p class="text-muted text-center">
+                        Silahkan masukan nomor handphone
+                        anda.</p>
                     <form action="{{ route('auth.storeDataGoogle') }}" method="post">
                         @csrf
                         <input type="hidden" name="name" value="{{ old('name', session('name')) }}">
                         <input type="hidden" name="email" value="{{ old('email', session('email')) }}">
                         <input type="hidden" name="google_id" value="{{ old('google_id', session('google_id')) }}">
-
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" name="username"
-                                        class="form-control @error('username') is-invalid @enderror" placeholder="Username"
-                                        value="{{ old('username') }}">
-                                    <div class="input-group-append">
-                                        <div class="input-group-text">
-                                            <span class="fas fa-user"></span>
-                                        </div>
-                                    </div>
-                                    @error('username')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="col-md-12">
                             <div class="form-group">
