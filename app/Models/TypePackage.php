@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class TypePackage extends Model
 {
@@ -12,8 +13,18 @@ class TypePackage extends Model
 
     public function package()
     {
-        return $this->hasMany(Package::class, 'id_type_package', 'id')->whereNull('deleted_at')->where('status', 1)->orderBy('price', 'DESC');
+        return $this->hasMany(Package::class, 'id_type_package', 'id')
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                if (Auth::check() && User::find(Auth::user()->id)->hasRole('counselor')) {
+                    $q->whereIn('status', [1, 2]);
+                } else {
+                    $q->where('status', 1);
+                }
+            })
+            ->orderBy('price', 'DESC');
     }
+
 
     public function children()
     {
