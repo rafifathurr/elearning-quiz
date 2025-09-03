@@ -34,7 +34,31 @@ messaging.onBackgroundMessage((payload) => {
     const notificationOptions = {
         body: payload.data?.body || "Cek sistem untuk melihatnya.",
         icon: "/firebase-logo.png",
+        data: {
+            url: "https://bratacerdas.com",
+        },
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener("notificationclick", function (event) {
+    event.notification.close();
+
+    const targetUrl = event.notification.data?.url || "https://bratacerdas.com";
+
+    event.waitUntil(
+        clients
+            .matchAll({ type: "window", includeUncontrolled: true })
+            .then((clientList) => {
+                for (const client of clientList) {
+                    if (client.url === targetUrl && "focus" in client) {
+                        return client.focus();
+                    }
+                }
+                if (clients.openWindow) {
+                    return clients.openWindow(targetUrl);
+                }
+            })
+    );
 });
