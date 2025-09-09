@@ -214,6 +214,11 @@ class UserController extends Controller
     {
         try {
             if (!is_null($id)) {
+                if (!User::find(Auth::user()->id)->hasRole('admin')) {
+                    return redirect()
+                        ->back()
+                        ->with(['failed' => 'Anda tidak memiliki akses untuk mengedit user lain.']);
+                }
                 $user  = User::find($id);
 
                 if (!is_null($user)) {

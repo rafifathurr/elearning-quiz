@@ -70,135 +70,135 @@
                 
                 ?>
 
-                <li class="nav-item {{ $display }} {{ $orderActive }}">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-chart-pie"></i>
-                        <p>
-                            Order
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @hasanyrole('user|counselor')
-                            <li class="nav-item {{ $display }}">
-
-                                <a href="{{ route('order.index') }}"
-                                    class="nav-link {{ request()->routeIs('order.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-shopping-cart"></i>
-                                    <p>
-                                        My Order <span
-                                            class="badge badge-danger ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
-                                    </p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('myvoucher.index') }}"
-                                    class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-tag"></i>
-                                    <p>
-                                        My Voucher
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('order.history') }}"
-                                    class="nav-link {{ request()->routeIs('order.history') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-list-alt"></i>
-                                    <p>
-                                        Order List <span
-                                            class="badge badge-danger ml-1 position-absolute">{{ $historyOrder > 0 ? $historyOrder : '' }}</span>
-                                    </p>
-                                </a>
-                            </li>
-                        @endhasanyrole
-
-
-                        @hasanyrole('admin|finance|manager')
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('order.listOrder') }}"
-                                    class="nav-link {{ request()->routeIs('order.listOrder') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-shopping-bag"></i>
-                                    <p>
-                                        Daftar Order
-                                        @hasanyrole('admin|finance')
-                                            @if ($orderList > 0)
-                                                <span
-                                                    class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}
-                                                </span>
-                                            @endif
-                                        @endhasanyrole
-
-                                    </p>
-                                </a>
-                            </li>
-                        @endhasanyrole
-                        @hasrole('user')
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('mytest.index') }}"
-                                    class="nav-link {{ request()->routeIs('mytest.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-book"></i>
-                                    <p>
-                                        My Test
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('myclass.index') }}"
-                                    class="nav-link {{ request()->routeIs('myclass.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-chalkboard"></i>
-                                    <p>
-                                        My Class
-                                    </p>
-                                </a>
-                            </li>
-                        @endhasrole
-
-                        @hasanyrole('admin|manager')
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('master.dateclass.index') }}"
-                                    class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-calendar-alt"></i>
-                                    <p>
-                                        Jadwal Kelas
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('master.voucher.index') }}"
-                                    class="nav-link {{ request()->routeIs('master.voucher.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-tags"></i>
-                                    <p>
-                                        Voucher Paket
-                                    </p>
-                                </a>
-                            </li>
-                        @endhasanyrole
-
-                        @hasanyrole('counselor|class-operator|manager')
-                            <li class="nav-item {{ $display }}">
-                                <a href="{{ route('class.index') }}"
-                                    class="nav-link {{ request()->routeIs('class.index') ? 'bg-primary' : '' }}">
-                                    <i class="nav-icon fas fa-chalkboard"></i>
-                                    <p>
-                                        My Class Konselor
-                                    </p>
-                                </a>
-                            </li>
-                            @hasanyrole('class-operator|manager')
+                @hasanyrole('user|counselor|admin|finance|manager|class-operator')
+                    <li class="nav-item {{ $display }} {{ $orderActive }}">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <p>
+                                Order
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @hasanyrole('user|counselor')
                                 <li class="nav-item {{ $display }}">
-                                    <a href="{{ route('master.member.index') }}"
-                                        class="nav-link {{ request()->routeIs('master.member.index') ? 'bg-primary' : '' }}">
-                                        <i class="nav-icon fas fa-user-check mr-1"></i>
-                                        <p> Daftar Peserta</p>
+
+                                    <a href="{{ route('order.index') }}"
+                                        class="nav-link {{ request()->routeIs('order.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-shopping-cart"></i>
+                                        <p>
+                                            My Order <span
+                                                class="badge badge-danger ml-1 position-absolute">{{ $orderPackage > 0 ? $orderPackage : '' }}</span>
+                                        </p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('myvoucher.index') }}"
+                                        class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-tag"></i>
+                                        <p>
+                                            My Voucher
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('order.history') }}"
+                                        class="nav-link {{ request()->routeIs('order.history') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-list-alt"></i>
+                                        <p>
+                                            Order List <span
+                                                class="badge badge-danger ml-1 position-absolute">{{ $historyOrder > 0 ? $historyOrder : '' }}</span>
+                                        </p>
                                     </a>
                                 </li>
                             @endhasanyrole
-                        @endhasanyrole
-                    </ul>
-                </li>
 
 
+                            @hasanyrole('admin|finance|manager')
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('order.listOrder') }}"
+                                        class="nav-link {{ request()->routeIs('order.listOrder') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-shopping-bag"></i>
+                                        <p>
+                                            Daftar Order
+                                            @hasanyrole('admin|finance')
+                                                @if ($orderList > 0)
+                                                    <span
+                                                        class="badge badge-danger ml-1 position-absolute">{{ $orderList > 0 ? $orderList : '' }}
+                                                    </span>
+                                                @endif
+                                            @endhasanyrole
+
+                                        </p>
+                                    </a>
+                                </li>
+                            @endhasanyrole
+                            @hasrole('user')
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('mytest.index') }}"
+                                        class="nav-link {{ request()->routeIs('mytest.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>
+                                            My Test
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('myclass.index') }}"
+                                        class="nav-link {{ request()->routeIs('myclass.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-chalkboard"></i>
+                                        <p>
+                                            My Class
+                                        </p>
+                                    </a>
+                                </li>
+                            @endhasrole
+
+                            @hasanyrole('admin|manager')
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('master.dateclass.index') }}"
+                                        class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-calendar-alt"></i>
+                                        <p>
+                                            Jadwal Kelas
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('master.voucher.index') }}"
+                                        class="nav-link {{ request()->routeIs('master.voucher.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-tags"></i>
+                                        <p>
+                                            Voucher Paket
+                                        </p>
+                                    </a>
+                                </li>
+                            @endhasanyrole
+
+                            @hasanyrole('counselor|class-operator|manager')
+                                <li class="nav-item {{ $display }}">
+                                    <a href="{{ route('class.index') }}"
+                                        class="nav-link {{ request()->routeIs('class.index') ? 'bg-primary' : '' }}">
+                                        <i class="nav-icon fas fa-chalkboard"></i>
+                                        <p>
+                                            My Class Konselor
+                                        </p>
+                                    </a>
+                                </li>
+                                @hasanyrole('class-operator|manager')
+                                    <li class="nav-item {{ $display }}">
+                                        <a href="{{ route('master.member.index') }}"
+                                            class="nav-link {{ request()->routeIs('master.member.index') ? 'bg-primary' : '' }}">
+                                            <i class="nav-icon fas fa-user-check mr-1"></i>
+                                            <p> Daftar Peserta</p>
+                                        </a>
+                                    </li>
+                                @endhasanyrole
+                            @endhasanyrole
+                        </ul>
+                    </li>
+                @endhasanyrole
                 <?php
                 $testActive = request()->routeIs('admin.quiz.index') || request()->routeIs('master.aspect.index') || request()->routeIs('master.question.index') || request()->routeIs('master.typePackage.index') || request()->routeIs('master.package.index') || request()->routeIs('mytest.history') ? 'menu-open' : ''; ?>
                 @hasanyrole('admin|package-manager|question-operator|manager')
@@ -313,7 +313,7 @@
                     </li>
                 @endhasanyrole
 
-                @hasanyrole('admin|manager')
+                @hasanyrole('admin|class-operator|manager')
                     <li class="nav-item {{ $display }}">
                         <a href="{{ route('master.user.index') }}"
                             class="nav-link {{ request()->routeIs('master.user.index') ? 'active' : '' }}">

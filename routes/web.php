@@ -304,7 +304,7 @@ Route::group(['middleware' => ['role:counselor|class-operator|manager']], functi
 
 
 // Hanya Admin
-Route::group(['middleware' => ['role:admin|manager']], function () {
+Route::group(['middleware' => ['role:admin|class-operator|manager']], function () {
 
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         //Pengguna
