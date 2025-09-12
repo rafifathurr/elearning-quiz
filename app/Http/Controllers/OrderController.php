@@ -818,8 +818,8 @@ class OrderController extends Controller
     private function sendFcmNotificationToAllDevices($title, $body)
     {
         $tokens = TokenData::whereHas('user.roles', function ($query) {
-            $query->where('name', 'admin');
-        })->with('user')->get();
+            $query->whereIn('name', ['admin', 'finance']);
+        })->with('user')->get()->unique('token');
 
         $accessToken = $this->getGoogleAccessToken();
 
