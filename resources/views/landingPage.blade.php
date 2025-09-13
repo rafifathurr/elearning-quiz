@@ -405,21 +405,14 @@
 
                     <!-- Kontak WhatsApp 1 -->
                     <p class="mb-3">
-                        <a href="https://wa.me/6285860571111" target="_blank"
+                        <a href="https://wa.me/6281318826787" target="_blank"
                             class="d-flex align-items-center text-success text-decoration-none">
                             <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
-                            <span class="h5 font-weight-bold">+62 858 6057 1111</span>
+                            <span class="h5 font-weight-bold">+62 813 1882 6787</span>
                         </a>
                     </p>
 
-                    <!-- Kontak WhatsApp 2 -->
-                    <p>
-                        <a href="https://wa.me/6281315001480" target="_blank"
-                            class="d-flex align-items-center text-success text-decoration-none">
-                            <i class="fab fa-whatsapp fa-2x mr-3 hover-scale"></i>
-                            <span class="h5 font-weight-bold">+62 813 1500 1480</span>
-                        </a>
-                    </p>
+
                 </div>
             </div>
         </div>
