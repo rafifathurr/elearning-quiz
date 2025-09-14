@@ -70,7 +70,7 @@
                 
                 ?>
 
-                @hasanyrole('user|counselor|admin|finance|manager|class-operator')
+                @hasanyrole('user|counselor|admin|finance|manager|class-operator|package-manager')
                     <li class="nav-item {{ $display }} {{ $orderActive }}">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-chart-pie"></i>
@@ -134,6 +134,7 @@
                                     </a>
                                 </li>
                             @endhasanyrole
+
                             @hasrole('user')
                                 <li class="nav-item {{ $display }}">
                                     <a href="{{ route('mytest.index') }}"
@@ -155,7 +156,7 @@
                                 </li>
                             @endhasrole
 
-                            @hasanyrole('admin|manager')
+                            @hasanyrole('admin|manager|package-manager')
                                 <li class="nav-item {{ $display }}">
                                     <a href="{{ route('master.dateclass.index') }}"
                                         class="nav-link {{ request()->routeIs('master.dateclass.index') ? 'bg-primary' : '' }}">

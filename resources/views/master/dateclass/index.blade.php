@@ -12,7 +12,7 @@
                                 <h3 class="font-weight-bold">Jadwal Kelas</h3>
                             </div>
                             <div class="card-body">
-                                @hasanyrole('admin')
+                                @hasanyrole('admin|package-manager')
                                     <a href="{{ route('master.dateclass.create') }}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-plus mr-1"></i>
                                         Tambah Jadwal Kelas

@@ -246,7 +246,7 @@ Route::group(['middleware' => ['role:admin|finance|manager']], function () {
 
 
 // Admin | Konselor
-Route::group(['middleware' => ['role:admin|counselor|manager']], function () {
+Route::group(['middleware' => ['role:admin|counselor|manager|package-manager']], function () {
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         // Kelola Jadwal Kelas
         Route::group(['controller' => DateClassController::class, 'prefix' => 'dateclass', 'as' => 'dateclass.'], function () {
