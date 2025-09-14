@@ -611,17 +611,24 @@ class OrderController extends Controller
 
                     // Jika metode pembayaran transfer, arahkan ke detailPayment
                     if ($request->payment_method == 'transfer') {
-                        if (User::find(Auth::user()->id)->hasRole('user') && !User::find(Auth::user()->id)->hasRole('counselor')) {
-                            $sendMail = Mail::to(Auth::user()->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
-                        } else {
-                            $sendMail = Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
-                        }
-                        if ($sendMail) {
-                            return response()->json([
-                                'success' => true,
-                                'redirect_url' => route('order.detailPayment', ['id' => $id])
-                            ]);
-                        }
+                        $authUser = Auth::user();
+                        $authUserId = $authUser->id;
+                        $authUserEmail = $authUser->email;
+                        register_shutdown_function(function () use ($order, $order_package, $totalPrice, $authUserId, $authUserEmail) {
+                            try {
+                                if (User::find($authUserId)->hasRole('user') && !User::find($authUserId)->hasRole('counselor')) {
+                                    Mail::to($authUserEmail)->send(new InvoiceMail($order, $order_package, $totalPrice));
+                                } else {
+                                    Mail::to($order->user->email)->send(new InvoiceMail($order, $order_package, $totalPrice));
+                                }
+                            } catch (\Exception $e) {
+                                Log::error('Gagal kirim email invoice: ' . $e->getMessage());
+                            }
+                        });
+                        return response()->json([
+                            'success' => true,
+                            'redirect_url' => route('order.detailPayment', ['id' => $id])
+                        ]);
                     } elseif ($request->payment_method == 'briva') {
                         $year = now()->format('y'); // Ambil 2 digit terakhir tahun
                         // Gabungkan tahun dan order ID menjadi satu angka
@@ -980,11 +987,16 @@ class OrderController extends Controller
                 }
             }
 
-            // Kirim email tetap dikirim, baik ada paket atau tidak
-            Mail::to($order->user->email)->send(new ApproveOrderMail($order, $order_package));
-
             DB::commit();
             session()->flash('success', 'Berhasil Menerima Order');
+
+            register_shutdown_function(function () use ($order, $order_package) {
+                try {
+                    Mail::to($order->user->email)->send(new ApproveOrderMail($order, $order_package));
+                } catch (\Exception $e) {
+                    Log::error('Gagal kirim email approve order: ' . $e->getMessage());
+                }
+            });
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('failed', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -1004,16 +1016,28 @@ class OrderController extends Controller
             ]);
 
             if ($reject_order) {
-                Mail::to($order->user->email)->send(new RejectOrderMail($order));
                 DB::commit();
+
+
                 session()->flash('success', 'Berhasil Menolak Order');
+
+
+                register_shutdown_function(function () use ($order) {
+                    try {
+                        Mail::to($order->user->email)->send(new RejectOrderMail($order));
+                    } catch (\Exception $e) {
+                        Log::error('Gagal kirim email reject order: ' . $e->getMessage());
+                    }
+                });
             } else {
-                throw new Exception('Gagal mengubah status order.');
+                throw new \Exception('Gagal mengubah status order.');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('failed', $e->getMessage());
+            session()->flash('failed', 'Gagal Menolak Order');
         }
+
+        return redirect()->back();
     }
 
 
