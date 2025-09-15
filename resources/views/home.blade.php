@@ -31,8 +31,8 @@
 
 
         /* .select2-container {
-                                    z-index: 9999 !important;
-                                    margin-bottom: 1rem !important; */
+                                                z-index: 9999 !important;
+                                                margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -261,6 +261,7 @@
                     <h3 class="text-center font-weight-bold my-3">
                         Paket <span class="custom-shape bg-gradient-lightblue">Kelas</span>
                     </h3>
+
                     <div class="d-flex justify-content-center m-3">
                         <div class="col-4">
                             <label>Aspek</label>
@@ -274,10 +275,9 @@
                             <label>Pendidikan</label>
                             <select class="form-control select2" id="filterJenis" data-placeholder="Semua Pendidikan"
                                 multiple>
-                                @foreach ($otherPackages as $item)
-                                    <option value="{{ $item->name }}">{{ $item->name }}</option>
+                                @foreach ($otherPackages->pluck('jenis')->unique() as $jenis)
+                                    <option value="{{ $jenis }}">{{ $jenis }}</option>
                                 @endforeach
-
                             </select>
                         </div>
                         <div class="col-4">
@@ -287,40 +287,20 @@
                                 <option value="Offline">Offline</option>
                             </select>
                         </div>
-
                     </div>
 
                     <div class="row mx-3 justify-content-center">
-                        @foreach ($otherPackages as $type)
-                            <div class="col-md-5 col-sm-6 mx-1 my-3 package-card" data-jenis="{{ $type->name }}">
-                                <div class="card h-100 rounded-lg shadow-sm border-0">
-                                    <div class="card-header bg-gradient-lightblue text-center">
-                                        <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
-
-                                        @php
-                                            $allPackages = collect();
-                                            foreach ($type->children as $child) {
-                                                foreach ($child->package as $package) {
-                                                    $package->aspek = Str::before($child->name, ' ');
-                                                    $package->sesi = Str::afterLast($child->name, ' ');
-                                                    $allPackages->push($package);
-                                                }
-                                            }
-                                        @endphp
-
-                                        @include('master.package_payment.package_list', [
-                                            'packages' => $allPackages,
-                                            'showMeta' => true,
-                                        ])
-                                    </div>
-                                </div>
+                        @foreach ($otherPackages as $package)
+                            <div class="col-md-5 col-sm-6 col-12 my-2 mx-1"
+                                data-aspek="{{ strtolower($package->aspek ?? '') }}"
+                                data-sesi="{{ strtolower($package->sesi ?? '') }}"
+                                data-jenis="{{ strtolower($package->jenis ?? '') }}">
+                                @include('master.package_payment.package_list', [
+                                    'package' => $package,
+                                    'showMeta' => true,
+                                ])
                             </div>
                         @endforeach
-
-
                     </div>
                 @endif
 
@@ -345,47 +325,21 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const filterAspek = $('#filterAspek');
-                const filterJenis = $('#filterJenis');
-                const filterSesi = $('#filterSesi');
-
                 function applyFilter() {
                     const aspekValues = $('#filterAspek').val()?.map(v => v.toLowerCase()) || [];
                     const jenisValues = $('#filterJenis').val()?.map(v => v.toLowerCase()) || [];
                     const sesiValues = $('#filterSesi').val()?.map(v => v.toLowerCase()) || [];
 
-                    document.querySelectorAll('.package-card').forEach(card => {
-                        let jenisMatch = jenisValues.length === 0 ||
-                            jenisValues.some(j => card.dataset.jenis.toLowerCase().includes(j));
+                    document.querySelectorAll('[data-aspek]').forEach(pkg => {
+                        let aspekMatch = aspekValues.length === 0 || aspekValues.includes(pkg.dataset.aspek);
+                        let jenisMatch = jenisValues.length === 0 || jenisValues.includes(pkg.dataset.jenis);
+                        let sesiMatch = sesiValues.length === 0 || sesiValues.includes(pkg.dataset.sesi);
 
-                        let packageVisible = false;
-
-                        card.querySelectorAll('li').forEach(pkg => {
-                            let aspekMatch = aspekValues.length === 0 ||
-                                aspekValues.includes(pkg.dataset.aspek);
-
-                            let sesiMatch = sesiValues.length === 0 ||
-                                sesiValues.includes(pkg.dataset.sesi);
-
-                            if (aspekMatch && sesiMatch && jenisMatch) {
-                                pkg.style.display = 'block';
-                                packageVisible = true;
-                            } else {
-                                pkg.style.display = 'none';
-                            }
-                        });
-
-
-                        card.style.display = (jenisMatch && packageVisible) ? 'block' : 'none';
+                        pkg.style.display = (aspekMatch && jenisMatch && sesiMatch) ? '' : 'none';
                     });
                 }
 
                 $('#filterAspek, #filterJenis, #filterSesi').on('change', applyFilter);
-
-
-                [filterAspek, filterJenis, filterSesi].forEach(el => {
-                    el.on('change', applyFilter);
-                });
             });
         </script>
 

@@ -125,8 +125,8 @@
         }
 
         /* .select2-container {
-                                                                                                                z-index: 9999 !important;
-                                                                                                                margin-bottom: 1rem !important; */
+                                                                                                                    z-index: 9999 !important;
+                                                                                                                    margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -532,12 +532,12 @@
                         const jenisValues = $('#filterJenis').val()?.map(v => v.toLowerCase()) || [];
                         const sesiValues = $('#filterSesi').val()?.map(v => v.toLowerCase()) || [];
 
-                        document.querySelectorAll('li[data-aspek]').forEach(pkg => {
+                        document.querySelectorAll('[data-aspek]').forEach(pkg => {
                             let aspekMatch = aspekValues.length === 0 || aspekValues.includes(pkg.dataset.aspek);
                             let jenisMatch = jenisValues.length === 0 || jenisValues.includes(pkg.dataset.jenis);
                             let sesiMatch = sesiValues.length === 0 || sesiValues.includes(pkg.dataset.sesi);
 
-                            pkg.style.display = (aspekMatch && jenisMatch && sesiMatch) ? 'block' : 'none';
+                            pkg.style.display = (aspekMatch && jenisMatch && sesiMatch) ? '' : 'none';
                         });
                     }
 
