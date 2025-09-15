@@ -282,7 +282,7 @@
 
                 @endhasanyrole
 
-                @hasanyrole('admin|manager')
+                @hasanyrole('admin|finance|manager')
                     <?php
                     $laporanActive = request()->routeIs('laporan.index') ? 'menu-open' : ''; ?>
                     <li class="nav-item {{ $laporanActive }}">
@@ -305,7 +305,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="../../index3.html" class="nav-link">
+                                <a href="#" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Laporan Hasil</p>
                                 </a>
