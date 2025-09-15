@@ -147,8 +147,8 @@ if (Auth::check()) {
 
         {{-- Meta --}}
         @if ($showMeta)
-            <span class="package-meta">
-                {{ $package->aspek }} | {{ $package->sesi }}
+            <span class="package-meta mt-2">
+                {{ $package->jenis }} |{{ $package->aspek }} | {{ $package->sesi }}
             </span>
         @endif
     </button>
@@ -196,8 +196,8 @@ if (Auth::check()) {
 
         {{-- Meta --}}
         @if ($showMeta)
-            <span class="package-meta">
-                {{ $package->aspek }} | {{ $package->sesi }}
+            <span class="package-meta mt-2">
+                {{ $package->jenis }} |{{ $package->aspek }} | {{ $package->sesi }}
             </span>
         @endif
     </a>
