@@ -15,7 +15,7 @@
         text-align: center;
         position: relative;
         text-decoration: none;
-        min-height: 160px;
+
     }
 
     .stylish-button:hover {
@@ -83,9 +83,8 @@
     }
 
     .package-meta {
-        position: absolute;
-        bottom: 8px;
-        left: 12px;
+
+        align-self: flex-start;
         font-size: 0.85rem;
         font-weight: bold;
         color: #fff;
@@ -134,7 +133,7 @@
                             {!! nl2br(e($package->description)) !!}
                         </span>
                     @endif
-                    <span class="price-badge mt-2">
+                    <span class="price-badge">
                         @if ($package->price > 0)
                             Rp. {{ number_format($package->price, 0, ',', '.') }} <span class="per-peserta">/
                                 Peserta</span>
@@ -144,7 +143,7 @@
                     </span>
 
                     @if ($showMeta)
-                        <span class="package-meta">
+                        <span class="package-meta mt-4">
                             {{ $package->aspek }} | {{ $package->sesi }}
                         </span>
                     @endif
