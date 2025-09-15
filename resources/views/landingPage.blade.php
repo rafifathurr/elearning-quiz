@@ -125,8 +125,8 @@
         }
 
         /* .select2-container {
-                                                                                                                    z-index: 9999 !important;
-                                                                                                                    margin-bottom: 1rem !important; */
+                                                                                                                        z-index: 9999 !important;
+                                                                                                                        margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -372,14 +372,15 @@
                             <div class="card-body">
                                 <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
                                 <div class="row justify-content-center">
-                                    @foreach ($type->package as $package)
+                                    @foreach ($type->package as $item)
                                         <div class="col-md-5 col-sm-6 col-12 my-2">
                                             @include('master.package_payment.package_list', [
-                                                'packages' => [$package],
+                                                'package' => $item,
                                                 'showMeta' => false,
                                             ])
                                         </div>
                                     @endforeach
+
                                 </div>
 
 
