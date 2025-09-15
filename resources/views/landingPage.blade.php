@@ -66,7 +66,7 @@
             transition: all 0.4s ease;
             background-color: transparent;
             /* Transparan saat di posisi atas */
-            z-index: 1000;
+            z-index: 99999;
             position: relative;
             /* Tidak sticky secara default */
         }
@@ -124,11 +124,11 @@
             }
         }
 
-        .select2-container {
-            z-index: 9999 !important;
-            margin-bottom: 1rem !important;
-            /* Menjamin dropdown tampil di atas modal */
-        }
+        /* .select2-container {
+                                            z-index: 9999 !important;
+                                            margin-bottom: 1rem !important; */
+        /* Menjamin dropdown tampil di atas modal */
+        /* } */
 
         .select2-container .select2-selection--multiple {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
@@ -376,24 +376,13 @@
                                         <div class="col-md-5 col-sm-6 col-12 my-2">
                                             @include('master.package_payment.package_list', [
                                                 'packages' => [$package],
+                                                'showMeta' => false,
                                             ])
                                         </div>
                                     @endforeach
                                 </div>
 
-                                {{-- Children kalau ada --}}
-                                @foreach ($type->children as $child)
-                                    <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
-                                        <h4 class="text-center font-weight-bold text-primary">
-                                            {{ $child->name }}
-                                        </h4>
-                                        <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
-                                        @include('master.package_payment.package_list', [
-                                            'packages' => $child->package,
-                                            'showEmpty' => true,
-                                        ])
-                                    </div>
-                                @endforeach
+
                             </div>
                         </div>
                     </div>
@@ -404,7 +393,7 @@
         {{-- OTHER PACKAGES --}}
         @if ($otherPackages->isNotEmpty())
             <h3 class="text-center font-weight-bold my-3">
-                Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                Paket <span class="custom-shape bg-gradient-lightblue">Kelas</span>
             </h3>
             <div class="d-flex justify-content-center m-3">
                 <div class="col-4">
@@ -444,25 +433,26 @@
                             <div class="card-body">
                                 <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
 
-                                {{-- Children --}}
-                                @foreach ($type->children as $child)
-                                    <div class="border rounded-lg p-2 mx-2 my-3 bg-light package-child"
-                                        data-aspek="{{ Str::before($child->name, ' ') }}"
-                                        data-sesi="{{ Str::afterLast($child->name, ' ') }}">
-                                        <h4 class="text-center font-weight-bold text-primary">
-                                            {{ $child->name }}
-                                        </h4>
-                                        <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
-                                        @include('master.package_payment.package_list', [
-                                            'packages' => $child->package,
-                                            'showEmpty' => true,
-                                        ])
-                                    </div>
-                                @endforeach
+                                @php
+                                    $allPackages = collect();
+                                    foreach ($type->children as $child) {
+                                        foreach ($child->package as $package) {
+                                            $package->aspek = Str::before($child->name, ' ');
+                                            $package->sesi = Str::afterLast($child->name, ' ');
+                                            $allPackages->push($package);
+                                        }
+                                    }
+                                @endphp
+
+                                @include('master.package_payment.package_list', [
+                                    'packages' => $allPackages,
+                                    'showMeta' => true,
+                                ])
                             </div>
                         </div>
                     </div>
                 @endforeach
+
 
             </div>
         @endif
@@ -562,43 +552,44 @@
                     const filterSesi = $('#filterSesi');
 
                     function applyFilter() {
-                        const aspekValues = filterAspek.val()?.map(v => v.toLowerCase()) || [];
-                        const jenisValues = filterJenis.val()?.map(v => v.toLowerCase()) || [];
-                        const sesiValues = filterSesi.val()?.map(v => v.toLowerCase()) || [];
+                        const aspekValues = $('#filterAspek').val()?.map(v => v.toLowerCase()) || [];
+                        const jenisValues = $('#filterJenis').val()?.map(v => v.toLowerCase()) || [];
+                        const sesiValues = $('#filterSesi').val()?.map(v => v.toLowerCase()) || [];
 
                         document.querySelectorAll('.package-card').forEach(card => {
                             let jenisMatch = jenisValues.length === 0 ||
                                 jenisValues.some(j => card.dataset.jenis.toLowerCase().includes(j));
 
-                            let childVisible = false;
+                            let packageVisible = false;
 
-                            card.querySelectorAll('.package-child').forEach(child => {
+                            card.querySelectorAll('li').forEach(pkg => {
                                 let aspekMatch = aspekValues.length === 0 ||
-                                    aspekValues.some(a => child.dataset.aspek.toLowerCase().includes(a));
+                                    aspekValues.includes(pkg.dataset.aspek);
 
                                 let sesiMatch = sesiValues.length === 0 ||
-                                    sesiValues.some(s => child.dataset.sesi.toLowerCase().includes(s));
+                                    sesiValues.includes(pkg.dataset.sesi);
 
                                 if (aspekMatch && sesiMatch && jenisMatch) {
-                                    child.style.display = 'block';
-                                    childVisible = true;
+                                    pkg.style.display = 'block';
+                                    packageVisible = true;
                                 } else {
-                                    child.style.display = 'none';
+                                    pkg.style.display = 'none';
                                 }
                             });
 
-                            card.style.display = (jenisMatch && childVisible) ? 'block' : 'none';
+
+                            card.style.display = (jenisMatch && packageVisible) ? 'block' : 'none';
                         });
                     }
+
+                    $('#filterAspek, #filterJenis, #filterSesi').on('change', applyFilter);
+
 
                     [filterAspek, filterJenis, filterSesi].forEach(el => {
                         el.on('change', applyFilter);
                     });
                 });
             </script>
-
-
-
 
             <!-- Script Back to Top & Navbar -->
             <script>

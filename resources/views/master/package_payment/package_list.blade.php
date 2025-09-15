@@ -15,6 +15,7 @@
         text-align: center;
         position: relative;
         text-decoration: none;
+        min-height: 160px;
     }
 
     .stylish-button:hover {
@@ -80,9 +81,19 @@
         padding: 5px 10px;
         opacity: 0.8;
     }
+
+    .package-meta {
+        position: absolute;
+        bottom: 8px;
+        left: 12px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #fff;
+        opacity: 0.9;
+    }
 </style>
 <ul class="text-center list-unstyled p-2 m-0">
-    @forelse ($packages as $package)
+    @foreach ($packages as $package)
         <?php
         if (Auth::check()) {
             if (auth()->user()->hasRole('counselor')) {
@@ -94,7 +105,8 @@
             $onClick = null;
         }
         ?>
-        <li class="mb-3">
+        <li class="mb-3" data-aspek="{{ strtolower($package->aspek ?? '') }}"
+            data-sesi="{{ strtolower($package->sesi ?? '') }}">
             @if ($onClick)
                 <button onclick="{{ $onClick }}" class="stylish-button w-100 shadow-sm">
                     <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
@@ -130,6 +142,12 @@
                             Gratis
                         @endif
                     </span>
+
+                    @if ($showMeta)
+                        <span class="package-meta">
+                            {{ $package->aspek }} | {{ $package->sesi }}
+                        </span>
+                    @endif
 
 
                 </button>
@@ -167,12 +185,15 @@
                             Gratis
                         @endif
                     </span>
+
+                    @if ($showMeta)
+                        <span class="package-meta">
+                            {{ $package->aspek }} | {{ $package->sesi }}
+                        </span>
+                    @endif
                 </a>
             @endif
         </li>
-    @empty
-        @if (!empty($showEmpty) && $showEmpty === true)
-            <p class="font-weight-bolder text-danger">-- Belum Ada Paket --</p>
-        @endif
-    @endforelse
+
+    @endforeach
 </ul>
