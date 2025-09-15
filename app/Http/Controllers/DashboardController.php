@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -199,25 +200,39 @@ class DashboardController extends Controller
 
         $typePackages = TypePackage::where('id_parent', 0)
             ->whereNull('deleted_at')
-            ->with('children', 'package')
+            ->with('children.package')
             ->orderBy('created_at', 'DESC')
             ->get();
+
         $tryOutPackages = $typePackages->filter(function ($item) {
             return strtoupper($item->name) === 'TRY OUT';
         });
-
 
         $otherPackages = $typePackages->reject(function ($item) {
             return strtoupper($item->name) === 'TRY OUT';
         });
 
+        // 🔥 Kumpulkan semua package tanpa parent
+        $allPackages = collect();
+        foreach ($otherPackages as $type) {
+            foreach ($type->children as $child) {
+                foreach ($child->package as $package) {
+                    $package->aspek = Str::before($child->name, ' ');
+                    $package->sesi = Str::afterLast($child->name, ' ');
+                    $package->jenis = $type->name;
+                    $allPackages->push($package);
+                }
+            }
+        }
+
         $data = [
             'tryOutPackages' => $tryOutPackages,
-            'otherPackages'  => $otherPackages,
+            'otherPackages'  => $allPackages,
         ];
 
         return view('landingPage', $data);
     }
+
 
     public function contact()
     {
