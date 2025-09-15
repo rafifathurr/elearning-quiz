@@ -318,71 +318,117 @@
             </div>
         </div>
 
-        {{-- Daftar Paket --}}
-        <div class="package pt-4" id="package">
-            <div class="py-3 px-3">
-                @if ($type_package->isNotEmpty())
-                    <h3 class="text-center font-weight-bold my-3">
-                        Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
-                    </h3>
-                    <div class="row mx-3 justify-content-center">
-                        @foreach ($type_package as $type)
-                            <div class="{{ $type->name == 'TRY OUT' ? 'col-12' : 'col-md-5 col-sm-6' }} mx-1 my-3">
-                                {{-- Responsif di layar kecil --}}
-                                <div class="card h-100 rounded-lg shadow-sm border-0">
-                                    <div class="card-header bg-gradient-lightblue text-center">
-                                        <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
 
-                                        {{-- Paket dari parent --}}
-                                        @if ($type->name == 'TRY OUT')
-                                            <div class="row justify-content-center">
-                                                @foreach ($type->package as $package)
-                                                    <div class="col-md-5 col-sm-6 col-12 my-2">
-                                                        @include('master.package_payment.package_list', [
-                                                            'packages' => [$package],
-                                                        ])
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            @include('master.package_payment.package_list', [
-                                                'packages' => $type->package,
-                                                'showEmpty' => false,
-                                            ])
-                                        @endif
-
-                                        {{-- Paket dari children --}}
-                                        @foreach ($type->children as $child)
-                                            <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
-                                                <h4 class="text-center font-weight-bold text-primary">
-                                                    {{ $child->name }}
-                                                </h4>
-                                                <p class="text-center text-muted">{{ $child->description ?? '' }}
-                                                </p>
-                                                @include('master.package_payment.package_list', [
-                                                    'packages' => $child->package,
-                                                    'showEmpty' => true,
-                                                ])
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
+        {{-- TRY OUT --}}
+        @if ($tryOutPackages->isNotEmpty())
+            <h3 class="text-center font-weight-bold my-3">
+                Daftar <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
+            </h3>
+            <div class="row mx-3 justify-content-center">
+                @foreach ($tryOutPackages as $type)
+                    <div class="col-12 mx-1 my-3">
+                        <div class="card h-100 rounded-lg shadow-sm border-0">
+                            <div class="card-header bg-gradient-lightblue text-center">
+                                <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
                             </div>
-                        @endforeach
+                            <div class="card-body">
+                                <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+                                <div class="row justify-content-center">
+                                    @foreach ($type->package as $package)
+                                        <div class="col-md-5 col-sm-6 col-12 my-2">
+                                            @include('master.package_payment.package_list', [
+                                                'packages' => [$package],
+                                            ])
+                                        </div>
+                                    @endforeach
+                                </div>
 
-
+                                {{-- Children kalau ada --}}
+                                @foreach ($type->children as $child)
+                                    <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
+                                        <h4 class="text-center font-weight-bold text-primary">
+                                            {{ $child->name }}
+                                        </h4>
+                                        <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
+                                        @include('master.package_payment.package_list', [
+                                            'packages' => $child->package,
+                                            'showEmpty' => true,
+                                        ])
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
-                @else
-                    <h3 class="text-center font-weight-bold my-3">
-                        Belum Ada Paket
-                    </h3>
-                @endif
+                @endforeach
+            </div>
+        @endif
+
+        {{-- OTHER PACKAGES --}}
+        @if ($otherPackages->isNotEmpty())
+            <h3 class="text-center font-weight-bold my-3">
+                Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+            </h3>
+            <div class="d-flex justify-content-center m-3">
+                <div class="col-4">
+                    <label>Pilih Aspek</label>
+                    <select class="form-control" id="filterAspek">
+                        <option value="">-- Pilih Aspek --</option>
+                        <option value="Psikologi">Psikologi</option>
+                        <option value="Akademik">Akademik</option>
+                        <option value="Jasmani">Jasmani</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label>Pilih Jenis</label>
+                    <select class="form-control" id="filterJenis">
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="Akpol">Akpol</option>
+                        <option value="Bintara">Bintara</option>
+                        <option value="Dikbang">Dikbang</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label>Pilih Sesi</label>
+                    <select class="form-control" id="filterSesi">
+                        <option value="">-- Pilih Sesi --</option>
+                        <option value="Online">Online</option>
+                        <option value="Offline">Offline</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mx-3 justify-content-center">
+                @foreach ($otherPackages as $type)
+                    <div class="col-md-5 col-sm-6 mx-1 my-3 package-card" data-jenis="{{ $type->name }}">
+                        <div class="card h-100 rounded-lg shadow-sm border-0">
+                            <div class="card-header bg-gradient-lightblue text-center">
+                                <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+
+                                {{-- Children --}}
+                                @foreach ($type->children as $child)
+                                    <div class="border rounded-lg p-2 mx-2 my-3 bg-light package-child"
+                                        data-aspek="{{ Str::before($child->name, ' ') }}"
+                                        data-sesi="{{ Str::afterLast($child->name, ' ') }}">
+                                        <h4 class="text-center font-weight-bold text-primary">
+                                            {{ $child->name }}
+                                        </h4>
+                                        <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
+                                        @include('master.package_payment.package_list', [
+                                            'packages' => $child->package,
+                                            'showEmpty' => true,
+                                        ])
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
 
             </div>
-        </div>
+        @endif
 
 
         {{-- Contact Us --}}
@@ -462,6 +508,47 @@
 
         @push('javascript-bottom')
             @include('js.order.script')
+            <!-- Script Filter Paket -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const filterAspek = document.getElementById('filterAspek');
+                    const filterJenis = document.getElementById('filterJenis');
+                    const filterSesi = document.getElementById('filterSesi');
+
+                    function applyFilter() {
+                        const aspek = filterAspek.value.toLowerCase();
+                        const jenis = filterJenis.value.toLowerCase();
+                        const sesi = filterSesi.value.toLowerCase();
+
+                        document.querySelectorAll('.package-card').forEach(card => {
+                            let jenisMatch = !jenis || card.dataset.jenis.toLowerCase().includes(jenis);
+                            let childVisible = false;
+
+                            card.querySelectorAll('.package-child').forEach(child => {
+                                let aspekMatch = !aspek || child.dataset.aspek.toLowerCase().includes(
+                                    aspek);
+                                let sesiMatch = !sesi || child.dataset.sesi.toLowerCase().includes(sesi);
+
+                                if (aspekMatch && sesiMatch && jenisMatch) {
+                                    child.style.display = 'block';
+                                    childVisible = true;
+                                } else {
+                                    child.style.display = 'none';
+                                }
+                            });
+
+                            card.style.display = (jenisMatch && childVisible) ? 'block' : 'none';
+                        });
+                    }
+
+                    [filterAspek, filterJenis, filterSesi].forEach(el => {
+                        el.addEventListener('change', applyFilter);
+                    });
+                });
+            </script>
+
+
+
             <!-- Script Back to Top & Navbar -->
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
