@@ -130,6 +130,44 @@
             /* Menjamin dropdown tampil di atas modal */
         }
 
+        .select2-container .select2-selection--multiple {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #94a3b8;
+            border-radius: 10px;
+            min-height: 42px;
+            color: #0f172a;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(2, 132, 199, 0.08);
+            padding: 4px 8px;
+        }
+
+        .select2-container--default .select2-selection--multiple:hover,
+        .select2-container--default .select2-selection--multiple:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+        }
+
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #0284c7;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin: 3px 4px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice span,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+            color: #fff !important;
+        }
+
+
+
+
         .swal2-popup {
             z-index: 1050 !important;
             /* Pastikan popup Swal berada di bawah dropdown */
@@ -322,7 +360,7 @@
         {{-- TRY OUT --}}
         @if ($tryOutPackages->isNotEmpty())
             <h3 class="text-center font-weight-bold my-3">
-                Daftar <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
+                Program <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
             </h3>
             <div class="row mx-3 justify-content-center">
                 @foreach ($tryOutPackages as $type)
@@ -370,31 +408,30 @@
             </h3>
             <div class="d-flex justify-content-center m-3">
                 <div class="col-4">
-                    <label>Pilih Aspek</label>
-                    <select class="form-control" id="filterAspek">
-                        <option value="">-- Pilih Aspek --</option>
+                    <label>Aspek</label>
+                    <select class="form-control select2" id="filterAspek" data-placeholder="Semua Aspek" multiple>
                         <option value="Psikologi">Psikologi</option>
                         <option value="Akademik">Akademik</option>
                         <option value="Jasmani">Jasmani</option>
                     </select>
                 </div>
                 <div class="col-4">
-                    <label>Pilih Jenis</label>
-                    <select class="form-control" id="filterJenis">
-                        <option value="">-- Pilih Jenis --</option>
-                        <option value="Akpol">Akpol</option>
-                        <option value="Bintara">Bintara</option>
-                        <option value="Dikbang">Dikbang</option>
+                    <label>Pendidikan</label>
+                    <select class="form-control select2" id="filterJenis" data-placeholder="Semua Pendidikan" multiple>
+                        @foreach ($otherPackages as $item)
+                            <option value="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+
                     </select>
                 </div>
                 <div class="col-4">
-                    <label>Pilih Sesi</label>
-                    <select class="form-control" id="filterSesi">
-                        <option value="">-- Pilih Sesi --</option>
+                    <label>Sesi</label>
+                    <select class="form-control select2" id="filterSesi" data-placeholder="Semua Sesi" multiple>
                         <option value="Online">Online</option>
                         <option value="Offline">Offline</option>
                     </select>
                 </div>
+
             </div>
 
             <div class="row mx-3 justify-content-center">
@@ -510,24 +547,37 @@
             @include('js.order.script')
             <!-- Script Filter Paket -->
             <script>
+                $(function() {
+                    $('.select2').select2({
+                        allowClear: true,
+                        width: '100%'
+                    });
+                });
+            </script>
+
+            <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const filterAspek = document.getElementById('filterAspek');
-                    const filterJenis = document.getElementById('filterJenis');
-                    const filterSesi = document.getElementById('filterSesi');
+                    const filterAspek = $('#filterAspek');
+                    const filterJenis = $('#filterJenis');
+                    const filterSesi = $('#filterSesi');
 
                     function applyFilter() {
-                        const aspek = filterAspek.value.toLowerCase();
-                        const jenis = filterJenis.value.toLowerCase();
-                        const sesi = filterSesi.value.toLowerCase();
+                        const aspekValues = filterAspek.val()?.map(v => v.toLowerCase()) || [];
+                        const jenisValues = filterJenis.val()?.map(v => v.toLowerCase()) || [];
+                        const sesiValues = filterSesi.val()?.map(v => v.toLowerCase()) || [];
 
                         document.querySelectorAll('.package-card').forEach(card => {
-                            let jenisMatch = !jenis || card.dataset.jenis.toLowerCase().includes(jenis);
+                            let jenisMatch = jenisValues.length === 0 ||
+                                jenisValues.some(j => card.dataset.jenis.toLowerCase().includes(j));
+
                             let childVisible = false;
 
                             card.querySelectorAll('.package-child').forEach(child => {
-                                let aspekMatch = !aspek || child.dataset.aspek.toLowerCase().includes(
-                                    aspek);
-                                let sesiMatch = !sesi || child.dataset.sesi.toLowerCase().includes(sesi);
+                                let aspekMatch = aspekValues.length === 0 ||
+                                    aspekValues.some(a => child.dataset.aspek.toLowerCase().includes(a));
+
+                                let sesiMatch = sesiValues.length === 0 ||
+                                    sesiValues.some(s => child.dataset.sesi.toLowerCase().includes(s));
 
                                 if (aspekMatch && sesiMatch && jenisMatch) {
                                     child.style.display = 'block';
@@ -542,10 +592,11 @@
                     }
 
                     [filterAspek, filterJenis, filterSesi].forEach(el => {
-                        el.addEventListener('change', applyFilter);
+                        el.on('change', applyFilter);
                     });
                 });
             </script>
+
 
 
 

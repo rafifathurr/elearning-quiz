@@ -28,17 +28,47 @@
             /* Animasi untuk memperhalus perubahan ukuran */
         }
 
-        .card:hover {
-            transform: scale(1.05);
-            /* Membesarkan ukuran card 5% */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            /* Menambahkan efek bayangan saat hover */
-        }
+
 
         .select2-container {
             z-index: 9999 !important;
             margin-bottom: 1rem !important;
             /* Menjamin dropdown tampil di atas modal */
+        }
+
+        .select2-container .select2-selection--multiple {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #94a3b8;
+            border-radius: 10px;
+            min-height: 42px;
+            color: #0f172a;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(2, 132, 199, 0.08);
+            padding: 4px 8px;
+        }
+
+        .select2-container--default .select2-selection--multiple:hover,
+        .select2-container--default .select2-selection--multiple:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+        }
+
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #0284c7;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin: 3px 4px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice span,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+            color: #fff !important;
         }
 
         .swal2-popup {
@@ -193,42 +223,31 @@
                 @endif
 
 
-                {{-- Paket --}}
-                @if ($type_package->isNotEmpty())
-                    <h3 class="text-center font-weight-bold my-3 w-100">
-                        Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                {{-- TRY OUT --}}
+                @if ($tryOutPackages->isNotEmpty())
+                    <h3 class="text-center font-weight-bold my-3">
+                        Program <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
                     </h3>
-
-                    <div class="row justify-content-center">
-                        @foreach ($type_package as $type)
-                            <div class="{{ $type->name == 'TRY OUT' ? 'col-11' : 'col-md-5 col-sm-6' }} mx-1 my-3">
-                                {{-- Responsif di layar kecil --}}
-                                <div class="card h-100 shadow-sm border-0">
+                    <div class="row mx-3 justify-content-center">
+                        @foreach ($tryOutPackages as $type)
+                            <div class="col-12 mx-1 my-3">
+                                <div class="card h-100 rounded-lg shadow-sm border-0">
                                     <div class="card-header bg-gradient-lightblue text-center">
                                         <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
                                     </div>
                                     <div class="card-body">
                                         <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+                                        <div class="row justify-content-center">
+                                            @foreach ($type->package as $package)
+                                                <div class="col-md-5 col-sm-6 col-12 my-2">
+                                                    @include('master.package_payment.package_list', [
+                                                        'packages' => [$package],
+                                                    ])
+                                                </div>
+                                            @endforeach
+                                        </div>
 
-                                        {{-- Paket dari parent --}}
-                                        @if ($type->name == 'TRY OUT')
-                                            <div class="row justify-content-center">
-                                                @foreach ($type->package as $package)
-                                                    <div class="col-md-5 col-sm-6 col-12 my-2">
-                                                        @include('master.package_payment.package_list', [
-                                                            'packages' => [$package],
-                                                        ])
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            @include('master.package_payment.package_list', [
-                                                'packages' => $type->package,
-                                                'showEmpty' => false,
-                                            ])
-                                        @endif
-
-                                        {{-- Paket dari children --}}
+                                        {{-- Children kalau ada --}}
                                         @foreach ($type->children as $child)
                                             <div class="border rounded-lg p-2 mx-2 my-3 bg-light">
                                                 <h4 class="text-center font-weight-bold text-primary">
@@ -246,8 +265,73 @@
                             </div>
                         @endforeach
                     </div>
-                @else
-                    <h3 class="text-center font-weight-bold my-3">Belum Ada Paket</h3>
+                @endif
+
+                {{-- OTHER PACKAGES --}}
+                @if ($otherPackages->isNotEmpty())
+                    <h3 class="text-center font-weight-bold my-3">
+                        Daftar <span class="custom-shape bg-gradient-lightblue">Paket</span>
+                    </h3>
+                    <div class="d-flex justify-content-center m-3">
+                        <div class="col-4">
+                            <label>Aspek</label>
+                            <select class="form-control select2" id="filterAspek" data-placeholder="Semua Aspek" multiple>
+                                <option value="Psikologi">Psikologi</option>
+                                <option value="Akademik">Akademik</option>
+                                <option value="Jasmani">Jasmani</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label>Pendidikan</label>
+                            <select class="form-control select2" id="filterJenis" data-placeholder="Semua Pendidikan"
+                                multiple>
+                                @foreach ($otherPackages as $item)
+                                    <option value="{{ $item->name }}">{{ $item->name }}</option>
+                                @endforeach
+
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label>Sesi</label>
+                            <select class="form-control select2" id="filterSesi" data-placeholder="Semua Sesi" multiple>
+                                <option value="Online">Online</option>
+                                <option value="Offline">Offline</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="row mx-3 justify-content-center">
+                        @foreach ($otherPackages as $type)
+                            <div class="col-md-5 col-sm-6 mx-1 my-3 package-card" data-jenis="{{ $type->name }}">
+                                <div class="card h-100 rounded-lg shadow-sm border-0">
+                                    <div class="card-header bg-gradient-lightblue text-center">
+                                        <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+
+                                        {{-- Children --}}
+                                        @foreach ($type->children as $child)
+                                            <div class="border rounded-lg p-2 mx-2 my-3 bg-light package-child"
+                                                data-aspek="{{ Str::before($child->name, ' ') }}"
+                                                data-sesi="{{ Str::afterLast($child->name, ' ') }}">
+                                                <h4 class="text-center font-weight-bold text-primary">
+                                                    {{ $child->name }}
+                                                </h4>
+                                                <p class="text-center text-muted">{{ $child->description ?? '' }}</p>
+                                                @include('master.package_payment.package_list', [
+                                                    'packages' => $child->package,
+                                                    'showEmpty' => true,
+                                                ])
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
                 @endif
 
             </div>
@@ -259,6 +343,57 @@
     </div>
     @push('javascript-bottom')
         @include('js.order.script')
+        <!-- Script Filter Paket -->
+        <script>
+            $(function() {
+                $('.select2').select2({
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const filterAspek = $('#filterAspek');
+                const filterJenis = $('#filterJenis');
+                const filterSesi = $('#filterSesi');
+
+                function applyFilter() {
+                    const aspekValues = filterAspek.val()?.map(v => v.toLowerCase()) || [];
+                    const jenisValues = filterJenis.val()?.map(v => v.toLowerCase()) || [];
+                    const sesiValues = filterSesi.val()?.map(v => v.toLowerCase()) || [];
+
+                    document.querySelectorAll('.package-card').forEach(card => {
+                        let jenisMatch = jenisValues.length === 0 ||
+                            jenisValues.some(j => card.dataset.jenis.toLowerCase().includes(j));
+
+                        let childVisible = false;
+
+                        card.querySelectorAll('.package-child').forEach(child => {
+                            let aspekMatch = aspekValues.length === 0 ||
+                                aspekValues.some(a => child.dataset.aspek.toLowerCase().includes(a));
+
+                            let sesiMatch = sesiValues.length === 0 ||
+                                sesiValues.some(s => child.dataset.sesi.toLowerCase().includes(s));
+
+                            if (aspekMatch && sesiMatch && jenisMatch) {
+                                child.style.display = 'block';
+                                childVisible = true;
+                            } else {
+                                child.style.display = 'none';
+                            }
+                        });
+
+                        card.style.display = (jenisMatch && childVisible) ? 'block' : 'none';
+                    });
+                }
+
+                [filterAspek, filterJenis, filterSesi].forEach(el => {
+                    el.on('change', applyFilter);
+                });
+            });
+        </script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const backToTopButton = document.querySelector('.back-to-top');

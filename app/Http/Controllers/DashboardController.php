@@ -139,12 +139,29 @@ class DashboardController extends Controller
             };
         }
 
+
+        $typePackages = TypePackage::where('id_parent', 0)
+            ->whereNull('deleted_at')
+            ->with('children', 'package')
+            ->orderBy('created_at', 'DESC')
+            ->get();
+        $tryOutPackages = $typePackages->filter(function ($item) {
+            return strtoupper($item->name) === 'TRY OUT';
+        });
+
+
+        $otherPackages = $typePackages->reject(function ($item) {
+            return strtoupper($item->name) === 'TRY OUT';
+        });
+
+        $data = [
+            'tryOutPackages' => $tryOutPackages,
+            'otherPackages'  => $otherPackages,
+        ];
         $data['packages'] = Package::whereNull('deleted_at')
             ->where('status', 1)
-            ->whereHas('voucher') // hanya ambil paket yang punya voucher
+            ->whereHas('voucher')
             ->get();
-
-        $data['type_package'] = TypePackage::where('id_parent', 0)->whereNull('deleted_at')->with('children')->orderBy('created_at', 'DESC')->get();
 
         return view('home', $data);
     }
