@@ -13,7 +13,7 @@
                                 <h3 class="font-weight-bold">Daftar Pengguna</h3>
                             </div>
                             <div class="card-body">
-                                @hasrole('admin')
+                                @hasrole('admin|class-operator')
                                     <a href="{{ route('master.user.create') }}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-plus mr-1"></i>
                                         Tambah Pengguna

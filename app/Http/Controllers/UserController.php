@@ -54,7 +54,7 @@ class UserController extends Controller
                 return $list_view;
             })
             ->addColumn('status', function ($data) {
-                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                if (User::find(Auth::user()->id)->hasAnyRole('admin', 'class-operator')) {
                     // Cek apakah status aktif (1) atau tidak (0)
                     $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
 
@@ -69,7 +69,7 @@ class UserController extends Controller
                 }
             })
             ->addColumn('action', function ($data) {
-                if (User::find(Auth::user()->id)->hasRole('admin')) {
+                if (User::find(Auth::user()->id)->hasAnyRole('admin', 'class-operator')) {
                     $btn_action = '<div align="center">';
                     $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail"><i class="fas fa-eye"></i></a>';
                     $btn_action .= '<a href="' . route('master.user.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
@@ -118,7 +118,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+            if (auth()->check() && User::find(auth()->user()->id)->hasAnyRole('admin', 'class-operator')) {
                 $request->validate([
                     'username' => 'required',
                     'name' => 'required|string',
@@ -164,7 +164,7 @@ class UserController extends Controller
                 ]);
 
 
-                if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                if (auth()->check() && User::find(auth()->user()->id)->hasAnyRole('admin', 'class-operator')) {
                     foreach ($request->roles as $role) {
                         $user_role = $add_user->assignRole($role);
                     }
@@ -178,7 +178,7 @@ class UserController extends Controller
 
                 //nanti apus lagi
                 if ($add_user && $user_role) {
-                    if (auth()->check() && User::find(auth()->user()->id)->hasRole('admin')) {
+                    if (auth()->check() && User::find(auth()->user()->id)->hasAnyRole('admin', 'class-operator')) {
                         DB::commit();
                         return redirect()
                             ->route('master.user.index')
@@ -214,11 +214,6 @@ class UserController extends Controller
     {
         try {
             if (!is_null($id)) {
-                if (!User::find(Auth::user()->id)->hasRole('admin')) {
-                    return redirect()
-                        ->back()
-                        ->with(['failed' => 'Anda tidak memiliki akses untuk mengedit user lain.']);
-                }
                 $user  = User::find($id);
 
                 if (!is_null($user)) {
