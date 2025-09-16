@@ -54,7 +54,7 @@ class UserController extends Controller
                 return $list_view;
             })
             ->addColumn('status', function ($data) {
-                if (User::find(Auth::user()->id)->hasAnyRole('admin', 'class-operator')) {
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
                     // Cek apakah status aktif (1) atau tidak (0)
                     $checked = $data->status == 1 ? 'checked' : ''; // Jika status 1, maka checkbox tercentang
 
@@ -211,6 +211,11 @@ class UserController extends Controller
     {
         try {
             if (!is_null($id)) {
+                if (!User::find(Auth::user()->id)->hasRole('admin')) {
+                    return redirect()
+                        ->back()
+                        ->with(['failed' => 'Anda tidak memiliki akses untuk mengedit user lain.']);
+                }
                 $user  = User::find($id);
 
                 if (!is_null($user)) {
