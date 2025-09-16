@@ -143,7 +143,7 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 //Order User Konselor
-Route::group(['middleware' => ['role:user|counselor']], function () {
+Route::group(['middleware' => ['role:user|counselor|class-operator']], function () {
 
     Route::group(['controller' => OrderController::class, 'prefix' => 'order', 'as' => 'order.'], function () {
         //Order User
