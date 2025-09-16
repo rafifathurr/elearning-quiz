@@ -258,9 +258,6 @@ class KecermatanController extends Controller
                 'order_detail_id' => $orderDetailId
             ]);
 
-            Log::info('New result created with ID: ' . $result->id);
-
-
             DB::commit();
             // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
@@ -276,7 +273,6 @@ class KecermatanController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             // Tangani error
-            Log::error('Error in starting quiz: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -284,8 +280,6 @@ class KecermatanController extends Controller
     public function getQuestion(Result $result, Request $request)
     {
         $questionKecermatan = json_decode($result->quiz->question_kecermatan, true);
-
-        Log::info('Decoded question data:', ['question_kecermatan' => $questionKecermatan]);
 
         if (!is_array($questionKecermatan) || empty($questionKecermatan)) {
             throw new Exception('Invalid question data');
@@ -296,8 +290,6 @@ class KecermatanController extends Controller
             ->map(fn($questions) => $questions->first()['durasi_kombinasi'] ?? 0)
             ->toArray();
 
-        Log::info('Durasi Kombinasi:', ['durasi_kombinasi' => $durasiKombinasi]);
-
         $activeQuestionNumber = 1; // Default value
         if ($request->has('q')) {
 
@@ -307,8 +299,6 @@ class KecermatanController extends Controller
             $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
             $activeQuestionNumber = $resultDetails->first()->order + 1;
         }
-
-        Log::info('Active Question Number:', ['active_question_number' => $activeQuestionNumber]);
 
         $activeQuestion = collect($questionKecermatan)->firstWhere('order', $activeQuestionNumber);
 
@@ -327,7 +317,6 @@ class KecermatanController extends Controller
         $isLastCombination = $currentCombinationIndex === (count($durasiKombinasi) - 1);
 
         if ($isLastCombination && $activeQuestionNumber > max(array_column($questionsInCombination, 'order'))) {
-            // Arahkan ke fungsi finish jika sudah di kombinasi terakhir
             // Create a request to pass the resultId
             $request = new Request();
             $request->merge([
@@ -359,7 +348,6 @@ class KecermatanController extends Controller
             session()->put('unique_answers', $uniqueAnswers);
         }
 
-        Log::info('Unique Answers:', ['unique_answers' => $uniqueAnswers]);
 
         $correctAnswer = $activeQuestion['correct_answer'] ?? null;
 
@@ -367,7 +355,6 @@ class KecermatanController extends Controller
             throw new Exception('Correct answer not found in question data');
         }
 
-        Log::info('Correct Answer:', ['correct_answer' => $correctAnswer]);
 
         $wrongAnswers = array_values(array_filter($uniqueAnswers, function ($answer) use ($correctAnswer) {
             return $answer !== $correctAnswer;
@@ -375,7 +362,6 @@ class KecermatanController extends Controller
 
         $wrongAnswers = array_slice($wrongAnswers, 0, 4);
 
-        Log::info('Wrong Answers:', ['wrong_answers' => $wrongAnswers]);
 
         $quizAnswerArr = [];
         foreach ($wrongAnswers as $answer) {
@@ -422,11 +408,8 @@ class KecermatanController extends Controller
             return response()->json(['result' => $data], 200);
         } else {
             if ($request->has('q')) {
-                Log::info('Render Question');
                 return view('master.kecermatan.play.question', $data);
             }
-
-            Log::info('Rendering HTML View');
             return view('master.kecermatan.play.index', $data);
         }
     }
@@ -439,15 +422,11 @@ class KecermatanController extends Controller
             return isset($question['nama_kombinasi']) && $question['nama_kombinasi'] === $currentCombination;
         });
 
-        Log::info('Filtered Questions for Combination:', ['filtered_questions' => $filteredQuestions]);
-
         foreach ($filteredQuestions as $question) {
             if (isset($question['correct_answer']) && !in_array($question['correct_answer'], $uniqueAnswers)) {
                 $uniqueAnswers[] = $question['correct_answer'];
             }
         }
-
-        Log::info('Generated Unique Answers:', ['unique_answers' => $uniqueAnswers]);
 
         return $uniqueAnswers;
     }
@@ -467,8 +446,6 @@ class KecermatanController extends Controller
                 'questionNumber' => 'required|integer',
                 'currentCombination' => 'required',
             ]);
-
-            Log::info('Result ID: ' . $request->resultId);
 
             // Ambil data `result`
             $result = Result::findOrFail($validated['resultId']);
@@ -506,13 +483,8 @@ class KecermatanController extends Controller
                 'display_time' => now(),
             ]);
 
-            Log::info('Jawaban yang diberikan: ' . $request->value . ' Tipe: ' . gettype($request->value));
-            Log::info('Jawaban yang benar: ' . $correctAnswer . ' Tipe: ' . gettype($correctAnswer));
-            Log::info('Skor yang disimpan: ' . $resultDetail->score);
-
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
         } catch (Exception $e) {
-            Log::error('Error pada pengolahan jawaban: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -524,9 +496,6 @@ class KecermatanController extends Controller
             $validated = $request->validate([
                 'resultId' => 'nullable|integer',
             ]);
-
-            Log::info('Result ID: ' . $request->resultId);
-            Log::info('Request Data:', $request->all());
 
 
             session()->forget('unique_answers');
@@ -544,69 +513,6 @@ class KecermatanController extends Controller
                     'updated_at' => now()
                 ]);
             }
-            // if (User::find(Auth::user()->id)->hasRole('user')) {
-            //     $data = [
-            //         'result' => $resultData,
-            //         'name' => Auth::user()->name,
-            //     ];
-            //     $correctAnswers = $resultData->details->where('score', 1)->count();
-            //     $totalQuestions = $resultData->details->count();
-            //     $wrongAnswers = $totalQuestions - $correctAnswers;
-
-            //     // Kecepatan
-            //     $speed = '';
-            //     if ($correctAnswers > 300) {
-            //         $speed = 'B'; // Baik
-            //     } elseif ($correctAnswers >= 280 && $correctAnswers < 300) {
-            //         $speed = 'CB'; // Cukup Baik
-            //     } elseif ($correctAnswers >= 260 && $correctAnswers < 280) {
-            //         $speed = 'C'; // Cukup
-            //     } elseif ($correctAnswers >= 240 && $correctAnswers < 260) {
-            //         $speed = 'K'; // Kurang
-            //     } elseif ($correctAnswers >= 0 && $correctAnswers < 240) {
-            //         $speed = 'KS'; // Kurang Sekali
-            //     }
-
-            //     // Ketelitian
-            //     $accuracy = ($wrongAnswers / $totalQuestions) * 100;
-            //     $accuracyLabel = '';
-            //     if ($accuracy < 4) {
-            //         $accuracyLabel = 'B'; // Baik
-            //     } elseif ($accuracy >= 4.1 && $accuracy < 6) {
-            //         $accuracyLabel = 'CB'; // Cukup Baik
-            //     } elseif ($accuracy >= 6.1 && $accuracy < 8) {
-            //         $accuracyLabel = 'C'; // Cukup
-            //     } elseif ($accuracy >= 8.1 && $accuracy < 10) {
-            //         $accuracyLabel = 'K'; // Kurang
-            //     } elseif ($accuracy >= 10.1) {
-            //         $accuracyLabel = 'KS'; // Kurang Sekali
-            //     }
-
-            //     Log::info('Generate PDF');
-            //     Log::info('Speed: ' . $speed);
-            //     Log::info('Accuracy Label: ' . $accuracyLabel);
-
-            //     // Pemanggilan PDF yang benar
-            //     // Generate PDF dari hasil
-            //     $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'speed', 'accuracyLabel'));
-
-            //     // Simpan PDF ke file sementara
-            //     $pdfPath = storage_path('app/public/result_pdf.pdf');
-            //     $pdf->save($pdfPath);
-
-            //     // Pastikan file PDF ada
-            //     if (!file_exists($pdfPath)) {
-            //         Log::error('PDF tidak ditemukan di path: ' . $pdfPath);
-            //     } else {
-            //         Log::info('PDF berhasil dibuat: ' . $pdfPath);
-
-            //         // Kirim email dengan lampiran PDF
-            //         Log::info('Email dimasukkan ke antrian');
-            //         Mail::to(Auth::user()->email)->queue(new FinishMail($data, $pdfPath));
-            //         Log::info('Email berhasil dikirim ke antrian');
-            //     }
-            // }
-
             return view('quiz.result', compact('result'));
         } catch (Exception $e) {
             Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
@@ -618,12 +524,12 @@ class KecermatanController extends Controller
         try {
             if (User::find(Auth::user()->id)->hasRole('admin')) {
                 $result = Result::where('id', $resultId)
-                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->with(['quiz', 'details.aspect'])
                     ->firstOrFail();
             } else {
                 $result = Result::where('id', $resultId)
                     ->where('user_id', Auth::id())
-                    ->with(['quiz', 'details.aspect']) // Pastikan memuat aspek terkait
+                    ->with(['quiz', 'details.aspect'])
                     ->firstOrFail();
             }
 
@@ -653,12 +559,7 @@ class KecermatanController extends Controller
                     ];
                 });
 
-
-            // Pastikan kecermatan 1-10 ada dalam data
             $formattedCombinations = range(1, 10); // Kecermatan 1 sampai 10
-
-
-
 
             return view('quiz.result', compact('result', 'accuracyData', 'formattedCombinations'));
         } catch (\Exception $e) {
