@@ -433,8 +433,7 @@ class OrderController extends Controller
                 $date_class = DateClass::find($schedule_id);
             }
 
-            Log::info('schedule id: ' . $schedule_id);
-            Log::info('User id: ' . $user_id);
+
 
             $onGoingOrder = Order::where('order_by',  $counselor_id)->where('status', 1)->first();
             if ($onGoingOrder) {

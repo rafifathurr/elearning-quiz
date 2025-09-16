@@ -93,7 +93,7 @@
 </style>
 <?php
 if (Auth::check()) {
-    if (auth()->user()->hasRole('counselor')) {
+    if (auth()->user()->hasAnyRole('counselor', 'class-operator')) {
         $onClick = "checkOutCounselor({$package->id}, '{$package->name}')";
     } else {
         $onClick = "checkOut({$package->id}, '{$package->name}')";
