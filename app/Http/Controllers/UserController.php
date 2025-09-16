@@ -69,22 +69,19 @@ class UserController extends Controller
                 }
             })
             ->addColumn('action', function ($data) {
-                if (User::find(Auth::user()->id)->hasAnyRole('admin', 'class-operator')) {
-                    $btn_action = '<div align="center">';
+                $btn_action = '<div align="center">';
+                if (User::find(Auth::user()->id)->hasRole('admin')) {
                     $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail"><i class="fas fa-eye"></i></a>';
                     $btn_action .= '<a href="' . route('master.user.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
 
-                    /**
-                     * Validation User Logged In Equals with User Record id
-                     */
                     if (Auth::user()->id != $data->id) {
                         $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
                     }
-                    $btn_action .= '</div>';
-                    return $btn_action;
-                } else {
-                    return null;
+                } elseif (User::find(Auth::user()->id)->hasRole('class-operator')) {
+                    $btn_action .= '<a href="' . route('master.user.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail"><i class="fas fa-eye"></i></a>';
                 }
+                $btn_action .= '</div>';
+                return $btn_action;
             })
             ->only(['id', 'name', 'username', 'email', 'role', 'action', 'status'])
             ->rawColumns(['action', 'status', 'role'])
