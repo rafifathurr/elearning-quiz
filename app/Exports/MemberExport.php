@@ -43,8 +43,10 @@ class MemberExport implements FromCollection, WithHeadings
                 return [
                     'Nama Paket' => $data->package->name ?? '-',
                     'Waktu Mendaftar' => \Carbon\Carbon::parse($data->order->created_at)->translatedFormat('d F Y H:i') ?? '-',
-                    'Nama Peserta' => $data->order->user->name ?? '-',
                     'Jadwal Kelas' => $data->dateClass->name ?? '-',
+                    'Nama Peserta' => $data->order->user->name ?? '-',
+                    'Email' => $data->order->user->email ?? '-',
+                    'Nomor HP' => $data->order->user->phone ?? '-',
                 ];
             });
     }
@@ -52,6 +54,6 @@ class MemberExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ["Nama Paket", "Waktu Mendaftar", "Nama Peserta", "Jadwal Kelas"];
+        return ["Nama Paket", "Waktu Mendaftar", "Jadwal Kelas", "Nama Peserta", "Email", "Nomor HP"];
     }
 }
