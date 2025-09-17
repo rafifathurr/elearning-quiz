@@ -98,7 +98,6 @@ class QuizController extends Controller
         return response()->json(['message' => 'Bad Request: Missing parameters'], 400);
     }
 
-
     private function appendAspect($quiz_aspect = null, $increment, $disabled = '', $type_aspect = null)
     {
         // Pastikan type_aspect ada dan valid
@@ -120,9 +119,6 @@ class QuizController extends Controller
         // Return view
         return view('quiz.form.aspect', $data);
     }
-
-
-
 
     public function store(Request $request)
     {
@@ -339,13 +335,14 @@ class QuizController extends Controller
         }
     }
 
-    public function showQuestion(Quiz $quiz)
+    //Daftar Pertanyaan
+    private function getQuizQuestions(Quiz $quiz)
     {
-        $questions = collect();
+        $questionAspectPairs = collect();
 
-        // Ambil pertanyaan berdasarkan aspek dan level
         foreach ($quiz->quizAspect as $aspect) {
-            $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
+            // Ambil pertanyaan single aspect
+            $singleAspectQuestions = QuizQuestion::where(function ($query) use ($aspect) {
                 $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
                     ->orWhere('level', '0');
             })
@@ -354,95 +351,89 @@ class QuizController extends Controller
                         ->orWhere('aspect', '0');
                 })
                 ->whereNull('deleted_at')
+                ->whereRaw("(LENGTH(aspect) - LENGTH(REPLACE(aspect, '|', ''))) = 2")
                 ->inRandomOrder()
-                ->limit($aspect->total_question)
                 ->get();
 
+            $remaining = $aspect->total_question - $singleAspectQuestions->count();
+            $questionSet = $singleAspectQuestions;
 
+            if ($remaining > 0) {
+                // Ambil pertanyaan multi-aspect
+                $multiAspectQuestions = QuizQuestion::where(function ($query) use ($aspect) {
+                    $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
+                        ->orWhere('level', '0');
+                })
+                    ->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
+                    ->whereRaw("(LENGTH(aspect) - LENGTH(REPLACE(aspect, '|', ''))) > 2")
+                    ->whereNull('deleted_at')
+                    ->inRandomOrder()
+                    ->limit($remaining)
+                    ->get();
 
-            // Gabungkan semua pertanyaan ke dalam koleksi
-            $questions = $questions->merge($questionSet);
+                $questionSet = $questionSet->merge($multiAspectQuestions);
+            }
+
+            $questionAspectPairs = $questionAspectPairs->merge($questionSet);
         }
 
-        // Tambahkan jawaban untuk setiap pertanyaan
+        // Hilangkan duplikat
+        return $questionAspectPairs->unique('id')->values();
+    }
+
+    public function showQuestion(Quiz $quiz)
+    {
+        $questions = $this->getQuizQuestions($quiz);
+
+        // Tambahkan jawaban
         $questions->each(function ($question) {
             $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
         });
 
-        // Acak ulang seluruh pertanyaan (aspek, level, dan pertanyaan)
+        $totalQuestions = $questions->count();
+
+
         $shuffledQuestions = $questions->shuffle();
 
-        // Hitung total pertanyaan
-        $totalQuestions = $shuffledQuestions->count();
-
-        // Kirim ke view
-        return view('quiz.preview', compact('shuffledQuestions', 'totalQuestions'));
+        return view('quiz.preview', [
+            'shuffledQuestions' => $shuffledQuestions,
+            'totalQuestions' => $totalQuestions,
+        ]);
     }
-
 
     public function start($encryptedQuizId, Request $request)
     {
         try {
-            // Dekripsi ID quiz yang diterima melalui URL
             $quizId = decrypt($encryptedQuizId);
-            $quiz = Quiz::findOrFail($quizId);  // Temukan quiz berdasarkan ID yang didekripsi
+            $quiz = Quiz::findOrFail($quizId);
 
-            // Inisialisasi orderDetailId sebagai null
             $orderDetailId = null;
-
-            // Cek jika order_detail_id ada di request dan dekripsi jika ada
             if ($request->has('order_detail_id')) {
-                $encryptedOrderDetailId = $request->get('order_detail_id');
-                $orderDetailId = decrypt($encryptedOrderDetailId);
+                $orderDetailId = decrypt($request->get('order_detail_id'));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             abort(403, 'Invalid ID');
         }
 
-        $questions = collect();
+        $questions = $this->getQuizQuestions($quiz);
 
-        // Ambil pertanyaan berdasarkan aspek dan level
-        foreach ($quiz->quizAspect as $aspect) {
-            $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
-                $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
-                    ->orWhere('level', '0');
-            })
-                ->where(function ($query) use ($aspect) {
-                    $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
-                        ->orWhere('aspect', '0');
-                })
-                ->inRandomOrder()
-                ->limit($aspect->total_question)
-                ->get();
+        $totalQuestions =  $questions->count();
 
-            $questions = $questions->merge($questionSet);
-        }
-
-        // Tambahkan jawaban untuk setiap pertanyaan
-        $questions->each(function ($question) {
-            $question->quizAnswer = $question->quizAnswer()->whereNull('deleted_at')->get();
-        });
-
-        // Acak ulang seluruh pertanyaan
-        $shuffledQuestions = $questions->shuffle();
-        $totalQuestions = $shuffledQuestions->count();
-
-        // Jika permintaan berbasis API (JSON)
-        if (request()->wantsJson() || str_starts_with(request()->path(), 'api')) {
+        // JSON response
+        if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {
             return response()->json([
-                'result' => $quiz,
+                'quiz' => $quiz,
                 'total_questions' => $totalQuestions,
             ], 200);
-        } else {
-            // Kirim data ke tampilan
-            return view('quiz.play.start', [
-                'quiz' => $quiz,
-                'orderDetailId' => $orderDetailId,
-                'totalQuestions' => $totalQuestions,
-            ]);
         }
-    }
 
+        // View
+        return view('quiz.play.start', [
+            'quiz' => $quiz,
+            'orderDetailId' => $orderDetailId,
+            'totalQuestions' => $totalQuestions,
+        ]);
+    }
 
     public function play(Quiz $quiz, Request $request)
     {
@@ -451,7 +442,7 @@ class QuizController extends Controller
 
             $encryptedId = $request->get('order_detail_id');
             $orderDetailId = decrypt($encryptedId);
-            // Buat entri Result baru
+
             $result = Result::create([
                 'quiz_id' => $quiz->id,
                 'user_id' => Auth::user()->id,
@@ -460,45 +451,31 @@ class QuizController extends Controller
                 'order_detail_id' => $orderDetailId,
             ]);
 
-            Log::info('New result created with ID: ' . $result->id);
-
-            $order = 0; // Pertanyaan pertama dimulai dari order 0
-            $questionAspectPairs = []; // Menyimpan pasangan pertanyaan dan aspek
-
-            // Proses pengambilan soal dan pengacakan aspek
-            foreach ($quiz->quizAspect as $aspect) {
-                // Ambil pertanyaan berdasarkan level dan aspek
-                $questionSet = QuizQuestion::where(function ($query) use ($aspect) {
-                    $query->where('level', 'like', '%' . '|' . $aspect->level . '|' . '%')
-                        ->orWhere('level', '0');
-                })
-                    ->where(function ($query) use ($aspect) {
-                        $query->where('aspect', 'like', '%' . '|' . $aspect->aspect_id . '|' . '%')
-                            ->orWhere('aspect', '0');
-                    })
-                    ->whereNull('deleted_at')
-                    ->inRandomOrder()
-                    ->when($aspect->total_question > 0, function ($query) use ($aspect) {
-                        return $query->limit($aspect->total_question);
-                    })
-                    ->get();
+            $order = 0;
+            $questionAspectPairs = [];
+            $questions = $this->getQuizQuestions($quiz);
 
 
-                foreach ($questionSet as $question) {
-                    $questionAspectPairs[] = [
-                        'question_id' => $question->id,
-                        'aspect_id' => $aspect->aspect_id,
-                        'level' => $aspect->level,
-                        'question_detail' => json_encode([
-                            'direction_question' => $question->direction_question,
-                            'description' => $question->description,
-                            'question' => $question->question,
-                            'attachment' => $question->attachment,
-                            'is_random_answer' => $question->is_random_answer,
-                            'is_generate_random_answer' => $question->is_generate_random_answer,
-                        ]),
-                    ];
-                }
+            foreach ($questions as $question) {
+                $matchedAspect = $quiz->quizAspect
+                    ->first(function ($aspect) use ($question) {
+                        return str_contains($question->aspect, "|{$aspect->aspect_id}|")
+                            && (str_contains($question->level, "|{$aspect->level}|") || $question->level === '0');
+                    });
+
+                $questionAspectPairs[] = [
+                    'question_id' => $question->id,
+                    'aspect_id' => $matchedAspect ? $matchedAspect->aspect_id : null,
+                    'level' => $matchedAspect ? $matchedAspect->level : null,
+                    'question_detail' => json_encode([
+                        'direction_question' => $question->direction_question,
+                        'description' => $question->description,
+                        'question' => $question->question,
+                        'attachment' => $question->attachment,
+                        'is_random_answer' => $question->is_random_answer,
+                        'is_generate_random_answer' => $question->is_generate_random_answer,
+                    ]),
+                ];
             }
 
             // Acak pasangan soal dan aspek
@@ -518,19 +495,17 @@ class QuizController extends Controller
                         'order' => $order,
                     ]);
                 } catch (Exception $e) {
-                    // Tangani duplikat tanpa menghentikan proses
                     Log::warning('Duplicate question skipped for result_id: ' . $result->id . ' and question_id: ' . $pair['question_id']);
                     $order--; // Kurangi order jika gagal menyimpan
                 }
             }
 
-            // Tampilkan waktu untuk pertanyaan pertama
+            // display time pertanyaan pertama
             ResultDetail::where('result_id', $result->id)->where('order', 1)->update([
                 'display_time' => now()
             ]);
 
             DB::commit();
-            // Jika permintaan adalah JSON (API)
             if ($request->wantsJson()) {
                 return response()->json([
                     'message' => 'Quiz has started successfully',
@@ -539,25 +514,17 @@ class QuizController extends Controller
                 ], 200);
             }
 
-            // Mengarahkan ke halaman soal pertama
             return redirect()->route('admin.quiz.getQuestion', ['result' => $result->id]);
         } catch (Exception $e) {
             DB::rollBack();
-            // Tangani error
             Log::error('Error in starting quiz: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-
-
     public function getQuestion(Result $result, Request $request)
     {
         try {
-            Log::info('Request Headers:', $request->headers->all());
-            Log::info('Request Data:', $request->all());
-            Log::info('Request Accepts JSON: ' . ($request->wantsJson() ? 'Yes' : 'No'));
-            Log::info('Result ID from route: ' . $result->id);
 
             // Ambil seluruh ResultDetail terkait quiz dan user
             $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
@@ -643,14 +610,13 @@ class QuizController extends Controller
             ];
 
             if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {
-                Log::info('Sending JSON Response');
                 return response()->json(['result' => $data], 200);
             } else {
                 if ($request->has('q')) {
-                    Log::info('Render Question');
+
                     return view('quiz.play.question', $data);
                 }
-                Log::info('Rendering HTML View');
+
                 return view('quiz.play.index', $data);
             }
         } catch (Exception $e) {
@@ -658,7 +624,6 @@ class QuizController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
 
     public function answer(Request $request)
     {
@@ -668,9 +633,6 @@ class QuizController extends Controller
                 'resultId' => 'required|integer',
                 'questionId' => 'required|integer',
             ]);
-
-            Log::info('Question ID: ' . $request->questionId);
-            Log::info('Result ID: ' . $request->resultId);
 
             // Simpan jawaban pengguna
             $resultDetail = ResultDetail::where('question_id', $request->questionId)
@@ -702,8 +664,6 @@ class QuizController extends Controller
                 'answer' => $validated['value'],
                 'score' => $score,
             ]);
-            Log::info('Jawaban yang disimpan: ' . $resultDetail->answer);
-            Log::info('Skor yang disimpan: ' . $resultDetail->score);
 
             return response()->json(['message' => 'Jawaban berhasil disimpan'], 200);
         } catch (Exception $e) {
@@ -720,9 +680,6 @@ class QuizController extends Controller
                 'resultId' => 'required|integer',
             ]);
 
-            Log::info('Order: ' . $request->q);
-
-            // Simpan jawaban pengguna
             // Tentukan pertanyaan berikutnya berdasarkan order
             $nextResultDetail = ResultDetail::where('order', $request->q)
                 ->where('result_id', $request->resultId)
@@ -747,7 +704,6 @@ class QuizController extends Controller
         }
     }
 
-
     public function finish(Request $request)
     {
         try {
@@ -758,11 +714,6 @@ class QuizController extends Controller
                 'questionId' => 'nullable|integer',
                 'value' => 'nullable',
             ]);
-
-
-            Log::info('Question ID: ' . $request->questionId);
-            Log::info('Result ID: ' . $request->resultId);
-            Log::info('Request Data:', $request->all());
 
 
             // Simpan jawaban pengguna
@@ -810,52 +761,7 @@ class QuizController extends Controller
                     'updated_at' => now()
                 ]);
             }
-            // if (User::find(Auth::user()->id)->hasRole('user')) {
-            //     $data = [
-            //         'result' => $resultData,
-            //         'name' => Auth::user()->name,
-            //     ];
-            //     // Generate PDF dari hasil
-            //     $questionsPerAspect = $resultData->details
-            //         ->groupBy('aspect_id')
-            //         ->map(function ($details, $aspectId) {
-            //             $totalQuestions = $details->count();
-            //             $correctQuestions = $details->where('score', 1)->count();
-            //             $percentage = $totalQuestions > 0
-            //                 ? ($correctQuestions / $totalQuestions) * 100
-            //                 : 0;
 
-            //             return [
-            //                 'aspect_name' => $details->first()->aspect->name ?? 'Unknown Aspect',
-            //                 'total_questions' => $totalQuestions,
-            //                 'correct_questions' => $correctQuestions,
-            //                 'percentage' => round($percentage, 2),
-            //             ];
-            //         });
-
-            //     $questionsPerAspect = $questionsPerAspect->sortByDesc('percentage');
-
-            //     Log::info('Generate PDF');
-            //     // Pemanggilan PDF yang benar
-            //     // Generate PDF dari hasil
-            //     $pdf = app('dompdf.wrapper')->loadView('result_pdf', compact('resultData', 'questionsPerAspect'));
-
-            //     // Simpan PDF ke file sementara
-            //     $pdfPath = storage_path('app/public/result_pdf.pdf');
-            //     $pdf->save($pdfPath);
-
-            //     // Pastikan file PDF ada
-            //     if (!file_exists($pdfPath)) {
-            //         Log::error('PDF tidak ditemukan di path: ' . $pdfPath);
-            //     } else {
-            //         Log::info('PDF berhasil dibuat: ' . $pdfPath);
-
-            //         // Kirim email dengan lampiran PDF
-            //         Log::info('Email dimasukkan ke antrian');
-            //         Mail::to(Auth::user()->email)->queue(new FinishMail($data, $pdfPath));
-            //         Log::info('Email berhasil dikirim ke antrian');
-            //     }
-            // };
             return view('quiz.result', compact('result'));
         } catch (Exception $e) {
             Log::error('Error pada pengolahan jawaban: ' . $e->getMessage()); // Log error
