@@ -56,355 +56,200 @@
     </div>
     @push('javascript-bottom')
         <script>
-            // Ambil waktu dari localStorage jika ada, jika tidak, gunakan nilai dari elemen input.
-            let time = localStorage.getItem('remainingTime') ? parseInt(localStorage.getItem('remainingTime')) : parseInt($(
-                '#time').val());
+            $(function() {
+                const token = $('meta[name="csrf-token"]').attr('content');
+                const resultId = $('#result_id').val();
+                const quizId = '{{ $quiz['id'] }}';
+                let time = parseInt(localStorage.getItem('remainingTime')) || parseInt($('#time').val());
+                let durasi = parseInt(localStorage.getItem('waktuSisa')) || parseInt($('#durasi').val());
+                let currentCombination = localStorage.getItem('kombinasi') || $('#current_combination').val();
+                const durasiKombinasi = @json($durasi_kombinasi);
+                const soalData = @json($soal_data);
 
-
-            function answerKecermatan(element) {
-                if (durasi <= 1) {
-                    console.log("Waktu hampir habis, jawaban tidak dikirim.");
-                    return;
-                }
-                let selectedAnswer = $(element).find('input[name="answer_list"]').val();
-                let resultId = $('#result_id').val();
-                let token = $('meta[name="csrf-token"]').attr('content');
-                let questionNumber = $('#active_question').data('question-number');
-                let totalQuestion = $('#total_question').val();
-                let currentCombination = $('#current_combination').val();
-
-                $.ajax({
-                    url: '{{ url('kecermatan/answer') }}',
-                    type: 'POST',
-                    data: {
-                        _token: token,
-                        value: selectedAnswer,
-                        resultId: resultId,
-                        questionNumber: questionNumber,
-                        currentCombination: currentCombination,
-                    },
-                    success: function(data) {
-                        // Status jawaban berhasil
-                        console.log("Jawaban berhasil disimpan:", data.value);
-
-                        // Update tampilan dan mark kombinasi yang dipilih
-                        $('#answer_list .card').removeClass('bg-secondary').addClass('bg-white');
-                        $(element).removeClass('bg-white').addClass('bg-secondary');
-
-                        // Lanjutkan ke pertanyaan berikutnya jika bukan pertanyaan terakhir
-                        goToNextQuestionOrCombination();
-                    },
-                    error: function(xhr) {
-                        console.error("Error AJAX:", xhr);
-                        swalError('Gagal mengirim jawaban, silakan coba lagi.');
-                    },
-                });
-            }
-
-            function goToNextQuestionOrCombination() {
-                // Lakukan pengecekan apakah waktu sudah habis
-                if (time <= 0) {
-                    moveNextCombination();
-                } else {
-                    // Lanjutkan ke pertanyaan berikutnya
+                // Helper umum AJAX
+                function ajaxRequest(url, method, data, onSuccess) {
                     $.ajax({
-                        url: $('#url-next').val(),
-                        type: 'GET',
-                        success: function(data) {
-                            if (data) {
-                                $('#question_box').html(data);
-                            } else {
-                                swalError('Tidak ada pertanyaan berikutnya.');
-                            }
-                        },
-                        error: function(xhr) {
-                            console.log(xhr);
-                            if (xhr.status == 401) {
+                        url,
+                        type: method,
+                        data,
+                        cache: false,
+                        success: onSuccess,
+                        error: xhr => {
+                            console.error("Error AJAX:", xhr);
+                            if (xhr.status === 401) {
                                 swalError('Sesi Anda telah habis.');
-                                window.location.href = '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
+                                window.location.href =
+                                    `{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}`;
+                            } else {
+                                swalError('Terjadi kesalahan, silakan coba lagi.');
                             }
                         }
                     });
                 }
-            }
 
+                // Helper redirect ke hasil
+                function goToResult() {
+                    const resultUrl = `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`.replace(
+                        '__RESULT_ID__', resultId);
+                    window.location.href = resultUrl;
+                }
 
+                // Kirim jawaban
+                window.answerKecermatan = function(element) {
+                    if (durasi <= 1) return console.log("Waktu hampir habis, jawaban tidak dikirim.");
 
+                    const selectedAnswer = $(element).find('input[name="answer_list"]').val();
+                    const questionNumber = $('#active_question').data('question-number');
+                    const currentCombination = $('#current_combination').val();
 
-            function timeExpired() {
-                Swal.fire({
-                    title: 'Waktu tes Anda Telah Habis!',
-                    icon: 'warning',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false, // Menghilangkan tombol konfirmasi
-                    timer: 2000, // Tampilkan selama 2 detik lalu lanjutkan
-                    timerProgressBar: true, // Menampilkan progress bar
-                    customClass: {
-                        popup: 'swal-no-button',
-                    },
-                });
-                let token = $('meta[name="csrf-token"]').attr('content');
-                let resultId = $('#result_id').val();
-
-
-                // Kirim data terakhir ke server
-                $.ajax({
-                    url: '{{ url('kecermatan/finish') }}',
-                    type: 'POST',
-                    cache: false,
-                    data: {
+                    ajaxRequest('{{ url('kecermatan/answer') }}', 'POST', {
                         _token: token,
-                        resultId: resultId,
-                        q: $('#active_question').data('question-number') || 0,
-                    },
-                    success: function() {
-                        const resultUrl =
-                            `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
-                            .replace('__RESULT_ID__', resultId);
-                        window.location.href = resultUrl;
-                    },
-                    error: function(xhr) {
-                        console.error("Error AJAX:", xhr);
-                        swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
-                    },
-                });
-            }
+                        value: selectedAnswer,
+                        resultId,
+                        questionNumber,
+                        currentCombination
+                    }, data => {
+                        console.log("Jawaban berhasil disimpan:", data.value);
+                        $('#answer_list .card').removeClass('bg-secondary').addClass('bg-white');
+                        $(element).removeClass('bg-white').addClass('bg-secondary');
+                        goToNextQuestionOrCombination();
+                    });
+                };
 
-
-
-
-
-
-            updateTimestamp();
-            let interval = setInterval(updateTimestamp, 1000);
-
-            function updateTimestamp() {
-                if (time > 0) {
-                    // Hitung detik
-                    let seconds = time % 60;
-                    $('#second_time').html(seconds > 9 ? seconds : '0' + seconds);
-
-                    // Hitung menit
-                    let minutes = Math.floor((time % 3600) / 60);
-                    $('#minute_time').html(minutes > 9 ? minutes : '0' + minutes);
-
-                    // Hitung jam
-                    let hours = Math.floor(time / 3600);
-                    $('#hour_time').html(hours > 9 ? hours : '0' + hours);
-
-                    // Simpan waktu yang tersisa ke localStorage
-                    localStorage.setItem('remainingTime', time);
-
-                    time--;
-                } else {
-                    clearInterval(interval);
-                    timeExpired();
+                // Pindah ke pertanyaan berikutnya / kombinasi berikutnya
+                function goToNextQuestionOrCombination() {
+                    if (time <= 0) return moveNextCombination();
+                    ajaxRequest($('#url-next').val(), 'GET', {}, data => {
+                        if (data) $('#question_box').html(data);
+                        else swalError('Tidak ada pertanyaan berikutnya.');
+                    });
                 }
-            }
 
-
-            function finishQuiz() {
-                Swal.fire({
-                    title: 'Apakah Anda yakin ingin menyelesaikan tes ini?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    customClass: {
-                        confirmButton: 'btn btn-primary mr-2 mb-3',
-                        cancelButton: 'btn btn-danger mb-3',
-                    },
-                    buttonsStyling: false,
-                    confirmButtonText: 'Ya',
-                    cancelButtonText: 'Tidak',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let token = $('meta[name="csrf-token"]').attr('content');
-                        let resultId = $('#result_id').val();
-
-                        console.log("resultId:", resultId);
-
-                        // Kirim data terakhir ke server
-                        $.ajax({
-                            url: '{{ url('kecermatan/finish') }}',
-                            type: 'POST',
-                            cache: false,
-                            data: {
-                                _token: token,
-                                resultId: resultId,
-                                q: $('#active_question').data('question-number') || 0,
-                            },
-                            success: function() {
-                                const resultUrl =
-                                    `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
-                                    .replace('__RESULT_ID__', resultId);
-                                window.location.href = resultUrl;
-                            },
-                            error: function(xhr) {
-                                console.error("Error AJAX:", xhr);
-                                swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
-                            },
-                        });
-                    }
-                });
-            }
-
-            let durasi = localStorage.getItem('waktuSisa') ? parseInt(localStorage.getItem('waktuSisa')) : parseInt($('#durasi')
-                .val());
-
-            let kombinasiSekarang = localStorage.getItem('kombinasi') ? localStorage.getItem('kombinasi') : $(
-                '#current_combination').val();
-
-            const displayCombination = kombinasiSekarang.replace(/([a-zA-Z]+)(\d+)/, 'Kolom $2');
-
-            $('#current').html(displayCombination);
-
-            updateWaktu();
-            let intervalWaktu = setInterval(updateWaktu, 1000);
-
-            function updateWaktu() {
-                if (durasi > 0) {
-                    let seconds = durasi % 60;
-                    $('#detik').html(seconds > 9 ? seconds : '0' + seconds);
-
-                    let minutes = Math.floor((durasi % 3600) / 60);
-
-                    if (durasi < 60) {
-                        $('#menit').hide();
-                        $('#batas').hide();
-                    } else {
-                        $('#batas').show();
-                        $('#menit').show();
-                        $('#menit').html(minutes > 9 ? minutes : '0' + minutes);
-                    }
-
-                    let hours = Math.floor(durasi / 3600);
-                    $('#jam').html(hours > 9 ? hours : '0' + hours);
-
-                    localStorage.setItem('waktuSisa', durasi);
-
-                    if (durasi === 1) {
-                        $('.card.bg-white').addClass('disabled').css('pointer-events', 'none');
-                    }
-
-                    durasi--;
-                } else {
-                    clearInterval(intervalWaktu);
-                    localStorage.removeItem('waktuSisa');
-
+                // Waktu habis total
+                function timeExpired() {
                     Swal.fire({
-                        icon: 'info',
-                        title: 'Waktu habis!',
-                        text: 'Berpindah ke kombinasi berikutnya.',
-                        toast: false,
-                        position: 'center',
-                        showConfirmButton: false,
+                        title: 'Waktu tes Anda Telah Habis!',
+                        icon: 'warning',
                         allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        timer: 1000,
-                        timerProgressBar: true,
-                    }).then(() => {
-                        moveNextCombination();
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
                     });
-                }
-            }
-
-            function moveNextCombination() {
-                let durasiKombinasi = @json($durasi_kombinasi);
-                let soalData = @json($soal_data);
-                let currentCombination = $('#current_combination').val();
-
-                // Dapatkan urutan kombinasi
-                let combinations = Object.keys(durasiKombinasi);
-                let currentIndex = combinations.indexOf(currentCombination);
-                let nextCombination = combinations[currentIndex + 1]; // Kombinasi berikutnya
-                let isLastCombination = currentIndex === combinations.length - 1; // Apakah ini kombinasi terakhir?
-
-                let lastQuestionInCurrentCombination = soalData.filter(
-                    soal => soal.nama_kombinasi === currentCombination
-                ).pop();
-
-                let nextQuestionNumber = 1;
-                if (lastQuestionInCurrentCombination) {
-                    nextQuestionNumber = lastQuestionInCurrentCombination.order + 1;
+                    ajaxRequest('{{ url('kecermatan/finish') }}', 'POST', {
+                        _token: token,
+                        resultId,
+                        q: $('#active_question').data('question-number') || 0
+                    }, goToResult);
                 }
 
-                // Jika kombinasi terakhir selesai
-                if (isLastCombination && nextQuestionNumber > lastQuestionInCurrentCombination.order) {
-                    let token = $('meta[name="csrf-token"]').attr('content');
-                    let resultId = $('#result_id').val();
-
-                    $.ajax({
-                        url: '{{ url('kecermatan/finish') }}',
-                        type: 'POST',
-                        cache: false,
-                        data: {
+                // Tombol finish
+                window.finishQuiz = function() {
+                    Swal.fire({
+                        title: 'Apakah Anda yakin ingin menyelesaikan tes ini?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        allowOutsideClick: false,
+                        confirmButtonText: 'Ya',
+                        cancelButtonText: 'Tidak',
+                        customClass: {
+                            confirmButton: 'btn btn-primary mr-2 mb-3',
+                            cancelButton: 'btn btn-danger mb-3'
+                        },
+                        buttonsStyling: false
+                    }).then(res => {
+                        if (res.isConfirmed) ajaxRequest('{{ url('kecermatan/finish') }}', 'POST', {
                             _token: token,
-                            resultId: resultId,
-                            q: nextQuestionNumber,
-                        },
-                        success: function() {
-                            const resultUrl = `{{ route('kecermatan.result', ['resultId' => '__RESULT_ID__']) }}`
-                                .replace('__RESULT_ID__', resultId);
-                            window.location.href = resultUrl;
-                        },
-                        error: function(xhr) {
-                            console.error("Error AJAX:", xhr);
-                            swalError('Gagal menyelesaikan quiz, silakan coba lagi.');
-                        },
+                            resultId,
+                            q: $('#active_question').data('question-number') || 0
+                        }, goToResult);
                     });
-                    return;
+                };
+
+                // Timer utama
+                function updateTimer() {
+                    if (time > 0) {
+                        $('#hour_time').text(String(Math.floor(time / 3600)).padStart(2, '0'));
+                        $('#minute_time').text(String(Math.floor((time % 3600) / 60)).padStart(2, '0'));
+                        $('#second_time').text(String(time % 60).padStart(2, '0'));
+                        localStorage.setItem('remainingTime', time--);
+                    } else {
+                        clearInterval(timerInterval);
+                        timeExpired();
+                    }
                 }
+                let timerInterval = setInterval(updateTimer, 1000);
+                updateTimer();
 
-                // Menuju kombinasi berikutnya
-                if (nextCombination) {
-                    let firstQuestionInNextCombination = soalData.find(
-                        soal => soal.nama_kombinasi === nextCombination
-                    );
+                // Timer kombinasi
+                function updateDurasi() {
+                    if (durasi > 0) {
+                        $('#jam').text(String(Math.floor(durasi / 3600)).padStart(2, '0'));
+                        let minutes = Math.floor((durasi % 3600) / 60);
+                        $('#menit').toggle(durasi >= 60).text(String(minutes).padStart(2, '0'));
+                        $('#batas').toggle(durasi >= 60);
+                        $('#detik').text(String(durasi % 60).padStart(2, '0'));
+                        localStorage.setItem('waktuSisa', durasi);
+                        if (durasi === 1) $('.card.bg-white').addClass('disabled').css('pointer-events', 'none');
+                        durasi--;
+                    } else {
+                        clearInterval(durasiInterval);
+                        localStorage.removeItem('waktuSisa');
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Waktu habis!',
+                            text: 'Berpindah ke kombinasi berikutnya.',
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(moveNextCombination);
+                    }
+                }
+                let durasiInterval = setInterval(updateDurasi, 1000);
+                updateDurasi();
 
-                    if (firstQuestionInNextCombination) {
-                        let nextCombinationUrl = '{{ route('kecermatan.getQuestion', ['result' => $result->id]) }}';
-                        nextCombinationUrl += `?q=${firstQuestionInNextCombination.order}`;
-                        nextCombinationUrl += '&durasi_kombinasi=' + encodeURIComponent(JSON.stringify(durasiKombinasi));
+                // Fungsi pindah kombinasi
+                function moveNextCombination() {
+                    let combinations = Object.keys(durasiKombinasi);
+                    let currentIndex = combinations.indexOf(currentCombination);
+                    let nextCombination = combinations[currentIndex + 1];
+                    let isLastCombination = currentIndex === combinations.length - 1;
 
-                        $.ajax({
-                            url: nextCombinationUrl,
-                            type: 'GET',
-                            cache: false,
-                            success: function(data) {
-                                if (data) {
-                                    $('#question_box').html(data);
+                    let lastQuestion = soalData.filter(s => s.nama_kombinasi === currentCombination).pop();
+                    let nextQuestionNumber = lastQuestion ? lastQuestion.order + 1 : 1;
 
-                                    let newDuration = parseInt($('#durasi').val());
-                                    if (!isNaN(newDuration)) {
-                                        durasi = newDuration;
-                                        clearInterval(intervalWaktu);
-                                        intervalWaktu = setInterval(updateWaktu, 1000);
-                                    }
+                    if (isLastCombination && nextQuestionNumber > lastQuestion.order) {
+                        return ajaxRequest('{{ url('kecermatan/finish') }}', 'POST', {
+                            _token: token,
+                            resultId,
+                            q: nextQuestionNumber
+                        }, goToResult);
+                    }
 
-                                    const displayNextCombination = nextCombination.replace(/([a-zA-Z]+)(\d+)/,
-                                        'Kolom $2');
-                                    $('#current').html(displayNextCombination);
+                    if (nextCombination) {
+                        let firstQuestion = soalData.find(s => s.nama_kombinasi === nextCombination);
+                        if (!firstQuestion) return;
 
-                                    localStorage.removeItem('waktuSisa');
-                                    localStorage.setItem('kombinasi', nextCombination);
+                        let nextUrl = '{{ route('kecermatan.getQuestion', ['result' => $result->id]) }}' +
+                            `?q=${firstQuestion.order}&durasi_kombinasi=${encodeURIComponent(JSON.stringify(durasiKombinasi))}`;
 
-                                }
-                            },
-                            error: function(xhr) {
-                                if (xhr.status == 401) {
-                                    swalError('Sesi Anda telah habis.');
-                                    window.location.href =
-                                        '{{ route('admin.quiz.start', ['quiz' => $quiz['id']]) }}';
-                                } else if (xhr.status == 500) {
-                                    swalError('Terjadi kesalahan koneksi.');
-                                }
-                            },
+                        ajaxRequest(nextUrl, 'GET', {}, data => {
+                            $('#question_box').html(data);
+                            let newDuration = parseInt($('#durasi').val());
+                            if (!isNaN(newDuration)) {
+                                durasi = newDuration;
+                                clearInterval(durasiInterval);
+                                durasiInterval = setInterval(updateDurasi, 1000);
+                            }
+                            $('#current').text(nextCombination.replace(/([a-zA-Z]+)(\d+)/, 'Kolom $2'));
+                            localStorage.setItem('kombinasi', nextCombination);
+                            localStorage.removeItem('waktuSisa');
+                            currentCombination = nextCombination;
                         });
                     }
                 }
-            }
+
+                // Tampilkan kombinasi sekarang
+                $('#current').text(currentCombination.replace(/([a-zA-Z]+)(\d+)/, 'Kolom $2'));
+            });
         </script>
     @endpush
 @endsection

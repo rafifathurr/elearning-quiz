@@ -259,7 +259,7 @@ class KecermatanController extends Controller
             ]);
 
             DB::commit();
-            // Jika permintaan adalah JSON (API)
+            // Jika request  JSON (API)
             if ($request->wantsJson()) {
                 return response()->json([
                     'message' => 'Quiz has started successfully',
@@ -279,106 +279,98 @@ class KecermatanController extends Controller
 
     public function getQuestion(Result $result, Request $request)
     {
+        // Decode data soal
         $questionKecermatan = json_decode($result->quiz->question_kecermatan, true);
 
         if (!is_array($questionKecermatan) || empty($questionKecermatan)) {
             throw new Exception('Invalid question data');
         }
 
-        $durasiKombinasi = collect($questionKecermatan)
-            ->groupBy(fn($question) => $question['nama_kombinasi'] ?? null)
-            ->map(fn($questions) => $questions->first()['durasi_kombinasi'] ?? 0)
-            ->toArray();
+        // Cache grouping per kombinasi di session
+        $groupedKey = "grouped_questions_{$result->id}";
+        if (!session()->has($groupedKey)) {
+            $grouped = collect($questionKecermatan)->groupBy('nama_kombinasi')->toArray();
+            session()->put($groupedKey, $grouped);
+        }
+        $groupedQuestions = session($groupedKey);
 
-        $activeQuestionNumber = 1; // Default value
+        // Durasi tiap kombinasi
+        $durasiKombinasi = collect($groupedQuestions)->map(
+            fn($questions) =>
+            $questions[0]['durasi_kombinasi'] ?? 0
+        )->toArray();
+
+        // Tentukan nomor soal aktif
         if ($request->has('q')) {
-
             $activeQuestionNumber = (int) $request->input('q');
-        } elseif (isset($result->details) && $result->details->isNotEmpty()) {
-
-            $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
-            $activeQuestionNumber = $resultDetails->first()->order + 1;
+        } else {
+            $lastDetail = $result->details()->latest('display_time')->first();
+            $activeQuestionNumber = $lastDetail ? $lastDetail->order + 1 : 1;
         }
 
         $activeQuestion = collect($questionKecermatan)->firstWhere('order', $activeQuestionNumber);
-
         if (!$activeQuestion || !isset($activeQuestion['nama_kombinasi'])) {
             throw new Exception('Combination not found for active question');
         }
 
         $currentCombination = $activeQuestion['nama_kombinasi'];
+        $questionsInCombination = $groupedQuestions[$currentCombination] ?? [];
 
-
-        $questionsInCombination = array_filter($questionKecermatan, function ($question) use ($currentCombination) {
-            return $question['nama_kombinasi'] === $currentCombination;
-        });
-
-        $currentCombinationIndex = array_search($currentCombination, array_keys($durasiKombinasi));
+        // Cek apakah sudah kombinasi terakhir
+        $combinationKeys = array_keys($durasiKombinasi);
+        $currentCombinationIndex = array_search($currentCombination, $combinationKeys);
         $isLastCombination = $currentCombinationIndex === (count($durasiKombinasi) - 1);
 
         if ($isLastCombination && $activeQuestionNumber > max(array_column($questionsInCombination, 'order'))) {
-            // Create a request to pass the resultId
-            $request = new Request();
-            $request->merge([
-                'resultId' => $result->id,  // Pass the resultId here
-            ]);
-
-            return $this->finish($request);  // Pass the request object to finish
+            $request = new Request(['resultId' => $result->id]);
+            return $this->finish($request);
         }
 
-        Log::info('Questions in Current Combination:', ['questions_in_combination' => $questionsInCombination]);
-
-        // Hapus unique_answers lama di session saat berpindah kombinasi
-        $previousCombination = session()->get('previous_combination');
-        if ($previousCombination !== $currentCombination) {
+        // Reset unique_answers jika berpindah kombinasi
+        if (session('previous_combination') !== $currentCombination) {
             session()->forget('unique_answers');
             session()->put('previous_combination', $currentCombination);
         }
 
-        // Ambil unique_answers dari session atau generate baru jika tidak ada
-        $uniqueAnswers = session()->get('unique_answers', []);
+        // Ambil unique_answers dari session
+        $uniqueAnswers = session('unique_answers', []);
         if (empty($uniqueAnswers)) {
             $uniqueAnswers = $this->generateUniqueAnswersSet($questionsInCombination, $currentCombination);
 
             if (empty($uniqueAnswers)) {
-                Log::warning('Unique Answers is empty. Generating fallback data.');
                 $uniqueAnswers = array_unique(array_column($questionKecermatan, 'correct_answer'));
             }
             shuffle($uniqueAnswers);
             session()->put('unique_answers', $uniqueAnswers);
         }
 
-
+        // Jawaban benar & salah
         $correctAnswer = $activeQuestion['correct_answer'] ?? null;
-
         if (!$correctAnswer) {
             throw new Exception('Correct answer not found in question data');
         }
 
-
-        $wrongAnswers = array_values(array_filter($uniqueAnswers, function ($answer) use ($correctAnswer) {
-            return $answer !== $correctAnswer;
-        }));
-
+        $wrongAnswers = array_values(array_filter($uniqueAnswers, fn($a) => $a !== $correctAnswer));
         $wrongAnswers = array_slice($wrongAnswers, 0, 4);
 
-
-        $quizAnswerArr = [];
-        foreach ($wrongAnswers as $answer) {
-            $quizAnswerArr[] = [
-                'answer' => $answer,
-                'attachment' => null,
-                'answered' => false,
-                'point' => 0,
-                'is_answer' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
+        $quizAnswerArr = collect($wrongAnswers)->map(fn($answer) => [
+            'answer' => $answer,
+            'attachment' => null,
+            'answered' => false,
+            'point' => 0,
+            'is_answer' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->toArray();
 
         shuffle($quizAnswerArr);
 
-        $display_time = ResultDetail::where('result_id', $result->id)->count() + 1;
+        // Hitung display_time pake counter di session
+        $counterKey = "display_counter_{$result->id}";
+        $display_time = session($counterKey, 0) + 1;
+        session()->put($counterKey, $display_time);
+
+        // Siapkan soal aktif
         $activeQuestion = [
             'question_number' => $activeQuestion['order'],
             'direction_question' => $activeQuestion['direction_question'] ?? '',
@@ -390,7 +382,9 @@ class KecermatanController extends Controller
             'durasi_kombinasi' => $durasiKombinasi[$currentCombination] ?? 0,
         ];
 
+        // Time remaining 
         $remainingTime = $request->has('remaining_time') ? decrypt($request->remaining_time) : null;
+
         $data = [
             'quiz' => $result->quiz->toArray(),
             'result' => $result,
@@ -404,15 +398,13 @@ class KecermatanController extends Controller
             'remaining_time' => $remainingTime,
         ];
 
-        if ($request->wantsJson() || str_starts_with($request->path(), 'api')) {
-            return response()->json(['result' => $data], 200);
-        } else {
-            if ($request->has('q')) {
-                return view('master.kecermatan.play.question', $data);
-            }
-            return view('master.kecermatan.play.index', $data);
-        }
+        return $request->wantsJson() || str_starts_with($request->path(), 'api')
+            ? response()->json(['result' => $data], 200)
+            : ($request->has('q')
+                ? view('master.kecermatan.play.question', $data)
+                : view('master.kecermatan.play.index', $data));
     }
+
 
     private function generateUniqueAnswersSet($questions, $currentCombination)
     {
@@ -431,11 +423,6 @@ class KecermatanController extends Controller
         return $uniqueAnswers;
     }
 
-
-
-
-
-
     public function answer(Request $request)
     {
         try {
@@ -452,7 +439,7 @@ class KecermatanController extends Controller
             $questionKecermatan = json_decode($result->quiz->question_kecermatan, true);
 
 
-            // Cari pertanyaan aktif berdasarkan "order"
+            // Cari pertanyaan aktif berdasarkan order
             $activeQuestion = collect($questionKecermatan)->firstWhere('order', $validated['questionNumber']);
 
             if (!$activeQuestion || !isset($activeQuestion['correct_answer'])) {
@@ -474,7 +461,7 @@ class KecermatanController extends Controller
 
 
             // Simpan jawaban pengguna
-            $resultDetail = ResultDetail::create([
+            ResultDetail::create([
                 'result_id' => $validated['resultId'],
                 'answer' => $validated['value'],
                 'order' => $validated['questionNumber'],
@@ -497,8 +484,13 @@ class KecermatanController extends Controller
                 'resultId' => 'nullable|integer',
             ]);
 
-
+            $resultId = $request->resultId;
             session()->forget('unique_answers');
+            session()->forget("grouped_questions_{$resultId}");
+            session()->forget("display_counter_{$resultId}");
+            session()->forget("unique_answers");
+            session()->forget("previous_combination");
+
             $totalScore = ResultDetail::where('result_id', $request->resultId)->sum('score');
 
             $resultData = Result::find($request->resultId);
