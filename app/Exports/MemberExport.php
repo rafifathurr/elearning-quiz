@@ -12,22 +12,36 @@ class MemberExport implements FromCollection, WithHeadings
 {
     protected $packageFilter;
     protected $dateFilter;
+    protected $startDate;
+    protected $endDate;
 
-    public function __construct($packageFilter, $dateFilter)
+    public function __construct($packageFilter, $dateFilter, $startDate = null, $endDate = null)
     {
         $this->packageFilter = $packageFilter;
         $this->dateFilter = $dateFilter;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function collection()
     {
-        $orderId = Order::whereNull('deleted_at')->where('status', 100)->pluck('id');
+        $orderId = Order::whereNull('deleted_at')
+            ->where('status', 100)
+            ->when($this->startDate && $this->endDate, function ($q) {
+                $q->whereBetween('created_at', [
+                    \Carbon\Carbon::parse($this->startDate)->startOfDay(),
+                    \Carbon\Carbon::parse($this->endDate)->endOfDay()
+                ]);
+            })
+            ->pluck('id');
+
         $packageId = Package::whereNull('deleted_at')->pluck('id');
+
         return OrderPackage::whereNull('deleted_at')
             ->where('class', '>', 0)
             ->whereIn('order_id', $orderId)
             ->whereIn('package_id', $packageId)
-            ->with(['package', 'order.user', 'dateClass']) // Pastikan load relasi yang dibutuhkan
+            ->with(['package', 'order.user', 'dateClass'])
             ->when($this->packageFilter, function ($query) {
                 $query->whereHas('package', function ($q) {
                     $q->where('id', $this->packageFilter);

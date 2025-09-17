@@ -86,11 +86,11 @@ class myClassAdminController extends Controller
         return view('counselor.create', compact('packages', 'counselors', 'dates'));
     }
 
-    public function getOrderPackages($package_id, $date_in_class)
+    public function getOrderPackages($package_id, $date_in_class = null)
     {
-        // Decode URL untuk mendapatkan date_in_class yang benar
-        $date_in_class = urldecode($date_in_class);
-        Log::info('date_in_class: ' . $date_in_class);
+        // Decode URL
+        $date_in_class = $date_in_class ? urldecode($date_in_class) : null;
+
 
 
         $orderPackageIdInMember = ClassUser::pluck('order_package_id');
@@ -101,9 +101,11 @@ class myClassAdminController extends Controller
         })
             ->whereNull('deleted_at')
             ->where('package_id', $package_id)
-            ->where('date_in_class', $date_in_class)
+            ->when($date_in_class, function ($query) use ($date_in_class) {
+                $query->where('date_in_class', $date_in_class);
+            })
             ->whereNotIn('id', $orderPackageIdInMember)
-            ->with('order.user') // Eager Loading
+            ->with('order.user')
             ->get();
 
 
@@ -146,7 +148,7 @@ class myClassAdminController extends Controller
                 'name' => $request->name,
                 'total_meeting' => $package->class,
                 'current_meeting' => 0,
-                'class_date' => $request->date_class_id,
+                'class_date' => $request->date_class_id ?: null,
             ]);
 
             //add Class Counselor

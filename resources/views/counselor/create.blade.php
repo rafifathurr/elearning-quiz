@@ -57,8 +57,7 @@
                                             <span class="text-danger">*</span></label>
                                         <div class="col-md-8 col-sm-12">
                                             <select class="form-control @error('date_class_id') is-invalid @enderror"
-                                                id="date_class_id" name="date_class_id" data-placeholder="Pilih Jadwal"
-                                                required>
+                                                id="date_class_id" name="date_class_id" data-placeholder="Pilih Jadwal">
                                             </select>
                                             @error('date_class_id')
                                                 <div class="alert alert-danger mt-2">
@@ -160,16 +159,19 @@
             $(document).ready(function() {
                 function getOrderPackages() {
                     var package_id = $('#package_id').val();
-                    var date_in_class = $('#date_class_id option:selected').text()
-                        .trim(); // Ambil teks sebagai date_in_class dan trim spasi
+                    var date_in_class = $('#date_class_id').val();
                     $('#order_package_id').empty(); // Kosongkan opsi sebelumnya
 
-                    // Cek jika kedua parameter terisi
-                    if (package_id && date_in_class) {
+
+                    if (package_id) {
                         // Gunakan encodeURIComponent untuk mengatasi karakter khusus
+                        var url = date_in_class ?
+                            '{{ url('class/get-order-packages') }}/' + package_id + '/' + encodeURIComponent(
+                                date_in_class) :
+                            '{{ url('class/get-order-packages') }}/' + package_id;
+
                         $.ajax({
-                            url: '{{ url('class/get-order-packages') }}/' + package_id + '/' +
-                                encodeURIComponent(date_in_class),
+                            url: url,
                             type: "GET",
                             dataType: "json",
                             success: function(data) {
@@ -184,7 +186,7 @@
                         });
                     } else {
                         $('#order_package_id').append(
-                            '<option value="">Pilih Paket dan Jadwal Terlebih Dahulu</option>');
+                            '<option value="">Pilih Paket Terlebih Dahulu</option>');
                     }
                 }
 

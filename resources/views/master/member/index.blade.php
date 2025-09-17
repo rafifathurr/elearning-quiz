@@ -16,7 +16,20 @@
                                 <form action="{{ route('master.member.export') }}" method="GET">
                                     <div class="row mb-3">
                                         <div class="col-md-4 my-1">
-                                            <label for="packageFilter">Filter Nama Paket:</label>
+                                            <label for="reservation">Rentang Tanggal:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="reservation"
+                                                    name="reservation" placeholder="-- Semua tanggal --">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text"><i
+                                                            class="far fa-calendar-alt"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-4 my-1">
+                                            <label for="packageFilter">Nama Paket:</label>
                                             <select id="packageFilter" name="packageFilter" class="form-control">
                                                 <option value="">-- Semua Paket --</option>
                                                 @foreach ($packages as $package)
@@ -26,7 +39,7 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4 my-1">
-                                            <label for="dateClassFilter">Filter Tanggal Kelas:</label>
+                                            <label for="dateClassFilter">Jadwal Kelas:</label>
                                             <select id="dateClassFilter" name="dateClassFilter" class="form-control">
                                                 <option value="">-- Semua Jadwal Kelas --</option>
                                             </select>

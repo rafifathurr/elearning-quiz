@@ -31,6 +31,9 @@ class PackageMemberController extends Controller
     {
         $packageFilter = request()->get('package');
         $dateClassFilter = request()->get('dateClass');
+        $startDate       = request()->get('startDate');
+        $endDate         = request()->get('endDate');
+
         $orderId = Order::whereNull('deleted_at')->where('status', 100)->pluck('id');
         $packageId = Package::whereNull('deleted_at')->pluck('id');
 
@@ -40,17 +43,34 @@ class PackageMemberController extends Controller
             ->whereIn('order_id', $orderId)
             ->whereIn('package_id', $packageId);
 
-        // Filter berdasarkan paket jika dipilih
+
         if ($packageFilter) {
             $query->where('package_id', $packageFilter);
         }
 
-        // Filter berdasarkan nama tanggal kelas jika dipilih
         if ($dateClassFilter) {
             $query->where('date_class_id', $dateClassFilter);
         }
 
-        if (!$packageFilter && !$dateClassFilter) {
+
+        if ($startDate && $endDate) {
+            $query->whereHas('order', function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [
+                    \Carbon\Carbon::parse($startDate)->startOfDay(),
+                    \Carbon\Carbon::parse($endDate)->endOfDay()
+                ]);
+            });
+        } elseif ($startDate) {
+            $query->whereHas('order', function ($q) use ($startDate) {
+                $q->where('created_at', '>=', \Carbon\Carbon::parse($startDate)->startOfDay());
+            });
+        } elseif ($endDate) {
+            $query->whereHas('order', function ($q) use ($endDate) {
+                $q->where('created_at', '<=', \Carbon\Carbon::parse($endDate)->endOfDay());
+            });
+        }
+
+        if (!$packageFilter && !$dateClassFilter && !$startDate && !$endDate) {
             $query->orderBy('package_id', 'ASC');
         }
 
@@ -99,11 +119,21 @@ class PackageMemberController extends Controller
     {
         $packageFilter = $request->input('packageFilter');
         $dateFilter = $request->input('dateClassFilter');
+        $reservation = $request->input('reservation');
+
+        $startDate = null;
+        $endDate = null;
+
+        if ($reservation) {
+            $dates = explode(' - ', $reservation);
+            $startDate = $dates[0] ?? null;
+            $endDate   = $dates[1] ?? null;
+        }
 
         $package = $packageFilter ? Package::find($packageFilter) : null;
         $date = $dateFilter ? DateClass::find($dateFilter) : null;
 
-        // Tentukan nama file berdasarkan filter yang dipilih
+
         if ($package && $date) {
             $fileName = "Data Peserta - {$package->name} - {$date->name}.xlsx";
         } elseif ($package) {
@@ -114,7 +144,7 @@ class PackageMemberController extends Controller
             $fileName = "Data Peserta - Semua Paket - Semua Jadwal.xlsx";
         }
 
-        return Excel::download(new MemberExport($packageFilter, $dateFilter), $fileName);
+        return Excel::download(new MemberExport($packageFilter, $dateFilter, $startDate, $endDate), $fileName);
     }
 
     public function getDateClass(Request $request)

@@ -269,7 +269,7 @@ Route::group(['middleware' => ['role:counselor|class-operator|manager']], functi
     // Kelola Kelas Konselor
     Route::group(['controller' => myClassAdminController::class, 'prefix' => 'class', 'as' => 'class.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('get-order-packages/{package_id}/{date_in_class}', 'getOrderPackages')
+        Route::get('get-order-packages/{package_id}/{date_in_class?}', 'getOrderPackages')
             ->where('date_in_class', '.*') // Tambahkan regex agar bisa menerima karakter khusus
             ->name('getOrderPackages');
 

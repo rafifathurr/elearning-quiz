@@ -143,7 +143,7 @@ class DashboardController extends Controller
 
         $typePackages = TypePackage::where('id_parent', 0)
             ->whereNull('deleted_at')
-            ->with('children.package')
+            ->with(['children.package', 'package'])
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -166,6 +166,14 @@ class DashboardController extends Controller
                     $allPackages->push($package);
                 }
             }
+
+            // kalau tidak ada child
+            // foreach ($type->package as $package) {
+            //     $package->aspek = null;
+            //     $package->sesi  = null;
+            //     $package->jenis = $type->name;
+            //     $allPackages->push($package);
+            // }
         }
 
         $data = [
@@ -213,7 +221,7 @@ class DashboardController extends Controller
 
         $typePackages = TypePackage::where('id_parent', 0)
             ->whereNull('deleted_at')
-            ->with('children.package')
+            ->with(['children.package', 'package'])
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -228,6 +236,7 @@ class DashboardController extends Controller
 
         $allPackages = collect();
         foreach ($otherPackages as $type) {
+            // kalau ada child
             foreach ($type->children as $child) {
                 foreach ($child->package as $package) {
                     $package->aspek = Str::before($child->name, ' ');
@@ -236,6 +245,14 @@ class DashboardController extends Controller
                     $allPackages->push($package);
                 }
             }
+
+            // kalau tidak ada child
+            // foreach ($type->package as $package) {
+            //     $package->aspek = null;
+            //     $package->sesi  = null;
+            //     $package->jenis = $type->name;
+            //     $allPackages->push($package);
+            // }
         }
 
         $data = [
