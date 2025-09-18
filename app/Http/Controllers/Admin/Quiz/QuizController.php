@@ -525,9 +525,14 @@ class QuizController extends Controller
     public function getQuestion(Result $result, Request $request)
     {
         try {
+            $resultDetails = $result->details()
+                ->with([
+                    'resultQuestion.quizAnswer' => fn($q) => $q->whereNull('deleted_at'),
+                    'aspect',
+                ])
+                ->orderBy('display_time', 'desc')
+                ->get();
 
-            // Ambil seluruh ResultDetail terkait quiz dan user
-            $resultDetails = $result->details()->orderBy('display_time', 'desc')->get();
 
             if ($result->user_id != Auth::user()->id) {
                 session()->flash('failed', 'Tidak Dibenarkan Mengakses Test Orang Lain');
@@ -540,13 +545,10 @@ class QuizController extends Controller
 
             // Persiapkan data untuk setiap soal
             $questions = $resultDetails->map(function ($resultDetail) {
-                $question = QuizQuestion::find($resultDetail->question_id);
-
                 $questionDetail = json_decode($resultDetail->question_detail, true);
 
 
-
-                $quizAnswerArr = $question->quizAnswer->map(function ($quiz_answer) {
+                $quizAnswerArr = $resultDetail->resultQuestion->quizAnswer->map(function ($quiz_answer) {
                     return [
                         'id' => $quiz_answer->id,
                         'answer' => $quiz_answer->answer,
@@ -555,7 +557,6 @@ class QuizController extends Controller
                         'answered' => false,
                     ];
                 })->toArray();
-
 
 
                 if ($questionDetail['is_random_answer']) {
