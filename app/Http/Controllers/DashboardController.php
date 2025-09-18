@@ -143,9 +143,24 @@ class DashboardController extends Controller
 
         $typePackages = TypePackage::where('id_parent', 0)
             ->whereNull('deleted_at')
-            ->with(['children.package', 'package'])
+            ->with(['children.package' => function ($q) {
+                if (Auth::check() && (User::find(Auth::user()->id)->hasRole('counselor') || User::find(Auth::user()->id)->hasRole('class-operator'))) {
+                    $q->whereIn('status', [1, 2]);
+                } else {
+                    $q->where('status', 1);
+                }
+            }, 'package' => function ($q) {
+                if (Auth::check() && (User::find(Auth::user()->id)->hasRole('counselor') || User::find(Auth::user()->id)->hasRole('class-operator'))) {
+                    $q->whereIn('status', [1, 2]);
+                } else {
+                    $q->where('status', 1);
+                }
+            }])
+
             ->orderBy('created_at', 'DESC')
             ->get();
+
+
 
         $tryOutPackages = $typePackages->filter(function ($item) {
             return strtoupper($item->name) === 'TRY OUT';
@@ -221,9 +236,14 @@ class DashboardController extends Controller
 
         $typePackages = TypePackage::where('id_parent', 0)
             ->whereNull('deleted_at')
-            ->with(['children.package', 'package'])
+            ->with(['children.package' => function ($q) {
+                $q->where('status', 1);
+            }, 'package' => function ($q) {
+                $q->where('status', 1);
+            }])
             ->orderBy('created_at', 'DESC')
             ->get();
+
 
         $tryOutPackages = $typePackages->filter(function ($item) {
             return strtoupper($item->name) === 'TRY OUT';
@@ -247,12 +267,12 @@ class DashboardController extends Controller
             }
 
             // kalau tidak ada child
-            // foreach ($type->package as $package) {
-            //     $package->aspek = null;
-            //     $package->sesi  = null;
-            //     $package->jenis = $type->name;
-            //     $allPackages->push($package);
-            // }
+            foreach ($type->package as $package) {
+                $package->aspek = null;
+                $package->sesi  = null;
+                $package->jenis = $type->name;
+                $allPackages->push($package);
+            }
         }
 
         $data = [

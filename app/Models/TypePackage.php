@@ -15,13 +15,6 @@ class TypePackage extends Model
     {
         return $this->hasMany(Package::class, 'id_type_package', 'id')
             ->whereNull('deleted_at')
-            ->where(function ($q) {
-                if (Auth::check() && User::find(Auth::user()->id)->hasRole('counselor')) {
-                    $q->whereIn('status', [1, 2]);
-                } else {
-                    $q->where('status', 1);
-                }
-            })
             ->orderBy('price', 'DESC');
     }
 
