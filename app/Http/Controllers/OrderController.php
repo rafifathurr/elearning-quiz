@@ -690,7 +690,7 @@ class OrderController extends Controller
     }
 
 
-    public function checkoutVoucher(Request $request, String $id)
+    public function checkoutVoucher(Request $request)
     {
         DB::beginTransaction();
         try {
@@ -715,6 +715,7 @@ class OrderController extends Controller
             $userId = Auth::id();
             $timestamp = now()->timestamp;
 
+
             for ($i = 0; $i < $request->jumlah; $i++) {
                 do {
                     $raw = (int)($order->id . $userId . $request->voucher_id . $timestamp . $i);
@@ -735,6 +736,26 @@ class OrderController extends Controller
                         : $voucher->fixed_price,
                 ]);
             }
+            if ($request->metode == 'briva') {
+                $year = now()->format('y');
+                $digitOrderId = $year . $order->id;
+
+
+                $customerNo = str_pad($digitOrderId, 13, '0', STR_PAD_LEFT);
+
+                $prefixVa = '19114' . $customerNo;
+
+                SupportBriva::create([
+                    'order_id' => $order->id,
+                    'customer_no' => $customerNo,
+                    'va' => $prefixVa,
+                    'source' => 'BRI',
+                    'latest_inquiry' => null,
+                    'create_time' => now(),
+                    'payment_time' => null,
+                ]);
+            }
+
 
             DB::commit();
 
