@@ -66,7 +66,7 @@
             transition: all 0.4s ease;
             background-color: transparent;
             /* Transparan saat di posisi atas */
-            z-index: 99999;
+            z-index: 1030;
             position: relative;
             /* Tidak sticky secara default */
         }
@@ -125,8 +125,8 @@
         }
 
         /* .select2-container {
-                                                                                                                        z-index: 9999 !important;
-                                                                                                                        margin-bottom: 1rem !important; */
+                                                                                                                                            z-index: 9999 !important;
+                                                                                                                                            margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -356,87 +356,89 @@
             </div>
         </div>
 
+        <div id="package" class="package">
+            {{-- TRY OUT --}}
+            @if ($tryOutPackages->isNotEmpty())
+                <h3 class="text-center font-weight-bold my-3">
+                    Program <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
+                </h3>
+                <div class="row mx-3 justify-content-center">
+                    @foreach ($tryOutPackages as $type)
+                        <div class="col-12 mx-1 my-3">
+                            <div class="card h-100 rounded-lg shadow-sm border-0">
+                                <div class="card-header bg-gradient-lightblue text-center">
+                                    <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
+                                    <div class="row justify-content-center">
+                                        @foreach ($type->package as $item)
+                                            <div class="col-md-5 col-sm-6 col-12 my-2">
+                                                @include('master.package_payment.package_list', [
+                                                    'package' => $item,
+                                                    'showMeta' => false,
+                                                ])
+                                            </div>
+                                        @endforeach
 
-        {{-- TRY OUT --}}
-        @if ($tryOutPackages->isNotEmpty())
-            <h3 class="text-center font-weight-bold my-3">
-                Program <span class="custom-shape bg-gradient-lightblue">TRY OUT</span>
-            </h3>
-            <div class="row mx-3 justify-content-center">
-                @foreach ($tryOutPackages as $type)
-                    <div class="col-12 mx-1 my-3">
-                        <div class="card h-100 rounded-lg shadow-sm border-0">
-                            <div class="card-header bg-gradient-lightblue text-center">
-                                <h5 class="font-weight-bold text-white">{{ $type->name }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-center text-muted">{{ $type->description ?? '' }}</p>
-                                <div class="row justify-content-center">
-                                    @foreach ($type->package as $item)
-                                        <div class="col-md-5 col-sm-6 col-12 my-2">
-                                            @include('master.package_payment.package_list', [
-                                                'package' => $item,
-                                                'showMeta' => false,
-                                            ])
-                                        </div>
-                                    @endforeach
+                                    </div>
+
 
                                 </div>
-
-
                             </div>
                         </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- OTHER PACKAGES --}}
+            @if ($otherPackages->isNotEmpty())
+                <h3 class="text-center font-weight-bold my-3">
+                    Paket <span class="custom-shape bg-gradient-lightblue">Kelas</span>
+                </h3>
+
+                <div class="d-flex justify-content-center m-3">
+                    <div class="col-4">
+                        <label>Aspek</label>
+                        <select class="form-control select2" id="filterAspek" data-placeholder="Semua Aspek" multiple>
+                            <option value="Psikologi">Psikologi</option>
+                            <option value="Akademik">Akademik</option>
+                            <option value="Jasmani">Jasmani</option>
+                        </select>
                     </div>
-                @endforeach
-            </div>
-        @endif
-
-        {{-- OTHER PACKAGES --}}
-        @if ($otherPackages->isNotEmpty())
-            <h3 class="text-center font-weight-bold my-3">
-                Paket <span class="custom-shape bg-gradient-lightblue">Kelas</span>
-            </h3>
-
-            <div class="d-flex justify-content-center m-3">
-                <div class="col-4">
-                    <label>Aspek</label>
-                    <select class="form-control select2" id="filterAspek" data-placeholder="Semua Aspek" multiple>
-                        <option value="Psikologi">Psikologi</option>
-                        <option value="Akademik">Akademik</option>
-                        <option value="Jasmani">Jasmani</option>
-                    </select>
-                </div>
-                <div class="col-4">
-                    <label>Pendidikan</label>
-                    <select class="form-control select2" id="filterJenis" data-placeholder="Semua Pendidikan" multiple>
-                        @foreach ($otherPackages->pluck('jenis')->unique() as $jenis)
-                            <option value="{{ $jenis }}">{{ $jenis }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-4">
-                    <label>Sesi</label>
-                    <select class="form-control select2" id="filterSesi" data-placeholder="Semua Sesi" multiple>
-                        <option value="Online">Online</option>
-                        <option value="Offline">Offline</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row mx-3 justify-content-center">
-                @foreach ($otherPackages as $package)
-                    <div class="col-md-5 col-sm-6 col-12 my-2 mx-1" data-aspek="{{ strtolower($package->aspek ?? '') }}"
-                        data-sesi="{{ strtolower($package->sesi ?? '') }}"
-                        data-jenis="{{ strtolower($package->jenis ?? '') }}">
-                        @include('master.package_payment.package_list', [
-                            'package' => $package,
-                            'showMeta' => true,
-                        ])
+                    <div class="col-4">
+                        <label>Pendidikan</label>
+                        <select class="form-control select2" id="filterJenis" data-placeholder="Semua Pendidikan"
+                            multiple>
+                            @foreach ($otherPackages->pluck('jenis')->unique() as $jenis)
+                                <option value="{{ $jenis }}">{{ $jenis }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                @endforeach
-            </div>
-        @endif
+                    <div class="col-4">
+                        <label>Sesi</label>
+                        <select class="form-control select2" id="filterSesi" data-placeholder="Semua Sesi" multiple>
+                            <option value="Online">Online</option>
+                            <option value="Offline">Offline</option>
+                        </select>
+                    </div>
+                </div>
 
+                <div class="row mx-3 justify-content-center">
+                    @foreach ($otherPackages as $package)
+                        <div class="col-md-5 col-sm-6 col-12 my-2 mx-1"
+                            data-aspek="{{ strtolower($package->aspek ?? '') }}"
+                            data-sesi="{{ strtolower($package->sesi ?? '') }}"
+                            data-jenis="{{ strtolower($package->jenis ?? '') }}">
+                            @include('master.package_payment.package_list', [
+                                'package' => $package,
+                                'showMeta' => true,
+                            ])
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
 
 
         {{-- Contact Us --}}
