@@ -23,7 +23,8 @@
                             </div>
                             <div class="modal-body text-center">
                                 <!-- Embed Video -->
-                                <video id="videoFrame" width="100%" controls autoplay muted style=" max-height: 400px; ">
+                                <video id="videoFrame" width="100%" controls autoplay muted
+                                    style=" max-height: 410px; object-fit: cover; ">
                                     <source src="{{ asset('img/tutorial_mengerjakan_test.mp4') }}" type="video/mp4">
                                     Browser Anda tidak mendukung tag video.
                                 </video>
