@@ -157,7 +157,7 @@ class DashboardController extends Controller
                 }
             }])
 
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('name', 'ASC')
             ->get();
 
 
@@ -241,7 +241,7 @@ class DashboardController extends Controller
             }, 'package' => function ($q) {
                 $q->where('status', 1);
             }])
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('name', 'ASC')
             ->get();
 
 
