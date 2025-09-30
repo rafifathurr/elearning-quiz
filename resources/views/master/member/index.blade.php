@@ -1,7 +1,6 @@
 @extends('layouts.section')
 @section('content')
     <div class="px-3 py-4">
-
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
@@ -34,7 +33,14 @@
                                                 <option value="">-- Semua Paket --</option>
                                                 @foreach ($packages as $package)
                                                     <option value="{{ $package->id }}">{{ $package->name }} |
-                                                        {{ $package->typePackage->name }}</option>
+                                                        {{ $package->typePackage->name }}
+                                                        @if (isset($package->class) && $package->class > 0)
+                                                            | {{ $package->class }} pertemuan
+                                                        @endif
+                                                        @if (isset($package->max_member) && $package->max_member > 0)
+                                                            | {{ $package->max_member }} peserta
+                                                        @endif
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>

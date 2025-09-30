@@ -40,23 +40,27 @@
                                             <select class="form-control @error('package_id') is-invalid @enderror"
                                                 name="package_id" id="package_id" required>
                                                 @foreach ($packages as $package)
-                                                    @if ($voucher->package_id == $package->id)
-                                                        <option value="{{ $package->id }}" selected>
-                                                            {{ $package->name }}
-                                                        </option>
-                                                    @else
-                                                        <option value="{{ $package->id }}">
-                                                            {{ $package->name }}
-                                                        </option>
-                                                    @endif
+                                                    <option value="{{ $package->id }}"
+                                                        {{ $voucher->package_id == $package->id ? 'selected' : '' }}>
+                                                        {{ $package->name }} | {{ $package->typePackage->name }}
+                                                        @if (isset($package->class) && $package->class > 0)
+                                                            | {{ $package->class }} pertemuan
+                                                        @endif
+
+                                                        @if (isset($package->max_member) && $package->max_member > 0)
+                                                            | {{ $package->max_member }} peserta
+                                                        @endif
+                                                    </option>
                                                 @endforeach
                                             </select>
+
                                             @error('package_id')
                                                 <div class="alert alert-danger mt-2">
                                                     {{ $message }}
                                                 </div>
                                             @enderror
                                         </div>
+
                                     </div>
 
                                     <div class="form-group row">
