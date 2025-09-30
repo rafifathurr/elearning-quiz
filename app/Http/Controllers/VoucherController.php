@@ -147,7 +147,6 @@ class VoucherController extends Controller
             $baseRules = [
                 'name' => 'required',
                 'type_voucher' => 'required|in:discount,fixed_price',
-                'voucher_price' => 'nullable|numeric',
                 'package_id' => 'required|integer',
                 'description' => 'nullable|string',
             ];
@@ -166,7 +165,6 @@ class VoucherController extends Controller
             $voucher->update([
                 'name' => $validated['name'],
                 'type_voucher' => $validated['type_voucher'],
-                'voucher_price' => $validated['voucher_price'],
                 'package_id' => $validated['package_id'],
                 'description' => $validated['description'] ?? null,
                 'discount' => $validated['type_voucher'] === 'discount' ? $validated['discount'] : null,
