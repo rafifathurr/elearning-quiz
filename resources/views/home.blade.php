@@ -31,8 +31,8 @@
 
 
         /* .select2-container {
-                                                        z-index: 9999 !important;
-                                                        margin-bottom: 1rem !important; */
+                                                            z-index: 9999 !important;
+                                                            margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -162,7 +162,8 @@
                             <div class="col-md-5  col-12 mx-1 my-3"> {{-- Responsif di layar kecil --}}
                                 <div class="card h-100 shadow-lg border-0 rounded-4">
                                     <div class="card-header bg-gradient-lightblue text-center rounded-top-4">
-                                        <h5 class="font-weight-bold text-white m-0">{{ $package->name }}</h5>
+                                        <h5 class="font-weight-bold text-white m-0">{{ $package->name }} |
+                                            {{ $package->typePackage->name }}</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row justify-content-center px-2">
