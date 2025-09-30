@@ -31,8 +31,8 @@
 
 
         /* .select2-container {
-                                                                                                                            z-index: 9999 !important;
-                                                                                                                            margin-bottom: 1rem !important; */
+                                                                                                                                        z-index: 9999 !important;
+                                                                                                                                        margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -153,83 +153,86 @@
             <div class="container-fluid">
 
                 {{-- Voucher --}}
-                @if ($packages->isNotEmpty())
-                    <h3 class="text-center font-weight-bold my-3 w-100">
-                        Daftar <span class="custom-shape bg-gradient-lightblue">Voucher</span>
-                    </h3>
-                    <div class="row justify-content-center">
-                        @foreach ($packages as $package)
-                            <div class="col-md-5  col-12 mx-1 my-3">
-                                <div class="card h-100 shadow-lg border-0 rounded-4">
-                                    <div class="card-header bg-gradient-lightblue text-center rounded-top-4 py-3">
-                                        <h5 class="font-weight-bold text-white m-0">{{ $package->name }}</h5>
-                                        <small class="d-block text-white-50 mt-1" style="font-size: 0.9rem;">
-                                            {{ $package->typePackage->name }}
-                                            @if (isset($package->class) && $package->class > 0)
-                                                • {{ $package->class }} Pertemuan
-                                            @endif
-                                            @if (isset($package->max_member) && $package->max_member > 0)
-                                                • {{ $package->max_member }} Peserta
-                                            @endif
-                                        </small>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row justify-content-center px-2">
-                                            @foreach ($package->voucher as $voucher)
-                                                <div class="col-md-6 mb-4">
-                                                    <div class="card h-100 border-0 shadow-md rounded-3 position-relative ">
-                                                        <div
-                                                            class="card-header text-white {{ isset($voucher->discount) ? 'bg-success' : 'bg-warning' }}">
-                                                            <span style="font-size: 1rem; font-weight: bold;">
-                                                                <i class="fas fa-tags mr-2"></i>{{ $voucher->name }}
-                                                            </span>
-                                                        </div>
-                                                        <div class="card-body text-center px-2">
-                                                            @if (isset($voucher->discount))
-                                                                <span class="badge bg-success mb-2"
-                                                                    style="font-size: 1rem">Diskon
-                                                                    {{ $voucher->discount }}<sup>%</sup></span>
-                                                            @endif
-                                                            @if (isset($voucher->fixed_price))
-                                                                <span class="badge bg-warning text-dark mb-2"
-                                                                    style="font-size: 1rem">
-                                                                    Fixed Price
-                                                                    {{ 'Rp. ' . number_format($voucher->fixed_price, 0, ',', '.') }}
+                @hasanyrole('class-operator|counselor')
+                    @if ($packages->isNotEmpty())
+                        <h3 class="text-center font-weight-bold my-3 w-100">
+                            Daftar <span class="custom-shape bg-gradient-lightblue">Voucher</span>
+                        </h3>
+                        <div class="row justify-content-center">
+                            @foreach ($packages as $package)
+                                <div class="col-md-5  col-12 mx-1 my-3">
+                                    <div class="card h-100 shadow-lg border-0 rounded-4">
+                                        <div class="card-header bg-gradient-lightblue text-center rounded-top-4 py-3">
+                                            <h5 class="font-weight-bold text-white m-0">{{ $package->name }}</h5>
+                                            <small class="d-block text-white-50 mt-1" style="font-size: 0.9rem;">
+                                                {{ $package->typePackage->name }}
+                                                @if (isset($package->class) && $package->class > 0)
+                                                    • {{ $package->class }} Pertemuan
+                                                @endif
+                                                @if (isset($package->max_member) && $package->max_member > 0)
+                                                    • {{ $package->max_member }} Peserta
+                                                @endif
+                                            </small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row justify-content-center px-2">
+                                                @foreach ($package->voucher as $voucher)
+                                                    <div class="col-md-6 mb-4">
+                                                        <div class="card h-100 border-0 shadow-md rounded-3 position-relative ">
+                                                            <div
+                                                                class="card-header text-white {{ isset($voucher->discount) ? 'bg-success' : 'bg-warning' }}">
+                                                                <span style="font-size: 1rem; font-weight: bold;">
+                                                                    <i class="fas fa-tags mr-2"></i>{{ $voucher->name }}
                                                                 </span>
-                                                            @endif
-                                                            @if (isset($voucher->description))
-                                                                <span class="text-gray mt-3" style="opacity: 0.8;">
-                                                                    {!! $voucher->description !!}
-                                                                </span>
-                                                            @endif
-                                                            {{-- <h4 class="mt-2 text-primary">
+                                                            </div>
+                                                            <div class="card-body text-center px-2">
+                                                                @if (isset($voucher->discount))
+                                                                    <span class="badge bg-success mb-2"
+                                                                        style="font-size: 1rem">Diskon
+                                                                        {{ $voucher->discount }}<sup>%</sup></span>
+                                                                @endif
+                                                                @if (isset($voucher->fixed_price))
+                                                                    <span class="badge bg-warning text-dark mb-2"
+                                                                        style="font-size: 1rem">
+                                                                        Fixed Price
+                                                                        {{ 'Rp. ' . number_format($voucher->fixed_price, 0, ',', '.') }}
+                                                                    </span>
+                                                                @endif
+                                                                @if (isset($voucher->description))
+                                                                    <span class="text-gray mt-3" style="opacity: 0.8;">
+                                                                        {!! $voucher->description !!}
+                                                                    </span>
+                                                                @endif
+                                                                {{-- <h4 class="mt-2 text-primary">
                                                                 {{ 'Rp. ' . number_format($voucher->voucher_price, 0, ',', '.') }}
                                                             </h4> --}}
-                                                        </div>
-                                                        <div class="card-footer bg-white text-center">
-                                                            <button
-                                                                onclick="checkOutVoucher({{ $voucher->id }}, '{{ $voucher->name }}', {{ $voucher->voucher_price }})"
-                                                                class="btn btn-outline-primary w-100">
-                                                                Checkout
-                                                            </button>
+                                                            </div>
+                                                            <div class="card-footer bg-white text-center">
+                                                                <button
+                                                                    onclick="checkOutVoucher({{ $voucher->id }}, '{{ $voucher->name }}', {{ $voucher->voucher_price }})"
+                                                                    class="btn btn-outline-primary w-100">
+                                                                    Checkout
+                                                                </button>
 
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            @endforeach
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-12">
-                            <img src="{{ asset('img/breadcrumb-line.png') }}" class="img-fluid">
+                                </div>
+                            @endforeach
                         </div>
-                    </div>
-                @endif
+                        <div class="row text-center">
+                            <div class="col-12">
+                                <img src="{{ asset('img/breadcrumb-line.png') }}" class="img-fluid">
+                            </div>
+                        </div>
+                    @endif
+                @endhasanyrole
+
 
 
                 {{-- TRY OUT --}}
