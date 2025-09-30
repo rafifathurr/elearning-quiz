@@ -27,7 +27,7 @@
                                                 <th>Nama Paket</th>
                                                 <th>Nama Voucher</th>
                                                 <th>Tipe Voucher</th>
-                                                <th>Harga</th>
+
                                                 <th>Status</th>
                                             </tr>
                                         </thead>

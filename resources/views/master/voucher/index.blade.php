@@ -29,7 +29,6 @@
                                                 <th>Nama Voucher</th>
                                                 <th>Diskon</th>
                                                 <th>Fixed Price</th>
-                                                <th>Harga Voucher</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

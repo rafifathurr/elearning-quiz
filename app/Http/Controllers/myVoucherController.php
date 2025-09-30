@@ -53,9 +53,9 @@ class myVoucherController extends Controller
                 }
                 return $value;
             })
-            ->addColumn('price', function ($data) {
-                return 'Rp. ' . number_format($data->price, 0, ',', '.');
-            })
+            // ->addColumn('price', function ($data) {
+            //     return 'Rp. ' . number_format($data->price, 0, ',', '.');
+            // })
             ->addColumn('status', function ($data) {
                 if ($data->status == 1) {
                     $status = '<span class="text-primary">Belum Digunakan</span>';
@@ -66,7 +66,7 @@ class myVoucherController extends Controller
             })
 
 
-            ->only(['voucher_code', 'package', 'name', 'price', 'type_voucher', 'status'])
+            ->only(['voucher_code', 'package', 'name', 'type_voucher', 'status'])
             ->rawColumns(['status', 'voucher_code'])
             ->make(true);
     }

@@ -33,10 +33,7 @@
                     data: 'type_voucher',
                     defaultContent: '-'
                 },
-                {
-                    data: 'price',
-                    defaultContent: '-'
-                },
+
 
                 {
                     data: 'status',

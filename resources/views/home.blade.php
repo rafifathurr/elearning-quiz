@@ -31,8 +31,8 @@
 
 
         /* .select2-container {
-                                                    z-index: 9999 !important;
-                                                    margin-bottom: 1rem !important; */
+                                                        z-index: 9999 !important;
+                                                        margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -193,9 +193,9 @@
                                                                     {!! $voucher->description !!}
                                                                 </span>
                                                             @endif
-                                                            <h4 class="mt-2 text-primary">
+                                                            {{-- <h4 class="mt-2 text-primary">
                                                                 {{ 'Rp. ' . number_format($voucher->voucher_price, 0, ',', '.') }}
-                                                            </h4>
+                                                            </h4> --}}
                                                         </div>
                                                         <div class="card-footer bg-white text-center">
                                                             <button

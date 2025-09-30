@@ -297,18 +297,18 @@
     function checkOutVoucher(id, name, harga) {
         let token = $('meta[name="csrf-token"]').attr('content');
 
-        // Pop-up 1: Pilih jumlah voucher
+        // Pop-up: Pilih jumlah voucher
         Swal.fire({
             title: `Ambil Voucher: ${name}`,
             html: `
-                <p>Beli voucher untuk saya dan teman saya</p>
-                <div style="display:flex; align-items:center; justify-content:center; gap: 5px;">
-                    <button type="button" id="btn-minus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">−</button>
-                    <input type="number" id="jumlah-voucher" class="swal2-input" 
-                        style="width:80px; height:45px; text-align:center; font-size:18px; margin:0;" min="1" value="1">
-                    <button type="button" id="btn-plus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">+</button>
-                </div>
-            `,
+            <p>Beli voucher untuk saya dan teman saya</p>
+            <div style="display:flex; align-items:center; justify-content:center; gap: 5px;">
+                <button type="button" id="btn-minus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">−</button>
+                <input type="number" id="jumlah-voucher" class="swal2-input" 
+                    style="width:80px; height:45px; text-align:center; font-size:18px; margin:0;" min="1" value="1">
+                <button type="button" id="btn-plus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">+</button>
+            </div>
+        `,
             icon: 'question',
             showCancelButton: true,
             allowOutsideClick: false,
@@ -337,118 +337,13 @@
                 }
                 return jumlah;
             }
-        }).then(firstResult => {
-            if (firstResult.isConfirmed) {
-                const jumlah = firstResult.value;
-
-                Swal.fire({
-                    title: 'Pilih Metode Pembayaran',
-                    html: `
-                        <div class="text-center">
-                            <button id="btn-transfer" class="btn btn-success mr-3 mb-3" style="width: 120px;">Transfer</button>
-                            <button id="btn-briva" class="btn btn-secondary mb-3" style="width: 120px;">BRIVA</button>
-                        </div>
-                    `,
-                    showConfirmButton: false,
-                    showCancelButton: false,
-                    showCloseButton: true,
-                    didOpen: () => {
-                        const showConfirmation = (metode) => {
-                            Swal.fire({
-                                title: 'Konfirmasi Pembayaran',
-                                text: `Apakah Anda yakin memilih metode pembayaran "${metode.toUpperCase()}"?`,
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonText: 'Ya, lanjutkan',
-                                cancelButtonText: 'Batal',
-                                reverseButtons: true,
-                                customClass: {
-                                    confirmButton: 'btn btn-primary ',
-                                    cancelButton: 'btn mr-2 btn-outline-secondary'
-                                },
-                                buttonsStyling: false
-                            }).then(result => {
-                                if (result.isConfirmed) {
-                                    kirimDataCheckout(id, jumlah, harga, metode);
-                                } else {
-                                    // Tampilkan ulang pilihan metode pembayaran
-                                    checkOutMetodePembayaran(id, jumlah, harga);
-                                }
-                            });
-                        };
-
-                        document.getElementById('btn-transfer').addEventListener('click',
-                            function() {
-                                showConfirmation('transfer');
-                            });
-
-                        document.getElementById('btn-briva').addEventListener('click', function() {
-                            showConfirmation('briva');
-                        });
-
-                        @if (!(Auth::check() && Auth::user()->username === 'test_user23'))
-                            document.getElementById('btn-briva').disabled = true;
-                        @endif
-                    }
-
-                });
-
-
+        }).then(result => {
+            if (result.isConfirmed) {
+                const jumlah = result.value;
+                kirimDataCheckout(id, jumlah, harga, 'transfer');
             }
         });
     }
-
-    function checkOutMetodePembayaran(id, jumlah, harga) {
-        Swal.fire({
-            title: 'Pilih Metode Pembayaran',
-            html: `
-            <div class="text-center">
-                <button id="btn-transfer" class="btn btn-success mr-3 mb-3" style="width: 120px;">Transfer</button>
-                <button id="btn-briva" class="btn btn-secondary mb-3" style="width: 120px;">BRIVA</button>
-            </div>
-        `,
-            showConfirmButton: false,
-            showCancelButton: false,
-            showCloseButton: true,
-            didOpen: () => {
-                const showConfirmation = (metode) => {
-                    Swal.fire({
-                        title: 'Konfirmasi Pembayaran',
-                        text: `Apakah Anda yakin memilih metode pembayaran "${metode.toUpperCase()}"?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, lanjutkan',
-                        cancelButtonText: 'Batal',
-                        reverseButtons: true,
-                        customClass: {
-                            confirmButton: 'btn btn-primary  mb-3',
-                            cancelButton: 'btn btn-danger mr-2 mb-3',
-                        },
-                        buttonsStyling: false
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            kirimDataCheckout(id, jumlah, harga, metode);
-                        } else {
-                            checkOutMetodePembayaran(id, jumlah, harga);
-                        }
-                    });
-                };
-
-                document.getElementById('btn-transfer').addEventListener('click', function() {
-                    showConfirmation('transfer');
-                });
-
-                document.getElementById('btn-briva').addEventListener('click', function() {
-                    showConfirmation('briva');
-                });
-
-                @if (!(Auth::check() && Auth::user()->username === 'test_user23'))
-                    document.getElementById('btn-briva').disabled = true;
-                @endif
-            }
-        });
-    }
-
 
     function kirimDataCheckout(id, jumlah, harga, metode) {
         let token = $('meta[name="csrf-token"]').attr('content');
@@ -476,6 +371,7 @@
             }
         });
     }
+
 
 
 

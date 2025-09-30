@@ -55,10 +55,7 @@
                     data: 'fixed_price',
                     defaultContent: '-'
                 },
-                {
-                    data: 'voucher_price',
-                    defaultContent: '-'
-                },
+
                 {
                     data: 'action',
                     width: '20%',

@@ -102,7 +102,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    {{-- <div class="form-group row">
                                         <label for="voucher_price" class="col-md-4 control-label text-left">Harga Voucher
                                             <span class="text-danger ml-1">*</span>
                                         </label>
@@ -116,7 +116,7 @@
                                                 </div>
                                             @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
 
 
                                     <div class="form-group row">

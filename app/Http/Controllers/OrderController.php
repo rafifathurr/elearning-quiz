@@ -698,13 +698,13 @@ class OrderController extends Controller
                 'voucher_id' => 'required|exists:vouchers,id',
                 'jumlah' => 'required|integer|min:1',
                 'metode' => 'required|in:transfer,briva',
-                'harga' => 'required|numeric|min:0',
+                'harga' => 'nullable|numeric|min:0',
             ]);
 
             $totalPrice = $request->jumlah * $request->harga;
 
             $order = Order::create([
-                'status' => 2,
+                'status' => 100,
                 'user_id' => Auth::id(),
                 'total_price' => $totalPrice,
                 'payment_method' => $request->metode,
@@ -736,32 +736,12 @@ class OrderController extends Controller
                         : $voucher->fixed_price,
                 ]);
             }
-            if ($request->metode == 'briva') {
-                $year = now()->format('y');
-                $digitOrderId = $year . $order->id;
-
-
-                $customerNo = str_pad($digitOrderId, 13, '0', STR_PAD_LEFT);
-
-                $prefixVa = '19114' . $customerNo;
-
-                SupportBriva::create([
-                    'order_id' => $order->id,
-                    'customer_no' => $customerNo,
-                    'va' => $prefixVa,
-                    'source' => 'BRI',
-                    'latest_inquiry' => null,
-                    'create_time' => now(),
-                    'payment_time' => null,
-                ]);
-            }
-
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('order.detailPayment', ['id' => $order->id])
+                'redirect_url' => route('myvoucher.index')
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

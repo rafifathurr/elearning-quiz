@@ -42,12 +42,12 @@ class VoucherController extends Controller
 
                 return $price;
             })
-            ->addColumn('voucher_price', function ($data) {
-                $voucher_price = '<div>' . 'Rp. ' . number_format($data->voucher_price, 0, ',', '.');
+            // ->addColumn('voucher_price', function ($data) {
+            //     $voucher_price = '<div>' . 'Rp. ' . number_format($data->voucher_price, 0, ',', '.');
 
-                $voucher_price .= '<div>';
-                return $voucher_price;
-            })
+            //     $voucher_price .= '<div>';
+            //     return $voucher_price;
+            // })
             ->addColumn('action', function ($data) {
                 if (User::find(Auth::user()->id)->hasRole('admin')) {
                     $btn_action = '<div align="center">';
@@ -62,8 +62,8 @@ class VoucherController extends Controller
                 }
             })
 
-            ->only(['name', 'package_name', 'discount', 'fixed_price', 'voucher_price', 'action'])
-            ->rawColumns(['action', 'package_name', 'discount', 'fixed_price', 'voucher_price'])
+            ->only(['name', 'package_name', 'discount', 'fixed_price', 'action'])
+            ->rawColumns(['action', 'package_name', 'discount', 'fixed_price'])
             ->make(true);
 
         return $dataTable;
@@ -82,7 +82,7 @@ class VoucherController extends Controller
             $baseRules = [
                 'name' => 'required',
                 'type_voucher' => 'required|in:discount,fixed_price',
-                'voucher_price' => 'required|numeric',
+                'voucher_price' => 'nullable|numeric',
                 'package_id' => 'required|integer',
                 'description' => 'nullable|string',
             ];
@@ -147,7 +147,7 @@ class VoucherController extends Controller
             $baseRules = [
                 'name' => 'required',
                 'type_voucher' => 'required|in:discount,fixed_price',
-                'voucher_price' => 'required|numeric',
+                'voucher_price' => 'nullable|numeric',
                 'package_id' => 'required|integer',
                 'description' => 'nullable|string',
             ];
