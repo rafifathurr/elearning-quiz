@@ -1117,6 +1117,7 @@ class OrderController extends Controller
                     ->orWhere('status', 2)
                     ->orWhere('status', 1)->whereNotNull('proof_payment');
             })->whereNull('deleted_at')
+                ->where('total_price', '>', 0)
                 ->orderByDesc('created_at')
                 ->get();
 
