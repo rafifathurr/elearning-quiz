@@ -301,7 +301,7 @@
         Swal.fire({
             title: `Ambil Voucher: ${name}`,
             html: `
-            <p>Beli voucher untuk saya dan teman saya</p>
+            <p>Masukan jumlah voucher yang anda inginkan</p>
             <div style="display:flex; align-items:center; justify-content:center; gap: 5px;">
                 <button type="button" id="btn-minus" class="btn btn-secondary" style="width:45px; height:45px; font-size:20px;">−</button>
                 <input type="number" id="jumlah-voucher" class="swal2-input" 
