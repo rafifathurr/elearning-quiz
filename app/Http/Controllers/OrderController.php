@@ -146,7 +146,8 @@ class OrderController extends Controller
                 $query->where('status', 100)
                     ->orWhere('status', 10)
                     ->orWhere('status', 2)->whereNotNull('proof_payment');
-            })->whereNull('deleted_at');
+            })->whereNull('deleted_at')
+            ->where('total_price', '>', 0);
 
         // Filter berdasarkan paket jika dipilih
         if ($statusFilter) {
