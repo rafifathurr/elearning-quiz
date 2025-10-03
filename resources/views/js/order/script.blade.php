@@ -587,26 +587,48 @@
         let token = $('meta[name="csrf-token"]').attr('content');
 
         Swal.fire({
-            title: 'Apakah Anda Yakin Ingin Menerima Order Ini?',
+            title: 'Pilih Status Pembayaran',
             icon: 'question',
-            showCancelButton: true,
+            showDenyButton: true,
+            showCancelButton: false,
+            showCloseButton: true,
             allowOutsideClick: false,
             customClass: {
-                confirmButton: 'btn btn-primary mr-2 mb-3',
-                cancelButton: 'btn btn-danger mb-3',
+                confirmButton: 'btn btn-success mr-2 mb-3',
+                denyButton: 'btn btn-danger mb-3',
             },
             buttonsStyling: false,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Lunas',
+            denyButtonText: 'Belum Lunas'
         }).then(result => {
             if (result.isConfirmed) {
+                // Jika Lunas
                 swalProcess();
                 $.ajax({
                     url: '{{ url('order/approve') }}/' + id,
                     type: 'POST',
                     cache: false,
                     data: {
-                        _token: token
+                        _token: token,
+                        payment_status: 1
+                    },
+                    success: function(data) {
+                        location.reload();
+                    },
+                    error: function(xhr, error, code) {
+                        swalError(error);
+                    }
+                });
+            } else if (result.isDenied) {
+                // Jika Belum Lunas
+                swalProcess();
+                $.ajax({
+                    url: '{{ url('order/approve') }}/' + id,
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        _token: token,
+                        payment_status: 0
                     },
                     success: function(data) {
                         location.reload();
@@ -618,6 +640,7 @@
             }
         });
     }
+
 
     function rejectOrder(id) {
         let token = $('meta[name="csrf-token"]').attr('content');

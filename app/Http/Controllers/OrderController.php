@@ -187,9 +187,13 @@ class OrderController extends Controller
             ->addColumn('status_payment', function ($data) {
                 $list_view = '<div align="center">';
                 if ($data->status == 100) {
-                    $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
+                    if ($data->payment_status == 1) {
+                        $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Lunas</span>';
+                    } else {
+                        $list_view .= '<span class="badge bg-secondary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Belum Lunas</span>';
+                    }
                 } elseif ($data->status == 10) {
-                    $list_view .= '<span class="badge bg-warning  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                    $list_view .= '<span class="badge bg-purple  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
                 } else {
                     $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
                 }
@@ -937,7 +941,7 @@ class OrderController extends Controller
     }
 
 
-    public function approve(string $id)
+    public function approve(Request $request, string $id)
     {
         DB::beginTransaction();
         try {
@@ -948,6 +952,8 @@ class OrderController extends Controller
                 'status' => 100,
                 'approval_date' => now(),
                 'approval_by' => Auth::user()->id,
+                'payment_status' => (int) $request->payment_status,
+
             ]);
 
             if (!$approve_order) {
@@ -1130,9 +1136,13 @@ class OrderController extends Controller
                 ->addColumn('status_payment', function ($data) {
                     $list_view = '<div align="center">';
                     if ($data->status == 100) {
-                        $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Berhasil</span>';
+                        if ($data->payment_status == 1) {
+                            $list_view .= '<span class="badge bg-success p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Lunas</span>';
+                        } else {
+                            $list_view .= '<span class="badge bg-secondary p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Belum Lunas</span>';
+                        }
                     } elseif ($data->status == 10) {
-                        $list_view .= '<span class="badge bg-maroon  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
+                        $list_view .= '<span class="badge bg-purple  p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Menunggu Konfirmasi</span>';
                     } elseif ($data->status == 2 && !is_null($data->proof_payment)) {
                         $list_view .= '<span class="badge bg-danger p-2 m-1" style="font-size: 0.9rem; font-weight: bold;">Ditolak</span>';
                     } else {

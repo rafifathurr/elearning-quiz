@@ -31,8 +31,8 @@
 
 
         /* .select2-container {
-                                                                                                                                        z-index: 9999 !important;
-                                                                                                                                        margin-bottom: 1rem !important; */
+                                                                                                                                            z-index: 9999 !important;
+                                                                                                                                            margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -211,7 +211,7 @@
                                                                 <button
                                                                     onclick="checkOutVoucher({{ $voucher->id }}, '{{ $voucher->name }}', {{ $voucher->voucher_price }})"
                                                                     class="btn btn-outline-primary w-100">
-                                                                    Checkout
+                                                                    Ambil Voucher
                                                                 </button>
 
                                                             </div>
