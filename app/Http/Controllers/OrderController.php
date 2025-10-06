@@ -384,6 +384,7 @@ class OrderController extends Controller
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
                     'price' => $final_price,
                     'voucher_code' => $voucher->voucher_code ?? null,
+                    'price_before_discount' => $voucher ? $package->price : null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -399,6 +400,7 @@ class OrderController extends Controller
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
                     'price' => $final_price,
                     'voucher_code' => $voucher->voucher_code ?? null,
+                    'price_before_discount' => $voucher ? $package->price : null,
 
                 ]);
             }
@@ -409,6 +411,7 @@ class OrderController extends Controller
             }
 
             if ($add_order_package) {
+                dd($add_order_package);
                 DB::commit();
                 session()->flash('berhasil', 'Berhasil Ambil Paket');
             } else {
@@ -558,6 +561,7 @@ class OrderController extends Controller
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
                     'price' => $final_price,
                     'voucher_code' => $voucher->voucher_code ?? null,
+                    'price_before_discount' => $voucher ? $package->price : null,
                 ]);
             } else {
                 $new_order = Order::lockforUpdate()->create([
@@ -574,6 +578,7 @@ class OrderController extends Controller
                     'date_in_class' => !empty($date_class) ? $date_class->name : null,
                     'price' => $final_price,
                     'voucher_code' => $voucher->voucher_code ?? null,
+                    'price_before_discount' => $voucher ? $package->price : null,
                 ]);
             }
 

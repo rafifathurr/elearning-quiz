@@ -121,7 +121,22 @@
                                                         {{ $item->dateClass ? $item->dateClass->name : '-' }}
                                                     </td>
                                                     <td>
-                                                        {{ 'Rp. ' . number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
+                                                        @if (!empty($item->price_before_discount))
+                                                            <span class="text-gray " style="text-decoration: line-through;">
+                                                                Rp.
+                                                                {{ number_format($item->price_before_discount, 0, ',', '.') }}
+                                                            </span>
+                                                            <br>
+                                                            <span class="text-danger font-weight-bold">
+                                                                Rp.
+                                                                {{ number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
+                                                            </span>
+                                                        @else
+                                                            <span>
+                                                                Rp.
+                                                                {{ number_format($item->price ?? optional($item->package)->price, 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
                                                     </td>
 
                                                 </tr>
