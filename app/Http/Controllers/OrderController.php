@@ -151,7 +151,11 @@ class OrderController extends Controller
 
         // Filter berdasarkan paket jika dipilih
         if ($statusFilter) {
-            $data->where('status', $statusFilter);
+            if (in_array($statusFilter, [101, 102])) {
+                $data->where('payment_status', $statusFilter == 101 ? 1 : 0);
+            } else {
+                $data->where('status', $statusFilter);
+            }
         }
 
         if (!$statusFilter) {

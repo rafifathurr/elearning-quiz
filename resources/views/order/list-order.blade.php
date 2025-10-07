@@ -132,7 +132,8 @@
                                         <label for="statusFilter">Filter Status Order:</label>
                                         <select id="statusFilter" name="statusFilter" class="form-control">
                                             <option value="">-- Semua Status --</option>
-                                            <option value="100">Berhasil</option>
+                                            <option value="101">Lunas</option>
+                                            <option value="102">Belum Lunas</option>
                                             <option value="10">Menunggu Konfirmasi</option>
                                             <option value="2">Ditolak</option>
                                         </select>
