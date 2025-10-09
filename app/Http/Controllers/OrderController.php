@@ -415,7 +415,6 @@ class OrderController extends Controller
             }
 
             if ($add_order_package) {
-                dd($add_order_package);
                 DB::commit();
                 session()->flash('berhasil', 'Berhasil Ambil Paket');
             } else {
