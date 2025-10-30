@@ -53,13 +53,13 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
             return [
                 'no' => $index + 1,
                 'tanggal_order' => \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->created_at),
+                'tanggal_settle' => $isCashOrNonCash ? null : ($order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null),
+                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'order_id' => $order->id,
                 'nama' => $order->user->name ?? '-',
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'tanggal_settle' => $isCashOrNonCash ? null : ($order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null),
-                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'nominal' => $isCashOrNonCash ? null : $order->total_price,
 
             ];
@@ -71,7 +71,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
         return [
             ['Daftar order periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
             [''], // <--- baris kosong
-            ['No', 'Tanggal Order', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran', 'Tanggal Konfirmasi Pembayaran', 'Tanggal Approval', 'Nominal'],
+            ['No', 'Tanggal Order', 'Tanggal Konfirmasi Pembayaran', 'Tanggal Approval', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran',  'Nominal'],
         ];
     }
 
