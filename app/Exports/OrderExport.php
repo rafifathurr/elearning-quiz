@@ -118,12 +118,12 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 ]);
 
                 // Wrap text untuk paket
-                $sheet->getStyle('F')->getAlignment()->setWrapText(true);
+                $sheet->getStyle('H')->getAlignment()->setWrapText(true);
 
                 //Number Format
-                $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)
-                    ->getNumberFormat()
-                    ->setFormatCode('"Rp" #,##0');
+                // $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)
+                //     ->getNumberFormat()
+                //     ->setFormatCode('"Rp" #,##0');
 
                 //Nominal
                 $sheet->getStyle('J4:J' . ($rowCount - 1))
@@ -135,28 +135,28 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                     ->getNumberFormat()
                     ->setFormatCode('dd/mm/yyyy'); // hasilnya jadi: 18/04/2025
 
-                // Format tanggal aproval (kolom G)
-                $sheet->getStyle('H4:H' . $rowCount)
-                    ->getNumberFormat()
-                    ->setFormatCode('dd/mm/yyyy');
 
-                // Format tanggal_settle (kolom H)
-                $sheet->getStyle('I4:I' . $rowCount)
+                // Format konfirmasi (kolom C)
+                $sheet->getStyle('C4:C' . $rowCount)
                     ->getNumberFormat()
                     ->setFormatCode('dd/mm/yyyy');
 
 
+                // Format tanggal aproval (kolom D)
+                $sheet->getStyle('D4:D' . $rowCount)
+                    ->getNumberFormat()
+                    ->setFormatCode('dd/mm/yyyy');
 
                 // Atur lebar kolom manual supaya lebih lebar
                 $sheet->getColumnDimension('A')->setWidth(5);    // No
                 $sheet->getColumnDimension('B')->setWidth(15);   // Tanggal Order
-                $sheet->getColumnDimension('C')->setWidth(12);   // Order No
-                $sheet->getColumnDimension('D')->setWidth(20);   // Nama Pengguna
-                $sheet->getColumnDimension('E')->setWidth(25);   // Email Pengguna
-                $sheet->getColumnDimension('F')->setWidth(30);   // Paket Yang Diambil
-                $sheet->getColumnDimension('G')->setWidth(18);   // Jenis Pembayaran
-                $sheet->getColumnDimension('H')->setWidth(18);   // Tanggal Approval
-                $sheet->getColumnDimension('I')->setWidth(18);   // Tanggal Mutasi Rekening
+                $sheet->getColumnDimension('C')->setWidth(18);   // Tanggal Konfirmasi
+                $sheet->getColumnDimension('D')->setWidth(18);   // Tanggal Approval
+                $sheet->getColumnDimension('E')->setWidth(12);   // Order No
+                $sheet->getColumnDimension('F')->setWidth(20);   // Nama Pengguna
+                $sheet->getColumnDimension('G')->setWidth(25);   // Email Pengguna
+                $sheet->getColumnDimension('H')->setWidth(30);   // Paket Yang Diambil
+                $sheet->getColumnDimension('I')->setWidth(18);   // Jenis Pembayaran
                 $sheet->getColumnDimension('J')->setWidth(18);   // Nominal
 
                 // BORDER semua data (A3 sampai J + rowCount)
