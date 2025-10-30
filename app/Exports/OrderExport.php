@@ -121,9 +121,9 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $sheet->getStyle('H')->getAlignment()->setWrapText(true);
 
                 //Number Format
-                // $sheet->getStyle('I' . $rowCount . ':J' . $rowCount)
-                //     ->getNumberFormat()
-                //     ->setFormatCode('"Rp" #,##0');
+                $sheet->getStyle('J' . $rowCount)
+                    ->getNumberFormat()
+                    ->setFormatCode('"Rp" #,##0');
 
                 //Nominal
                 $sheet->getStyle('J4:J' . ($rowCount - 1))
