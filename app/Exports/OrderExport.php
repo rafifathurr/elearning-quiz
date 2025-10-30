@@ -58,8 +58,8 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 'email' => $order->user->email ?? '-',
                 'paket' => $packageList,
                 'pembayaran' => $order->payment_method,
-                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'tanggal_settle' => $isCashOrNonCash ? null : ($order->payment_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->payment_date) : null),
+                'tanggal_aproval' => $order->approval_date ? \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel($order->approval_date) : null,
                 'nominal' => $isCashOrNonCash ? null : $order->total_price,
 
             ];
@@ -71,7 +71,7 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
         return [
             ['Daftar order periode ' . \Carbon\Carbon::parse($this->startDate)->translatedFormat('d F Y') . ' sampai ' . \Carbon\Carbon::parse($this->endDate)->translatedFormat('d F Y')],
             [''], // <--- baris kosong
-            ['No', 'Tanggal Order', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran', 'Tanggal Approval', 'Tanggal Mutasi Rekening', 'Nominal'],
+            ['No', 'Tanggal Order', 'Order No', 'Nama Pengguna', 'Email Pengguna', 'Paket Yang Diambil', 'Jenis Pembayaran', 'Tanggal Konfirmasi Pembayaran', 'Tanggal Approval', 'Nominal'],
         ];
     }
 
@@ -85,80 +85,13 @@ class OrderExport implements FromCollection, WithHeadings, WithEvents, WithStart
                 $highestRow = $sheet->getHighestRow();
                 $startDataRow = 4; // Data mulai dari baris 4 (setelah header)
 
-                $bulanSebelumnya = null;
-                $startRow = $startDataRow;
                 $rowCount = $highestRow + 1; // +1 untuk keperluan total akhir
 
-                for ($row = $startDataRow; $row <= $highestRow; $row++) {
-                    // Ambil nilai tanggal dari kolom B
-                    $cellValue = $sheet->getCell('B' . $row)->getValue();
-                    if (!$cellValue) continue;
-
-                    // Convert Excel date ke PHP timestamp
-                    $tanggalOrder = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cellValue);
-                    $bulanSekarang = $tanggalOrder->format('Y-m');
-
-                    if ($bulanSebelumnya === null) {
-                        $bulanSebelumnya = $bulanSekarang;
-                    }
-
-                    if ($bulanSekarang !== $bulanSebelumnya) {
-                        // Waktu ganti bulan, masukkan subtotal untuk bulan sebelumnya
-                        // Insert baris baru sebelum subtotal supaya data bulan baru tidak nabrak subtotal
-                        $sheet->insertNewRowBefore($row, 1);
-                        $highestRow++;
-                        $subtotalRow = $row;
-                        $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
-                        $carbonBulan = \Carbon\Carbon::createFromFormat('Y-m-d', $bulanSebelumnya . '-01');
-                        $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . $carbonBulan->translatedFormat('F Y'));
-
-                        $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
-
-                        $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                        $sheet->getStyle('A' . $subtotalRow . ':J' . $subtotalRow)->applyFromArray([
-                            'font' => ['bold' => true],
-                            'fill' => [
-                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                                'startColor' => ['rgb' => 'FFFF00'], // Kuning
-                            ],
-                        ]);
-
-                        $sheet->getStyle('J' . $subtotalRow)
-                            ->getNumberFormat()
-                            ->setFormatCode('"Rp" #,##0');
-
-                        $startRow = $subtotalRow + 1;
-                        $bulanSebelumnya = $bulanSekarang;
-                    }
-                }
-
-                // Subtotal terakhir untuk bulan terakhir
-                if ($startRow <= $highestRow) {
-                    $subtotalRow = $highestRow + 1;
-                    $sheet->mergeCells('A' . $subtotalRow . ':I' . $subtotalRow);
-                    $carbonBulan = \Carbon\Carbon::createFromFormat('Y-m-d', $bulanSebelumnya . '-01');
-                    $sheet->setCellValue('A' . $subtotalRow, 'Sub Total ' . $carbonBulan->translatedFormat('F Y'));
-                    $sheet->setCellValue('J' . $subtotalRow, '=SUM(J' . $startRow . ':J' . ($row - 1) . ')');
-
-                    $sheet->getStyle('A' . $subtotalRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                    $sheet->getStyle('A' . $subtotalRow . ':J' . $subtotalRow)->applyFromArray([
-                        'font' => ['bold' => true],
-                        'fill' => [
-                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                            'startColor' => ['rgb' => 'FFFF00'], // Kuning
-                        ],
-                    ]);
-
-                    $sheet->getStyle('J' . $subtotalRow)
-                        ->getNumberFormat()
-                        ->setFormatCode('"Rp" #,##0"');
-
-                    $rowCount = $subtotalRow + 1;
-                }
 
                 $sheet->mergeCells('A' . $rowCount . ':I' . $rowCount);
                 $sheet->setCellValue('A' . $rowCount, 'Total:');
-                $sheet->setCellValue('J' . $rowCount, '=SUMIF(A4:A' . ($rowCount - 1) . ',"Sub Total *",J4:J' . ($rowCount - 1) . ')');
+                $sheet->setCellValue('J' . $rowCount, '=SUM(J' . $startDataRow . ':J' . ($rowCount - 1) . ')');
+
 
                 $sheet->getStyle('A' . $rowCount . ':J' . $rowCount)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
                 $sheet->getStyle('A' . $rowCount . ':J' . $rowCount)->applyFromArray([
