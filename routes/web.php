@@ -245,7 +245,7 @@ Route::group(['middleware' => ['role:admin|finance|manager']], function () {
 });
 
 
-// Admin | Konselor
+// Admin | Konselor | Package Manager
 Route::group(['middleware' => ['role:admin|counselor|manager|package-manager']], function () {
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         // Kelola Jadwal Kelas
@@ -303,8 +303,8 @@ Route::group(['middleware' => ['role:counselor|class-operator|manager']], functi
 });
 
 
-// Hanya Admin
-Route::group(['middleware' => ['role:admin|finance|class-operator|manager']], function () {
+// Admin | Finance | Package Manager | Kelas Operator
+Route::group(['middleware' => ['role:admin|finance|class-operator|package-manager|manager']], function () {
 
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         //Pengguna
@@ -320,7 +320,7 @@ Route::group(['middleware' => ['role:admin|finance|class-operator|manager']], fu
         });
         Route::resource('payment', PaymentPackageController::class)->parameters(['payment' => 'id']);
 
-        //Pengguna
+        //Voucher
         Route::group(['controller' => VoucherController::class, 'prefix' => 'voucher', 'as' => 'voucher.'], function () {
             Route::get('datatable', 'dataTable')->name('dataTable');
             Route::post('update-status/{id}', 'updateStatus')->name('updateStatus');
