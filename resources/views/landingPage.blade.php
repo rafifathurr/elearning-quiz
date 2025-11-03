@@ -125,8 +125,8 @@
         }
 
         /* .select2-container {
-                                                                                                                                            z-index: 9999 !important;
-                                                                                                                                            margin-bottom: 1rem !important; */
+                                                                                                                                                z-index: 9999 !important;
+                                                                                                                                                margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -627,4 +627,5 @@
         @endpush
 
     </body>
+    @include('layouts.footer')
 @endsection

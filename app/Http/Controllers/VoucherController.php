@@ -49,18 +49,38 @@ class VoucherController extends Controller
             //     return $voucher_price;
             // })
             ->addColumn('action', function ($data) {
-                if (User::find(Auth::user()->id)->hasRole('admin')) {
-                    $btn_action = '<div align="center">';
-                    // $btn_action .= '<a href="' . route('master.voucher.show', ['id' => $data->id]) . '" class="btn btn-sm btn-primary" title="Detail">Detail</a>';
-                    $btn_action .= '<a href="' . route('master.voucher.edit', ['id' => $data->id]) . '" class="btn btn-sm btn-warning ml-2" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
-                    $btn_action .= '<button class="btn btn-sm btn-danger ml-2" onclick="destroyRecord(' . $data->id . ')" title="Delete"><i class="fas fa-trash"></i></button>';
+                $user = User::find(Auth::user()->id);
+                $btn_action = '<div class="text-center">';
 
-                    $btn_action .= '<div>';
-                    return $btn_action;
-                } else {
-                    return null;
+                if ($user->hasAnyRole('counselor', 'class-operator')) {
+                    $btn_action .= '<button class="btn btn-sm btn-primary m-1" 
+                        onclick="checkOutVoucher(' . $data->id . ', \'' . $data->name . '\', ' . $data->voucher_price . ')" 
+                        title="Get">
+                        <i class="fas fa-gift mr-2"></i>Ambil Voucher
+                    </button>';
                 }
+
+                if ($user->hasAnyRole('admin', 'package-manager')) {
+                    $btn_action .= '<a href="' . route('master.voucher.edit', ['id' => $data->id]) . '" 
+                        class="btn btn-sm btn-warning m-1" title="Edit">
+                        <i class="fas fa-pencil-alt mr-2"></i>Edit
+                    </a>';
+
+                    $btn_action .= '<button class="btn btn-sm btn-danger m-1" 
+                        onclick="destroyRecord(' . $data->id . ')" title="Delete">
+                        <i class="fas fa-trash mr-2"></i>Hapus
+                    </button>';
+                }
+
+                if ($user->hasRole('manager')) {
+                    $btn_action .= '<span class="text-muted">-</span>';
+                }
+
+                $btn_action .= '</div>';
+                return $btn_action;
             })
+
+
 
             ->only(['name', 'package_name', 'discount', 'fixed_price', 'action'])
             ->rawColumns(['action', 'package_name', 'discount', 'fixed_price'])

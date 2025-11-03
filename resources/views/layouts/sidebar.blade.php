@@ -49,7 +49,7 @@
                 
                 if ($isUser && !$isCounselor) {
                     // Jika hanya 'user' tanpa 'counselor'
-                    $orderIds = App\Models\Order::whereNull('deleted_at')->where('user_id', $user->id)->whereNull('order_by')->where('status', 1)->pluck('id');
+                    $orderIds = App\Models\Order::whereNull('deleted_at')->where('user_id', $user->id)->where('status', 1)->pluck('id');
                 } else {
                     // Jika 'counselor' atau memiliki kedua role 'user' dan 'counselor'
                     $orderIds = App\Models\Order::whereNull('deleted_at')->where('order_by', $user->id)->where('status', 1)->pluck('id');
@@ -80,7 +80,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @hasanyrole('user|counselor')
+                            @hasanyrole('user|counselor|class-operator')
                                 <li class="nav-item {{ $display }}">
 
                                     <a href="{{ route('order.index') }}"
@@ -93,15 +93,17 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item {{ $display }}">
-                                    <a href="{{ route('myvoucher.index') }}"
-                                        class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
-                                        <i class="nav-icon fas fa-tag"></i>
-                                        <p>
-                                            My Voucher
-                                        </p>
-                                    </a>
-                                </li>
+                                @hasanyrole('counselor|class-operator')
+                                    <li class="nav-item {{ $display }}">
+                                        <a href="{{ route('myvoucher.index') }}"
+                                            class="nav-link {{ request()->routeIs('myvoucher.index') ? 'bg-primary' : '' }}">
+                                            <i class="nav-icon fas fa-tag"></i>
+                                            <p>
+                                                My Voucher
+                                            </p>
+                                        </a>
+                                    </li>
+                                @endhasanyrole
                                 <li class="nav-item {{ $display }}">
                                     <a href="{{ route('order.history') }}"
                                         class="nav-link {{ request()->routeIs('order.history') ? 'bg-primary' : '' }}">
@@ -166,6 +168,9 @@
                                         </p>
                                     </a>
                                 </li>
+                            @endhasanyrole
+
+                            @hasanyrole('admin|manager|package-manager|class-operator|counselor')
                                 <li class="nav-item {{ $display }}">
                                     <a href="{{ route('master.voucher.index') }}"
                                         class="nav-link {{ request()->routeIs('master.voucher.index') ? 'bg-primary' : '' }}">

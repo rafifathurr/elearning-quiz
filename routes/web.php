@@ -163,6 +163,12 @@ Route::group(['middleware' => ['role:user|counselor|class-operator']], function 
 
         Route::get('view-payment/{id}',  'viewPayment')->name('viewPayment');
     });
+
+    //Daftar Voucher User
+    Route::group(['controller' => myVoucherController::class, 'prefix' => 'myvoucher', 'as' => 'myvoucher.'], function () {
+        Route::get('datatable', 'dataTable')->name('dataTable');
+        Route::get('index', 'index')->name('index');
+    });
 });
 
 
@@ -171,12 +177,6 @@ Route::group(['middleware' => ['role:user']], function () {
 
     //Daftar Test User
     Route::group(['controller' => myTestController::class, 'prefix' => 'mytest', 'as' => 'mytest.'], function () {
-        Route::get('datatable', 'dataTable')->name('dataTable');
-        Route::get('index', 'index')->name('index');
-    });
-
-    //Daftar Voucher User
-    Route::group(['controller' => myVoucherController::class, 'prefix' => 'myvoucher', 'as' => 'myvoucher.'], function () {
         Route::get('datatable', 'dataTable')->name('dataTable');
         Route::get('index', 'index')->name('index');
     });
@@ -334,6 +334,19 @@ Route::group(['middleware' => ['role:admin|finance|class-operator|package-manage
     });
 });
 
+
+// Admin | Counselor | Package Manager | Kelas Operator
+Route::group(['middleware' => ['role:admin|counselor|class-operator|package-manager|manager']], function () {
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        //Voucher
+        Route::group(['controller' => VoucherController::class, 'prefix' => 'voucher', 'as' => 'voucher.'], function () {
+            Route::get('datatable', 'dataTable')->name('dataTable');
+            Route::post('update-status/{id}', 'updateStatus')->name('updateStatus');
+        });
+        Route::resource('voucher', VoucherController::class)->parameters(['voucher' => 'id']);
+    });
+});
 
 // Admin | Package Manager
 Route::group(['middleware' => ['role:admin|package-manager|manager']], function () {
