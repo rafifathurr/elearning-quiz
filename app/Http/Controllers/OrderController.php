@@ -123,7 +123,7 @@ class OrderController extends Controller
         $data['check_out'] = Order::whereNull('deleted_at')->whereNull('payment_method')->where('status', 1)->count();
         $data['not_payment'] = (clone $orderQuery)->where('status', 2)->whereNull('proof_payment')->count();
         $data['order_reject'] = (clone $orderQuery)->where('status', 2)->whereNotNull('proof_payment')->count();
-        $data['success_order'] = (clone $orderQuery)->where('status', 100)->count();
+        $data['success_order'] = (clone $orderQuery)->where('status', 100)->where('total_price', '>', 0)->count();
         $data['total_revenue'] = (clone $orderQuery)->where('status', 100)->sum('total_price');
         $data['payment_method_count'] = Order::whereNull('deleted_at')
             ->whereIn('payment_method', ['transfer', 'briva'])
