@@ -98,107 +98,66 @@ if (Auth::check()) {
     } else {
         $onClick = "checkOut({$package->id}, '{$package->name}')";
     }
+
+    $tag = 'button';
+    $attrs = 'onclick="' . $onClick . '"';
 } else {
-    $onClick = null;
+    $tag = 'a';
+    $attrs = 'href="' . route('login') . '"';
 }
 ?>
 
-@if ($onClick)
-    <button onclick="{{ $onClick }}" class="stylish-button w-100 shadow-sm">
-        <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
+<{{ $tag }} {!! $attrs !!} class="stylish-button w-100 shadow-sm">
 
-        {{-- Info Pertemuan & Peserta --}}
-        @if (!empty($package->class) || !empty($package->max_member))
-            <div class="d-flex justify-content-center align-items-center gap-2">
-                @if (!empty($package->class))
-                    <span class="meeting-info">
-                        <i class="fas fa-calendar-alt"></i> {{ $package->class }}x Pertemuan
-                    </span>
-                @endif
+    <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
 
-                @if (!empty($package->class) && !empty($package->max_member))
-                    <span class="divider">|</span>
-                @endif
+    @if (!empty($package->class) || !empty($package->max_member))
+        <div class="d-flex justify-content-center align-items-center gap-2">
+            @if (!empty($package->class))
+                <span class="meeting-info">
+                    <i class="fas fa-calendar-alt"></i> {{ $package->class }}x Pertemuan
+                </span>
+            @endif
 
-                @if (!empty($package->max_member))
-                    <span class="member-info">
-                        <i class="fas fa-users mr-1"></i> Max: {{ $package->max_member }} Peserta
-                    </span>
-                @endif
-            </div>
+            @if (!empty($package->class) && !empty($package->max_member))
+                <span class="divider">|</span>
+            @endif
+
+            @if (!empty($package->max_member))
+                <span class="member-info">
+                    <i class="fas fa-users mr-1"></i> Max: {{ $package->max_member }} Peserta
+                </span>
+            @endif
+        </div>
+    @endif
+
+    @if (!empty($package->description))
+        <span class="package-description">
+            {!! nl2br(e($package->description)) !!}
+        </span>
+    @endif
+
+    <span class="price-badge">
+        @if ($package->price > 0)
+            Rp. {{ number_format($package->price, 0, ',', '.') }}
+            <span class="per-peserta">/ Peserta</span>
+        @else
+            Gratis
         @endif
+    </span>
 
-        {{-- Deskripsi --}}
-        @if (!empty($package->description))
-            <span class="package-description">
-                {!! nl2br(e($package->description)) !!}
-            </span>
-        @endif
+    @if ($showMeta)
+        <span class="package-meta mt-2">
+            {{ $package->jenis }}
 
-        {{-- Harga --}}
-        <span class="price-badge">
-            @if ($package->price > 0)
-                Rp. {{ number_format($package->price, 0, ',', '.') }}
-                <span class="per-peserta">/ Peserta</span>
-            @else
-                Gratis
+            @if ($package->aspek)
+                | {{ $package->aspek }}
+            @endif
+
+            @if ($package->sesi)
+                | {{ $package->sesi }}
             @endif
         </span>
+    @endif
 
-        {{-- Meta --}}
-        @if ($showMeta)
-            <span class="package-meta mt-2">
-                {{ $package->jenis }} | {{ $package->aspek }} | {{ $package->sesi }}
-            </span>
-        @endif
-    </button>
-@else
-    <a href="{{ route('login') }}" class="stylish-button w-100 shadow-sm">
-        <span style="font-size: 1.1rem"><i class="fas fa-box"></i> {{ $package->name }}</span>
-
-        {{-- Info Pertemuan & Peserta --}}
-        @if (!empty($package->class) || !empty($package->max_member))
-            <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                @if (!empty($package->class))
-                    <span class="meeting-info">
-                        <i class="fas fa-calendar-alt"></i> {{ $package->class }}x Pertemuan
-                    </span>
-                @endif
-
-                @if (!empty($package->class) && !empty($package->max_member))
-                    <span class="divider">|</span>
-                @endif
-
-                @if (!empty($package->max_member))
-                    <span class="member-info">
-                        <i class="fas fa-users mr-1"></i> Max: {{ $package->max_member }} Peserta
-                    </span>
-                @endif
-            </div>
-        @endif
-
-        {{-- Deskripsi --}}
-        @if (!empty($package->description))
-            <span class="package-description">
-                {!! nl2br(e($package->description)) !!}
-            </span>
-        @endif
-
-        {{-- Harga --}}
-        <span class="price-badge mt-2">
-            @if ($package->price > 0)
-                Rp. {{ number_format($package->price, 0, ',', '.') }}
-                <span class="per-peserta">/ Peserta</span>
-            @else
-                Gratis
-            @endif
-        </span>
-
-        {{-- Meta --}}
-        @if ($showMeta)
-            <span class="package-meta mt-2">
-                {{ $package->jenis }} | {{ $package->aspek }} | {{ $package->sesi }}
-            </span>
-        @endif
-    </a>
-@endif
+    </{{ $tag }}>

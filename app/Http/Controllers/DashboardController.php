@@ -183,12 +183,12 @@ class DashboardController extends Controller
             }
 
             // kalau tidak ada child
-            // foreach ($type->package as $package) {
-            //     $package->aspek = null;
-            //     $package->sesi  = null;
-            //     $package->jenis = $type->name;
-            //     $allPackages->push($package);
-            // }
+            foreach ($type->package as $package) {
+                $package->aspek = null;
+                $package->sesi  = null;
+                $package->jenis = $type->name;
+                $allPackages->push($package);
+            }
         }
 
         $data = [
