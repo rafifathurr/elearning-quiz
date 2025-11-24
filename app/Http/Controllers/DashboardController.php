@@ -16,6 +16,59 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
+    private function getTypePackages($forCounselor = false)
+    {
+        $typePackages = TypePackage::where('id_parent', 0)
+            ->whereNull('deleted_at')
+            ->with(['children.package' => function ($q) use ($forCounselor) {
+                if ($forCounselor) {
+                    $q->whereIn('status', [1, 2]);
+                } else {
+                    $q->where('status', 1);
+                }
+            }, 'package' => function ($q) use ($forCounselor) {
+                if ($forCounselor) {
+                    $q->whereIn('status', [1, 2]);
+                } else {
+                    $q->where('status', 1);
+                }
+            }])
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        // Pisahkan Try Out dan Other
+        $tryOut = $typePackages->filter(fn($item) => strtoupper($item->name) === 'TRY OUT');
+        $others = $typePackages->reject(fn($item) => strtoupper($item->name) === 'TRY OUT');
+
+        // Transform Other Packages menjadi array "flatten"
+        $allPackages = collect();
+        foreach ($others as $type) {
+
+            // jika punya child
+            foreach ($type->children as $child) {
+                foreach ($child->package as $package) {
+                    $package->aspek = Str::before($child->name, ' ');
+                    $package->sesi  = Str::afterLast($child->name, ' ');
+                    $package->jenis = $type->name;
+                    $allPackages->push($package);
+                }
+            }
+
+            // jika tidak ada child
+            foreach ($type->package as $package) {
+                $package->aspek = null;
+                $package->sesi  = null;
+                $package->jenis = $type->name;
+                $allPackages->push($package);
+            }
+        }
+
+        return [
+            'tryOutPackages' => $tryOut,
+            'otherPackages'  => $allPackages
+        ];
+    }
+
     public function index()
     {
         if (User::find(Auth::user()->id)->hasRole('user')) {
@@ -141,66 +194,20 @@ class DashboardController extends Controller
         }
 
 
-        $typePackages = TypePackage::where('id_parent', 0)
-            ->whereNull('deleted_at')
-            ->with(['children.package' => function ($q) {
-                if (Auth::check() && (User::find(Auth::user()->id)->hasRole('counselor') || User::find(Auth::user()->id)->hasRole('class-operator'))) {
-                    $q->whereIn('status', [1, 2]);
-                } else {
-                    $q->where('status', 1);
-                }
-            }, 'package' => function ($q) {
-                if (Auth::check() && (User::find(Auth::user()->id)->hasRole('counselor') || User::find(Auth::user()->id)->hasRole('class-operator'))) {
-                    $q->whereIn('status', [1, 2]);
-                } else {
-                    $q->where('status', 1);
-                }
-            }])
+        $forCounselor = Auth::check() && (
+            User::find(Auth::id())->hasRole('counselor') ||
+            User::find(Auth::id())->hasRole('class-operator')
+        );
 
-            ->orderBy('name', 'ASC')
-            ->get();
+        $packages = $this->getTypePackages($forCounselor);
 
-
-
-        $tryOutPackages = $typePackages->filter(function ($item) {
-            return strtoupper($item->name) === 'TRY OUT';
-        });
-
-        $otherPackages = $typePackages->reject(function ($item) {
-            return strtoupper($item->name) === 'TRY OUT';
-        });
-
-
-        $allPackages = collect();
-        foreach ($otherPackages as $type) {
-            foreach ($type->children as $child) {
-                foreach ($child->package as $package) {
-                    $package->aspek = Str::before($child->name, ' ');
-                    $package->sesi = Str::afterLast($child->name, ' ');
-                    $package->jenis = $type->name;
-                    $allPackages->push($package);
-                }
-            }
-
-            // kalau tidak ada child
-            foreach ($type->package as $package) {
-                $package->aspek = null;
-                $package->sesi  = null;
-                $package->jenis = $type->name;
-                $allPackages->push($package);
-            }
-        }
-
-        $data = [
-            'tryOutPackages' => $tryOutPackages,
-            'otherPackages'  => $allPackages,
-        ];
-        $data['packages'] = Package::whereNull('deleted_at')
+        // ambil paket voucher
+        $packages['packages'] = Package::whereNull('deleted_at')
             ->where('status', 1)
             ->whereHas('voucher')
             ->get();
 
-        return view('home', $data);
+        return view('home', $packages);
     }
 
     public function saveChart(Request $request)
@@ -234,53 +241,9 @@ class DashboardController extends Controller
             }
         }
 
-        $typePackages = TypePackage::where('id_parent', 0)
-            ->whereNull('deleted_at')
-            ->with(['children.package' => function ($q) {
-                $q->where('status', 1);
-            }, 'package' => function ($q) {
-                $q->where('status', 1);
-            }])
-            ->orderBy('name', 'ASC')
-            ->get();
+        $packages = $this->getTypePackages(false);
 
-
-        $tryOutPackages = $typePackages->filter(function ($item) {
-            return strtoupper($item->name) === 'TRY OUT';
-        });
-
-        $otherPackages = $typePackages->reject(function ($item) {
-            return strtoupper($item->name) === 'TRY OUT';
-        });
-
-
-        $allPackages = collect();
-        foreach ($otherPackages as $type) {
-            // kalau ada child
-            foreach ($type->children as $child) {
-                foreach ($child->package as $package) {
-                    $package->aspek = Str::before($child->name, ' ');
-                    $package->sesi = Str::afterLast($child->name, ' ');
-                    $package->jenis = $type->name;
-                    $allPackages->push($package);
-                }
-            }
-
-            // kalau tidak ada child
-            foreach ($type->package as $package) {
-                $package->aspek = null;
-                $package->sesi  = null;
-                $package->jenis = $type->name;
-                $allPackages->push($package);
-            }
-        }
-
-        $data = [
-            'tryOutPackages' => $tryOutPackages,
-            'otherPackages'  => $allPackages,
-        ];
-
-        return view('landingPage', $data);
+        return view('landingPage', $packages);
     }
 
 
