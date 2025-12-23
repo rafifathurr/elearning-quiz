@@ -122,7 +122,7 @@
                 <div class="text-center mb-5">
                     <h2 class="fw-bold">Apa Kata Mereka?</h2>
                     <p class="text-muted">
-                        Testimoni langsung dari pengguna yang telah merasakan manfaat layanan kami
+                        Testimoni langsung dari peserta bimbingan yang telah merasakan manfaat layanan kami
                     </p>
                 </div>
 
@@ -132,7 +132,7 @@
                     <!-- Video 1 -->
                     <div class="col-md-6 col-lg-4">
                         <div class="testimoni-card">
-                            <video controls playsinline>
+                            <video autoplay muted loop playsinline controls>
                                 <source src="{{ asset('dist/adminlte/img/testi_1.mp4') }}" type="video/mp4">
                                 Browser tidak mendukung video.
                             </video>
@@ -147,7 +147,7 @@
                     <!-- Video 2 -->
                     <div class="col-md-6 col-lg-4">
                         <div class="testimoni-card">
-                            <video controls playsinline>
+                            <video autoplay muted loop playsinline controls>
                                 <source src="{{ asset('dist/adminlte/img/testi_2.mp4') }}" type="video/mp4">
                                 Browser tidak mendukung video.
                             </video>
@@ -164,6 +164,8 @@
             </div>
         </section>
 
+        @push('javascript-bottom')
+        @endpush
     </body>
     @include('layouts.footer')
 @endsection

@@ -116,8 +116,8 @@
         }
 
         /* .select2-container {
-                                                                                                                                                                                                                                                                                                                                                                                    z-index: 9999 !important;
-                                                                                                                                                                                                                                                                                                                                                                                    margin-bottom: 1rem !important; */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        z-index: 9999 !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -180,12 +180,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 7s ease;
         }
 
 
-        .carousel-item.active .carousel-img {
+        .carousel-item.active .animate-img {
             transform: scale(1.08);
-            transition: transform 7s ease;
         }
 
 
@@ -387,25 +387,23 @@
                 <ol class="carousel-indicators">
                     <li data-target="#homeCarousel" data-slide-to="0" class="active"></li>
                     <li data-target="#homeCarousel" data-slide-to="1"></li>
-                    <li data-target="#homeCarousel" data-slide-to="2"></li>
                 </ol>
 
                 <div class="carousel-inner">
 
                     <div class="carousel-item active">
-                        <img src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}"
-                            class="d-block w-100 carousel-img animate-img">
-                    </div>
-
-                    <div class="carousel-item">
                         <a href="{{ route('testimoni') }}" class="banner-link">
-                            <img src="{{ asset('dist/adminlte/img/bannertesti.png') }}"
-                                class="d-block w-100 carousel-img">
+                            <img src="{{ asset('dist/adminlte/img/bannertesti.png') }}" class="d-block w-100 carousel-img">
 
                             <div class="banner-overlay">
                                 <span class="banner-btn">Lihat Testimoni</span>
                             </div>
                         </a>
+                    </div>
+
+                    <div class="carousel-item ">
+                        <img src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}"
+                            class="d-block w-100 carousel-img animate-img">
                     </div>
                 </div>
 
@@ -663,18 +661,26 @@
 
         @push('javascript-bottom')
             @include('js.order.script')
-            <!-- Script Filter Paket -->
-            <script>
-                $(function() {
-                    $('.select2').select2({
-                        allowClear: true,
-                        width: '100%'
-                    });
-                });
-            </script>
 
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
+                    initSelect2();
+                    initFilter();
+                    initNavbar();
+                    initModalVideo();
+                    initCarouselAnimation();
+                });
+
+                function initSelect2() {
+                    if (typeof $ !== 'undefined' && $('.select2').length) {
+                        $('.select2').select2({
+                            allowClear: true,
+                            width: '100%'
+                        });
+                    }
+                }
+
+                function initFilter() {
                     function applyFilter() {
                         const aspekValues = $('#filterAspek').val()?.map(v => v.toLowerCase()) || [];
                         const jenisValues = $('#filterJenis').val()?.map(v => v.toLowerCase()) || [];
@@ -690,12 +696,9 @@
                     }
 
                     $('#filterAspek, #filterJenis, #filterSesi').on('change', applyFilter);
-                });
-            </script>
+                }
 
-            <!-- Script Back to Top & Navbar -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                function initNavbar() {
                     const backToTopButton = document.querySelector('.back-to-top');
 
                     backToTopButton.addEventListener('click', function(e) {
@@ -739,12 +742,9 @@
 
                         lastScrollY = currentScroll; // Update posisi scroll terakhir
                     });
-                });
-            </script>
+                }
 
-            <!-- Script Modal Video -->
-            <script>
-                $(document).ready(function() {
+                function initModalVideo() {
                     var shouldShowModal = @json(!Auth::check());
 
                     // Jika user belum login, tampilkan modal setelah 2 detik
@@ -767,7 +767,20 @@
                         video.pause(); // Hentikan video
                         video.currentTime = 0; // Reset video ke awal
                     });
-                });
+                }
+
+                function initCarouselAnimation() {
+                    const activeImg = document.querySelector('.carousel-item.active .carousel-img');
+
+                    if (activeImg) {
+                        activeImg.classList.remove('animate-img');
+
+                        // trigger reflow
+                        void activeImg.offsetWidth;
+
+                        activeImg.classList.add('animate-img');
+                    }
+                }
             </script>
         @endpush
 
