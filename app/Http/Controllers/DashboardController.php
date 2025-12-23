@@ -255,4 +255,21 @@ class DashboardController extends Controller
     {
         return view('contact');
     }
+
+    public function testimoni()
+    {
+        $testimoni = [
+            [
+                'video' => 'testi_1.mp4',
+                'nama' => 'Angga Ditri Pratama',
+                'pendidikan' => 'Akpol'
+            ],
+            [
+                'video' => 'testi_2.mp4',
+                'nama' => 'Wahyu Bryant Villareal',
+                'pendidikan' => 'Akpol'
+            ],
+        ];
+        return view('testimoni', compact('testimoni'));
+    }
 }

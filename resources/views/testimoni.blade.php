@@ -1,16 +1,6 @@
 @extends('layouts.main')
 @section('section')
     <style>
-        .nav-link {
-            transition: color 0.3s ease, transform 0.2s;
-        }
-
-        .nav-link:hover {
-            color: #007bff !important;
-            transform: translateY(-2px);
-        }
-
-
         .testimoni-section {
             padding: 80px 0;
             background: #f8f9fa;
@@ -52,13 +42,6 @@
         }
 
         @media (max-width: 768px) {
-            .nav-mobile-adjust {
-                margin-left: 1.5rem !important;
-                /* Sama dengan ml-4 di Bootstrap */
-                margin-right: 0 !important;
-                /* Hilangkan margin kanan jika perlu */
-            }
-
             .testimoni-section {
                 padding: 50px 0;
             }
@@ -81,37 +64,21 @@
 
                 <!-- Video Testimoni -->
                 <div class="row justify-content-center g-4">
+                    @foreach ($testimoni as $testi)
+                        <div class="col-md-6 col-lg-4">
+                            <div class="testimoni-card">
+                                <video playsinline controls controlslist="nodownload nofullscreen" disablepictureinpicture>
+                                    <source src="{{ asset('dist/adminlte/img/' . $testi['video']) }}" type="video/mp4">
+                                    Browser tidak mendukung video.
+                                </video>
 
-                    <!-- Video 1 -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="testimoni-card">
-                            <video playsinline controls controlslist="nodownload nofullscreen" disablepictureinpicture>
-                                <source src="{{ asset('dist/adminlte/img/testi_1.mp4') }}" type="video/mp4">
-                                Browser tidak mendukung video.
-                            </video>
-
-                            <div class="testimoni-info">
-                                <h5>Angga Ditri Pratama</h5>
-                                <span>Akpol</span>
+                                <div class="testimoni-info">
+                                    <h5>{{ $testi['nama'] }}</h5>
+                                    <span>{{ $testi['pendidikan'] }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Video 2 -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="testimoni-card">
-                            <video playsinline controls controlslist="nodownload nofullscreen" disablepictureinpicture>
-                                <source src="{{ asset('dist/adminlte/img/testi_2.mp4') }}" type="video/mp4">
-                                Browser tidak mendukung video.
-                            </video>
-
-                            <div class="testimoni-info">
-                                <h5>Wahyu Bryant Villareal</h5>
-                                <span>Akpol</span>
-                            </div>
-                        </div>
-                    </div>
-
+                    @endforeach
                 </div>
 
             </div>

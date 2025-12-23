@@ -100,9 +100,7 @@ Route::post('authenticate', [AuthController::class, 'authenticate'])->name('auth
 //Halaman Utama
 Route::get('/', [DashboardController::class, 'landingPage'])->name('landingPage');
 
-Route::get('/testimoni', function () {
-    return view('testimoni');
-})->name('testimoni');
+Route::get('/testimoni', [DashboardController::class, 'testimoni'])->name('testimoni');
 
 //Save Chart
 Route::post('/save-chart', [DashboardController::class, 'saveChart']);
