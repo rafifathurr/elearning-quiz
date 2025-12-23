@@ -115,18 +115,9 @@
             scroll-behavior: smooth;
         }
 
-        @media (max-width: 768px) {
-            .nav-mobile-adjust {
-                margin-left: 1.5rem !important;
-                /* Sama dengan ml-4 di Bootstrap */
-                margin-right: 0 !important;
-                /* Hilangkan margin kanan jika perlu */
-            }
-        }
-
         /* .select2-container {
-                                                                                                                                                z-index: 9999 !important;
-                                                                                                                                                margin-bottom: 1rem !important; */
+                                                                                                                                                                                                                                                                                                                                                                                    z-index: 9999 !important;
+                                                                                                                                                                                                                                                                                                                                                                                    margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -175,10 +166,132 @@
 
         .swal2-popup .select2-selection {
             margin-bottom: 1rem !important;
-            /* Menambah jarak di dalam dropdown */
         }
 
-        /* Bentuk Belah Ketupat */
+
+        .carousel,
+        .carousel-inner,
+        .carousel-item {
+            height: 650px;
+        }
+
+
+        .carousel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        .carousel-item.active .carousel-img {
+            transform: scale(1.08);
+            transition: transform 7s ease;
+        }
+
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: flex;
+            align-items: center;
+        }
+
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.6);
+            background-size: 60% 60%;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+        }
+
+
+        .banner-link {
+            position: relative;
+            display: block;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .banner-btn {
+            background: #ffffff;
+            color: #111;
+            padding: 14px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s ease;
+        }
+
+        /* Hover */
+        .banner-link:hover .banner-overlay {
+            opacity: 1;
+        }
+
+        .banner-link:hover .banner-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (min-width: 769px) and (max-width: 1000px) {
+
+            .carousel,
+            .carousel-inner,
+            .carousel-item {
+                height: 420px;
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .nav-mobile-adjust {
+                margin-left: 1.5rem !important;
+                /* Sama dengan ml-4 di Bootstrap */
+                margin-right: 0 !important;
+                /* Hilangkan margin kanan jika perlu */
+            }
+
+            .carousel,
+            .carousel-inner,
+            .carousel-item {
+                height: 200px;
+            }
+
+
+            .banner-overlay {
+                background: transparent;
+                opacity: 1;
+                justify-content: flex-center;
+                align-items: flex-end;
+                padding: 12px;
+            }
+
+
+            .banner-btn {
+                opacity: 1;
+                transform: none;
+                background: rgba(255, 255, 255, 0.95);
+                color: #111;
+                font-size: 0.9rem;
+                padding: 10px 18px;
+                border-radius: 30px;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+                margin-bottom: 12px;
+            }
+        }
     </style>
 
     <body class="hold-transition layout-top-nav">
@@ -266,13 +379,45 @@
             </div>
         </nav>
 
-
-
-
         {{-- Banner --}}
         <div class="home" id="home">
-            <img class="d-block w-100 " style="max-height: 650px" src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}">
+            <div id="homeCarousel" class="carousel slide carousel-fade" data-ride="carousel" data-interval="5000">
+
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-target="#homeCarousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#homeCarousel" data-slide-to="1"></li>
+                    <li data-target="#homeCarousel" data-slide-to="2"></li>
+                </ol>
+
+                <div class="carousel-inner">
+
+                    <div class="carousel-item active">
+                        <img src="{{ asset('dist/adminlte/img/bannerpol.jpg') }}"
+                            class="d-block w-100 carousel-img animate-img">
+                    </div>
+
+                    <div class="carousel-item">
+                        <a href="{{ route('testimoni') }}" class="banner-link">
+                            <img src="{{ asset('dist/adminlte/img/bannertesti.png') }}"
+                                class="d-block w-100 carousel-img">
+
+                            <div class="banner-overlay">
+                                <span class="banner-btn">Lihat Testimoni</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <a class="carousel-control-prev" href="#homeCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </a>
+                <a class="carousel-control-next" href="#homeCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </a>
+            </div>
         </div>
+
 
 
         {{-- Kenapa Harus Brata Cerdas --}}
