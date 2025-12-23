@@ -36,22 +36,16 @@
 
         .package .card {
             transition: transform 0.3s ease;
-            /* Animasi untuk memperhalus perubahan ukuran */
         }
 
         .package .card:hover {
             transform: scale(1.05);
-            /* Membesarkan ukuran card 5% */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            /* Menambahkan efek bayangan saat hover */
         }
 
         .tagline .card {
             border-radius: 1.5rem;
-
-
         }
-
 
         .tagline .card-body {
             display: flex;
@@ -61,65 +55,15 @@
 
         }
 
-        /* Navbar Default */
-        #navbar {
-            transition: all 0.4s ease;
-            background-color: transparent;
-            /* Transparan saat di posisi atas */
-            z-index: 1030;
-            position: relative;
-            /* Tidak sticky secara default */
-        }
-
-        /* Efek Blur dan Sticky saat Scroll */
-        #navbar.scrolled {
-            position: fixed;
-            /* Sticky hanya saat di-scroll */
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
-            /* Semi transparan */
-            backdrop-filter: blur(10px);
-            /* Efek blur */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            /* Bayangan halus */
-            animation: slideDown 0.3s ease;
-            /* Animasi muncul dari atas */
-        }
-
-        /* Animasi Navbar Muncul */
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-            }
-
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        /* Hover Efek */
-        .nav-link {
-            transition: color 0.3s ease, transform 0.2s;
-        }
-
-        .nav-link:hover {
-            color: #007bff !important;
-            transform: translateY(-2px);
-        }
-
-
-        /* Smooth Scroll */
         html {
             scroll-behavior: smooth;
         }
 
         /* .select2-container {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            z-index: 9999 !important;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            margin-bottom: 1rem !important; */
-        /* Menjamin dropdown tampil di atas modal */
-        /* } */
+                                                        z-index: 9999 !important;
+                                                        margin-bottom: 1rem !important;
+
+                                                    } */
 
         .select2-container .select2-selection--multiple {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
@@ -156,12 +100,8 @@
             color: #fff !important;
         }
 
-
-
-
         .swal2-popup {
             z-index: 1050 !important;
-            /* Pastikan popup Swal berada di bawah dropdown */
         }
 
         .swal2-popup .select2-selection {
@@ -175,7 +115,6 @@
             height: 650px;
         }
 
-
         .carousel-img {
             width: 100%;
             height: 100%;
@@ -183,18 +122,15 @@
             transition: transform 7s ease;
         }
 
-
         .carousel-item.active .animate-img {
             transform: scale(1.08);
         }
-
 
         .carousel-control-prev,
         .carousel-control-next {
             display: flex;
             align-items: center;
         }
-
 
         .carousel-control-prev-icon,
         .carousel-control-next-icon {
@@ -204,7 +140,6 @@
             width: 45px;
             height: 45px;
         }
-
 
         .banner-link {
             position: relative;
@@ -236,7 +171,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Hover */
         .banner-link:hover .banner-overlay {
             opacity: 1;
         }
@@ -257,12 +191,6 @@
 
         /* MOBILE */
         @media (max-width: 768px) {
-            .nav-mobile-adjust {
-                margin-left: 1.5rem !important;
-                /* Sama dengan ml-4 di Bootstrap */
-                margin-right: 0 !important;
-                /* Hilangkan margin kanan jika perlu */
-            }
 
             .carousel,
             .carousel-inner,
@@ -295,6 +223,7 @@
     </style>
 
     <body class="hold-transition layout-top-nav">
+        @include('layouts.navbar_landing_page')
 
         <!-- Modal untuk Video -->
         <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
@@ -323,61 +252,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Navbar --}}
-        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white" id="navbar">
-            <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <img src="{{ asset('img/bclogo.png') }}" alt="Brata Cerdas Logo" class="brand-image"
-                        style="max-width: 3rem;">
-                    <span class="brand-text font-weight-bold text-secondary ml-2" style="opacity: .9;">BRATA CERDAS</span>
-
-                    <ul class="navbar-nav ml-4">
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#home">Home</a></li>
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#contact">Kontak</a></li>
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#package">Paket</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link font-weight-bold" href="#" data-toggle="modal"
-                                data-target="#videoModal">
-                                E-Flyer
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ml-auto nav-mobile-adjust">
-                        @if (Auth::check())
-                            <li class="nav-item"><a href="{{ route('home') }}"
-                                    class="nav-link font-weight-bold">Dashboard</a>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-                <ul class=" navbar-nav  ml-auto nav-mobile-adjust">
-                    @if (Auth::check())
-                        <li class="nav-item dropdown">
-                            <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
-                                <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a href="javascript:void(0)" onclick="logoutAndRemoveToken()" class="dropdown-item"><i
-                                        class="fas fa-sign-out-alt mr-2"></i>
-                                    Logout</a>
-                            </div>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a href="{{ route('login') }}" class="nav-link font-weight-bold">
-                                <i class="fa fa-sign-in-alt mr-1"></i> Login
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-        </nav>
 
         {{-- Banner --}}
         <div class="home" id="home">
@@ -666,7 +540,7 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     initSelect2();
                     initFilter();
-                    initNavbar();
+                    initBackToTop();
                     initModalVideo();
                     initCarouselAnimation();
                 });
@@ -698,7 +572,7 @@
                     $('#filterAspek, #filterJenis, #filterSesi').on('change', applyFilter);
                 }
 
-                function initNavbar() {
+                function initBackToTop() {
                     const backToTopButton = document.querySelector('.back-to-top');
 
                     backToTopButton.addEventListener('click', function(e) {
@@ -712,35 +586,11 @@
                     });
 
                     window.addEventListener('scroll', function() {
-                        if (window.scrollY > 300) { // Tampilkan tombol jika scroll lebih dari 250px
+                        if (window.scrollY > 300) {
                             backToTopButton.classList.add('show');
                         } else {
                             backToTopButton.classList.remove('show');
                         }
-                    });
-
-                    const navbar = document.getElementById("navbar");
-                    let lastScrollY = window.scrollY; // Menyimpan posisi scroll terakhir
-
-                    window.addEventListener("scroll", function() {
-                        const currentScroll = window.scrollY;
-
-                        if (currentScroll > 50) {
-                            navbar.classList.add("scrolled"); // Tambahkan efek sticky saat scroll
-                            navbar.classList.remove("hide"); // Pastikan navbar terlihat saat scroll ke bawah
-                        } else {
-                            navbar.classList.remove("scrolled");
-                            navbar.classList.remove("hide"); // Tampilkan navbar kembali saat di posisi atas
-                        }
-
-                        // Deteksi arah scroll untuk menyembunyikan atau menampilkan navbar
-                        if (currentScroll > lastScrollY && currentScroll > 100) {
-                            navbar.classList.add("hide"); // Sembunyikan saat scroll ke bawah
-                        } else {
-                            navbar.classList.remove("hide"); // Tampilkan saat scroll ke atas
-                        }
-
-                        lastScrollY = currentScroll; // Update posisi scroll terakhir
                     });
                 }
 

@@ -66,54 +66,7 @@
     </style>
 
     <body class="hold-transition layout-top-nav">
-        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white" id="navbar">
-            <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <a href="{{ route('landingPage') }}" class="navbar-brand d-flex align-items-center">
-                        <img src="{{ asset('img/bclogo.png') }}" alt="Brata Cerdas Logo" class="brand-image"
-                            style="max-width: 3rem;">
-
-                        <span class="brand-text font-weight-bold text-secondary ml-2" style="opacity: .9;">
-                            BRATA CERDAS
-                        </span>
-                    </a>
-
-
-                    <ul class="navbar-nav ml-auto nav-mobile-adjust">
-                        @if (Auth::check())
-                            <li class="nav-item"><a href="{{ route('home') }}"
-                                    class="nav-link font-weight-bold">Dashboard</a>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-                <ul class=" navbar-nav  ml-auto nav-mobile-adjust">
-                    @if (Auth::check())
-                        <li class="nav-item dropdown">
-                            <a class="nav-link font-weight-bold" data-toggle="dropdown" href="#">
-                                <i class="far fa-user mr-2"></i> {{ Auth::user()->name }}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a href="javascript:void(0)" onclick="logoutAndRemoveToken()" class="dropdown-item"><i
-                                        class="fas fa-sign-out-alt mr-2"></i>
-                                    Logout</a>
-                            </div>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a href="{{ route('login') }}" class="nav-link font-weight-bold">
-                                <i class="fa fa-sign-in-alt mr-1"></i> Login
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-        </nav>
+        @include('layouts.navbar_landing_page')
 
         <section class="testimoni-section">
             <div class="container">
@@ -163,9 +116,6 @@
 
             </div>
         </section>
-
-        @push('javascript-bottom')
-        @endpush
     </body>
     @include('layouts.footer')
 @endsection
