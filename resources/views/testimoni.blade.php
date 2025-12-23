@@ -74,21 +74,16 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <img src="{{ asset('img/bclogo.png') }}" alt="Brata Cerdas Logo" class="brand-image"
-                        style="max-width: 3rem;">
-                    <span class="brand-text font-weight-bold text-secondary ml-2" style="opacity: .9;">BRATA CERDAS</span>
+                    <a href="{{ route('landingPage') }}" class="navbar-brand d-flex align-items-center">
+                        <img src="{{ asset('img/bclogo.png') }}" alt="Brata Cerdas Logo" class="brand-image"
+                            style="max-width: 3rem;">
 
-                    <ul class="navbar-nav ml-4">
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#home">Home</a></li>
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#contact">Kontak</a></li>
-                        <li class="nav-item"><a class="nav-link font-weight-bold" href="#package">Paket</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link font-weight-bold" href="#" data-toggle="modal"
-                                data-target="#videoModal">
-                                E-Flyer
-                            </a>
-                        </li>
-                    </ul>
+                        <span class="brand-text font-weight-bold text-secondary ml-2" style="opacity: .9;">
+                            BRATA CERDAS
+                        </span>
+                    </a>
+
+
                     <ul class="navbar-nav ml-auto nav-mobile-adjust">
                         @if (Auth::check())
                             <li class="nav-item"><a href="{{ route('home') }}"
