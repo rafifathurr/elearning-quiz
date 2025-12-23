@@ -132,7 +132,7 @@
                     <!-- Video 1 -->
                     <div class="col-md-6 col-lg-4">
                         <div class="testimoni-card">
-                            <video autoplay muted loop playsinline controls>
+                            <video playsinline controls>
                                 <source src="{{ asset('dist/adminlte/img/testi_1.mp4') }}" type="video/mp4">
                                 Browser tidak mendukung video.
                             </video>
@@ -147,7 +147,7 @@
                     <!-- Video 2 -->
                     <div class="col-md-6 col-lg-4">
                         <div class="testimoni-card">
-                            <video autoplay muted loop playsinline controls>
+                            <video playsinline controls>
                                 <source src="{{ asset('dist/adminlte/img/testi_2.mp4') }}" type="video/mp4">
                                 Browser tidak mendukung video.
                             </video>

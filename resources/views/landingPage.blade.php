@@ -116,8 +116,8 @@
         }
 
         /* .select2-container {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        z-index: 9999 !important;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        margin-bottom: 1rem !important; */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            z-index: 9999 !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            margin-bottom: 1rem !important; */
         /* Menjamin dropdown tampil di atas modal */
         /* } */
 
@@ -393,7 +393,7 @@
 
                     <div class="carousel-item active">
                         <a href="{{ route('testimoni') }}" class="banner-link">
-                            <img src="{{ asset('dist/adminlte/img/bannertesti.png') }}" class="d-block w-100 carousel-img">
+                            <img src="{{ asset('dist/adminlte/img/bannertesti.jpg') }}" class="d-block w-100 carousel-img">
 
                             <div class="banner-overlay">
                                 <span class="banner-btn">Lihat Testimoni</span>
