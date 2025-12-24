@@ -34,7 +34,7 @@ class UserController extends Controller
         /**
          * Get All User
          */
-        $users = User::whereNull('deleted_at')->get();
+        $users = User::whereNull('deleted_at');
 
         /**
          * Datatable Configuration

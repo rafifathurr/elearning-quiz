@@ -60,10 +60,10 @@
         }
 
         /* .select2-container {
-                                                        z-index: 9999 !important;
-                                                        margin-bottom: 1rem !important;
+                                                                                z-index: 9999 !important;
+                                                                                margin-bottom: 1rem !important;
 
-                                                    } */
+                                                                            } */
 
         .select2-container .select2-selection--multiple {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
@@ -139,6 +139,19 @@
             border-radius: 50%;
             width: 45px;
             height: 45px;
+        }
+
+        .carousel-indicators li {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            margin: 0 6px;
+            border: none;
+        }
+
+        .carousel-indicators .active {
+            background-color: #ffffff;
         }
 
         .banner-link {

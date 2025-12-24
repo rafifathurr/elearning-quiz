@@ -28,6 +28,9 @@
             responsive: true,
             processing: true,
             serverSide: true,
+            order: [
+                [1, 'asc']
+            ],
             ajax: {
                 url: url,
                 error: function(xhr, error, code) {
